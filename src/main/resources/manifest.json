@@ -1,0 +1,19 @@
+{
+    "Group": "chonbosmods",
+    "Name": "ChonbosChemistry",
+    "Version": "0.1.0",
+    "Description": "Chonbo's Chemistry is a foundational chemistry library for Hytale: a shared substance data model, a radiation engine, and a payload-agnostic containment/affliction system, with a clean API for an interconnected family of chemistry mods to build on.",
+    "Authors": [
+        {
+            "Name": "Chonbo",
+            "Url": "https://github.com/ChonbosMods"
+        }
+    ],
+    "Website": "https://github.com/ChonbosMods/ChonbosChemistry",
+    "DisabledByDefault": false,
+    "IncludesAssetPack": false,
+    "Dependencies": {},
+    "OptionalDependencies": {},
+    "ServerVersion": "0.5.x",
+    "Main": "com.chonbosmods.chemistry.ChonbosChemistry"
+}
