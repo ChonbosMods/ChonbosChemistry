@@ -90,7 +90,7 @@ All in `com.chonbosmods.chemistry.api.substance` unless noted.
 
 The wire values are human-readable and do not match Java constant names. Each enum carries an explicit `jsonValue` and maps via a reusable **`StringMappedCodec<E>`** in `api.shim` (wraps `Codec.STRING` + a `Map<String,E>` lookup; avoids the deprecated `FunctionCodec`). Data stays readable; the Java side stays typed.
 
-**Implementation note:** verify `EnumCodec`'s actual style behavior against the 0.5.3 server source first. If it supports a configurable style that matches the wire values, use it; otherwise `StringMappedCodec` is the robust fallback and the default plan.
+**Confirmed (de-risk spike, 2026-06-01):** `EnumCodec`'s default `CAMEL_CASE` style formats constants to PascalCase concatenations (`SOLID`→`"Solid"`, `BETA_MINUS`→`"BetaMinus"`, `CONTACT_ONLY`→`"ContactOnly"`) and matches case-sensitively. The spike showed it accepts only `"Solid"` and rejects `"solid"`/`"SOLID"`. It cannot read our readable wire values, so `StringMappedCodec` is the chosen path (not a fallback).
 
 ---
 
@@ -107,7 +107,7 @@ The wire values are human-readable and do not match Java constant names. Each en
 
 ## 6. Codecs
 
-Each bean exposes `public static final BuilderCodec<T> CODEC`, in `api.substance`. `Color` and the enums use `StringMappedCodec`. `Substance`'s shared fields are appended to the Element and Compound builders via a shared package-private helper to avoid duplication (Hytale's parent-codec inheritance wants a concrete buildable parent, which an abstract `Substance` is not).
+Each bean exposes `public static final BuilderCodec<T> CODEC`, in `api.substance`. `Color` and the enums use `StringMappedCodec`. `Substance`'s shared fields go in an abstract parent codec via **`BuilderCodec.abstractBuilder(Substance.class)`** (confirmed to exist in 0.5.3), and each leaf is `BuilderCodec.builder(Element.class, Element::new, Substance.ABSTRACT_CODEC).append(...)`. This uses Hytale's own parent-codec inheritance for the shared fields rather than a hand-rolled helper.
 
 ---
 
@@ -159,7 +159,7 @@ For each `data/*.json` file, decode every record through its `CODEC` and assert:
 2. **Spot values:** Fe `atomicNumber`=26 and category transition metal; U-235 `fissile`=true; H₂O `molarMass`≈18.015; Be-10 `halfLife`="1.387 My"; CuSO₄ `Color` ≈ blue.
 3. **Round-trip:** decode→encode→decode on a sample of each type, asserting symmetry.
 
-**Implementation note (gating):** confirm the codec's standalone decode entry point (likely `BsonUtil` / a document reader) runs in a plain unit test without a server bootstrap. If it does not, that is a finding to resolve before claiming the schema works, possibly via a minimal harness.
+**Confirmed (de-risk spike, 2026-06-01):** the standalone decode entry point is `codec.decodeJson(RawJsonReader.fromJsonString(json) | RawJsonReader.fromPath(path, buffer), EmptyExtraInfo.EMPTY)`. The spike decoded a `BuilderCodec` bean in a plain run with no server bootstrap (and `encode` round-tripped). The 2-arg `decodeJson(reader, extraInfo)` is the non-deprecated form; `EmptyExtraInfo.EMPTY` is deprecated but functional for tests/loading. No special harness needed. (Keep validators minimal: asset-cross-reference validators would reach for registries; plain fields do not.)
 
 ---
 
