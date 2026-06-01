@@ -85,7 +85,7 @@ All in `com.chonbosmods.chemistry.api.substance` unless noted.
 - `RadiationVector`: penetrating, contact-only, none
 - `DominantEmission`: alpha, beta-minus, beta-plus, gamma, neutron, electron-capture, X-ray, none
 - `ExposureRoute`: inhale, ingest, contact
-- `Onset`: acute, delayed
+- `Onset`: acute, delayed, chronic, acute/chronic (the last is a composite "both" value; the real compound data uses all four — discovered during the integration test)
 - `ValueConfidence`: measured, estimated
 
 The wire values are human-readable and do not match Java constant names. Each enum carries an explicit `jsonValue` and maps via a reusable **`StringMappedCodec<E>`** in `api.shim` (wraps `Codec.STRING` + a `Map<String,E>` lookup; avoids the deprecated `FunctionCodec`). Data stays readable; the Java side stays typed.
