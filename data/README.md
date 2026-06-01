@@ -16,6 +16,7 @@ gameplay MVP roster: expect a curation pass before it feeds `api.substance`.
 | `isotopes/batchE_Z81-100.json` | 109 | Actinides; fissile/fertile flags and RTG decay heat. |
 | `isotopes/batchF_Z101-118.json` | 49 | Superheavies; all `estimated` confidence. |
 | **Total isotopes** | **673** | Every isotope referenced by `elements.json` `isotopeSymbols` exists here (verified, no orphans). |
+| `compounds.json` | 153 | Acids, bases, salts, oxides, alloys, organics + notable poisons. Molar mass verified consistent with composition; includes the toxicity lens (route/potency/effect/onset/antidote) and isotopically-specific radioactive forms (UO₂, UF₆, PuO₂, Cs-137 chloride, …). |
 
 ## Provenance
 
@@ -44,8 +45,14 @@ conformance, link integrity, internal consistency, and accuracy spot-checks befo
 - **Be-10 half-life** uses the modern 1.387 My value (Korschinek/Chmeleff 2010), superseding
   the older 1.51 My figure; `specificActivity` and `decayHeat` are derived accordingly.
 
+- **`compoundType`** is typed by functional category (acid/base/salt/oxide/alloy/organic),
+  preferring the specific descriptor over the generic `molecular`/`ionic` — so those two enum
+  values go unused (H₂O→oxide, NH₃→base, CH₄→organic, NaCl→salt). `other` holds notable poisons
+  that fit no functional bucket. Downstream code should not expect `molecular`/`ionic` to appear.
+- **`isRadioactive`** on compounds is isotope-aware, not element-aware: a compound is flagged
+  radioactive when its *form* is (e.g. Cs-137 chloride is `true` though elemental Cs has a stable
+  isotope). Do not infer it from constituent element symbols alone.
+
 ## Pending
 
-- **Compounds** (`compounds.json`) — acids, bases, salts, oxides, alloys, organics, plus the
-  toxicity lens — not yet generated.
 - **Curation** — trim to the MVP substance roster; the full set is intentionally broad.

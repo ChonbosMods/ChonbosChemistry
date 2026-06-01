@@ -1,0 +1,5783 @@
+[
+  {
+    "name": "Sulfuric acid",
+    "formula": "H2SO4",
+    "composition": {
+      "H": 2,
+      "S": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 98.072,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.83,
+    "representativeColorHex": "#EFEFE0",
+    "appearance": "colorless to slightly yellow oily liquid",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "severe — causes chemical burns",
+      "effect": "corrosive burns; respiratory damage from vapor/mist",
+      "onset": "acute",
+      "durationNote": "immediate tissue damage",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigate with water; no chemical antidote"
+    },
+    "isRadioactive": false,
+    "notes": "dilution is strongly exothermic — add acid to water, never the reverse",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Hydrochloric acid",
+    "formula": "HCl",
+    "composition": {
+      "H": 1,
+      "Cl": 1
+    },
+    "molarMass_g_per_mol": 36.458,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.18,
+    "representativeColorHex": "#F0F8FF",
+    "appearance": "colorless to faint yellow fuming liquid (aqueous)",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "severe — corrosive",
+      "effect": "skin/eye burns; respiratory irritation from HCl gas",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation with water"
+    },
+    "isRadioactive": false,
+    "notes": "aqueous solution of hydrogen chloride gas; stomach acid component",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Nitric acid",
+    "formula": "HNO3",
+    "composition": {
+      "H": 1,
+      "N": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 63.012,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.51,
+    "representativeColorHex": "#FFF8DC",
+    "appearance": "colorless to yellow fuming liquid",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "severe — corrosive oxidizer",
+      "effect": "yellow staining burns (xanthoproteic); NOx inhalation injury",
+      "onset": "acute",
+      "durationNote": "immediate; pulmonary edema may be delayed",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation; supportive respiratory care"
+    },
+    "isRadioactive": false,
+    "notes": "",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Phosphoric acid",
+    "formula": "H3PO4",
+    "composition": {
+      "H": 3,
+      "P": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 97.9938,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.69,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless viscous liquid or solid",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact"
+      ],
+      "potencyNote": "moderate — irritant/corrosive",
+      "effect": "skin and eye irritation/burns",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "food-grade used as acidulant in colas",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Acetic acid",
+    "formula": "CH3COOH",
+    "composition": {
+      "C": 2,
+      "H": 4,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 60.052,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.05,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless liquid with pungent vinegar odor",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "moderate (concentrated)",
+      "effect": "glacial form burns skin; dilute (vinegar) is edible",
+      "onset": "acute",
+      "durationNote": "immediate for concentrated",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "vinegar is ~4-8% acetic acid",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Citric acid",
+    "formula": "C6H8O7",
+    "composition": {
+      "C": 6,
+      "H": 8,
+      "O": 7
+    },
+    "molarMass_g_per_mol": 192.123,
+    "compoundType": "acid",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.66,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline powder",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact"
+      ],
+      "potencyNote": "low — mild irritant",
+      "effect": "mild eye/skin irritation; edible in food amounts",
+      "onset": "acute",
+      "durationNote": "transient",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "weak acid abundant in citrus; common chelator and preservative",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Carbonic acid",
+    "formula": "H2CO3",
+    "composition": {
+      "H": 2,
+      "C": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 62.024,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.0,
+    "representativeColorHex": "#F5FFFA",
+    "appearance": "exists only in solution (CO2 in water)",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "unstable; equilibrium of dissolved CO2; gives carbonated water its acidity",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Hydrofluoric acid",
+    "formula": "HF",
+    "composition": {
+      "H": 1,
+      "F": 1
+    },
+    "molarMass_g_per_mol": 20.0064,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.15,
+    "representativeColorHex": "#F0FFFF",
+    "appearance": "colorless fuming liquid (aqueous)",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "extreme — deceptively severe",
+      "effect": "deep, often painless burns; fluoride causes systemic hypocalcemia and cardiac arrhythmia",
+      "onset": "delayed",
+      "durationNote": "burns progress for hours; small skin exposures can be fatal",
+      "bioaccumulation": "none",
+      "antidoteNote": "calcium gluconate gel/injection; IV calcium"
+    },
+    "isRadioactive": false,
+    "notes": "dissolves glass; one of the most dangerous common lab acids",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Hydrocyanic acid",
+    "formula": "HCN",
+    "composition": {
+      "H": 1,
+      "C": 1,
+      "N": 1
+    },
+    "molarMass_g_per_mol": 27.026,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.69,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless volatile liquid/gas, faint bitter-almond odor",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "ingest",
+        "contact"
+      ],
+      "potencyNote": "extreme — rapidly lethal",
+      "effect": "blocks cytochrome c oxidase → histotoxic hypoxia",
+      "onset": "acute",
+      "durationNote": "seconds to minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "hydroxocobalamin; sodium thiosulfate; amyl/sodium nitrite"
+    },
+    "isRadioactive": false,
+    "notes": "weak acid; the molecular form of cyanide; industrial and combustion hazard",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Boric acid",
+    "formula": "H3BO3",
+    "composition": {
+      "H": 3,
+      "B": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 61.831,
+    "compoundType": "acid",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.44,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline powder",
+    "waterSolubility": "moderate",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low-moderate",
+      "effect": "GI upset; chronic exposure toxic; insecticidal",
+      "onset": "acute",
+      "durationNote": "gradual",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "mild antiseptic and insecticide",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Formic acid",
+    "formula": "HCOOH",
+    "composition": {
+      "C": 1,
+      "H": 2,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 46.025,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.22,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless liquid, pungent odor",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "moderate-severe",
+      "effect": "burns; metabolic acidosis if ingested",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "simplest carboxylic acid; ant/sting venom component",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Oxalic acid",
+    "formula": "C2H2O4",
+    "composition": {
+      "C": 2,
+      "H": 2,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 90.034,
+    "compoundType": "acid",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.9,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "contact"
+      ],
+      "potencyNote": "toxic",
+      "effect": "binds calcium → hypocalcemia; kidney stones/failure (oxalate)",
+      "onset": "acute",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "calcium salts; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "found in rhubarb leaves; rust/stain remover",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Lactic acid",
+    "formula": "C3H6O3",
+    "composition": {
+      "C": 3,
+      "H": 6,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 90.078,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.21,
+    "representativeColorHex": "#FFFFF0",
+    "appearance": "colorless to yellow syrupy liquid",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact"
+      ],
+      "potencyNote": "low — mild irritant",
+      "effect": "mild irritation; metabolite in the body",
+      "onset": "acute",
+      "durationNote": "transient",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "produced by muscle metabolism and fermentation",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Perchloric acid",
+    "formula": "HClO4",
+    "composition": {
+      "H": 1,
+      "Cl": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 100.454,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.77,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless fuming liquid",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": true,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "severe",
+      "effect": "corrosive burns; strong oxidizer, explosion risk with organics",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "one of the strongest acids; concentrated/hot form is a powerful, dangerous oxidizer",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sulfurous acid",
+    "formula": "H2SO3",
+    "composition": {
+      "H": 2,
+      "S": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 82.073,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.03,
+    "representativeColorHex": "#FFFFF0",
+    "appearance": "colorless solution, sharp sulfur odor",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "moderate",
+      "effect": "respiratory irritation (SO2); mucous-membrane irritation",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air; irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "dissolved SO2 in water; unstable",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Nitrous acid",
+    "formula": "HNO2",
+    "composition": {
+      "H": 1,
+      "N": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 47.013,
+    "compoundType": "acid",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.0,
+    "representativeColorHex": "#FFFFF0",
+    "appearance": "pale blue solution; unstable",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "moderate; potential carcinogen precursor",
+      "effect": "forms carcinogenic nitrosamines",
+      "onset": "chronic",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "exists only in cold dilute solution; used in diazotization",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium hydroxide",
+    "formula": "NaOH",
+    "composition": {
+      "Na": 1,
+      "O": 1,
+      "H": 1
+    },
+    "molarMass_g_per_mol": 39.9968,
+    "compoundType": "base",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.13,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white deliquescent pellets/flakes",
+    "waterSolubility": "high (exothermic)",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "severe — caustic",
+      "effect": "liquefactive necrosis; deep burns; eye damage",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "copious irrigation; no chemical antidote"
+    },
+    "isRadioactive": false,
+    "notes": "lye/caustic soda; used in soap-making and drain cleaner",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Potassium hydroxide",
+    "formula": "KOH",
+    "composition": {
+      "K": 1,
+      "O": 1,
+      "H": 1
+    },
+    "molarMass_g_per_mol": 56.1053,
+    "compoundType": "base",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.04,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white deliquescent solid",
+    "waterSolubility": "high (exothermic)",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact"
+      ],
+      "potencyNote": "severe — caustic",
+      "effect": "severe burns; eye damage",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "caustic potash; soft-soap and electrolyte use",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Calcium hydroxide",
+    "formula": "Ca(OH)2",
+    "composition": {
+      "Ca": 1,
+      "O": 2,
+      "H": 2
+    },
+    "molarMass_g_per_mol": 74.092,
+    "compoundType": "base",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.21,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white powder",
+    "waterSolubility": "low",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "moderate",
+      "effect": "alkaline irritation/burns; respiratory irritation",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "slaked lime; mortar, water treatment, 'limewater'",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ammonia",
+    "formula": "NH3",
+    "composition": {
+      "N": 1,
+      "H": 3
+    },
+    "molarMass_g_per_mol": 17.031,
+    "compoundType": "base",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00073,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless gas, pungent sharp odor",
+    "waterSolubility": "very high",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "toxic/corrosive",
+      "effect": "airway and mucous-membrane burns; pulmonary edema at high levels",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air; irrigation; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "density given as gas at STP; fertilizer feedstock and refrigerant; colorless (white hex is placeholder)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ammonium hydroxide",
+    "formula": "NH4OH",
+    "composition": {
+      "N": 1,
+      "H": 5,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 35.046,
+    "compoundType": "base",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.9,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless solution, pungent odor",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "moderate-severe",
+      "effect": "irritant/corrosive to eyes, skin, airways",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "aqueous ammonia ('household ammonia' when dilute)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Magnesium hydroxide",
+    "formula": "Mg(OH)2",
+    "composition": {
+      "Mg": 1,
+      "O": 2,
+      "H": 2
+    },
+    "molarMass_g_per_mol": 58.319,
+    "compoundType": "base",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.34,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white powder",
+    "waterSolubility": "very low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low",
+      "effect": "mild laxative/antacid; large doses cause diarrhea",
+      "onset": "acute",
+      "durationNote": "gradual",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "milk of magnesia",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Aluminium hydroxide",
+    "formula": "Al(OH)3",
+    "composition": {
+      "Al": 1,
+      "O": 3,
+      "H": 3
+    },
+    "molarMass_g_per_mol": 78.0025,
+    "compoundType": "base",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.42,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white amorphous powder",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low",
+      "effect": "antacid; generally well tolerated",
+      "onset": "acute",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "amphoteric; antacid and flame retardant",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Lithium hydroxide",
+    "formula": "LiOH",
+    "composition": {
+      "Li": 1,
+      "O": 1,
+      "H": 1
+    },
+    "molarMass_g_per_mol": 23.947,
+    "compoundType": "base",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.46,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white hygroscopic solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact"
+      ],
+      "potencyNote": "moderate-severe",
+      "effect": "caustic burns",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "CO2 scrubber in spacecraft/submarines; battery and grease use",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Barium hydroxide",
+    "formula": "Ba(OH)2",
+    "composition": {
+      "Ba": 1,
+      "O": 2,
+      "H": 2
+    },
+    "molarMass_g_per_mol": 171.341,
+    "compoundType": "base",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.74,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white granular solid",
+    "waterSolubility": "moderate",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "contact"
+      ],
+      "potencyNote": "toxic + caustic",
+      "effect": "caustic burns; soluble barium is a muscle/cardiac toxin",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation; ingestion: sulfate salts to precipitate barium"
+    },
+    "isRadioactive": false,
+    "notes": "soluble barium compounds are toxic, unlike insoluble barium sulfate",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium chloride",
+    "formula": "NaCl",
+    "composition": {
+      "Na": 1,
+      "Cl": 1
+    },
+    "molarMass_g_per_mol": 58.4398,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.16,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low (essential nutrient); harmful in excess",
+      "effect": "hypernatremia/dehydration in massive excess",
+      "onset": "acute",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "table/rock salt; essential electrolyte; food preservation",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Potassium chloride",
+    "formula": "KCl",
+    "composition": {
+      "K": 1,
+      "Cl": 1
+    },
+    "molarMass_g_per_mol": 74.5483,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.98,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low orally; toxic IV in bolus",
+      "effect": "cardiac arrest if rapidly infused (hyperkalemia)",
+      "onset": "acute",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "salt substitute; fertilizer (potash)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Potassium nitrate",
+    "formula": "KNO3",
+    "composition": {
+      "K": 1,
+      "N": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 101.1023,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.11,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low-moderate",
+      "effect": "GI irritation; methemoglobinemia in large doses",
+      "onset": "acute",
+      "durationNote": "gradual",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "saltpeter; oxidizer in black powder, fertilizer, food curing",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium nitrate",
+    "formula": "NaNO3",
+    "composition": {
+      "Na": 1,
+      "N": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 84.9938,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.26,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low-moderate",
+      "effect": "methemoglobinemia; nitrosamine precursor",
+      "onset": "acute",
+      "durationNote": "gradual",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "Chile saltpeter; fertilizer and curing agent",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ammonium nitrate",
+    "formula": "NH4NO3",
+    "composition": {
+      "N": 2,
+      "H": 4,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 80.043,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.72,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white/grey hygroscopic prills",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": true,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "low-moderate",
+      "effect": "irritant; methemoglobinemia in excess",
+      "onset": "acute",
+      "durationNote": "gradual",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "major fertilizer and a strong oxidizer; detonable when contaminated/confined (industrial disaster history)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ammonium chloride",
+    "formula": "NH4Cl",
+    "composition": {
+      "N": 1,
+      "H": 4,
+      "Cl": 1
+    },
+    "molarMass_g_per_mol": 53.489,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.53,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low-moderate",
+      "effect": "acidosis/GI upset in large doses",
+      "onset": "acute",
+      "durationNote": "gradual",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "sal ammoniac; flux, electrolyte, expectorant",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ammonium sulfate",
+    "formula": "(NH4)2SO4",
+    "composition": {
+      "N": 2,
+      "H": 8,
+      "S": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 132.134,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.77,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white/tan crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low",
+      "effect": "mild irritant",
+      "onset": "acute",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "widely used nitrogen fertilizer",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Calcium carbonate",
+    "formula": "CaCO3",
+    "composition": {
+      "Ca": 1,
+      "C": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 100.086,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.71,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white powder or crystalline (calcite/limestone)",
+    "waterSolubility": "insoluble (dissolves in acid)",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low — antacid/supplement",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "limestone, chalk, marble, shells; antacid and building material",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium carbonate",
+    "formula": "Na2CO3",
+    "composition": {
+      "Na": 2,
+      "C": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 105.9875,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.54,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white powder",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "ingest"
+      ],
+      "potencyNote": "moderate — alkaline irritant",
+      "effect": "eye/skin/GI irritation",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "washing soda / soda ash; glassmaking, cleaning, pH control",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium bicarbonate",
+    "formula": "NaHCO3",
+    "composition": {
+      "Na": 1,
+      "H": 1,
+      "C": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 84.0058,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.2,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline powder",
+    "waterSolubility": "moderate",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low — edible (baking soda)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "baking soda; mild antacid, leavening, fire suppression",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Potassium carbonate",
+    "formula": "K2CO3",
+    "composition": {
+      "K": 2,
+      "C": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 138.2046,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.43,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white hygroscopic powder",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact"
+      ],
+      "potencyNote": "moderate — alkaline irritant",
+      "effect": "irritation/burns",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "potash; glass, soap, and food (pretzels) use",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Calcium sulfate",
+    "formula": "CaSO4",
+    "composition": {
+      "Ca": 1,
+      "S": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 136.134,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.96,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white powder (gypsum/anhydrite)",
+    "waterSolubility": "low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "gypsum/plaster of Paris/drywall; desiccant; tofu coagulant",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Magnesium sulfate",
+    "formula": "MgSO4",
+    "composition": {
+      "Mg": 1,
+      "S": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 120.361,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.66,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low",
+      "effect": "laxative; large IV doses cause hypotension/CNS depression",
+      "onset": "acute",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": "calcium gluconate (for hypermagnesemia)"
+    },
+    "isRadioactive": false,
+    "notes": "Epsom salt; bath soak, laxative, eclampsia treatment",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Copper(II) sulfate",
+    "formula": "CuSO4",
+    "composition": {
+      "Cu": 1,
+      "S": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 159.602,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.6,
+    "representativeColorHex": "#1E6FE0",
+    "appearance": "blue crystalline solid (pentahydrate); white when anhydrous",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "contact"
+      ],
+      "potencyNote": "moderate-toxic",
+      "effect": "GI corrosion, hemolysis, liver/kidney injury in quantity",
+      "onset": "acute",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive; chelation in severe cases"
+    },
+    "isRadioactive": false,
+    "notes": "blue vitriol; fungicide, algaecide, electroplating",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Iron(II) sulfate",
+    "formula": "FeSO4",
+    "composition": {
+      "Fe": 1,
+      "S": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 151.901,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.84,
+    "representativeColorHex": "#7FB77E",
+    "appearance": "pale blue-green crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "moderate; serious pediatric overdose risk",
+      "effect": "GI corrosion, metabolic acidosis, liver injury (iron toxicity)",
+      "onset": "acute",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "deferoxamine (iron chelator)"
+    },
+    "isRadioactive": false,
+    "notes": "copperas/green vitriol; iron supplement, water treatment",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Zinc sulfate",
+    "formula": "ZnSO4",
+    "composition": {
+      "Zn": 1,
+      "S": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 161.436,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.54,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low-moderate",
+      "effect": "GI irritation/emetic; excess impairs copper absorption",
+      "onset": "acute",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "dietary zinc source, mordant, wood preservative",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Calcium chloride",
+    "formula": "CaCl2",
+    "composition": {
+      "Ca": 1,
+      "Cl": 2
+    },
+    "molarMass_g_per_mol": 110.978,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.15,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white deliquescent solid",
+    "waterSolubility": "very high (exothermic)",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "ingest"
+      ],
+      "potencyNote": "low-moderate",
+      "effect": "irritation; concentrated solution mildly corrosive",
+      "onset": "acute",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "de-icer, desiccant, road dust control; dissolution releases heat",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Magnesium chloride",
+    "formula": "MgCl2",
+    "composition": {
+      "Mg": 1,
+      "Cl": 2
+    },
+    "molarMass_g_per_mol": 95.205,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.32,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white deliquescent solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low",
+      "effect": "laxative effect in excess",
+      "onset": "acute",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "de-icer, tofu coagulant (nigari), dust control",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Potassium permanganate",
+    "formula": "KMnO4",
+    "composition": {
+      "K": 1,
+      "Mn": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 158.0323,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.7,
+    "representativeColorHex": "#4B0F52",
+    "appearance": "dark purple crystalline solid",
+    "waterSolubility": "high (purple solution)",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "contact"
+      ],
+      "potencyNote": "moderate-toxic",
+      "effect": "corrosive oxidizer; GI burns, airway edema if concentrated",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation; dilution"
+    },
+    "isRadioactive": false,
+    "notes": "strong oxidizer; disinfectant, water treatment, survival fire-starting/antiseptic",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium thiosulfate",
+    "formula": "Na2S2O3",
+    "composition": {
+      "Na": 2,
+      "S": 2,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 158.0965,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.67,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low — used medicinally",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "photographic fixer ('hypo'); chlorine neutralizer; itself a cyanide antidote",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Silver nitrate",
+    "formula": "AgNO3",
+    "composition": {
+      "Ag": 1,
+      "N": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 169.8722,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 4.35,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless/white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "ingest"
+      ],
+      "potencyNote": "moderate-toxic",
+      "effect": "caustic; chronic exposure causes argyria (grey skin)",
+      "onset": "acute/chronic",
+      "durationNote": "immediate burns; argyria is permanent",
+      "bioaccumulation": "silver deposits in skin",
+      "antidoteNote": "irrigation; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "cauterizing agent, antiseptic, photography; stains skin black",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium sulfate",
+    "formula": "Na2SO4",
+    "composition": {
+      "Na": 2,
+      "S": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 142.0355,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.66,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low",
+      "effect": "osmotic laxative in quantity",
+      "onset": "acute",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "Glauber's salt; detergents, glassmaking, thermal storage",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium fluoride",
+    "formula": "NaF",
+    "composition": {
+      "Na": 1,
+      "F": 1
+    },
+    "molarMass_g_per_mol": 41.9882,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.56,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "moderate",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "toxic in quantity",
+      "effect": "GI distress, hypocalcemia, cardiac effects; chronic excess → fluorosis",
+      "onset": "acute/chronic",
+      "durationNote": "hours",
+      "bioaccumulation": "skeletal accumulation",
+      "antidoteNote": "calcium/magnesium; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "water fluoridation, toothpaste, pesticide",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Borax",
+    "formula": "Na2B4O7.10H2O",
+    "composition": {
+      "Na": 2,
+      "B": 4,
+      "O": 17,
+      "H": 20
+    },
+    "molarMass_g_per_mol": 381.3625,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.73,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white/colorless crystalline powder",
+    "waterSolubility": "moderate",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "contact"
+      ],
+      "potencyNote": "low-moderate",
+      "effect": "irritation; reproductive toxicant in high chronic doses",
+      "onset": "acute/chronic",
+      "durationNote": "gradual",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "sodium tetraborate decahydrate (the common household 'borax'); cleaning, flux, slime, insecticide",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium hypochlorite",
+    "formula": "NaOCl",
+    "composition": {
+      "Na": 1,
+      "O": 1,
+      "Cl": 1
+    },
+    "molarMass_g_per_mol": 74.4388,
+    "compoundType": "salt",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.11,
+    "representativeColorHex": "#F0FFE0",
+    "appearance": "pale greenish-yellow solution",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale",
+        "ingest"
+      ],
+      "potencyNote": "moderate-toxic",
+      "effect": "corrosive; mixing with acid/ammonia releases chlorine/chloramine gas",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "liquid bleach (~3-8%); disinfectant; never mix with ammonia or acids",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Calcium phosphate",
+    "formula": "Ca3(PO4)2",
+    "composition": {
+      "Ca": 3,
+      "P": 2,
+      "O": 8
+    },
+    "molarMass_g_per_mol": 310.1735,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.14,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white amorphous solid",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low — biological mineral",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "main mineral of bone and teeth; fertilizer feedstock",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Potassium iodide",
+    "formula": "KI",
+    "composition": {
+      "K": 1,
+      "I": 1
+    },
+    "molarMass_g_per_mol": 166.0028,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.12,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low at normal dose",
+      "effect": "iodism/thyroid effects with excess",
+      "onset": "acute/chronic",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "thyroid-blocking agent in radiation emergencies; dietary iodine, expectorant",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium nitrite",
+    "formula": "NaNO2",
+    "composition": {
+      "Na": 1,
+      "N": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 68.9948,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.17,
+    "representativeColorHex": "#FFF8E7",
+    "appearance": "white to pale yellow solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "toxic",
+      "effect": "methemoglobinemia (impairs O2 transport); hypotension",
+      "onset": "acute",
+      "durationNote": "under an hour",
+      "bioaccumulation": "none",
+      "antidoteNote": "methylene blue (for methemoglobinemia)"
+    },
+    "isRadioactive": false,
+    "notes": "meat curing (anti-botulinum), corrosion inhibitor; also a cyanide antidote",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Potassium chlorate",
+    "formula": "KClO3",
+    "composition": {
+      "K": 1,
+      "Cl": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 122.5453,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.32,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "moderate",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": true,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "toxic",
+      "effect": "methemoglobinemia, hemolysis, kidney injury",
+      "onset": "acute",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive; methylene blue"
+    },
+    "isRadioactive": false,
+    "notes": "strong oxidizer; matches, pyrotechnics, oxygen candles; explosive with fuels/friction",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ammonium perchlorate",
+    "formula": "NH4ClO4",
+    "composition": {
+      "N": 1,
+      "H": 4,
+      "Cl": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 117.485,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.95,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": true,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "moderate",
+      "effect": "perchlorate disrupts thyroid iodine uptake",
+      "onset": "acute/chronic",
+      "durationNote": "gradual",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "solid-rocket-propellant oxidizer; powerful oxidizer",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Lead(II) nitrate",
+    "formula": "Pb(NO3)2",
+    "composition": {
+      "Pb": 1,
+      "N": 2,
+      "O": 6
+    },
+    "molarMass_g_per_mol": 331.208,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 4.53,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "toxic, cumulative",
+      "effect": "lead poisoning: neurotoxicity, anemia, kidney/GI effects",
+      "onset": "chronic",
+      "durationNote": "builds over time",
+      "bioaccumulation": "accumulates in bone",
+      "antidoteNote": "chelation (EDTA, DMSA, BAL)"
+    },
+    "isRadioactive": false,
+    "notes": "soluble lead salt; historically a mordant and oxidizer",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Barium sulfate",
+    "formula": "BaSO4",
+    "composition": {
+      "Ba": 1,
+      "S": 1,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 233.383,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 4.49,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white insoluble powder",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low — insoluble (unlike soluble barium salts)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "radiocontrast 'barium meal'; insolubility makes it non-toxic where soluble barium is poisonous",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Potassium dichromate",
+    "formula": "K2Cr2O7",
+    "composition": {
+      "K": 2,
+      "Cr": 2,
+      "O": 7
+    },
+    "molarMass_g_per_mol": 294.1818,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.68,
+    "representativeColorHex": "#E8501E",
+    "appearance": "bright orange crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale",
+        "ingest"
+      ],
+      "potencyNote": "toxic, carcinogen",
+      "effect": "hexavalent chromium: corrosive, ulcers, carcinogenic, kidney/liver damage",
+      "onset": "acute/chronic",
+      "durationNote": "immediate burns; cancer is chronic",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation; supportive; ascorbic acid reduces Cr(VI)"
+    },
+    "isRadioactive": false,
+    "notes": "Cr(VI) oxidizer; tanning, analytical reagent; significant carcinogen",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Calcium hypochlorite",
+    "formula": "Ca(ClO)2",
+    "composition": {
+      "Ca": 1,
+      "Cl": 2,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 142.976,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.35,
+    "representativeColorHex": "#FFFFF0",
+    "appearance": "white granular solid, chlorine odor",
+    "waterSolubility": "high (reacts)",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact",
+        "ingest"
+      ],
+      "potencyNote": "moderate-toxic",
+      "effect": "corrosive; releases chlorine gas with acid",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation; fresh air"
+    },
+    "isRadioactive": false,
+    "notes": "'pool chlorine'/bleaching powder; water disinfection",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium silicate",
+    "formula": "Na2SiO3",
+    "composition": {
+      "Na": 2,
+      "Si": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 122.0615,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.4,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless to white glassy solid or syrupy solution",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact"
+      ],
+      "potencyNote": "moderate — alkaline",
+      "effect": "irritant/corrosive to eyes and skin",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "water glass; adhesive, sealant, egg preservation, detergent builder",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Water",
+    "formula": "H2O",
+    "composition": {
+      "H": 2,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 18.015,
+    "compoundType": "oxide",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.0,
+    "representativeColorHex": "#CFE8FF",
+    "appearance": "colorless, odorless liquid",
+    "waterSolubility": "n/a (is the solvent)",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "essential to life; non-toxic (water intoxication only in extreme excess)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "the universal solvent; colorless (hex is a faint placeholder tint)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Carbon dioxide",
+    "formula": "CO2",
+    "composition": {
+      "C": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 44.009,
+    "compoundType": "oxide",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00198,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless odorless gas",
+    "waterSolubility": "moderate (carbonation)",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "asphyxiant at high concentration",
+      "effect": "displaces oxygen; >~10% causes unconsciousness",
+      "onset": "acute",
+      "durationNote": "minutes at high conc.",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air"
+    },
+    "isRadioactive": false,
+    "notes": "density as gas at STP; respiration/combustion product; dry ice when solid; colorless",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Carbon monoxide",
+    "formula": "CO",
+    "composition": {
+      "C": 1,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 28.01,
+    "compoundType": "oxide",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00125,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless, odorless, tasteless gas",
+    "waterSolubility": "low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "highly toxic — 'silent killer'",
+      "effect": "binds hemoglobin (carboxyhemoglobin) → tissue hypoxia",
+      "onset": "acute",
+      "durationNote": "minutes to hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "100% oxygen; hyperbaric oxygen"
+    },
+    "isRadioactive": false,
+    "notes": "product of incomplete combustion; odorless makes it especially dangerous; colorless",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Silicon dioxide",
+    "formula": "SiO2",
+    "composition": {
+      "Si": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 60.083,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.65,
+    "representativeColorHex": "#F2F2F2",
+    "appearance": "colorless/white crystalline (quartz) or amorphous",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "chronic respiratory hazard (crystalline dust)",
+      "effect": "silicosis and lung cancer from inhaled crystalline silica dust",
+      "onset": "chronic",
+      "durationNote": "years",
+      "bioaccumulation": "lung scarring",
+      "antidoteNote": "none; prevent dust inhalation"
+    },
+    "isRadioactive": false,
+    "notes": "quartz, sand, glass; bulk solid is inert, the hazard is fine dust",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Iron(III) oxide",
+    "formula": "Fe2O3",
+    "composition": {
+      "Fe": 2,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 159.687,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 5.24,
+    "representativeColorHex": "#9B341A",
+    "appearance": "red-brown powder",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (nuisance dust)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "rust/hematite; pigment (red ochre), thermite component",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Iron(II,III) oxide",
+    "formula": "Fe3O4",
+    "composition": {
+      "Fe": 3,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 231.531,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 5.17,
+    "representativeColorHex": "#1C1C1C",
+    "appearance": "black magnetic solid",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (nuisance dust)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "magnetite/lodestone; ferromagnetic; pigment and magnetic media",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Aluminium oxide",
+    "formula": "Al2O3",
+    "composition": {
+      "Al": 2,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 101.9601,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.95,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid (corundum when crystalline)",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "low (nuisance dust)",
+      "effect": "mild respiratory irritation from dust",
+      "onset": "chronic",
+      "durationNote": "n/a",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "alumina/corundum; abrasive, refractory, ruby/sapphire host, aluminium ore intermediate",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Calcium oxide",
+    "formula": "CaO",
+    "composition": {
+      "Ca": 1,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 56.077,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.34,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white caustic solid",
+    "waterSolubility": "reacts with water (exothermic)",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "corrosive",
+      "effect": "alkaline burns; reacts with skin moisture releasing heat",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "brush off dry, then irrigate"
+    },
+    "isRadioactive": false,
+    "notes": "quicklime; cement, steelmaking flux; violent reaction with water makes slaked lime",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Magnesium oxide",
+    "formula": "MgO",
+    "composition": {
+      "Mg": 1,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 40.304,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.58,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white powder",
+    "waterSolubility": "very low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "low; metal-fume fever from fresh fume",
+      "effect": "fume fever (flu-like) from inhaling fresh MgO fume",
+      "onset": "acute",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "magnesia; refractory, antacid, supplement",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sulfur dioxide",
+    "formula": "SO2",
+    "composition": {
+      "S": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 64.058,
+    "compoundType": "oxide",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00293,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless gas, pungent suffocating odor",
+    "waterSolubility": "high (forms sulfurous acid)",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "toxic irritant",
+      "effect": "bronchoconstriction, airway/eye irritation, pulmonary edema",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "density as gas at STP; volcanic/combustion gas, preservative, acid-rain precursor",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sulfur trioxide",
+    "formula": "SO3",
+    "composition": {
+      "S": 1,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 80.057,
+    "compoundType": "oxide",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.92,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless to white fuming liquid/solid",
+    "waterSolubility": "reacts violently with water",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "severe",
+      "effect": "violently forms sulfuric acid on contact with moisture → severe burns",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "reacts with water to make sulfuric acid; oleum component",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Nitrogen dioxide",
+    "formula": "NO2",
+    "composition": {
+      "N": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 46.005,
+    "compoundType": "oxide",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00187,
+    "representativeColorHex": "#A0522D",
+    "appearance": "red-brown gas, sharp odor",
+    "waterSolubility": "reacts with water",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "toxic",
+      "effect": "deep-lung irritant; delayed pulmonary edema",
+      "onset": "delayed",
+      "durationNote": "edema may appear hours later",
+      "bioaccumulation": "none",
+      "antidoteNote": "oxygen; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "brown component of smog/NOx; oxidizer; delayed lung injury is characteristic",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Nitrous oxide",
+    "formula": "N2O",
+    "composition": {
+      "N": 2,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 44.013,
+    "compoundType": "oxide",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00185,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless gas, faint sweet odor",
+    "waterSolubility": "moderate",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "asphyxiant; CNS effects",
+      "effect": "euphoria/anesthesia; oxygen deprivation; chronic use → B12/nerve damage",
+      "onset": "acute/chronic",
+      "durationNote": "seconds",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air/oxygen"
+    },
+    "isRadioactive": false,
+    "notes": "'laughing gas'; anesthetic, propellant, engine oxidizer; supports combustion",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Zinc oxide",
+    "formula": "ZnO",
+    "composition": {
+      "Zn": 1,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 81.379,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 5.61,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white powder",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "low; fresh fume causes metal-fume fever",
+      "effect": "fume fever from welding/galvanizing fumes",
+      "onset": "acute",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "sunscreen, pigment (zinc white), rubber, skin protectant",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Titanium dioxide",
+    "formula": "TiO2",
+    "composition": {
+      "Ti": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 79.865,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 4.23,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "bright white powder",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "low; possible carcinogen as fine dust",
+      "effect": "respiratory effects from prolonged dust inhalation",
+      "onset": "chronic",
+      "durationNote": "years",
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "the standard white pigment; paint, sunscreen, food coloring (E171)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Copper(II) oxide",
+    "formula": "CuO",
+    "composition": {
+      "Cu": 1,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 79.545,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 6.31,
+    "representativeColorHex": "#1C1C1C",
+    "appearance": "black powder",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "moderate",
+      "effect": "GI irritation; metal-fume fever",
+      "onset": "acute",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "black copper oxide; pigment, catalyst, ore",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Hydrogen peroxide",
+    "formula": "H2O2",
+    "composition": {
+      "H": 2,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 34.014,
+    "compoundType": "oxide",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.45,
+    "representativeColorHex": "#F0FFFF",
+    "appearance": "colorless liquid (concentrated has sharp odor)",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "ingest"
+      ],
+      "potencyNote": "low (dilute) to severe (concentrated)",
+      "effect": "bleaching of skin; concentrated causes burns and embolism if ingested",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "strong oxidizer; antiseptic (3%), bleach, rocket monopropellant (high %)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Lead(II) oxide",
+    "formula": "PbO",
+    "composition": {
+      "Pb": 1,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 223.199,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 9.53,
+    "representativeColorHex": "#E8B23A",
+    "appearance": "yellow (litharge) or red solid",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "toxic, cumulative",
+      "effect": "lead poisoning: neuro/hematologic/renal",
+      "onset": "chronic",
+      "durationNote": "builds over time",
+      "bioaccumulation": "accumulates in bone",
+      "antidoteNote": "chelation (EDTA, DMSA)"
+    },
+    "isRadioactive": false,
+    "notes": "litharge; lead glass, ceramics, batteries, historic paint",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Manganese dioxide",
+    "formula": "MnO2",
+    "composition": {
+      "Mn": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 86.936,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 5.03,
+    "representativeColorHex": "#1C1C1C",
+    "appearance": "black/dark-brown powder",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "moderate (chronic)",
+      "effect": "manganism (neurological) from chronic dust/fume inhalation",
+      "onset": "chronic",
+      "durationNote": "years",
+      "bioaccumulation": "CNS accumulation",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "dry-cell battery cathode, catalyst, glass decolorizer, pigment",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Chromium(III) oxide",
+    "formula": "Cr2O3",
+    "composition": {
+      "Cr": 2,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 151.9892,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 5.22,
+    "representativeColorHex": "#2E5A1C",
+    "appearance": "green powder",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (Cr(III), unlike toxic Cr(VI))",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "green pigment (chrome green), abrasive (green rouge); Cr(III) is far less toxic than Cr(VI)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Lead dioxide",
+    "formula": "PbO2",
+    "composition": {
+      "Pb": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 239.198,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 9.38,
+    "representativeColorHex": "#3B2A20",
+    "appearance": "dark brown solid",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "toxic, cumulative",
+      "effect": "lead poisoning; strong oxidizer",
+      "onset": "chronic",
+      "durationNote": "builds over time",
+      "bioaccumulation": "accumulates in bone",
+      "antidoteNote": "chelation"
+    },
+    "isRadioactive": false,
+    "notes": "positive plate in lead-acid batteries; oxidizer",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Tin(IV) oxide",
+    "formula": "SnO2",
+    "composition": {
+      "Sn": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 150.708,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 6.95,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white/off-white powder",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "cassiterite (tin ore); ceramic glaze opacifier, polishing powder, gas sensors",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Dinitrogen tetroxide",
+    "formula": "N2O4",
+    "composition": {
+      "N": 2,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 92.01,
+    "compoundType": "oxide",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.45,
+    "representativeColorHex": "#C8893A",
+    "appearance": "colorless to pale-brown liquid in equilibrium with NO2",
+    "waterSolubility": "reacts",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "highly toxic",
+      "effect": "like NO2: severe lung irritant, delayed edema",
+      "onset": "delayed",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "oxygen; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "storable rocket oxidizer (with hydrazine fuels); equilibrium with NO2",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Carbon steel",
+    "formula": "Fe-C",
+    "composition": {
+      "Fe": 1,
+      "C": 0
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 7.85,
+    "representativeColorHex": "#43464B",
+    "appearance": "lustrous grey metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk metal)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "iron + ~0.05-2% carbon; the workhorse structural alloy; composition is nominal (mass-fraction), molar mass undefined",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Stainless steel",
+    "formula": "Fe-Cr-Ni",
+    "composition": {
+      "Fe": 1,
+      "Cr": 0,
+      "Ni": 0
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 8.0,
+    "representativeColorHex": "#54585C",
+    "appearance": "bright corrosion-resistant grey metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk); nickel can sensitize skin",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "iron + ~10.5-20% Cr + Ni; passive chromium-oxide layer resists corrosion; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Cast iron",
+    "formula": "Fe-C-Si",
+    "composition": {
+      "Fe": 1,
+      "C": 0,
+      "Si": 0
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 7.2,
+    "representativeColorHex": "#3A3A3A",
+    "appearance": "dull grey, brittle metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk metal)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "iron + ~2-4% carbon + silicon; hard, brittle, good in compression; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Brass",
+    "formula": "Cu-Zn",
+    "composition": {
+      "Cu": 1,
+      "Zn": 0
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 8.5,
+    "representativeColorHex": "#C8A951",
+    "appearance": "yellow-gold metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk); zinc fume fever on overheating",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "copper + ~5-45% zinc; ratio sets color/hardness; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Bronze",
+    "formula": "Cu-Sn",
+    "composition": {
+      "Cu": 1,
+      "Sn": 0
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 8.8,
+    "representativeColorHex": "#A86B32",
+    "appearance": "reddish-brown metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk metal)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "copper + ~12% tin (often other elements); harder than copper; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Solder (tin-lead)",
+    "formula": "Sn-Pb",
+    "composition": {
+      "Sn": 63,
+      "Pb": 37
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 8.4,
+    "representativeColorHex": "#B8B8B8",
+    "appearance": "dull silver low-melting metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "lead exposure hazard",
+      "effect": "lead poisoning from fumes/handling (leaded types)",
+      "onset": "chronic",
+      "durationNote": "builds over time",
+      "bioaccumulation": "accumulates in bone",
+      "antidoteNote": "chelation; use lead-free solder"
+    },
+    "isRadioactive": false,
+    "notes": "eutectic 63/37 Sn/Pb melts ~183C; modern lead-free uses Sn-Ag-Cu; composition nominal",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Pewter",
+    "formula": "Sn-Cu-Sb",
+    "composition": {
+      "Sn": 1,
+      "Cu": 0,
+      "Sb": 0
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 7.4,
+    "representativeColorHex": "#8E8E8E",
+    "appearance": "dull silver-grey metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (modern, lead-free); old pewter contained toxic lead",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "~85-99% tin with copper/antimony; tableware; old pewter was lead-bearing; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Sterling silver",
+    "formula": "Ag-Cu",
+    "composition": {
+      "Ag": 925,
+      "Cu": 75
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 10.36,
+    "representativeColorHex": "#E8E8E8",
+    "appearance": "bright white precious metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "92.5% silver + 7.5% copper; jewelry/tableware standard; composition nominal",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "White gold",
+    "formula": "Au-Ni-Pd",
+    "composition": {
+      "Au": 1,
+      "Ni": 0,
+      "Pd": 0
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 15.0,
+    "representativeColorHex": "#E6E6E6",
+    "appearance": "white-silver precious metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk); nickel types can sensitize skin",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "gold alloyed with white metals (Ni or Pd) + often rhodium plated; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Gunmetal",
+    "formula": "Cu-Sn-Zn",
+    "composition": {
+      "Cu": 88,
+      "Sn": 10,
+      "Zn": 2
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 8.7,
+    "representativeColorHex": "#9C7A4D",
+    "appearance": "reddish bronze metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk metal)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "88/10/2 Cu/Sn/Zn; tough, corrosion-resistant; bearings, valves, fittings; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Nichrome",
+    "formula": "Ni-Cr",
+    "composition": {
+      "Ni": 80,
+      "Cr": 20
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 8.4,
+    "representativeColorHex": "#6E6E6E",
+    "appearance": "silver-grey high-resistance metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk metal)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "~80/20 Ni/Cr; high resistivity + oxidation resistance for heating elements; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Duralumin",
+    "formula": "Al-Cu-Mg",
+    "composition": {
+      "Al": 1,
+      "Cu": 0,
+      "Mg": 0
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.8,
+    "representativeColorHex": "#C9CDD0",
+    "appearance": "light silver metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk metal)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "aluminium + ~4% Cu + Mg/Mn; strong and light, aircraft use; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Cupronickel",
+    "formula": "Cu-Ni",
+    "composition": {
+      "Cu": 75,
+      "Ni": 25
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 8.9,
+    "representativeColorHex": "#B6B6B0",
+    "appearance": "silver-grey metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (bulk metal)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "Cu + 10-30% Ni; seawater-corrosion-resistant; coinage, marine hardware; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Wood's metal",
+    "formula": "Bi-Pb-Sn-Cd",
+    "composition": {
+      "Bi": 50,
+      "Pb": 27,
+      "Sn": 13,
+      "Cd": 10
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 9.7,
+    "representativeColorHex": "#9A9A9A",
+    "appearance": "dull silver fusible metal",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "toxic (lead + cadmium)",
+      "effect": "lead and cadmium poisoning hazard",
+      "onset": "chronic",
+      "durationNote": "cumulative",
+      "bioaccumulation": "Pb in bone; Cd in kidney",
+      "antidoteNote": "chelation; avoid food contact"
+    },
+    "isRadioactive": false,
+    "notes": "eutectic melting ~70C; fusible links, sprinklers; toxic constituents; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Dental amalgam",
+    "formula": "Hg-Ag-Sn",
+    "composition": {
+      "Hg": 1,
+      "Ag": 0,
+      "Sn": 0
+    },
+    "molarMass_g_per_mol": null,
+    "compoundType": "alloy",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 11.0,
+    "representativeColorHex": "#C0C0C0",
+    "appearance": "silver metallic paste that hardens",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "low when set; mercury vapor risk during placement/removal",
+      "effect": "mercury vapor exposure (neurotoxic) mainly during handling",
+      "onset": "chronic",
+      "durationNote": "slow",
+      "bioaccumulation": "mercury can accumulate",
+      "antidoteNote": "chelation (for acute Hg)"
+    },
+    "isRadioactive": false,
+    "notes": "~50% mercury bound with silver-tin alloy; set amalgam releases minimal vapor; nominal composition",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Methane",
+    "formula": "CH4",
+    "composition": {
+      "C": 1,
+      "H": 4
+    },
+    "molarMass_g_per_mol": 16.043,
+    "compoundType": "organic",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.000657,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless, odorless flammable gas",
+    "waterSolubility": "very low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "simple asphyxiant",
+      "effect": "displaces oxygen; explosive 5-15% in air",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air"
+    },
+    "isRadioactive": false,
+    "notes": "natural gas main component; potent greenhouse gas; density as gas at STP",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ethane",
+    "formula": "C2H6",
+    "composition": {
+      "C": 2,
+      "H": 6
+    },
+    "molarMass_g_per_mol": 30.07,
+    "compoundType": "organic",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00125,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless, odorless flammable gas",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "simple asphyxiant",
+      "effect": "oxygen displacement",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air"
+    },
+    "isRadioactive": false,
+    "notes": "natural gas component; feedstock for ethylene; density as gas at STP",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Propane",
+    "formula": "C3H8",
+    "composition": {
+      "C": 3,
+      "H": 8
+    },
+    "molarMass_g_per_mol": 44.097,
+    "compoundType": "organic",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00201,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless gas (odorant added)",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "simple asphyxiant",
+      "effect": "oxygen displacement; high concentration narcosis",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air"
+    },
+    "isRadioactive": false,
+    "notes": "LPG fuel; stored liquefied under pressure; density as gas at STP",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Butane",
+    "formula": "C4H10",
+    "composition": {
+      "C": 4,
+      "H": 10
+    },
+    "molarMass_g_per_mol": 58.124,
+    "compoundType": "organic",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00251,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless gas, faint odor",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "simple asphyxiant; cardiac sensitization",
+      "effect": "oxygen displacement; 'sudden sniffing death' from abuse",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air"
+    },
+    "isRadioactive": false,
+    "notes": "lighter fuel, camping stoves; density as gas at STP",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ethylene",
+    "formula": "C2H4",
+    "composition": {
+      "C": 2,
+      "H": 4
+    },
+    "molarMass_g_per_mol": 28.054,
+    "compoundType": "organic",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00117,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless gas, faint sweet odor",
+    "waterSolubility": "low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "simple asphyxiant",
+      "effect": "oxygen displacement; mild anesthetic",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air"
+    },
+    "isRadioactive": false,
+    "notes": "largest-volume organic chemical; plant ripening hormone; polyethylene monomer",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Acetylene",
+    "formula": "C2H2",
+    "composition": {
+      "C": 2,
+      "H": 2
+    },
+    "molarMass_g_per_mol": 26.038,
+    "compoundType": "organic",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.0011,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless gas (garlic odor from impurities)",
+    "waterSolubility": "low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": true,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "simple asphyxiant",
+      "effect": "oxygen displacement",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air"
+    },
+    "isRadioactive": false,
+    "notes": "oxy-acetylene welding fuel; unstable under pressure (stored dissolved in acetone)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ethanol",
+    "formula": "C2H5OH",
+    "composition": {
+      "C": 2,
+      "H": 6,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 46.069,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.789,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless volatile liquid, characteristic odor",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "moderate",
+      "effect": "CNS depression, intoxication; toxic in large doses",
+      "onset": "acute",
+      "durationNote": "minutes to hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "drinking alcohol; fuel, solvent, antiseptic, fermentation product",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Methanol",
+    "formula": "CH3OH",
+    "composition": {
+      "C": 1,
+      "H": 4,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 32.042,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.792,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless volatile liquid",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "highly toxic",
+      "effect": "metabolized to formic acid → blindness, metabolic acidosis, death",
+      "onset": "delayed",
+      "durationNote": "6-30 h latent period",
+      "bioaccumulation": "none",
+      "antidoteNote": "fomepizole or ethanol; folinic acid; dialysis"
+    },
+    "isRadioactive": false,
+    "notes": "wood alcohol; fuel/solvent/antifreeze; dangerous as a drinking-alcohol substitute",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Isopropanol",
+    "formula": "C3H8O",
+    "composition": {
+      "C": 3,
+      "H": 8,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 60.096,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.786,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless liquid, sharp odor",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "moderate-toxic",
+      "effect": "CNS depression (~2x ethanol potency), ketosis; gastritis",
+      "onset": "acute",
+      "durationNote": "30-60 min",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive; dialysis if severe"
+    },
+    "isRadioactive": false,
+    "notes": "rubbing alcohol; solvent and disinfectant",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Acetone",
+    "formula": "C3H6O",
+    "composition": {
+      "C": 3,
+      "H": 6,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 58.08,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.784,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless liquid, sweet pungent odor",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "low-moderate",
+      "effect": "CNS depression, mucous-membrane/skin irritation, defatting",
+      "onset": "acute",
+      "durationNote": "minutes-hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "nail-polish remover, solvent; a normal metabolic ketone",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Glucose",
+    "formula": "C6H12O6",
+    "composition": {
+      "C": 6,
+      "H": 12,
+      "O": 6
+    },
+    "molarMass_g_per_mol": 180.156,
+    "compoundType": "organic",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.54,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline powder, sweet",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "none (primary metabolic fuel)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "blood sugar; product of photosynthesis; central energy molecule",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sucrose",
+    "formula": "C12H22O11",
+    "composition": {
+      "C": 12,
+      "H": 22,
+      "O": 11
+    },
+    "molarMass_g_per_mol": 342.297,
+    "compoundType": "organic",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.59,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid, sweet",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "none in normal use",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "table sugar; glucose + fructose disaccharide",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Cellulose",
+    "formula": "(C6H10O5)n",
+    "composition": {
+      "C": 6,
+      "H": 10,
+      "O": 5
+    },
+    "molarMass_g_per_mol": 162.141,
+    "compoundType": "organic",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.5,
+    "representativeColorHex": "#FFFFF5",
+    "appearance": "white fibrous solid",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "none (dietary fiber)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "structural polysaccharide of plants; paper, cotton, wood; composition and molar mass are per glucose monomer unit (polymer has no single molar mass)",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Starch",
+    "formula": "(C6H10O5)n",
+    "composition": {
+      "C": 6,
+      "H": 10,
+      "O": 5
+    },
+    "molarMass_g_per_mol": 162.141,
+    "compoundType": "organic",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.5,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white powder",
+    "waterSolubility": "low (gelatinizes hot)",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "none (food)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "plant energy-storage polysaccharide; food staple, adhesive, thickener; composition and molar mass are per glucose monomer unit",
+    "value_confidence": "estimated"
+  },
+  {
+    "name": "Urea",
+    "formula": "CH4N2O",
+    "composition": {
+      "C": 1,
+      "H": 4,
+      "N": 2,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 60.056,
+    "compoundType": "organic",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.32,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "protein-metabolism waste excreted in urine; major nitrogen fertilizer; first organic compound synthesized",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Glycerol",
+    "formula": "C3H8O3",
+    "composition": {
+      "C": 3,
+      "H": 8,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 92.094,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.26,
+    "representativeColorHex": "#FFFFF8",
+    "appearance": "colorless viscous sweet liquid",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (food/pharma grade)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "glycerin; humectant in food/cosmetics; nitroglycerin and soap precursor",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Benzene",
+    "formula": "C6H6",
+    "composition": {
+      "C": 6,
+      "H": 6
+    },
+    "molarMass_g_per_mol": 78.114,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.876,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless liquid, sweet aromatic odor",
+    "waterSolubility": "low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "ingest"
+      ],
+      "potencyNote": "toxic carcinogen",
+      "effect": "bone-marrow toxicity, leukemia (chronic); CNS depression (acute)",
+      "onset": "chronic",
+      "durationNote": "years for cancer",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive; no specific antidote"
+    },
+    "isRadioactive": false,
+    "notes": "aromatic feedstock; established human carcinogen; historic solvent now restricted",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Toluene",
+    "formula": "C7H8",
+    "composition": {
+      "C": 7,
+      "H": 8
+    },
+    "molarMass_g_per_mol": 92.141,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.867,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless liquid, paint-thinner odor",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "moderate",
+      "effect": "CNS depression, neurotoxicity with chronic abuse",
+      "onset": "acute/chronic",
+      "durationNote": "minutes (acute)",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "solvent, octane booster, feedstock; less toxic than benzene",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Formaldehyde",
+    "formula": "CH2O",
+    "composition": {
+      "C": 1,
+      "H": 2,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 30.026,
+    "compoundType": "organic",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.000815,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless gas, pungent suffocating odor",
+    "waterSolubility": "high (as formalin)",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "toxic, carcinogen",
+      "effect": "airway/eye irritation; nasopharyngeal carcinogen; sensitizer",
+      "onset": "acute/chronic",
+      "durationNote": "immediate irritation",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air; irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "preservative (formalin is ~37% aqueous), resin and disinfectant; density as gas at STP",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ethylene glycol",
+    "formula": "C2H6O2",
+    "composition": {
+      "C": 2,
+      "H": 6,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 62.068,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.11,
+    "representativeColorHex": "#FFFFF8",
+    "appearance": "colorless odorless syrupy sweet liquid",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "toxic — sweet taste is a hazard",
+      "effect": "metabolized to oxalate → metabolic acidosis, renal failure",
+      "onset": "delayed",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "fomepizole or ethanol; dialysis"
+    },
+    "isRadioactive": false,
+    "notes": "automotive antifreeze/coolant; dangerous to pets and children due to sweet taste",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Caffeine",
+    "formula": "C8H10N4O2",
+    "composition": {
+      "C": 8,
+      "H": 10,
+      "N": 4,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 194.194,
+    "compoundType": "organic",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.23,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white bitter crystalline powder",
+    "waterSolubility": "moderate",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest"
+      ],
+      "potencyNote": "low at normal dose; toxic in grams",
+      "effect": "stimulant; high doses cause arrhythmia, seizures",
+      "onset": "acute",
+      "durationNote": "30-60 min",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "CNS stimulant in coffee, tea, cocoa; purine alkaloid",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ascorbic acid",
+    "formula": "C6H8O6",
+    "composition": {
+      "C": 6,
+      "H": 8,
+      "O": 6
+    },
+    "molarMass_g_per_mol": 176.124,
+    "compoundType": "organic",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.65,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline powder",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "low (essential vitamin)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "vitamin C; antioxidant, antiscorbutic; deficiency causes scurvy",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Chloroform",
+    "formula": "CHCl3",
+    "composition": {
+      "C": 1,
+      "H": 1,
+      "Cl": 3
+    },
+    "molarMass_g_per_mol": 119.369,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.49,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless dense liquid, sweet odor",
+    "waterSolubility": "low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "ingest"
+      ],
+      "potencyNote": "toxic",
+      "effect": "CNS depression/anesthesia; hepatotoxic; probable carcinogen",
+      "onset": "acute/chronic",
+      "durationNote": "minutes (acute)",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "former anesthetic and solvent; now restricted; forms in chlorinated water",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Diethyl ether",
+    "formula": "C4H10O",
+    "composition": {
+      "C": 4,
+      "H": 10,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 74.123,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.713,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless volatile liquid, sweet odor",
+    "waterSolubility": "low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "moderate",
+      "effect": "anesthesia, CNS depression",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air"
+    },
+    "isRadioactive": false,
+    "notes": "early surgical anesthetic, solvent; forms explosive peroxides on storage; extremely flammable",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Naphthalene",
+    "formula": "C10H8",
+    "composition": {
+      "C": 10,
+      "H": 8
+    },
+    "molarMass_g_per_mol": 128.174,
+    "compoundType": "organic",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.14,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid, mothball odor",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "ingest"
+      ],
+      "potencyNote": "moderate-toxic",
+      "effect": "hemolytic anemia (esp. G6PD deficiency); possible carcinogen",
+      "onset": "acute/chronic",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "mothballs; dye and resin feedstock; simplest polycyclic aromatic",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Phenol",
+    "formula": "C6H6O",
+    "composition": {
+      "C": 6,
+      "H": 6,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 94.113,
+    "compoundType": "organic",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.07,
+    "representativeColorHex": "#FFF5EE",
+    "appearance": "white-to-pink crystalline solid, medicinal odor",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "toxic, corrosive",
+      "effect": "caustic burns (often painless), systemic CNS/cardiac/renal toxicity",
+      "onset": "acute",
+      "durationNote": "rapid absorption",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation (water/PEG); supportive"
+    },
+    "isRadioactive": false,
+    "notes": "carbolic acid; first surgical antiseptic; resin and pharmaceutical feedstock",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Acetic anhydride",
+    "formula": "C4H6O3",
+    "composition": {
+      "C": 4,
+      "H": 6,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 102.089,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.08,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless liquid, strong acetic/pungent odor",
+    "waterSolubility": "reacts with water",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "corrosive irritant",
+      "effect": "burns and lacrimation; reacts with moisture to acetic acid",
+      "onset": "acute",
+      "durationNote": "immediate",
+      "bioaccumulation": "none",
+      "antidoteNote": "irrigation"
+    },
+    "isRadioactive": false,
+    "notes": "acetylating agent (aspirin, cellulose acetate); watched chemical",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Ethyl acetate",
+    "formula": "C4H8O2",
+    "composition": {
+      "C": 4,
+      "H": 8,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 88.106,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.902,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless liquid, fruity odor",
+    "waterSolubility": "moderate",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "low-moderate",
+      "effect": "irritation, CNS depression at high vapor levels",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air"
+    },
+    "isRadioactive": false,
+    "notes": "common solvent (nail polish, adhesives, decaf coffee); pleasant fruity smell",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Glycine",
+    "formula": "C2H5NO2",
+    "composition": {
+      "C": 2,
+      "H": 5,
+      "N": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 75.067,
+    "compoundType": "organic",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.61,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid, sweet",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [],
+      "potencyNote": "none (amino acid)",
+      "effect": null,
+      "onset": null,
+      "durationNote": null,
+      "bioaccumulation": "none",
+      "antidoteNote": null
+    },
+    "isRadioactive": false,
+    "notes": "simplest amino acid; neurotransmitter, sweetener, buffer",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Nicotine",
+    "formula": "C10H14N2",
+    "composition": {
+      "C": 10,
+      "H": 14,
+      "N": 2
+    },
+    "molarMass_g_per_mol": 162.236,
+    "compoundType": "organic",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.01,
+    "representativeColorHex": "#F5E9C8",
+    "appearance": "colorless to pale yellow oily liquid (browns in air)",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "highly toxic",
+      "effect": "cholinergic stimulation then blockade; seizures, respiratory failure",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive; atropine for secretions"
+    },
+    "isRadioactive": false,
+    "notes": "tobacco alkaloid; stimulant and historic insecticide; readily absorbed through skin",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Hydrogen sulfide",
+    "formula": "H2S",
+    "composition": {
+      "H": 2,
+      "S": 1
+    },
+    "molarMass_g_per_mol": 34.076,
+    "compoundType": "other",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00139,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless gas, rotten-egg odor (deadens sense of smell)",
+    "waterSolubility": "moderate",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "highly toxic",
+      "effect": "inhibits cytochrome oxidase; rapid 'knockdown' and respiratory arrest at high ppm",
+      "onset": "acute",
+      "durationNote": "seconds-minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "remove to air; oxygen; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "sewer/swamp/volcanic gas, oil & gas hazard; olfactory fatigue makes high concentrations deceptively odorless",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Chlorine",
+    "formula": "Cl2",
+    "composition": {
+      "Cl": 2
+    },
+    "molarMass_g_per_mol": 70.9,
+    "compoundType": "other",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00321,
+    "representativeColorHex": "#C9E04A",
+    "appearance": "yellow-green gas, sharp bleach odor",
+    "waterSolubility": "moderate (reacts)",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "toxic",
+      "effect": "pulmonary irritant/edema; eye and skin burns",
+      "onset": "acute",
+      "durationNote": "immediate to hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air; humidified oxygen; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "water disinfection and bleaching; released by mixing bleach with acid/ammonia; first WWI war gas",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Phosgene",
+    "formula": "COCl2",
+    "composition": {
+      "C": 1,
+      "O": 1,
+      "Cl": 2
+    },
+    "molarMass_g_per_mol": 98.91,
+    "compoundType": "other",
+    "phaseAtSTP": "gas",
+    "density_g_per_cm3": 0.00425,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless gas, faint fresh-hay odor",
+    "waterSolubility": "reacts with water",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "highly toxic",
+      "effect": "delayed pulmonary edema after a deceptive latent period",
+      "onset": "delayed",
+      "durationNote": "symptoms 2-24 h after exposure",
+      "bioaccumulation": "none",
+      "antidoteNote": "strict rest; oxygen; supportive (no specific antidote)"
+    },
+    "isRadioactive": false,
+    "notes": "industrial intermediate (isocyanates, polycarbonates); insidious due to mild odor and delayed onset; historic war gas",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium cyanide",
+    "formula": "NaCN",
+    "composition": {
+      "Na": 1,
+      "C": 1,
+      "N": 1
+    },
+    "molarMass_g_per_mol": 49.0078,
+    "compoundType": "other",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.6,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white deliquescent solid, faint almond odor",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "extreme — rapidly lethal",
+      "effect": "blocks cellular respiration; releases HCN gas with acid",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "hydroxocobalamin; sodium thiosulfate; nitrites"
+    },
+    "isRadioactive": false,
+    "notes": "gold mining (leaching), electroplating; deadly; never contact with acids",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Potassium cyanide",
+    "formula": "KCN",
+    "composition": {
+      "K": 1,
+      "C": 1,
+      "N": 1
+    },
+    "molarMass_g_per_mol": 65.1163,
+    "compoundType": "other",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.52,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid, faint almond odor",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "extreme — rapidly lethal",
+      "effect": "blocks cytochrome c oxidase → histotoxic hypoxia",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "hydroxocobalamin; sodium thiosulfate; nitrites"
+    },
+    "isRadioactive": false,
+    "notes": "electroplating, gold extraction, organic synthesis; among the fastest-acting poisons",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Arsenic trioxide",
+    "formula": "As2O3",
+    "composition": {
+      "As": 2,
+      "O": 3
+    },
+    "molarMass_g_per_mol": 197.8402,
+    "compoundType": "other",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.74,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white powder, odorless and tasteless",
+    "waterSolubility": "low-moderate",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "highly toxic, carcinogen",
+      "effect": "multi-organ failure, GI hemorrhage, cardiac, neuropathy; carcinogenic",
+      "onset": "acute/chronic",
+      "durationNote": "hours (acute)",
+      "bioaccumulation": "accumulates in hair/nails",
+      "antidoteNote": "dimercaprol (BAL), DMSA chelation"
+    },
+    "isRadioactive": false,
+    "notes": "'white arsenic'; historic poison and pesticide; also a modern leukemia drug; tasteless makes it dangerous",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Lead(II) acetate",
+    "formula": "Pb(C2H3O2)2",
+    "composition": {
+      "Pb": 1,
+      "C": 4,
+      "H": 6,
+      "O": 4
+    },
+    "molarMass_g_per_mol": 325.288,
+    "compoundType": "other",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.25,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid, sweet taste",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "contact"
+      ],
+      "potencyNote": "toxic, cumulative",
+      "effect": "lead poisoning: neuro, hematologic, renal; sweet taste raises ingestion risk",
+      "onset": "chronic",
+      "durationNote": "builds over time",
+      "bioaccumulation": "accumulates in bone",
+      "antidoteNote": "chelation (EDTA, DMSA, BAL)"
+    },
+    "isRadioactive": false,
+    "notes": "'sugar of lead'; historic sweetener (Roman) and pigment; now banned in most uses",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Mercury(II) chloride",
+    "formula": "HgCl2",
+    "composition": {
+      "Hg": 1,
+      "Cl": 2
+    },
+    "molarMass_g_per_mol": 271.492,
+    "compoundType": "other",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 5.43,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "highly toxic, corrosive",
+      "effect": "corrosive GI injury; acute kidney failure; neuro/renal mercury toxicity",
+      "onset": "acute/chronic",
+      "durationNote": "hours",
+      "bioaccumulation": "mercury accumulates in kidney/CNS",
+      "antidoteNote": "chelation (DMSA, DMPS); supportive"
+    },
+    "isRadioactive": false,
+    "notes": "corrosive sublimate; historic disinfectant/preservative; soluble and highly toxic",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Tetraethyllead",
+    "formula": "Pb(C2H5)4",
+    "composition": {
+      "Pb": 1,
+      "C": 8,
+      "H": 20
+    },
+    "molarMass_g_per_mol": 323.448,
+    "compoundType": "other",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.65,
+    "representativeColorHex": "#FFF8E0",
+    "appearance": "colorless to pale oily liquid, sweet odor",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact",
+        "ingest"
+      ],
+      "potencyNote": "highly toxic, cumulative",
+      "effect": "organic-lead neurotoxicity (psychosis, tremor); absorbed through skin",
+      "onset": "acute/chronic",
+      "durationNote": "days for organolead",
+      "bioaccumulation": "accumulates in CNS/bone",
+      "antidoteNote": "supportive; chelation of limited use for organolead"
+    },
+    "isRadioactive": false,
+    "notes": "former anti-knock gasoline additive (leaded petrol); a major historic source of environmental lead",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Sodium azide",
+    "formula": "NaN3",
+    "composition": {
+      "Na": 1,
+      "N": 3
+    },
+    "molarMass_g_per_mol": 65.0108,
+    "compoundType": "other",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.85,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": true,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "contact",
+        "inhale"
+      ],
+      "potencyNote": "highly toxic",
+      "effect": "profound hypotension; blocks cytochrome oxidase (cyanide-like)",
+      "onset": "acute",
+      "durationNote": "minutes",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive; no proven antidote"
+    },
+    "isRadioactive": false,
+    "notes": "airbag gas generant, biocide/preservative; forms shock-sensitive heavy-metal azides with metals",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Hydrazine",
+    "formula": "N2H4",
+    "composition": {
+      "N": 2,
+      "H": 4
+    },
+    "molarMass_g_per_mol": 32.046,
+    "compoundType": "other",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.02,
+    "representativeColorHex": "#FAFAFF",
+    "appearance": "colorless fuming liquid, ammonia-like odor",
+    "waterSolubility": "miscible",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": true,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact",
+        "ingest"
+      ],
+      "potencyNote": "highly toxic, carcinogen",
+      "effect": "CNS excitation/seizures, hepatotoxic, corrosive; suspected carcinogen",
+      "onset": "acute/chronic",
+      "durationNote": "minutes-hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "pyridoxine (vitamin B6) for seizures; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "rocket propellant, blowing agent, oxygen scavenger; hypergolic with N2O4",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Methyl isocyanate",
+    "formula": "C2H3NO",
+    "composition": {
+      "C": 2,
+      "H": 3,
+      "N": 1,
+      "O": 1
+    },
+    "molarMass_g_per_mol": 57.052,
+    "compoundType": "other",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 0.92,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless liquid, sharp odor",
+    "waterSolubility": "reacts with water",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": true,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "highly toxic",
+      "effect": "severe respiratory and eye injury, pulmonary edema",
+      "onset": "acute",
+      "durationNote": "immediate-hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "fresh air; oxygen; supportive"
+    },
+    "isRadioactive": false,
+    "notes": "pesticide (carbaryl) intermediate; cause of the 1984 Bhopal disaster; reacts violently with water",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Carbon tetrachloride",
+    "formula": "CCl4",
+    "composition": {
+      "C": 1,
+      "Cl": 4
+    },
+    "molarMass_g_per_mol": 153.811,
+    "compoundType": "other",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.59,
+    "representativeColorHex": "#FAFAFA",
+    "appearance": "colorless dense liquid, sweet odor",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "ingest"
+      ],
+      "potencyNote": "toxic, carcinogen",
+      "effect": "severe hepatotoxicity/nephrotoxicity; CNS depression; probable carcinogen",
+      "onset": "acute/chronic",
+      "durationNote": "hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive; N-acetylcysteine"
+    },
+    "isRadioactive": false,
+    "notes": "former solvent/refrigerant/fire extinguisher; banned consumer use; ozone-depleting",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "DDT",
+    "formula": "C14H9Cl5",
+    "composition": {
+      "C": 14,
+      "H": 9,
+      "Cl": 5
+    },
+    "molarMass_g_per_mol": 354.476,
+    "compoundType": "other",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.56,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless to off-white crystalline solid",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "contact"
+      ],
+      "potencyNote": "moderate acute; major environmental persistence",
+      "effect": "neurotoxin (tremors, seizures); bioaccumulates and biomagnifies",
+      "onset": "acute/chronic",
+      "durationNote": "hours (acute)",
+      "bioaccumulation": "strongly bioaccumulates in fat and up food chains",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": false,
+    "notes": "persistent organochlorine insecticide; banned in most uses; still used against malaria vectors",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Strychnine",
+    "formula": "C21H22N2O2",
+    "composition": {
+      "C": 21,
+      "H": 22,
+      "N": 2,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 334.419,
+    "compoundType": "other",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 1.36,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid, intensely bitter",
+    "waterSolubility": "low",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "highly toxic",
+      "effect": "glycine-receptor antagonist → violent convulsions, asphyxia",
+      "onset": "acute",
+      "durationNote": "10-20 min",
+      "bioaccumulation": "none",
+      "antidoteNote": "supportive; benzodiazepines/muscle relaxants, control convulsions"
+    },
+    "isRadioactive": false,
+    "notes": "alkaloid from Strychnos seeds; historic rodenticide and poison",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Parathion",
+    "formula": "C10H14NO5PS",
+    "composition": {
+      "C": 10,
+      "H": 14,
+      "N": 1,
+      "O": 5,
+      "P": 1,
+      "S": 1
+    },
+    "molarMass_g_per_mol": 291.2578,
+    "compoundType": "other",
+    "phaseAtSTP": "liquid",
+    "density_g_per_cm3": 1.26,
+    "representativeColorHex": "#8B6B3A",
+    "appearance": "pale yellow to brown liquid, garlic odor",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "contact",
+        "inhale",
+        "ingest"
+      ],
+      "potencyNote": "highly toxic",
+      "effect": "organophosphate: irreversibly inhibits acetylcholinesterase → cholinergic crisis",
+      "onset": "acute",
+      "durationNote": "minutes-hours",
+      "bioaccumulation": "none",
+      "antidoteNote": "atropine + pralidoxime (2-PAM)"
+    },
+    "isRadioactive": false,
+    "notes": "banned/restricted organophosphate insecticide; readily absorbed through skin",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Uranium dioxide",
+    "formula": "UO2",
+    "composition": {
+      "U": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 270.0269,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 10.97,
+    "representativeColorHex": "#1C1C1C",
+    "appearance": "black/brown ceramic solid",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "ingest"
+      ],
+      "potencyNote": "chemically nephrotoxic + radiological",
+      "effect": "heavy-metal kidney toxicity; alpha radiation hazard if inhaled as dust",
+      "onset": "chronic",
+      "durationNote": "gradual",
+      "bioaccumulation": "uranium deposits in bone/kidney",
+      "antidoteNote": "chelation (limited); supportive"
+    },
+    "isRadioactive": true,
+    "notes": "primary nuclear reactor fuel (ceramic pellets); radioactivity from U isotopes (mainly U-238/U-235)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Uranium hexafluoride",
+    "formula": "UF6",
+    "composition": {
+      "U": 1,
+      "F": 6
+    },
+    "molarMass_g_per_mol": 352.0193,
+    "compoundType": "other",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 5.09,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "colorless/white volatile crystalline solid (sublimes)",
+    "waterSolubility": "reacts violently with water",
+    "propertyFlags": {
+      "corrosive": true,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": true,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "severe (chemical) + radiological",
+      "effect": "reacts with moisture to release corrosive HF + uranyl; HF burns and uranium nephrotoxicity",
+      "onset": "acute",
+      "durationNote": "immediate (HF)",
+      "bioaccumulation": "uranium in bone/kidney",
+      "antidoteNote": "HF: calcium gluconate; supportive"
+    },
+    "isRadioactive": true,
+    "notes": "the uranium enrichment process gas (sublimes near 56C); double hazard from fluorine chemistry and uranium",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Triuranium octoxide",
+    "formula": "U3O8",
+    "composition": {
+      "U": 3,
+      "O": 8
+    },
+    "molarMass_g_per_mol": 842.0787,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 8.3,
+    "representativeColorHex": "#3A2A1A",
+    "appearance": "olive-green to black powder",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale",
+        "ingest"
+      ],
+      "potencyNote": "chemically nephrotoxic + radiological",
+      "effect": "uranium heavy-metal toxicity; alpha hazard as dust",
+      "onset": "chronic",
+      "durationNote": "gradual",
+      "bioaccumulation": "uranium in bone/kidney",
+      "antidoteNote": "supportive; chelation limited"
+    },
+    "isRadioactive": true,
+    "notes": "'yellowcake' is largely U3O8; the most stable uranium oxide; milling/storage form",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Uranyl nitrate",
+    "formula": "UO2(NO3)2",
+    "composition": {
+      "U": 1,
+      "O": 8,
+      "N": 2
+    },
+    "molarMass_g_per_mol": 394.0349,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 2.81,
+    "representativeColorHex": "#F2E600",
+    "appearance": "yellow crystalline solid, fluorescent",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": true,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "chemically nephrotoxic + radiological",
+      "effect": "soluble uranium kidney toxicity; radiological hazard",
+      "onset": "acute/chronic",
+      "durationNote": "hours",
+      "bioaccumulation": "uranium in bone/kidney",
+      "antidoteNote": "supportive; chelation limited"
+    },
+    "isRadioactive": true,
+    "notes": "anhydrous form (molar mass computed from IUPAC standard atomic weights); soluble uranium salt; reprocessing and historic photographic toner; commonly handled as the hexahydrate",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Plutonium dioxide",
+    "formula": "PuO2",
+    "composition": {
+      "Pu": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 275.998,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 11.5,
+    "representativeColorHex": "#3A2A1A",
+    "appearance": "yellow-brown to olive ceramic solid",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "extreme radiological (alpha); chemically low",
+      "effect": "inhaled fine particles deliver intense localized alpha dose → lung/bone cancer risk",
+      "onset": "chronic",
+      "durationNote": "long latency",
+      "bioaccumulation": "retained in lung, bone, liver",
+      "antidoteNote": "DTPA chelation (for soluble forms); supportive"
+    },
+    "isRadioactive": true,
+    "notes": "reactor/weapon material and RTG fuel (Pu-238 form powers spacecraft); primarily an inhalation hazard",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Thorium dioxide",
+    "formula": "ThO2",
+    "composition": {
+      "Th": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 264.0357,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 10.0,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white ceramic solid (highest melting oxide)",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "radiological",
+      "effect": "alpha emitter; historic Thorotrast contrast caused liver cancers",
+      "onset": "chronic",
+      "durationNote": "decades latency",
+      "bioaccumulation": "retained in liver/spleen/bone",
+      "antidoteNote": "supportive"
+    },
+    "isRadioactive": true,
+    "notes": "thoria; gas mantles, high-temperature ceramics; fertile thorium-fuel-cycle material (Th-232)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Radium chloride",
+    "formula": "RaCl2",
+    "composition": {
+      "Ra": 1,
+      "Cl": 2
+    },
+    "molarMass_g_per_mol": 296.9,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 4.91,
+    "representativeColorHex": "#FFF5E0",
+    "appearance": "white-to-buff crystalline solid (self-luminous, glows faintly)",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale"
+      ],
+      "potencyNote": "severe radiological",
+      "effect": "bone-seeker; alpha emitter causes bone necrosis/sarcoma (radium-dial painters)",
+      "onset": "chronic",
+      "durationNote": "years latency",
+      "bioaccumulation": "strongly deposited in bone",
+      "antidoteNote": "supportive; no effective decorporation"
+    },
+    "isRadioactive": true,
+    "notes": "historic luminous-paint and 'medical' source (Ra-226); first isolated by the Curies; intensely radioactive",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Americium dioxide",
+    "formula": "AmO2",
+    "composition": {
+      "Am": 1,
+      "O": 2
+    },
+    "molarMass_g_per_mol": 274.998,
+    "compoundType": "oxide",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 11.68,
+    "representativeColorHex": "#3A2A1A",
+    "appearance": "black ceramic solid",
+    "waterSolubility": "insoluble",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": false
+    },
+    "toxicity": {
+      "route": [
+        "inhale"
+      ],
+      "potencyNote": "radiological (alpha + gamma)",
+      "effect": "alpha hazard if inhaled/ingested; 59.5 keV gamma",
+      "onset": "chronic",
+      "durationNote": "long latency",
+      "bioaccumulation": "retained in bone/liver",
+      "antidoteNote": "DTPA chelation"
+    },
+    "isRadioactive": true,
+    "notes": "Am-241 form is the ionization source in household smoke detectors (microgram quantities)",
+    "value_confidence": "measured"
+  },
+  {
+    "name": "Caesium-137 chloride",
+    "formula": "CsCl",
+    "composition": {
+      "Cs": 1,
+      "Cl": 1
+    },
+    "molarMass_g_per_mol": 168.3555,
+    "compoundType": "salt",
+    "phaseAtSTP": "solid",
+    "density_g_per_cm3": 3.99,
+    "representativeColorHex": "#FFFFFF",
+    "appearance": "white crystalline solid",
+    "waterSolubility": "high",
+    "propertyFlags": {
+      "corrosive": false,
+      "flammable": false,
+      "oxidizer": false,
+      "volatile": false,
+      "explosive": false,
+      "waterSoluble": true
+    },
+    "toxicity": {
+      "route": [
+        "ingest",
+        "inhale",
+        "contact"
+      ],
+      "potencyNote": "severe radiological",
+      "effect": "penetrating 662 keV gamma (from Ba-137m); whole-body dose; soluble → spreads in body and environment",
+      "onset": "acute/chronic",
+      "durationNote": "dose-dependent",
+      "bioaccumulation": "distributes like potassium in soft tissue",
+      "antidoteNote": "Prussian blue (enhances cesium excretion)"
+    },
+    "isRadioactive": true,
+    "notes": "Cs-137 source form for radiotherapy/irradiators/gauges; the Goiania (1987) accident involved dispersed CsCl; ordinary (non-Cs-137) CsCl is not radioactive",
+    "value_confidence": "measured"
+  }
+]
