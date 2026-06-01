@@ -1,3183 +1,2997 @@
 [
   {
-    "parentSymbol": "Sc",
-    "parentZ": 21,
-    "massNumber": 45,
-    "isotopeSymbol": "Sc-45",
-    "naturalAbundance_percent": 100.0,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Sc",
+    "ParentZ": 21,
+    "MassNumber": 45,
+    "IsotopeSymbol": "Sc-45",
+    "NaturalAbundance": 100.0,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sc",
-    "parentZ": 21,
-    "massNumber": 46,
-    "isotopeSymbol": "Sc-46",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "83.79 d",
-    "halfLife_seconds": 7239000.0,
-    "decayModes": [
+    "ParentSymbol": "Sc",
+    "ParentZ": 21,
+    "MassNumber": 46,
+    "IsotopeSymbol": "Sc-46",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "83.79 d",
+    "HalfLifeSeconds": 7239000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Ti-46",
-        "decayEnergy_MeV": 2.3666
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Ti-46",
+        "DecayEnergy": 2.3666
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1255000000000000.0,
-    "decayHeat_W_per_g": 158.6,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1255000000000000.0,
+    "DecayHeat": 158.6,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sc",
-    "parentZ": 21,
-    "massNumber": 47,
-    "isotopeSymbol": "Sc-47",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "3.3492 d",
-    "halfLife_seconds": 289400.0,
-    "decayModes": [
+    "ParentSymbol": "Sc",
+    "ParentZ": 21,
+    "MassNumber": 47,
+    "IsotopeSymbol": "Sc-47",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "3.3492 d",
+    "HalfLifeSeconds": 289400.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Ti-47",
-        "decayEnergy_MeV": 0.6008
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Ti-47",
+        "DecayEnergy": 0.6008
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 3.072e+16,
-    "decayHeat_W_per_g": 985.7,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 3.072e+16,
+    "DecayHeat": 985.7,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sc",
-    "parentZ": 21,
-    "massNumber": 48,
-    "isotopeSymbol": "Sc-48",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "43.67 h",
-    "halfLife_seconds": 157200.0,
-    "decayModes": [
+    "ParentSymbol": "Sc",
+    "ParentZ": 21,
+    "MassNumber": 48,
+    "IsotopeSymbol": "Sc-48",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "43.67 h",
+    "HalfLifeSeconds": 157200.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Ti-48",
-        "decayEnergy_MeV": 3.9889
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Ti-48",
+        "DecayEnergy": 3.9889
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 5.537e+16,
-    "decayHeat_W_per_g": 11800.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 5.537e+16,
+    "DecayHeat": 11800.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ti",
-    "parentZ": 22,
-    "massNumber": 44,
-    "isotopeSymbol": "Ti-44",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "60.0 y",
-    "halfLife_seconds": 1893000000.0,
-    "decayModes": [
+    "ParentSymbol": "Ti",
+    "ParentZ": 22,
+    "MassNumber": 44,
+    "IsotopeSymbol": "Ti-44",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "60.0 y",
+    "HalfLifeSeconds": 1893000000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Sc-44",
-        "decayEnergy_MeV": 0.2674
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Sc-44",
+        "DecayEnergy": 0.2674
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 5015000000000.0,
-    "decayHeat_W_per_g": 0.01074,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 5015000000000.0,
+    "DecayHeat": 0.01074,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ti",
-    "parentZ": 22,
-    "massNumber": 46,
-    "isotopeSymbol": "Ti-46",
-    "naturalAbundance_percent": 8.25,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ti",
+    "ParentZ": 22,
+    "MassNumber": 46,
+    "IsotopeSymbol": "Ti-46",
+    "NaturalAbundance": 8.25,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ti",
-    "parentZ": 22,
-    "massNumber": 47,
-    "isotopeSymbol": "Ti-47",
-    "naturalAbundance_percent": 7.44,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ti",
+    "ParentZ": 22,
+    "MassNumber": 47,
+    "IsotopeSymbol": "Ti-47",
+    "NaturalAbundance": 7.44,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ti",
-    "parentZ": 22,
-    "massNumber": 48,
-    "isotopeSymbol": "Ti-48",
-    "naturalAbundance_percent": 73.72,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ti",
+    "ParentZ": 22,
+    "MassNumber": 48,
+    "IsotopeSymbol": "Ti-48",
+    "NaturalAbundance": 73.72,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ti",
-    "parentZ": 22,
-    "massNumber": 49,
-    "isotopeSymbol": "Ti-49",
-    "naturalAbundance_percent": 5.41,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ti",
+    "ParentZ": 22,
+    "MassNumber": 49,
+    "IsotopeSymbol": "Ti-49",
+    "NaturalAbundance": 5.41,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ti",
-    "parentZ": 22,
-    "massNumber": 50,
-    "isotopeSymbol": "Ti-50",
-    "naturalAbundance_percent": 5.18,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ti",
+    "ParentZ": 22,
+    "MassNumber": 50,
+    "IsotopeSymbol": "Ti-50",
+    "NaturalAbundance": 5.18,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "V",
-    "parentZ": 23,
-    "massNumber": 48,
-    "isotopeSymbol": "V-48",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "15.9735 d",
-    "halfLife_seconds": 1380000.0,
-    "decayModes": [
+    "ParentSymbol": "V",
+    "ParentZ": 23,
+    "MassNumber": 48,
+    "IsotopeSymbol": "V-48",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "15.9735 d",
+    "HalfLifeSeconds": 1380000.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Ti-48",
-        "decayEnergy_MeV": 4.0149
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Ti-48",
+        "DecayEnergy": 4.0149
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 6307000000000000.0,
-    "decayHeat_W_per_g": 2041.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 6307000000000000.0,
+    "DecayHeat": 2041.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "V",
-    "parentZ": 23,
-    "massNumber": 49,
-    "isotopeSymbol": "V-49",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "330 d",
-    "halfLife_seconds": 28510000.0,
-    "decayModes": [
+    "ParentSymbol": "V",
+    "ParentZ": 23,
+    "MassNumber": 49,
+    "IsotopeSymbol": "V-49",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "330 d",
+    "HalfLifeSeconds": 28510000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Ti-49",
-        "decayEnergy_MeV": 0.6019
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Ti-49",
+        "DecayEnergy": 0.6019
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 299100000000000.0,
-    "decayHeat_W_per_g": 1.442,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 299100000000000.0,
+    "DecayHeat": 1.442,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "V",
-    "parentZ": 23,
-    "massNumber": 50,
-    "isotopeSymbol": "V-50",
-    "naturalAbundance_percent": 0.25,
-    "stability": "radioactive",
-    "halfLife": "150 Py",
-    "halfLife_seconds": 4.734e+24,
-    "decayModes": [
+    "ParentSymbol": "V",
+    "ParentZ": 23,
+    "MassNumber": 50,
+    "IsotopeSymbol": "V-50",
+    "NaturalAbundance": 0.25,
+    "Stability": "radioactive",
+    "HalfLife": "150 Py",
+    "HalfLifeSeconds": 4.734e+24,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 83.0,
-        "daughter": "Ti-50",
-        "decayEnergy_MeV": 2.2086
+        "Mode": "electron-capture",
+        "Branching": 83.0,
+        "Daughter": "Ti-50",
+        "DecayEnergy": 2.2086
       },
       {
-        "mode": "beta-minus",
-        "branching_percent": 17.0,
-        "daughter": "Cr-50",
-        "decayEnergy_MeV": 1.0381
+        "Mode": "beta-minus",
+        "Branching": 17.0,
+        "Daughter": "Cr-50",
+        "DecayEnergy": 1.0381
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 0.001766,
-    "decayHeat_W_per_g": 4.257e-17,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 0.001766,
+    "DecayHeat": 4.257e-17,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled); primordial / observationally near-stable despite radioactive classification",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled); primordial / observationally near-stable despite radioactive classification",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "V",
-    "parentZ": 23,
-    "massNumber": 51,
-    "isotopeSymbol": "V-51",
-    "naturalAbundance_percent": 99.75,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "V",
+    "ParentZ": 23,
+    "MassNumber": 51,
+    "IsotopeSymbol": "V-51",
+    "NaturalAbundance": 99.75,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Cr",
-    "parentZ": 24,
-    "massNumber": 50,
-    "isotopeSymbol": "Cr-50",
-    "naturalAbundance_percent": 4.345,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Cr",
+    "ParentZ": 24,
+    "MassNumber": 50,
+    "IsotopeSymbol": "Cr-50",
+    "NaturalAbundance": 4.345,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Cr",
-    "parentZ": 24,
-    "massNumber": 51,
-    "isotopeSymbol": "Cr-51",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "27.7025 d",
-    "halfLife_seconds": 2393000.0,
-    "decayModes": [
+    "ParentSymbol": "Cr",
+    "ParentZ": 24,
+    "MassNumber": 51,
+    "IsotopeSymbol": "Cr-51",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "27.7025 d",
+    "HalfLifeSeconds": 2393000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "V-51",
-        "decayEnergy_MeV": 0.7524
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "V-51",
+        "DecayEnergy": 0.7524
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 3423000000000000.0,
-    "decayHeat_W_per_g": 20.63,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 3423000000000000.0,
+    "DecayHeat": 20.63,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Cr",
-    "parentZ": 24,
-    "massNumber": 52,
-    "isotopeSymbol": "Cr-52",
-    "naturalAbundance_percent": 83.789,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Cr",
+    "ParentZ": 24,
+    "MassNumber": 52,
+    "IsotopeSymbol": "Cr-52",
+    "NaturalAbundance": 83.789,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Cr",
-    "parentZ": 24,
-    "massNumber": 53,
-    "isotopeSymbol": "Cr-53",
-    "naturalAbundance_percent": 9.501,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Cr",
+    "ParentZ": 24,
+    "MassNumber": 53,
+    "IsotopeSymbol": "Cr-53",
+    "NaturalAbundance": 9.501,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Cr",
-    "parentZ": 24,
-    "massNumber": 54,
-    "isotopeSymbol": "Cr-54",
-    "naturalAbundance_percent": 2.365,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Cr",
+    "ParentZ": 24,
+    "MassNumber": 54,
+    "IsotopeSymbol": "Cr-54",
+    "NaturalAbundance": 2.365,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Mn",
-    "parentZ": 25,
-    "massNumber": 52,
-    "isotopeSymbol": "Mn-52",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "5.591 d",
-    "halfLife_seconds": 483100.0,
-    "decayModes": [
+    "ParentSymbol": "Mn",
+    "ParentZ": 25,
+    "MassNumber": 52,
+    "IsotopeSymbol": "Mn-52",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "5.591 d",
+    "HalfLifeSeconds": 483100.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Cr-52",
-        "decayEnergy_MeV": 4.7081
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Cr-52",
+        "DecayEnergy": 4.7081
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.664e+16,
-    "decayHeat_W_per_g": 5999.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.664e+16,
+    "DecayHeat": 5999.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Mn",
-    "parentZ": 25,
-    "massNumber": 53,
-    "isotopeSymbol": "Mn-53",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "3.7 My",
-    "halfLife_seconds": 116800000000000.0,
-    "decayModes": [
+    "ParentSymbol": "Mn",
+    "ParentZ": 25,
+    "MassNumber": 53,
+    "IsotopeSymbol": "Mn-53",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "3.7 My",
+    "HalfLifeSeconds": 116800000000000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Cr-53",
-        "decayEnergy_MeV": 0.5973
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Cr-53",
+        "DecayEnergy": 0.5973
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 67530000.0,
-    "decayHeat_W_per_g": 3.231e-07,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 67530000.0,
+    "DecayHeat": 3.231e-07,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Mn",
-    "parentZ": 25,
-    "massNumber": 54,
-    "isotopeSymbol": "Mn-54",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "312.12 d",
-    "halfLife_seconds": 26970000.0,
-    "decayModes": [
+    "ParentSymbol": "Mn",
+    "ParentZ": 25,
+    "MassNumber": 54,
+    "IsotopeSymbol": "Mn-54",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "312.12 d",
+    "HalfLifeSeconds": 26970000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture + minor beta-plus",
-        "branching_percent": 100.0,
-        "daughter": "Cr-54",
-        "decayEnergy_MeV": 1.3771
+        "Mode": "electron-capture + minor beta-plus",
+        "Branching": 100.0,
+        "Daughter": "Cr-54",
+        "DecayEnergy": 1.3771
       },
       {
-        "mode": "beta-minus",
-        "branching_percent": 0.0003,
-        "daughter": "Fe-54",
-        "decayEnergy_MeV": 0.6964
+        "Mode": "beta-minus",
+        "Branching": 0.0003,
+        "Daughter": "Fe-54",
+        "DecayEnergy": 0.6964
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 287000000000000.0,
-    "decayHeat_W_per_g": 3.166,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 287000000000000.0,
+    "DecayHeat": 3.166,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Mn",
-    "parentZ": 25,
-    "massNumber": 55,
-    "isotopeSymbol": "Mn-55",
-    "naturalAbundance_percent": 100.0,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Mn",
+    "ParentZ": 25,
+    "MassNumber": 55,
+    "IsotopeSymbol": "Mn-55",
+    "NaturalAbundance": 100.0,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Fe",
-    "parentZ": 26,
-    "massNumber": 54,
-    "isotopeSymbol": "Fe-54",
-    "naturalAbundance_percent": 5.845,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Fe",
+    "ParentZ": 26,
+    "MassNumber": 54,
+    "IsotopeSymbol": "Fe-54",
+    "NaturalAbundance": 5.845,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Fe",
-    "parentZ": 26,
-    "massNumber": 55,
-    "isotopeSymbol": "Fe-55",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "2.737 y",
-    "halfLife_seconds": 86370000.0,
-    "decayModes": [
+    "ParentSymbol": "Fe",
+    "ParentZ": 26,
+    "MassNumber": 55,
+    "IsotopeSymbol": "Fe-55",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "2.737 y",
+    "HalfLifeSeconds": 86370000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Mn-55",
-        "decayEnergy_MeV": 0.2311
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Mn-55",
+        "DecayEnergy": 0.2311
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 87970000000000.0,
-    "decayHeat_W_per_g": 0.1629,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 87970000000000.0,
+    "DecayHeat": 0.1629,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Fe",
-    "parentZ": 26,
-    "massNumber": 56,
-    "isotopeSymbol": "Fe-56",
-    "naturalAbundance_percent": 91.754,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Fe",
+    "ParentZ": 26,
+    "MassNumber": 56,
+    "IsotopeSymbol": "Fe-56",
+    "NaturalAbundance": 91.754,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Fe",
-    "parentZ": 26,
-    "massNumber": 57,
-    "isotopeSymbol": "Fe-57",
-    "naturalAbundance_percent": 2.119,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Fe",
+    "ParentZ": 26,
+    "MassNumber": 57,
+    "IsotopeSymbol": "Fe-57",
+    "NaturalAbundance": 2.119,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Fe",
-    "parentZ": 26,
-    "massNumber": 58,
-    "isotopeSymbol": "Fe-58",
-    "naturalAbundance_percent": 0.282,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Fe",
+    "ParentZ": 26,
+    "MassNumber": 58,
+    "IsotopeSymbol": "Fe-58",
+    "NaturalAbundance": 0.282,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Fe",
-    "parentZ": 26,
-    "massNumber": 59,
-    "isotopeSymbol": "Fe-59",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "44.495 d",
-    "halfLife_seconds": 3844000.0,
-    "decayModes": [
+    "ParentSymbol": "Fe",
+    "ParentZ": 26,
+    "MassNumber": 59,
+    "IsotopeSymbol": "Fe-59",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "44.495 d",
+    "HalfLifeSeconds": 3844000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Co-59",
-        "decayEnergy_MeV": 1.5649
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Co-59",
+        "DecayEnergy": 1.5649
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1842000000000000.0,
-    "decayHeat_W_per_g": 154.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1842000000000000.0,
+    "DecayHeat": 154.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Fe",
-    "parentZ": 26,
-    "massNumber": 60,
-    "isotopeSymbol": "Fe-60",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "1.5 My",
-    "halfLife_seconds": 47340000000000.0,
-    "decayModes": [
+    "ParentSymbol": "Fe",
+    "ParentZ": 26,
+    "MassNumber": 60,
+    "IsotopeSymbol": "Fe-60",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "1.5 My",
+    "HalfLifeSeconds": 47340000000000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Co-60m",
-        "decayEnergy_MeV": 0.2373
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Co-60m",
+        "DecayEnergy": 0.2373
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 147100000.0,
-    "decayHeat_W_per_g": 1.864e-06,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 147100000.0,
+    "DecayHeat": 1.864e-06,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "a branch feeds a metastable (isomeric) daughter; decayEnergy_MeV is the Q-value to the daughter ground state, so that branch releases less by the isomer energy; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "a branch feeds a metastable (isomeric) daughter; decayEnergy_MeV is the Q-value to the daughter ground state, so that branch releases less by the isomer energy; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Co",
-    "parentZ": 27,
-    "massNumber": 56,
-    "isotopeSymbol": "Co-56",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "77.23 d",
-    "halfLife_seconds": 6673000.0,
-    "decayModes": [
+    "ParentSymbol": "Co",
+    "ParentZ": 27,
+    "MassNumber": 56,
+    "IsotopeSymbol": "Co-56",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "77.23 d",
+    "HalfLifeSeconds": 6673000.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Fe-56",
-        "decayEnergy_MeV": 4.5666
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Fe-56",
+        "DecayEnergy": 4.5666
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1118000000000000.0,
-    "decayHeat_W_per_g": 394.8,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1118000000000000.0,
+    "DecayHeat": 394.8,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Co",
-    "parentZ": 27,
-    "massNumber": 57,
-    "isotopeSymbol": "Co-57",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "271.74 d",
-    "halfLife_seconds": 23480000.0,
-    "decayModes": [
+    "ParentSymbol": "Co",
+    "ParentZ": 27,
+    "MassNumber": 57,
+    "IsotopeSymbol": "Co-57",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "271.74 d",
+    "HalfLifeSeconds": 23480000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Fe-57",
-        "decayEnergy_MeV": 0.8364
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Fe-57",
+        "DecayEnergy": 0.8364
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 312300000000000.0,
-    "decayHeat_W_per_g": 2.092,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 312300000000000.0,
+    "DecayHeat": 2.092,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Co",
-    "parentZ": 27,
-    "massNumber": 58,
-    "isotopeSymbol": "Co-58",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "70.86 d",
-    "halfLife_seconds": 6122000.0,
-    "decayModes": [
+    "ParentSymbol": "Co",
+    "ParentZ": 27,
+    "MassNumber": 58,
+    "IsotopeSymbol": "Co-58",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "70.86 d",
+    "HalfLifeSeconds": 6122000.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Fe-58",
-        "decayEnergy_MeV": 2.308
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Fe-58",
+        "DecayEnergy": 2.308
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1177000000000000.0,
-    "decayHeat_W_per_g": 273.5,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1177000000000000.0,
+    "DecayHeat": 273.5,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Co",
-    "parentZ": 27,
-    "massNumber": 59,
-    "isotopeSymbol": "Co-59",
-    "naturalAbundance_percent": 100.0,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Co",
+    "ParentZ": 27,
+    "MassNumber": 59,
+    "IsotopeSymbol": "Co-59",
+    "NaturalAbundance": 100.0,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Co",
-    "parentZ": 27,
-    "massNumber": 60,
-    "isotopeSymbol": "Co-60",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "5.2713 y",
-    "halfLife_seconds": 166300000.0,
-    "decayModes": [
+    "ParentSymbol": "Co",
+    "ParentZ": 27,
+    "MassNumber": 60,
+    "IsotopeSymbol": "Co-60",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "5.2713 y",
+    "HalfLifeSeconds": 166300000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Ni-60",
-        "decayEnergy_MeV": 2.8228
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Ni-60",
+        "DecayEnergy": 2.8228
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 41870000000000.0,
-    "decayHeat_W_per_g": 6.312,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 41870000000000.0,
+    "DecayHeat": 6.312,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ni",
-    "parentZ": 28,
-    "massNumber": 56,
-    "isotopeSymbol": "Ni-56",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "6.075 d",
-    "halfLife_seconds": 524900.0,
-    "decayModes": [
+    "ParentSymbol": "Ni",
+    "ParentZ": 28,
+    "MassNumber": 56,
+    "IsotopeSymbol": "Ni-56",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "6.075 d",
+    "HalfLifeSeconds": 524900.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Co-56",
-        "decayEnergy_MeV": 2.1329
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Co-56",
+        "DecayEnergy": 2.1329
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.422e+16,
-    "decayHeat_W_per_g": 3171.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.422e+16,
+    "DecayHeat": 3171.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ni",
-    "parentZ": 28,
-    "massNumber": 57,
-    "isotopeSymbol": "Ni-57",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "35.60 h",
-    "halfLife_seconds": 128200.0,
-    "decayModes": [
+    "ParentSymbol": "Ni",
+    "ParentZ": 28,
+    "MassNumber": 57,
+    "IsotopeSymbol": "Ni-57",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "35.60 h",
+    "HalfLifeSeconds": 128200.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Co-57",
-        "decayEnergy_MeV": 3.2617
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Co-57",
+        "DecayEnergy": 3.2617
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 5.72e+16,
-    "decayHeat_W_per_g": 16210.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 5.72e+16,
+    "DecayHeat": 16210.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ni",
-    "parentZ": 28,
-    "massNumber": 58,
-    "isotopeSymbol": "Ni-58",
-    "naturalAbundance_percent": 68.0769,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ni",
+    "ParentZ": 28,
+    "MassNumber": 58,
+    "IsotopeSymbol": "Ni-58",
+    "NaturalAbundance": 68.0769,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ni",
-    "parentZ": 28,
-    "massNumber": 59,
-    "isotopeSymbol": "Ni-59",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "0.101 My",
-    "halfLife_seconds": 3187000000000.0,
-    "decayModes": [
+    "ParentSymbol": "Ni",
+    "ParentZ": 28,
+    "MassNumber": 59,
+    "IsotopeSymbol": "Ni-59",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "0.101 My",
+    "HalfLifeSeconds": 3187000000000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture + minor beta-plus",
-        "branching_percent": 100.0,
-        "daughter": "Co-59",
-        "decayEnergy_MeV": 1.073
+        "Mode": "electron-capture + minor beta-plus",
+        "Branching": 100.0,
+        "Daughter": "Co-59",
+        "DecayEnergy": 1.073
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2222000000.0,
-    "decayHeat_W_per_g": 1.91e-05,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2222000000.0,
+    "DecayHeat": 1.91e-05,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ni",
-    "parentZ": 28,
-    "massNumber": 60,
-    "isotopeSymbol": "Ni-60",
-    "naturalAbundance_percent": 26.2231,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ni",
+    "ParentZ": 28,
+    "MassNumber": 60,
+    "IsotopeSymbol": "Ni-60",
+    "NaturalAbundance": 26.2231,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ni",
-    "parentZ": 28,
-    "massNumber": 61,
-    "isotopeSymbol": "Ni-61",
-    "naturalAbundance_percent": 1.1399,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ni",
+    "ParentZ": 28,
+    "MassNumber": 61,
+    "IsotopeSymbol": "Ni-61",
+    "NaturalAbundance": 1.1399,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ni",
-    "parentZ": 28,
-    "massNumber": 62,
-    "isotopeSymbol": "Ni-62",
-    "naturalAbundance_percent": 3.6345,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ni",
+    "ParentZ": 28,
+    "MassNumber": 62,
+    "IsotopeSymbol": "Ni-62",
+    "NaturalAbundance": 3.6345,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ni",
-    "parentZ": 28,
-    "massNumber": 63,
-    "isotopeSymbol": "Ni-63",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "100.1 y",
-    "halfLife_seconds": 3159000000.0,
-    "decayModes": [
+    "ParentSymbol": "Ni",
+    "ParentZ": 28,
+    "MassNumber": 63,
+    "IsotopeSymbol": "Ni-63",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "100.1 y",
+    "HalfLifeSeconds": 3159000000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Cu-63",
-        "decayEnergy_MeV": 0.067
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Cu-63",
+        "DecayEnergy": 0.067
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2100000000000.0,
-    "decayHeat_W_per_g": 0.007511,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2100000000000.0,
+    "DecayHeat": 0.007511,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ni",
-    "parentZ": 28,
-    "massNumber": 64,
-    "isotopeSymbol": "Ni-64",
-    "naturalAbundance_percent": 0.9256,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ni",
+    "ParentZ": 28,
+    "MassNumber": 64,
+    "IsotopeSymbol": "Ni-64",
+    "NaturalAbundance": 0.9256,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ni",
-    "parentZ": 28,
-    "massNumber": 66,
-    "isotopeSymbol": "Ni-66",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "54.6 h",
-    "halfLife_seconds": 196600.0,
-    "decayModes": [
+    "ParentSymbol": "Ni",
+    "ParentZ": 28,
+    "MassNumber": 66,
+    "IsotopeSymbol": "Ni-66",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "54.6 h",
+    "HalfLifeSeconds": 196600.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Cu-66",
-        "decayEnergy_MeV": 0.252
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Cu-66",
+        "DecayEnergy": 0.252
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 3.221e+16,
-    "decayHeat_W_per_g": 433.5,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 3.221e+16,
+    "DecayHeat": 433.5,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Cu",
-    "parentZ": 29,
-    "massNumber": 63,
-    "isotopeSymbol": "Cu-63",
-    "naturalAbundance_percent": 69.15,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Cu",
+    "ParentZ": 29,
+    "MassNumber": 63,
+    "IsotopeSymbol": "Cu-63",
+    "NaturalAbundance": 69.15,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Cu",
-    "parentZ": 29,
-    "massNumber": 65,
-    "isotopeSymbol": "Cu-65",
-    "naturalAbundance_percent": 30.85,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Cu",
+    "ParentZ": 29,
+    "MassNumber": 65,
+    "IsotopeSymbol": "Cu-65",
+    "NaturalAbundance": 30.85,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Cu",
-    "parentZ": 29,
-    "massNumber": 67,
-    "isotopeSymbol": "Cu-67",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "61.83 h",
-    "halfLife_seconds": 222600.0,
-    "decayModes": [
+    "ParentSymbol": "Cu",
+    "ParentZ": 29,
+    "MassNumber": 67,
+    "IsotopeSymbol": "Cu-67",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "61.83 h",
+    "HalfLifeSeconds": 222600.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Zn-67",
-        "decayEnergy_MeV": 0.5608
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Zn-67",
+        "DecayEnergy": 0.5608
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 2.802e+16,
-    "decayHeat_W_per_g": 839.2,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 2.802e+16,
+    "DecayHeat": 839.2,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zn",
-    "parentZ": 30,
-    "massNumber": 64,
-    "isotopeSymbol": "Zn-64",
-    "naturalAbundance_percent": 49.17,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Zn",
+    "ParentZ": 30,
+    "MassNumber": 64,
+    "IsotopeSymbol": "Zn-64",
+    "NaturalAbundance": 49.17,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zn",
-    "parentZ": 30,
-    "massNumber": 65,
-    "isotopeSymbol": "Zn-65",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "244.06 d",
-    "halfLife_seconds": 21090000.0,
-    "decayModes": [
+    "ParentSymbol": "Zn",
+    "ParentZ": 30,
+    "MassNumber": 65,
+    "IsotopeSymbol": "Zn-65",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "244.06 d",
+    "HalfLifeSeconds": 21090000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture + minor beta-plus",
-        "branching_percent": 100.0,
-        "daughter": "Cu-65",
-        "decayEnergy_MeV": 1.3517
+        "Mode": "electron-capture + minor beta-plus",
+        "Branching": 100.0,
+        "Daughter": "Cu-65",
+        "DecayEnergy": 1.3517
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 304900000000000.0,
-    "decayHeat_W_per_g": 3.301,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 304900000000000.0,
+    "DecayHeat": 3.301,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zn",
-    "parentZ": 30,
-    "massNumber": 66,
-    "isotopeSymbol": "Zn-66",
-    "naturalAbundance_percent": 27.73,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Zn",
+    "ParentZ": 30,
+    "MassNumber": 66,
+    "IsotopeSymbol": "Zn-66",
+    "NaturalAbundance": 27.73,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zn",
-    "parentZ": 30,
-    "massNumber": 67,
-    "isotopeSymbol": "Zn-67",
-    "naturalAbundance_percent": 4.04,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Zn",
+    "ParentZ": 30,
+    "MassNumber": 67,
+    "IsotopeSymbol": "Zn-67",
+    "NaturalAbundance": 4.04,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zn",
-    "parentZ": 30,
-    "massNumber": 68,
-    "isotopeSymbol": "Zn-68",
-    "naturalAbundance_percent": 18.45,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Zn",
+    "ParentZ": 30,
+    "MassNumber": 68,
+    "IsotopeSymbol": "Zn-68",
+    "NaturalAbundance": 18.45,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zn",
-    "parentZ": 30,
-    "massNumber": 70,
-    "isotopeSymbol": "Zn-70",
-    "naturalAbundance_percent": 0.61,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Zn",
+    "ParentZ": 30,
+    "MassNumber": 70,
+    "IsotopeSymbol": "Zn-70",
+    "NaturalAbundance": 0.61,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zn",
-    "parentZ": 30,
-    "massNumber": 72,
-    "isotopeSymbol": "Zn-72",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "46.5 h",
-    "halfLife_seconds": 167400.0,
-    "decayModes": [
+    "ParentSymbol": "Zn",
+    "ParentZ": 30,
+    "MassNumber": 72,
+    "IsotopeSymbol": "Zn-72",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "46.5 h",
+    "HalfLifeSeconds": 167400.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Ga-72",
-        "decayEnergy_MeV": 0.4428
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Ga-72",
+        "DecayEnergy": 0.4428
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 3.467e+16,
-    "decayHeat_W_per_g": 819.8,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 3.467e+16,
+    "DecayHeat": 819.8,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ga",
-    "parentZ": 31,
-    "massNumber": 67,
-    "isotopeSymbol": "Ga-67",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "3.2612 d",
-    "halfLife_seconds": 281800.0,
-    "decayModes": [
+    "ParentSymbol": "Ga",
+    "ParentZ": 31,
+    "MassNumber": 67,
+    "IsotopeSymbol": "Ga-67",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "3.2612 d",
+    "HalfLifeSeconds": 281800.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Zn-67",
-        "decayEnergy_MeV": 1.0012
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Zn-67",
+        "DecayEnergy": 1.0012
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 2.213e+16,
-    "decayHeat_W_per_g": 177.5,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 2.213e+16,
+    "DecayHeat": 177.5,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ga",
-    "parentZ": 31,
-    "massNumber": 69,
-    "isotopeSymbol": "Ga-69",
-    "naturalAbundance_percent": 60.108,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ga",
+    "ParentZ": 31,
+    "MassNumber": 69,
+    "IsotopeSymbol": "Ga-69",
+    "NaturalAbundance": 60.108,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ga",
-    "parentZ": 31,
-    "massNumber": 71,
-    "isotopeSymbol": "Ga-71",
-    "naturalAbundance_percent": 39.892,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ga",
+    "ParentZ": 31,
+    "MassNumber": 71,
+    "IsotopeSymbol": "Ga-71",
+    "NaturalAbundance": 39.892,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ge",
-    "parentZ": 32,
-    "massNumber": 68,
-    "isotopeSymbol": "Ge-68",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "270.95 d",
-    "halfLife_seconds": 23410000.0,
-    "decayModes": [
+    "ParentSymbol": "Ge",
+    "ParentZ": 32,
+    "MassNumber": 68,
+    "IsotopeSymbol": "Ge-68",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "270.95 d",
+    "HalfLifeSeconds": 23410000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Ga-68",
-        "decayEnergy_MeV": 0.1073
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Ga-68",
+        "DecayEnergy": 0.1073
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 262500000000000.0,
-    "decayHeat_W_per_g": 0.2255,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 262500000000000.0,
+    "DecayHeat": 0.2255,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ge",
-    "parentZ": 32,
-    "massNumber": 69,
-    "isotopeSymbol": "Ge-69",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "39.05 h",
-    "halfLife_seconds": 140600.0,
-    "decayModes": [
+    "ParentSymbol": "Ge",
+    "ParentZ": 32,
+    "MassNumber": 69,
+    "IsotopeSymbol": "Ge-69",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "39.05 h",
+    "HalfLifeSeconds": 140600.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Ga-69",
-        "decayEnergy_MeV": 2.2271
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Ga-69",
+        "DecayEnergy": 2.2271
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 4.308e+16,
-    "decayHeat_W_per_g": 9826.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 4.308e+16,
+    "DecayHeat": 9826.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ge",
-    "parentZ": 32,
-    "massNumber": 70,
-    "isotopeSymbol": "Ge-70",
-    "naturalAbundance_percent": 20.52,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ge",
+    "ParentZ": 32,
+    "MassNumber": 70,
+    "IsotopeSymbol": "Ge-70",
+    "NaturalAbundance": 20.52,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ge",
-    "parentZ": 32,
-    "massNumber": 71,
-    "isotopeSymbol": "Ge-71",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "11.43 d",
-    "halfLife_seconds": 987600.0,
-    "decayModes": [
+    "ParentSymbol": "Ge",
+    "ParentZ": 32,
+    "MassNumber": 71,
+    "IsotopeSymbol": "Ge-71",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "11.43 d",
+    "HalfLifeSeconds": 987600.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Ga-71",
-        "decayEnergy_MeV": 0.2325
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Ga-71",
+        "DecayEnergy": 0.2325
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 5960000000000000.0,
-    "decayHeat_W_per_g": 11.1,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 5960000000000000.0,
+    "DecayHeat": 11.1,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ge",
-    "parentZ": 32,
-    "massNumber": 72,
-    "isotopeSymbol": "Ge-72",
-    "naturalAbundance_percent": 27.45,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ge",
+    "ParentZ": 32,
+    "MassNumber": 72,
+    "IsotopeSymbol": "Ge-72",
+    "NaturalAbundance": 27.45,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ge",
-    "parentZ": 32,
-    "massNumber": 73,
-    "isotopeSymbol": "Ge-73",
-    "naturalAbundance_percent": 7.76,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ge",
+    "ParentZ": 32,
+    "MassNumber": 73,
+    "IsotopeSymbol": "Ge-73",
+    "NaturalAbundance": 7.76,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ge",
-    "parentZ": 32,
-    "massNumber": 74,
-    "isotopeSymbol": "Ge-74",
-    "naturalAbundance_percent": 36.52,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ge",
+    "ParentZ": 32,
+    "MassNumber": 74,
+    "IsotopeSymbol": "Ge-74",
+    "NaturalAbundance": 36.52,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Ge",
-    "parentZ": 32,
-    "massNumber": 76,
-    "isotopeSymbol": "Ge-76",
-    "naturalAbundance_percent": 7.75,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Ge",
+    "ParentZ": 32,
+    "MassNumber": 76,
+    "IsotopeSymbol": "Ge-76",
+    "NaturalAbundance": 7.75,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "observationally stable: half-life 1.88 Zyear (double-beta-minus -> Se-76) exceeds the 1e+18-year stability threshold; treated as stable (decay is real but negligible, specific activity ~0)",
-    "value_confidence": "measured"
+    "Notes": "observationally stable: half-life 1.88 Zyear (double-beta-minus -> Se-76) exceeds the 1e+18-year stability threshold; treated as stable (decay is real but negligible, specific activity ~0)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "As",
-    "parentZ": 33,
-    "massNumber": 71,
-    "isotopeSymbol": "As-71",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "65.28 h",
-    "halfLife_seconds": 235000.0,
-    "decayModes": [
+    "ParentSymbol": "As",
+    "ParentZ": 33,
+    "MassNumber": 71,
+    "IsotopeSymbol": "As-71",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "65.28 h",
+    "HalfLifeSeconds": 235000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture + minor beta-plus",
-        "branching_percent": 100.0,
-        "daughter": "Ge-71",
-        "decayEnergy_MeV": 2.0134
+        "Mode": "electron-capture + minor beta-plus",
+        "Branching": 100.0,
+        "Daughter": "Ge-71",
+        "DecayEnergy": 2.0134
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2.504e+16,
-    "decayHeat_W_per_g": 403.9,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2.504e+16,
+    "DecayHeat": 403.9,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "As",
-    "parentZ": 33,
-    "massNumber": 72,
-    "isotopeSymbol": "As-72",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "26.0 h",
-    "halfLife_seconds": 93600.0,
-    "decayModes": [
+    "ParentSymbol": "As",
+    "ParentZ": 33,
+    "MassNumber": 72,
+    "IsotopeSymbol": "As-72",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "26.0 h",
+    "HalfLifeSeconds": 93600.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Ge-72",
-        "decayEnergy_MeV": 4.3561
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Ge-72",
+        "DecayEnergy": 4.3561
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 6.2e+16,
-    "decayHeat_W_per_g": 21190.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 6.2e+16,
+    "DecayHeat": 21190.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "As",
-    "parentZ": 33,
-    "massNumber": 73,
-    "isotopeSymbol": "As-73",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "80.30 d",
-    "halfLife_seconds": 6938000.0,
-    "decayModes": [
+    "ParentSymbol": "As",
+    "ParentZ": 33,
+    "MassNumber": 73,
+    "IsotopeSymbol": "As-73",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "80.30 d",
+    "HalfLifeSeconds": 6938000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Ge-73",
-        "decayEnergy_MeV": 0.3448
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Ge-73",
+        "DecayEnergy": 0.3448
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 825000000000000.0,
-    "decayHeat_W_per_g": 2.279,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 825000000000000.0,
+    "DecayHeat": 2.279,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "As",
-    "parentZ": 33,
-    "massNumber": 74,
-    "isotopeSymbol": "As-74",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "17.77 d",
-    "halfLife_seconds": 1535000.0,
-    "decayModes": [
+    "ParentSymbol": "As",
+    "ParentZ": 33,
+    "MassNumber": 74,
+    "IsotopeSymbol": "As-74",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "17.77 d",
+    "HalfLifeSeconds": 1535000.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 66.0,
-        "daughter": "Ge-74",
-        "decayEnergy_MeV": 2.5624
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 66.0,
+        "Daughter": "Ge-74",
+        "DecayEnergy": 2.5624
       },
       {
-        "mode": "beta-minus",
-        "branching_percent": 34.0,
-        "daughter": "Se-74",
-        "decayEnergy_MeV": 1.3531
+        "Mode": "beta-minus",
+        "Branching": 34.0,
+        "Daughter": "Se-74",
+        "DecayEnergy": 1.3531
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 3678000000000000.0,
-    "decayHeat_W_per_g": 687.5,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 3678000000000000.0,
+    "DecayHeat": 687.5,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "As",
-    "parentZ": 33,
-    "massNumber": 75,
-    "isotopeSymbol": "As-75",
-    "naturalAbundance_percent": 100.0,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "As",
+    "ParentZ": 33,
+    "MassNumber": 75,
+    "IsotopeSymbol": "As-75",
+    "NaturalAbundance": 100.0,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "As",
-    "parentZ": 33,
-    "massNumber": 76,
-    "isotopeSymbol": "As-76",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "1.0778 d",
-    "halfLife_seconds": 93120.0,
-    "decayModes": [
+    "ParentSymbol": "As",
+    "ParentZ": 33,
+    "MassNumber": 76,
+    "IsotopeSymbol": "As-76",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "1.0778 d",
+    "HalfLifeSeconds": 93120.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Se-76",
-        "decayEnergy_MeV": 2.9606
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Se-76",
+        "DecayEnergy": 2.9606
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 5.904e+16,
-    "decayHeat_W_per_g": 9335.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 5.904e+16,
+    "DecayHeat": 9335.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "As",
-    "parentZ": 33,
-    "massNumber": 77,
-    "isotopeSymbol": "As-77",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "38.83 h",
-    "halfLife_seconds": 139800.0,
-    "decayModes": [
+    "ParentSymbol": "As",
+    "ParentZ": 33,
+    "MassNumber": 77,
+    "IsotopeSymbol": "As-77",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "38.83 h",
+    "HalfLifeSeconds": 139800.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Se-77",
-        "decayEnergy_MeV": 0.6832
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Se-77",
+        "DecayEnergy": 0.6832
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 3.882e+16,
-    "decayHeat_W_per_g": 1416.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 3.882e+16,
+    "DecayHeat": 1416.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Se",
-    "parentZ": 34,
-    "massNumber": 72,
-    "isotopeSymbol": "Se-72",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "8.40 d",
-    "halfLife_seconds": 725800.0,
-    "decayModes": [
+    "ParentSymbol": "Se",
+    "ParentZ": 34,
+    "MassNumber": 72,
+    "IsotopeSymbol": "Se-72",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "8.40 d",
+    "HalfLifeSeconds": 725800.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "As-72",
-        "decayEnergy_MeV": 0.3616
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "As-72",
+        "DecayEnergy": 0.3616
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 7996000000000000.0,
-    "decayHeat_W_per_g": 23.16,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 7996000000000000.0,
+    "DecayHeat": 23.16,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Se",
-    "parentZ": 34,
-    "massNumber": 74,
-    "isotopeSymbol": "Se-74",
-    "naturalAbundance_percent": 0.86,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Se",
+    "ParentZ": 34,
+    "MassNumber": 74,
+    "IsotopeSymbol": "Se-74",
+    "NaturalAbundance": 0.86,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Se",
-    "parentZ": 34,
-    "massNumber": 75,
-    "isotopeSymbol": "Se-75",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "119.779 d",
-    "halfLife_seconds": 10350000.0,
-    "decayModes": [
+    "ParentSymbol": "Se",
+    "ParentZ": 34,
+    "MassNumber": 75,
+    "IsotopeSymbol": "Se-75",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "119.779 d",
+    "HalfLifeSeconds": 10350000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "As-75",
-        "decayEnergy_MeV": 0.8647
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "As-75",
+        "DecayEnergy": 0.8647
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 538400000000000.0,
-    "decayHeat_W_per_g": 3.729,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 538400000000000.0,
+    "DecayHeat": 3.729,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Se",
-    "parentZ": 34,
-    "massNumber": 76,
-    "isotopeSymbol": "Se-76",
-    "naturalAbundance_percent": 9.23,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Se",
+    "ParentZ": 34,
+    "MassNumber": 76,
+    "IsotopeSymbol": "Se-76",
+    "NaturalAbundance": 9.23,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Se",
-    "parentZ": 34,
-    "massNumber": 77,
-    "isotopeSymbol": "Se-77",
-    "naturalAbundance_percent": 7.6,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Se",
+    "ParentZ": 34,
+    "MassNumber": 77,
+    "IsotopeSymbol": "Se-77",
+    "NaturalAbundance": 7.6,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Se",
-    "parentZ": 34,
-    "massNumber": 78,
-    "isotopeSymbol": "Se-78",
-    "naturalAbundance_percent": 23.69,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Se",
+    "ParentZ": 34,
+    "MassNumber": 78,
+    "IsotopeSymbol": "Se-78",
+    "NaturalAbundance": 23.69,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Se",
-    "parentZ": 34,
-    "massNumber": 79,
-    "isotopeSymbol": "Se-79",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "0.295 My",
-    "halfLife_seconds": 9309000000000.0,
-    "decayModes": [
+    "ParentSymbol": "Se",
+    "ParentZ": 34,
+    "MassNumber": 79,
+    "IsotopeSymbol": "Se-79",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "0.295 My",
+    "HalfLifeSeconds": 9309000000000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Br-79",
-        "decayEnergy_MeV": 0.1506
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Br-79",
+        "DecayEnergy": 0.1506
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 568200000.0,
-    "decayHeat_W_per_g": 4.57e-06,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 568200000.0,
+    "DecayHeat": 4.57e-06,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Se",
-    "parentZ": 34,
-    "massNumber": 80,
-    "isotopeSymbol": "Se-80",
-    "naturalAbundance_percent": 49.8,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Se",
+    "ParentZ": 34,
+    "MassNumber": 80,
+    "IsotopeSymbol": "Se-80",
+    "NaturalAbundance": 49.8,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Se",
-    "parentZ": 34,
-    "massNumber": 82,
-    "isotopeSymbol": "Se-82",
-    "naturalAbundance_percent": 8.82,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Se",
+    "ParentZ": 34,
+    "MassNumber": 82,
+    "IsotopeSymbol": "Se-82",
+    "NaturalAbundance": 8.82,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "observationally stable: half-life 87.6 Eyear (double-beta-minus -> Kr-82) exceeds the 1e+18-year stability threshold; treated as stable (decay is real but negligible, specific activity ~0)",
-    "value_confidence": "measured"
+    "Notes": "observationally stable: half-life 87.6 Eyear (double-beta-minus -> Kr-82) exceeds the 1e+18-year stability threshold; treated as stable (decay is real but negligible, specific activity ~0)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Br",
-    "parentZ": 35,
-    "massNumber": 77,
-    "isotopeSymbol": "Br-77",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "57.036 h",
-    "halfLife_seconds": 205300.0,
-    "decayModes": [
+    "ParentSymbol": "Br",
+    "ParentZ": 35,
+    "MassNumber": 77,
+    "IsotopeSymbol": "Br-77",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "57.036 h",
+    "HalfLifeSeconds": 205300.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture + minor beta-plus",
-        "branching_percent": 100.0,
-        "daughter": "Se-77",
-        "decayEnergy_MeV": 1.3647
+        "Mode": "electron-capture + minor beta-plus",
+        "Branching": 100.0,
+        "Daughter": "Se-77",
+        "DecayEnergy": 1.3647
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2.643e+16,
-    "decayHeat_W_per_g": 288.9,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2.643e+16,
+    "DecayHeat": 288.9,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Br",
-    "parentZ": 35,
-    "massNumber": 79,
-    "isotopeSymbol": "Br-79",
-    "naturalAbundance_percent": 50.65,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Br",
+    "ParentZ": 35,
+    "MassNumber": 79,
+    "IsotopeSymbol": "Br-79",
+    "NaturalAbundance": 50.65,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Br",
-    "parentZ": 35,
-    "massNumber": 81,
-    "isotopeSymbol": "Br-81",
-    "naturalAbundance_percent": 49.35,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Br",
+    "ParentZ": 35,
+    "MassNumber": 81,
+    "IsotopeSymbol": "Br-81",
+    "NaturalAbundance": 49.35,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Br",
-    "parentZ": 35,
-    "massNumber": 82,
-    "isotopeSymbol": "Br-82",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "35.30 h",
-    "halfLife_seconds": 127100.0,
-    "decayModes": [
+    "ParentSymbol": "Br",
+    "ParentZ": 35,
+    "MassNumber": 82,
+    "IsotopeSymbol": "Br-82",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "35.30 h",
+    "HalfLifeSeconds": 127100.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Kr-82",
-        "decayEnergy_MeV": 3.0931
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Kr-82",
+        "DecayEnergy": 3.0931
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 4.01e+16,
-    "decayHeat_W_per_g": 6624.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 4.01e+16,
+    "DecayHeat": 6624.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Kr",
-    "parentZ": 36,
-    "massNumber": 78,
-    "isotopeSymbol": "Kr-78",
-    "naturalAbundance_percent": 0.355,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Kr",
+    "ParentZ": 36,
+    "MassNumber": 78,
+    "IsotopeSymbol": "Kr-78",
+    "NaturalAbundance": 0.355,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Kr",
-    "parentZ": 36,
-    "massNumber": 79,
-    "isotopeSymbol": "Kr-79",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "35.04 h",
-    "halfLife_seconds": 126100.0,
-    "decayModes": [
+    "ParentSymbol": "Kr",
+    "ParentZ": 36,
+    "MassNumber": 79,
+    "IsotopeSymbol": "Kr-79",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "35.04 h",
+    "HalfLifeSeconds": 126100.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture + minor beta-plus",
-        "branching_percent": 100.0,
-        "daughter": "Br-79",
-        "decayEnergy_MeV": 1.6258
+        "Mode": "electron-capture + minor beta-plus",
+        "Branching": 100.0,
+        "Daughter": "Br-79",
+        "DecayEnergy": 1.6258
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 4.193e+16,
-    "decayHeat_W_per_g": 546.1,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 4.193e+16,
+    "DecayHeat": 546.1,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Kr",
-    "parentZ": 36,
-    "massNumber": 80,
-    "isotopeSymbol": "Kr-80",
-    "naturalAbundance_percent": 2.286,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Kr",
+    "ParentZ": 36,
+    "MassNumber": 80,
+    "IsotopeSymbol": "Kr-80",
+    "NaturalAbundance": 2.286,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Kr",
-    "parentZ": 36,
-    "massNumber": 81,
-    "isotopeSymbol": "Kr-81",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "0.229 My",
-    "halfLife_seconds": 7227000000000.0,
-    "decayModes": [
+    "ParentSymbol": "Kr",
+    "ParentZ": 36,
+    "MassNumber": 81,
+    "IsotopeSymbol": "Kr-81",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "0.229 My",
+    "HalfLifeSeconds": 7227000000000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Br-81",
-        "decayEnergy_MeV": 0.2809
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Br-81",
+        "DecayEnergy": 0.2809
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 713900000.0,
-    "decayHeat_W_per_g": 1.606e-06,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 713900000.0,
+    "DecayHeat": 1.606e-06,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Kr",
-    "parentZ": 36,
-    "massNumber": 82,
-    "isotopeSymbol": "Kr-82",
-    "naturalAbundance_percent": 11.593,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Kr",
+    "ParentZ": 36,
+    "MassNumber": 82,
+    "IsotopeSymbol": "Kr-82",
+    "NaturalAbundance": 11.593,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Kr",
-    "parentZ": 36,
-    "massNumber": 83,
-    "isotopeSymbol": "Kr-83",
-    "naturalAbundance_percent": 11.5,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Kr",
+    "ParentZ": 36,
+    "MassNumber": 83,
+    "IsotopeSymbol": "Kr-83",
+    "NaturalAbundance": 11.5,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Kr",
-    "parentZ": 36,
-    "massNumber": 84,
-    "isotopeSymbol": "Kr-84",
-    "naturalAbundance_percent": 56.987,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Kr",
+    "ParentZ": 36,
+    "MassNumber": 84,
+    "IsotopeSymbol": "Kr-84",
+    "NaturalAbundance": 56.987,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Kr",
-    "parentZ": 36,
-    "massNumber": 85,
-    "isotopeSymbol": "Kr-85",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "10.756 y",
-    "halfLife_seconds": 339400000.0,
-    "decayModes": [
+    "ParentSymbol": "Kr",
+    "ParentZ": 36,
+    "MassNumber": 85,
+    "IsotopeSymbol": "Kr-85",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "10.756 y",
+    "HalfLifeSeconds": 339400000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Rb-85",
-        "decayEnergy_MeV": 0.687
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Rb-85",
+        "DecayEnergy": 0.687
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 14480000000000.0,
-    "decayHeat_W_per_g": 0.5314,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 14480000000000.0,
+    "DecayHeat": 0.5314,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Kr",
-    "parentZ": 36,
-    "massNumber": 86,
-    "isotopeSymbol": "Kr-86",
-    "naturalAbundance_percent": 17.279,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Kr",
+    "ParentZ": 36,
+    "MassNumber": 86,
+    "IsotopeSymbol": "Kr-86",
+    "NaturalAbundance": 17.279,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Rb",
-    "parentZ": 37,
-    "massNumber": 83,
-    "isotopeSymbol": "Rb-83",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "86.2 d",
-    "halfLife_seconds": 7448000.0,
-    "decayModes": [
+    "ParentSymbol": "Rb",
+    "ParentZ": 37,
+    "MassNumber": 83,
+    "IsotopeSymbol": "Rb-83",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "86.2 d",
+    "HalfLifeSeconds": 7448000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 74.292,
-        "daughter": "Kr-83m",
-        "decayEnergy_MeV": 0.92
+        "Mode": "electron-capture",
+        "Branching": 74.292,
+        "Daughter": "Kr-83m",
+        "DecayEnergy": 0.92
       },
       {
-        "mode": "electron-capture",
-        "branching_percent": 25.708,
-        "daughter": "Kr-83",
-        "decayEnergy_MeV": 0.92
+        "Mode": "electron-capture",
+        "Branching": 25.708,
+        "Daughter": "Kr-83",
+        "DecayEnergy": 0.92
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 676000000000000.0,
-    "decayHeat_W_per_g": 4.982,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 676000000000000.0,
+    "DecayHeat": 4.982,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "a branch feeds a metastable (isomeric) daughter; decayEnergy_MeV is the Q-value to the daughter ground state, so that branch releases less by the isomer energy; significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "a branch feeds a metastable (isomeric) daughter; decayEnergy_MeV is the Q-value to the daughter ground state, so that branch releases less by the isomer energy; significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Rb",
-    "parentZ": 37,
-    "massNumber": 84,
-    "isotopeSymbol": "Rb-84",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "32.77 d",
-    "halfLife_seconds": 2831000.0,
-    "decayModes": [
+    "ParentSymbol": "Rb",
+    "ParentZ": 37,
+    "MassNumber": 84,
+    "IsotopeSymbol": "Rb-84",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "32.77 d",
+    "HalfLifeSeconds": 2831000.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 96.2,
-        "daughter": "Kr-84",
-        "decayEnergy_MeV": 2.6804
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 96.2,
+        "Daughter": "Kr-84",
+        "DecayEnergy": 2.6804
       },
       {
-        "mode": "beta-minus",
-        "branching_percent": 3.8,
-        "daughter": "Sr-84",
-        "decayEnergy_MeV": 0.8906
+        "Mode": "beta-minus",
+        "Branching": 3.8,
+        "Daughter": "Sr-84",
+        "DecayEnergy": 0.8906
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1757000000000000.0,
-    "decayHeat_W_per_g": 429.6,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1757000000000000.0,
+    "DecayHeat": 429.6,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Rb",
-    "parentZ": 37,
-    "massNumber": 85,
-    "isotopeSymbol": "Rb-85",
-    "naturalAbundance_percent": 72.17,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Rb",
+    "ParentZ": 37,
+    "MassNumber": 85,
+    "IsotopeSymbol": "Rb-85",
+    "NaturalAbundance": 72.17,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Rb",
-    "parentZ": 37,
-    "massNumber": 86,
-    "isotopeSymbol": "Rb-86",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "18.642 d",
-    "halfLife_seconds": 1611000.0,
-    "decayModes": [
+    "ParentSymbol": "Rb",
+    "ParentZ": 37,
+    "MassNumber": 86,
+    "IsotopeSymbol": "Rb-86",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "18.642 d",
+    "HalfLifeSeconds": 1611000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 99.995,
-        "daughter": "Sr-86",
-        "decayEnergy_MeV": 1.7761
+        "Mode": "beta-minus",
+        "Branching": 99.995,
+        "Daughter": "Sr-86",
+        "DecayEnergy": 1.7761
       },
       {
-        "mode": "electron-capture",
-        "branching_percent": 0.0052,
-        "daughter": "Kr-86",
-        "decayEnergy_MeV": 0.5187
+        "Mode": "electron-capture",
+        "Branching": 0.0052,
+        "Daughter": "Kr-86",
+        "DecayEnergy": 0.5187
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 3017000000000000.0,
-    "decayHeat_W_per_g": 286.1,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 3017000000000000.0,
+    "DecayHeat": 286.1,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Rb",
-    "parentZ": 37,
-    "massNumber": 87,
-    "isotopeSymbol": "Rb-87",
-    "naturalAbundance_percent": 27.83,
-    "stability": "radioactive",
-    "halfLife": "49.23 By",
-    "halfLife_seconds": 1.554e+18,
-    "decayModes": [
+    "ParentSymbol": "Rb",
+    "ParentZ": 37,
+    "MassNumber": 87,
+    "IsotopeSymbol": "Rb-87",
+    "NaturalAbundance": 27.83,
+    "Stability": "radioactive",
+    "HalfLife": "49.23 By",
+    "HalfLifeSeconds": 1.554e+18,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Sr-87",
-        "decayEnergy_MeV": 0.2823
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Sr-87",
+        "DecayEnergy": 0.2823
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 3092.0,
-    "decayHeat_W_per_g": 4.661e-11,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 3092.0,
+    "DecayHeat": 4.661e-11,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled); primordial / observationally near-stable despite radioactive classification",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled); primordial / observationally near-stable despite radioactive classification",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sr",
-    "parentZ": 38,
-    "massNumber": 82,
-    "isotopeSymbol": "Sr-82",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "25.36 d",
-    "halfLife_seconds": 2191000.0,
-    "decayModes": [
+    "ParentSymbol": "Sr",
+    "ParentZ": 38,
+    "MassNumber": 82,
+    "IsotopeSymbol": "Sr-82",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "25.36 d",
+    "HalfLifeSeconds": 2191000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Rb-82",
-        "decayEnergy_MeV": 0.1777
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Rb-82",
+        "DecayEnergy": 0.1777
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2326000000000000.0,
-    "decayHeat_W_per_g": 3.311,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2326000000000000.0,
+    "DecayHeat": 3.311,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sr",
-    "parentZ": 38,
-    "massNumber": 83,
-    "isotopeSymbol": "Sr-83",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "32.41 h",
-    "halfLife_seconds": 116700.0,
-    "decayModes": [
+    "ParentSymbol": "Sr",
+    "ParentZ": 38,
+    "MassNumber": 83,
+    "IsotopeSymbol": "Sr-83",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "32.41 h",
+    "HalfLifeSeconds": 116700.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Rb-83",
-        "decayEnergy_MeV": 2.273
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Rb-83",
+        "DecayEnergy": 2.273
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 4.315e+16,
-    "decayHeat_W_per_g": 9948.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 4.315e+16,
+    "DecayHeat": 9948.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sr",
-    "parentZ": 38,
-    "massNumber": 84,
-    "isotopeSymbol": "Sr-84",
-    "naturalAbundance_percent": 0.56,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Sr",
+    "ParentZ": 38,
+    "MassNumber": 84,
+    "IsotopeSymbol": "Sr-84",
+    "NaturalAbundance": 0.56,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sr",
-    "parentZ": 38,
-    "massNumber": 85,
-    "isotopeSymbol": "Sr-85",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "64.84 d",
-    "halfLife_seconds": 5602000.0,
-    "decayModes": [
+    "ParentSymbol": "Sr",
+    "ParentZ": 38,
+    "MassNumber": 85,
+    "IsotopeSymbol": "Sr-85",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "64.84 d",
+    "HalfLifeSeconds": 5602000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Rb-85",
-        "decayEnergy_MeV": 1.0641
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Rb-85",
+        "DecayEnergy": 1.0641
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 877500000000000.0,
-    "decayHeat_W_per_g": 7.48,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 877500000000000.0,
+    "DecayHeat": 7.48,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sr",
-    "parentZ": 38,
-    "massNumber": 86,
-    "isotopeSymbol": "Sr-86",
-    "naturalAbundance_percent": 9.86,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Sr",
+    "ParentZ": 38,
+    "MassNumber": 86,
+    "IsotopeSymbol": "Sr-86",
+    "NaturalAbundance": 9.86,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sr",
-    "parentZ": 38,
-    "massNumber": 87,
-    "isotopeSymbol": "Sr-87",
-    "naturalAbundance_percent": 7.0,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Sr",
+    "ParentZ": 38,
+    "MassNumber": 87,
+    "IsotopeSymbol": "Sr-87",
+    "NaturalAbundance": 7.0,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sr",
-    "parentZ": 38,
-    "massNumber": 88,
-    "isotopeSymbol": "Sr-88",
-    "naturalAbundance_percent": 82.58,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Sr",
+    "ParentZ": 38,
+    "MassNumber": 88,
+    "IsotopeSymbol": "Sr-88",
+    "NaturalAbundance": 82.58,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sr",
-    "parentZ": 38,
-    "massNumber": 89,
-    "isotopeSymbol": "Sr-89",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "50.53 d",
-    "halfLife_seconds": 4366000.0,
-    "decayModes": [
+    "ParentSymbol": "Sr",
+    "ParentZ": 38,
+    "MassNumber": 89,
+    "IsotopeSymbol": "Sr-89",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "50.53 d",
+    "HalfLifeSeconds": 4366000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Y-89",
-        "decayEnergy_MeV": 1.5022
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Y-89",
+        "DecayEnergy": 1.5022
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1075000000000000.0,
-    "decayHeat_W_per_g": 86.28,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1075000000000000.0,
+    "DecayHeat": 86.28,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Sr",
-    "parentZ": 38,
-    "massNumber": 90,
-    "isotopeSymbol": "Sr-90",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "28.79 y",
-    "halfLife_seconds": 908500000.0,
-    "decayModes": [
+    "ParentSymbol": "Sr",
+    "ParentZ": 38,
+    "MassNumber": 90,
+    "IsotopeSymbol": "Sr-90",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "28.79 y",
+    "HalfLifeSeconds": 908500000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Y-90",
-        "decayEnergy_MeV": 0.546
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Y-90",
+        "DecayEnergy": 0.546
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 5110000000000.0,
-    "decayHeat_W_per_g": 0.149,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 5110000000000.0,
+    "DecayHeat": 0.149,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Y",
-    "parentZ": 39,
-    "massNumber": 87,
-    "isotopeSymbol": "Y-87",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "79.8 h",
-    "halfLife_seconds": 287300.0,
-    "decayModes": [
+    "ParentSymbol": "Y",
+    "ParentZ": 39,
+    "MassNumber": 87,
+    "IsotopeSymbol": "Y-87",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "79.8 h",
+    "HalfLifeSeconds": 287300.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture + minor beta-plus",
-        "branching_percent": 100.0,
-        "daughter": "Sr-87m",
-        "decayEnergy_MeV": 1.8617
+        "Mode": "electron-capture + minor beta-plus",
+        "Branching": 100.0,
+        "Daughter": "Sr-87m",
+        "DecayEnergy": 1.8617
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.672e+16,
-    "decayHeat_W_per_g": 249.3,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.672e+16,
+    "DecayHeat": 249.3,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "a branch feeds a metastable (isomeric) daughter; decayEnergy_MeV is the Q-value to the daughter ground state, so that branch releases less by the isomer energy; significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "a branch feeds a metastable (isomeric) daughter; decayEnergy_MeV is the Q-value to the daughter ground state, so that branch releases less by the isomer energy; significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Y",
-    "parentZ": 39,
-    "massNumber": 88,
-    "isotopeSymbol": "Y-88",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "106.65 d",
-    "halfLife_seconds": 9215000.0,
-    "decayModes": [
+    "ParentSymbol": "Y",
+    "ParentZ": 39,
+    "MassNumber": 88,
+    "IsotopeSymbol": "Y-88",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "106.65 d",
+    "HalfLifeSeconds": 9215000.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Sr-88",
-        "decayEnergy_MeV": 3.6226
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Sr-88",
+        "DecayEnergy": 3.6226
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 515300000000000.0,
-    "decayHeat_W_per_g": 155.9,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 515300000000000.0,
+    "DecayHeat": 155.9,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Y",
-    "parentZ": 39,
-    "massNumber": 89,
-    "isotopeSymbol": "Y-89",
-    "naturalAbundance_percent": 100.0,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Y",
+    "ParentZ": 39,
+    "MassNumber": 89,
+    "IsotopeSymbol": "Y-89",
+    "NaturalAbundance": 100.0,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Y",
-    "parentZ": 39,
-    "massNumber": 90,
-    "isotopeSymbol": "Y-90",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "64.10 h",
-    "halfLife_seconds": 230800.0,
-    "decayModes": [
+    "ParentSymbol": "Y",
+    "ParentZ": 39,
+    "MassNumber": 90,
+    "IsotopeSymbol": "Y-90",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "64.10 h",
+    "HalfLifeSeconds": 230800.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Zr-90",
-        "decayEnergy_MeV": 2.2756
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Zr-90",
+        "DecayEnergy": 2.2756
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 2.012e+16,
-    "decayHeat_W_per_g": 2445.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 2.012e+16,
+    "DecayHeat": 2445.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Y",
-    "parentZ": 39,
-    "massNumber": 91,
-    "isotopeSymbol": "Y-91",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "58.51 d",
-    "halfLife_seconds": 5055000.0,
-    "decayModes": [
+    "ParentSymbol": "Y",
+    "ParentZ": 39,
+    "MassNumber": 91,
+    "IsotopeSymbol": "Y-91",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "58.51 d",
+    "HalfLifeSeconds": 5055000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 100.0,
-        "daughter": "Zr-91",
-        "decayEnergy_MeV": 1.5443
+        "Mode": "beta-minus",
+        "Branching": 100.0,
+        "Daughter": "Zr-91",
+        "DecayEnergy": 1.5443
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 908300000000000.0,
-    "decayHeat_W_per_g": 74.91,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 908300000000000.0,
+    "DecayHeat": 74.91,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zr",
-    "parentZ": 40,
-    "massNumber": 88,
-    "isotopeSymbol": "Zr-88",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "83.4 d",
-    "halfLife_seconds": 7206000.0,
-    "decayModes": [
+    "ParentSymbol": "Zr",
+    "ParentZ": 40,
+    "MassNumber": 88,
+    "IsotopeSymbol": "Zr-88",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "83.4 d",
+    "HalfLifeSeconds": 7206000.0,
+    "DecayModes": [
       {
-        "mode": "electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Y-88",
-        "decayEnergy_MeV": 0.6702
+        "Mode": "electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Y-88",
+        "DecayEnergy": 0.6702
       }
     ],
-    "dominantEmission": "electron-capture",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 659000000000000.0,
-    "decayHeat_W_per_g": 3.538,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "electron-capture",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 659000000000000.0,
+    "DecayHeat": 3.538,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zr",
-    "parentZ": 40,
-    "massNumber": 89,
-    "isotopeSymbol": "Zr-89",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "78.41 h",
-    "halfLife_seconds": 282300.0,
-    "decayModes": [
+    "ParentSymbol": "Zr",
+    "ParentZ": 40,
+    "MassNumber": 89,
+    "IsotopeSymbol": "Zr-89",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "78.41 h",
+    "HalfLifeSeconds": 282300.0,
+    "DecayModes": [
       {
-        "mode": "beta-plus + electron-capture",
-        "branching_percent": 100.0,
-        "daughter": "Y-89",
-        "decayEnergy_MeV": 2.8332
+        "Mode": "beta-plus + electron-capture",
+        "Branching": 100.0,
+        "Daughter": "Y-89",
+        "DecayEnergy": 2.8332
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.663e+16,
-    "decayHeat_W_per_g": 4332.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.663e+16,
+    "DecayHeat": 4332.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zr",
-    "parentZ": 40,
-    "massNumber": 90,
-    "isotopeSymbol": "Zr-90",
-    "naturalAbundance_percent": 51.45,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Zr",
+    "ParentZ": 40,
+    "MassNumber": 90,
+    "IsotopeSymbol": "Zr-90",
+    "NaturalAbundance": 51.45,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zr",
-    "parentZ": 40,
-    "massNumber": 91,
-    "isotopeSymbol": "Zr-91",
-    "naturalAbundance_percent": 11.22,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Zr",
+    "ParentZ": 40,
+    "MassNumber": 91,
+    "IsotopeSymbol": "Zr-91",
+    "NaturalAbundance": 11.22,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zr",
-    "parentZ": 40,
-    "massNumber": 92,
-    "isotopeSymbol": "Zr-92",
-    "naturalAbundance_percent": 17.15,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Zr",
+    "ParentZ": 40,
+    "MassNumber": 92,
+    "IsotopeSymbol": "Zr-92",
+    "NaturalAbundance": 17.15,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zr",
-    "parentZ": 40,
-    "massNumber": 93,
-    "isotopeSymbol": "Zr-93",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "1.53 My",
-    "halfLife_seconds": 48280000000000.0,
-    "decayModes": [
+    "ParentSymbol": "Zr",
+    "ParentZ": 40,
+    "MassNumber": 93,
+    "IsotopeSymbol": "Zr-93",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "1.53 My",
+    "HalfLifeSeconds": 48280000000000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 97.5,
-        "daughter": "Nb-93m",
-        "decayEnergy_MeV": 0.0908
+        "Mode": "beta-minus",
+        "Branching": 97.5,
+        "Daughter": "Nb-93m",
+        "DecayEnergy": 0.0908
       },
       {
-        "mode": "beta-minus",
-        "branching_percent": 2.5,
-        "daughter": "Nb-93",
-        "decayEnergy_MeV": 0.0908
+        "Mode": "beta-minus",
+        "Branching": 2.5,
+        "Daughter": "Nb-93",
+        "DecayEnergy": 0.0908
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 93060000.0,
-    "decayHeat_W_per_g": 4.513e-07,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 93060000.0,
+    "DecayHeat": 4.513e-07,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "a branch feeds a metastable (isomeric) daughter; decayEnergy_MeV is the Q-value to the daughter ground state, so that branch releases less by the isomer energy; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "a branch feeds a metastable (isomeric) daughter; decayEnergy_MeV is the Q-value to the daughter ground state, so that branch releases less by the isomer energy; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zr",
-    "parentZ": 40,
-    "massNumber": 94,
-    "isotopeSymbol": "Zr-94",
-    "naturalAbundance_percent": 17.38,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Zr",
+    "ParentZ": 40,
+    "MassNumber": 94,
+    "IsotopeSymbol": "Zr-94",
+    "NaturalAbundance": 17.38,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "",
-    "value_confidence": "measured"
+    "Notes": "",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zr",
-    "parentZ": 40,
-    "massNumber": 95,
-    "isotopeSymbol": "Zr-95",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "64.032 d",
-    "halfLife_seconds": 5532000.0,
-    "decayModes": [
+    "ParentSymbol": "Zr",
+    "ParentZ": 40,
+    "MassNumber": 95,
+    "IsotopeSymbol": "Zr-95",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "64.032 d",
+    "HalfLifeSeconds": 5532000.0,
+    "DecayModes": [
       {
-        "mode": "beta-minus",
-        "branching_percent": 98.92,
-        "daughter": "Nb-95",
-        "decayEnergy_MeV": 1.1263
+        "Mode": "beta-minus",
+        "Branching": 98.92,
+        "Daughter": "Nb-95",
+        "DecayEnergy": 1.1263
       },
       {
-        "mode": "beta-minus",
-        "branching_percent": 1.0802,
-        "daughter": "Nb-95m",
-        "decayEnergy_MeV": 1.1263
+        "Mode": "beta-minus",
+        "Branching": 1.0802,
+        "Daughter": "Nb-95m",
+        "DecayEnergy": 1.1263
       }
     ],
-    "dominantEmission": "beta-minus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 795000000000000.0,
-    "decayHeat_W_per_g": 47.82,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-minus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 795000000000000.0,
+    "DecayHeat": 47.82,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "a branch feeds a metastable (isomeric) daughter; decayEnergy_MeV is the Q-value to the daughter ground state, so that branch releases less by the isomer energy; significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
-    "value_confidence": "measured"
+    "Notes": "a branch feeds a metastable (isomeric) daughter; decayEnergy_MeV is the Q-value to the daughter ground state, so that branch releases less by the isomer energy; significant gamma emission (curated); vector set to penetrating; decay modes/branching/daughters from ICRP-107/NUBASE2020/AME2020; decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%; neutrino loss not fully modeled)",
+    "ValueConfidence": "measured"
   },
   {
-    "parentSymbol": "Zr",
-    "parentZ": 40,
-    "massNumber": 96,
-    "isotopeSymbol": "Zr-96",
-    "naturalAbundance_percent": 2.8,
-    "stability": "stable",
-    "halfLife": "stable",
-    "halfLife_seconds": null,
-    "decayModes": [],
-    "dominantEmission": "none",
-    "suggestedRadiationVector": "none",
-    "specificActivity_Bq_per_g": null,
-    "decayHeat_W_per_g": null,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "ParentSymbol": "Zr",
+    "ParentZ": 40,
+    "MassNumber": 96,
+    "IsotopeSymbol": "Zr-96",
+    "NaturalAbundance": 2.8,
+    "Stability": "stable",
+    "HalfLife": "stable",
+    "DecayModes": [],
+    "DominantEmission": "none",
+    "RadiationVector": "none",
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "observationally stable: half-life 23.4 Eyear (double-beta-minus -> Mo-96) exceeds the 1e+18-year stability threshold; treated as stable (decay is real but negligible, specific activity ~0)",
-    "value_confidence": "measured"
+    "Notes": "observationally stable: half-life 23.4 Eyear (double-beta-minus -> Mo-96) exceeds the 1e+18-year stability threshold; treated as stable (decay is real but negligible, specific activity ~0)",
+    "ValueConfidence": "measured"
   }
 ]

@@ -1,1639 +1,1564 @@
 [
   {
-    "parentSymbol": "Md",
-    "parentZ": 101,
-    "massNumber": 258,
-    "isotopeSymbol": "Md-258",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "51.59 day",
-    "halfLife_seconds": 4457000.0,
-    "decayModes": [
+    "ParentSymbol": "Md",
+    "ParentZ": 101,
+    "MassNumber": 258,
+    "IsotopeSymbol": "Md-258",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "51.59 day",
+    "HalfLifeSeconds": 4457000.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Es-254",
-        "decayEnergy_MeV": 7.2713
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Es-254",
+        "DecayEnergy": 7.2713
       },
       {
-        "mode": "beta-plus",
-        "branching_percent": 0.0015,
-        "daughter": "Fm-258",
-        "decayEnergy_MeV": 1.2637
+        "Mode": "beta-plus",
+        "Branching": 0.0015,
+        "Daughter": "Fm-258",
+        "DecayEnergy": 1.2637
       },
       {
-        "mode": "beta-minus",
-        "branching_percent": 0.0015,
-        "daughter": "No-258",
-        "decayEnergy_MeV": 0.213
+        "Mode": "beta-minus",
+        "Branching": 0.0015,
+        "Daughter": "No-258",
+        "DecayEnergy": 0.213
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 362800000000000.0,
-    "decayHeat_W_per_g": 422.7,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 362800000000000.0,
+    "DecayHeat": 422.7,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Md",
-    "parentZ": 101,
-    "massNumber": 260,
-    "isotopeSymbol": "Md-260",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "27.8 day",
-    "halfLife_seconds": 2402000.0,
-    "decayModes": [
+    "ParentSymbol": "Md",
+    "ParentZ": 101,
+    "MassNumber": 260,
+    "IsotopeSymbol": "Md-260",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "27.8 day",
+    "HalfLifeSeconds": 2402000.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 88.1057,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 88.1057
       },
       {
-        "mode": "alpha",
-        "branching_percent": 4.4053,
-        "daughter": "Es-256",
-        "decayEnergy_MeV": 6.9394
+        "Mode": "alpha",
+        "Branching": 4.4053,
+        "Daughter": "Es-256",
+        "DecayEnergy": 6.9394
       },
       {
-        "mode": "electron-capture",
-        "branching_percent": 4.4053,
-        "daughter": "Fm-260",
-        "decayEnergy_MeV": 0.7834
+        "Mode": "electron-capture",
+        "Branching": 4.4053,
+        "Daughter": "Fm-260",
+        "DecayEnergy": 0.7834
       },
       {
-        "mode": "beta-minus",
-        "branching_percent": 3.0837,
-        "daughter": "No-260",
-        "decayEnergy_MeV": 0.9399
+        "Mode": "beta-minus",
+        "Branching": 3.0837,
+        "Daughter": "No-260",
+        "DecayEnergy": 0.9399
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 668100000000000.0,
-    "decayHeat_W_per_g": 17480.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 668100000000000.0,
+    "DecayHeat": 17480.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; source branchings summed to 114%; normalized to 100% (uncertain/superheavy data); undergoes spontaneous fission (88.1057% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; source branchings summed to 114%; normalized to 100% (uncertain/superheavy data); undergoes spontaneous fission (88.1057% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "No",
-    "parentZ": 102,
-    "massNumber": 253,
-    "isotopeSymbol": "No-253",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "1.57 minute",
-    "halfLife_seconds": 94.2,
-    "decayModes": [
+    "ParentSymbol": "No",
+    "ParentZ": 102,
+    "MassNumber": 253,
+    "IsotopeSymbol": "No-253",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "1.57 minute",
+    "HalfLifeSeconds": 94.2,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 55.0,
-        "daughter": "Fm-249",
-        "decayEnergy_MeV": 8.4146
+        "Mode": "alpha",
+        "Branching": 55.0,
+        "Daughter": "Fm-249",
+        "DecayEnergy": 8.4146
       },
       {
-        "mode": "beta-plus",
-        "branching_percent": null,
-        "daughter": "Md-253",
-        "decayEnergy_MeV": 3.1855
+        "Mode": "beta-plus",
+        "Daughter": "Md-253",
+        "DecayEnergy": 3.1855
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 1.751e+19,
-    "decayHeat_W_per_g": 12980000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 1.751e+19,
+    "DecayHeat": 12980000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "No",
-    "parentZ": 102,
-    "massNumber": 255,
-    "isotopeSymbol": "No-255",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "3.52 minute",
-    "halfLife_seconds": 211.2,
-    "decayModes": [
+    "ParentSymbol": "No",
+    "ParentZ": 102,
+    "MassNumber": 255,
+    "IsotopeSymbol": "No-255",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "3.52 minute",
+    "HalfLifeSeconds": 211.2,
+    "DecayModes": [
       {
-        "mode": "beta-plus",
-        "branching_percent": 70.0,
-        "daughter": "Md-255",
-        "decayEnergy_MeV": 1.9699
+        "Mode": "beta-plus",
+        "Branching": 70.0,
+        "Daughter": "Md-255",
+        "DecayEnergy": 1.9699
       },
       {
-        "mode": "alpha",
-        "branching_percent": 30.0,
-        "daughter": "Fm-251",
-        "decayEnergy_MeV": 8.4282
+        "Mode": "alpha",
+        "Branching": 30.0,
+        "Daughter": "Fm-251",
+        "DecayEnergy": 8.4282
       }
     ],
-    "dominantEmission": "beta-plus",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 7.748e+18,
-    "decayHeat_W_per_g": 4301000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "beta-plus",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 7.748e+18,
+    "DecayHeat": 4301000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "No",
-    "parentZ": 102,
-    "massNumber": 259,
-    "isotopeSymbol": "No-259",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "58.0 minute",
-    "halfLife_seconds": 3480.0,
-    "decayModes": [
+    "ParentSymbol": "No",
+    "ParentZ": 102,
+    "MassNumber": 259,
+    "IsotopeSymbol": "No-259",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "58.0 minute",
+    "HalfLifeSeconds": 3480.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 68.1818,
-        "daughter": "Fm-255",
-        "decayEnergy_MeV": 7.854
+        "Mode": "alpha",
+        "Branching": 68.1818,
+        "Daughter": "Fm-255",
+        "DecayEnergy": 7.854
       },
       {
-        "mode": "electron-capture",
-        "branching_percent": 22.7273,
-        "daughter": "Md-259",
-        "decayEnergy_MeV": 0.5155
+        "Mode": "electron-capture",
+        "Branching": 22.7273,
+        "Daughter": "Md-259",
+        "DecayEnergy": 0.5155
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 9.0909,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 9.0909
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 4.629e+17,
-    "decayHeat_W_per_g": 1645000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 4.629e+17,
+    "DecayHeat": 1645000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; source branchings summed to 110%; normalized to 100% (uncertain/superheavy data); undergoes spontaneous fission (9.0909% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; source branchings summed to 110%; normalized to 100% (uncertain/superheavy data); undergoes spontaneous fission (9.0909% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Lr",
-    "parentZ": 103,
-    "massNumber": 260,
-    "isotopeSymbol": "Lr-260",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "3.0 minute",
-    "halfLife_seconds": 180.0,
-    "decayModes": [
+    "ParentSymbol": "Lr",
+    "ParentZ": 103,
+    "MassNumber": 260,
+    "IsotopeSymbol": "Lr-260",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "3.0 minute",
+    "HalfLifeSeconds": 180.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 80.0,
-        "daughter": "Md-256",
-        "decayEnergy_MeV": 8.3953
+        "Mode": "alpha",
+        "Branching": 80.0,
+        "Daughter": "Md-256",
+        "DecayEnergy": 8.3953
       },
       {
-        "mode": "beta-plus",
-        "branching_percent": 20.0,
-        "daughter": "No-260",
-        "decayEnergy_MeV": 2.6669
+        "Mode": "beta-plus",
+        "Branching": 20.0,
+        "Daughter": "No-260",
+        "DecayEnergy": 2.6669
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 8.916e+18,
-    "decayHeat_W_per_g": 10040000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 8.916e+18,
+    "DecayHeat": 10040000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Lr",
-    "parentZ": 103,
-    "massNumber": 261,
-    "isotopeSymbol": "Lr-261",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "39.0 minute",
-    "halfLife_seconds": 2340.0,
-    "decayModes": [
+    "ParentSymbol": "Lr",
+    "ParentZ": 103,
+    "MassNumber": 261,
+    "IsotopeSymbol": "Lr-261",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "39.0 minute",
+    "HalfLifeSeconds": 2340.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 100.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 100.0
       },
       {
-        "mode": "alpha",
-        "branching_percent": null,
-        "daughter": "Md-257",
-        "decayEnergy_MeV": 8.1398
+        "Mode": "alpha",
+        "Daughter": "Md-257",
+        "DecayEnergy": 8.1398
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 6.832e+17,
-    "decayHeat_W_per_g": 20250000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 6.832e+17,
+    "DecayHeat": 20250000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Lr",
-    "parentZ": 103,
-    "massNumber": 266,
-    "isotopeSymbol": "Lr-266",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "22.0 hour",
-    "halfLife_seconds": 79200.0,
-    "decayModes": [
+    "ParentSymbol": "Lr",
+    "ParentZ": 103,
+    "MassNumber": 266,
+    "IsotopeSymbol": "Lr-266",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "22.0 hour",
+    "HalfLifeSeconds": 79200.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 100.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 100.0
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.98e+16,
-    "decayHeat_W_per_g": 587000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.98e+16,
+    "DecayHeat": 587000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Rf",
-    "parentZ": 104,
-    "massNumber": 263,
-    "isotopeSymbol": "Rf-263",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "11.0 minute",
-    "halfLife_seconds": 660.0,
-    "decayModes": [
+    "ParentSymbol": "Rf",
+    "ParentZ": 104,
+    "MassNumber": 263,
+    "IsotopeSymbol": "Rf-263",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "11.0 minute",
+    "HalfLifeSeconds": 660.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 100.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 100.0
       },
       {
-        "mode": "alpha",
-        "branching_percent": null,
-        "daughter": "No-259",
-        "decayEnergy_MeV": 8.2525
+        "Mode": "alpha",
+        "Daughter": "No-259",
+        "DecayEnergy": 8.2525
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 2.404e+18,
-    "decayHeat_W_per_g": 71250000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 2.404e+18,
+    "DecayHeat": 71250000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Rf",
-    "parentZ": 104,
-    "massNumber": 265,
-    "isotopeSymbol": "Rf-265",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "1.6 minute",
-    "halfLife_seconds": 96.0,
-    "decayModes": [
+    "ParentSymbol": "Rf",
+    "ParentZ": 104,
+    "MassNumber": 265,
+    "IsotopeSymbol": "Rf-265",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "1.6 minute",
+    "HalfLifeSeconds": 96.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 100.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 100.0
       },
       {
-        "mode": "alpha",
-        "branching_percent": null,
-        "daughter": "No-261",
-        "decayEnergy_MeV": 7.8094
+        "Mode": "alpha",
+        "Daughter": "No-261",
+        "DecayEnergy": 7.8094
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.64e+19,
-    "decayHeat_W_per_g": 486100000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.64e+19,
+    "DecayHeat": 486100000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Rf",
-    "parentZ": 104,
-    "massNumber": 267,
-    "isotopeSymbol": "Rf-267",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "2.5 hour",
-    "halfLife_seconds": 9000.0,
-    "decayModes": [
+    "ParentSymbol": "Rf",
+    "ParentZ": 104,
+    "MassNumber": 267,
+    "IsotopeSymbol": "Rf-267",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "2.5 hour",
+    "HalfLifeSeconds": 9000.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 100.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 100.0
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.736e+17,
-    "decayHeat_W_per_g": 5146000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.736e+17,
+    "DecayHeat": 5146000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Db",
-    "parentZ": 105,
-    "massNumber": 268,
-    "isotopeSymbol": "Db-268",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "29.0 hour",
-    "halfLife_seconds": 104400.0,
-    "decayModes": [
+    "ParentSymbol": "Db",
+    "ParentZ": 105,
+    "MassNumber": 268,
+    "IsotopeSymbol": "Db-268",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "29.0 hour",
+    "HalfLifeSeconds": 104400.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 100.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 100.0
       },
       {
-        "mode": "beta-plus",
-        "branching_percent": null,
-        "daughter": "Rf-268",
-        "decayEnergy_MeV": 1.5845
+        "Mode": "beta-plus",
+        "Daughter": "Rf-268",
+        "DecayEnergy": 1.5845
       },
       {
-        "mode": "alpha",
-        "branching_percent": null,
-        "daughter": "Lr-264",
-        "decayEnergy_MeV": 8.2603
+        "Mode": "alpha",
+        "Daughter": "Lr-264",
+        "DecayEnergy": 8.2603
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.491e+16,
-    "decayHeat_W_per_g": 442000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.491e+16,
+    "DecayHeat": 442000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Sg",
-    "parentZ": 106,
-    "massNumber": 267,
-    "isotopeSymbol": "Sg-267",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "1.8 minute",
-    "halfLife_seconds": 108.0,
-    "decayModes": [
+    "ParentSymbol": "Sg",
+    "ParentZ": 106,
+    "MassNumber": 267,
+    "IsotopeSymbol": "Sg-267",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "1.8 minute",
+    "HalfLifeSeconds": 108.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 83.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 83.0
       },
       {
-        "mode": "alpha",
-        "branching_percent": 17.0,
-        "daughter": "Rf-263",
-        "decayEnergy_MeV": 8.6245
+        "Mode": "alpha",
+        "Branching": 17.0,
+        "Daughter": "Rf-263",
+        "DecayEnergy": 8.6245
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.447e+19,
-    "decayHeat_W_per_g": 359400000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.447e+19,
+    "DecayHeat": 359400000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (83% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (83% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Sg",
-    "parentZ": 106,
-    "massNumber": 269,
-    "isotopeSymbol": "Sg-269",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "5.0 minute",
-    "halfLife_seconds": 300.0,
-    "decayModes": [
+    "ParentSymbol": "Sg",
+    "ParentZ": 106,
+    "MassNumber": 269,
+    "IsotopeSymbol": "Sg-269",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "5.0 minute",
+    "HalfLifeSeconds": 300.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Rf-265",
-        "decayEnergy_MeV": 8.5779
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Rf-265",
+        "DecayEnergy": 8.5779
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 5.17e+18,
-    "decayHeat_W_per_g": 7105000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 5.17e+18,
+    "DecayHeat": 7105000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Sg",
-    "parentZ": 106,
-    "massNumber": 271,
-    "isotopeSymbol": "Sg-271",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "2.2 minute",
-    "halfLife_seconds": 132.0,
-    "decayModes": [
+    "ParentSymbol": "Sg",
+    "ParentZ": 106,
+    "MassNumber": 271,
+    "IsotopeSymbol": "Sg-271",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "2.2 minute",
+    "HalfLifeSeconds": 132.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 42.0,
-        "daughter": "Rf-267",
-        "decayEnergy_MeV": 8.7484
+        "Mode": "alpha",
+        "Branching": 42.0,
+        "Daughter": "Rf-267",
+        "DecayEnergy": 8.7484
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 58.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 58.0
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.166e+19,
-    "decayHeat_W_per_g": 207400000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.166e+19,
+    "DecayHeat": 207400000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (58% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (58% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Bh",
-    "parentZ": 107,
-    "massNumber": 267,
-    "isotopeSymbol": "Bh-267",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "22.0 sec",
-    "halfLife_seconds": 22.0,
-    "decayModes": [
+    "ParentSymbol": "Bh",
+    "ParentZ": 107,
+    "MassNumber": 267,
+    "IsotopeSymbol": "Bh-267",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "22.0 sec",
+    "HalfLifeSeconds": 22.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Db-263",
-        "decayEnergy_MeV": 9.2299
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Db-263",
+        "DecayEnergy": 9.2299
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 7.103e+19,
-    "decayHeat_W_per_g": 105000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 7.103e+19,
+    "DecayHeat": 105000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Bh",
-    "parentZ": 107,
-    "massNumber": 270,
-    "isotopeSymbol": "Bh-270",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "3.8 minute",
-    "halfLife_seconds": 228.0,
-    "decayModes": [
+    "ParentSymbol": "Bh",
+    "ParentZ": 107,
+    "MassNumber": 270,
+    "IsotopeSymbol": "Bh-270",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "3.8 minute",
+    "HalfLifeSeconds": 228.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Db-266",
-        "decayEnergy_MeV": 9.0641
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Db-266",
+        "DecayEnergy": 9.0641
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 6.777e+18,
-    "decayHeat_W_per_g": 9842000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 6.777e+18,
+    "DecayHeat": 9842000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Bh",
-    "parentZ": 107,
-    "massNumber": 274,
-    "isotopeSymbol": "Bh-274",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "57.0 sec",
-    "halfLife_seconds": 57.0,
-    "decayModes": [
+    "ParentSymbol": "Bh",
+    "ParentZ": 107,
+    "MassNumber": 274,
+    "IsotopeSymbol": "Bh-274",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "57.0 sec",
+    "HalfLifeSeconds": 57.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Db-270",
-        "decayEnergy_MeV": 8.9393
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Db-270",
+        "DecayEnergy": 8.9393
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2.671e+19,
-    "decayHeat_W_per_g": 38260000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2.671e+19,
+    "DecayHeat": 38260000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Hs",
-    "parentZ": 108,
-    "massNumber": 268,
-    "isotopeSymbol": "Hs-268",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "1.4 sec",
-    "halfLife_seconds": 1.4,
-    "decayModes": [
+    "ParentSymbol": "Hs",
+    "ParentZ": 108,
+    "MassNumber": 268,
+    "IsotopeSymbol": "Hs-268",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "1.4 sec",
+    "HalfLifeSeconds": 1.4,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Sg-264",
-        "decayEnergy_MeV": 9.76
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Sg-264",
+        "DecayEnergy": 9.76
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 1.112e+21,
-    "decayHeat_W_per_g": 1739000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 1.112e+21,
+    "DecayHeat": 1739000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Hs",
-    "parentZ": 108,
-    "massNumber": 269,
-    "isotopeSymbol": "Hs-269",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "15.0 sec",
-    "halfLife_seconds": 15.0,
-    "decayModes": [
+    "ParentSymbol": "Hs",
+    "ParentZ": 108,
+    "MassNumber": 269,
+    "IsotopeSymbol": "Hs-269",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "15.0 sec",
+    "HalfLifeSeconds": 15.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Sg-265",
-        "decayEnergy_MeV": 9.2747
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Sg-265",
+        "DecayEnergy": 9.2747
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 1.034e+20,
-    "decayHeat_W_per_g": 153600000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 1.034e+20,
+    "DecayHeat": 153600000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Hs",
-    "parentZ": 108,
-    "massNumber": 270,
-    "isotopeSymbol": "Hs-270",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "9.0 sec",
-    "halfLife_seconds": 9.0,
-    "decayModes": [
+    "ParentSymbol": "Hs",
+    "ParentZ": 108,
+    "MassNumber": 270,
+    "IsotopeSymbol": "Hs-270",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "9.0 sec",
+    "HalfLifeSeconds": 9.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Sg-266",
-        "decayEnergy_MeV": 9.0697
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Sg-266",
+        "DecayEnergy": 9.0697
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 1.717e+20,
-    "decayHeat_W_per_g": 249500000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 1.717e+20,
+    "DecayHeat": 249500000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Mt",
-    "parentZ": 109,
-    "massNumber": 274,
-    "isotopeSymbol": "Mt-274",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "850.0 msec",
-    "halfLife_seconds": 0.85,
-    "decayModes": [
+    "ParentSymbol": "Mt",
+    "ParentZ": 109,
+    "MassNumber": 274,
+    "IsotopeSymbol": "Mt-274",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "850.0 msec",
+    "HalfLifeSeconds": 0.85,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Bh-270",
-        "decayEnergy_MeV": 10.5946
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Bh-270",
+        "DecayEnergy": 10.5946
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 1.791e+21,
-    "decayHeat_W_per_g": 3041000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 1.791e+21,
+    "DecayHeat": 3041000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Mt",
-    "parentZ": 109,
-    "massNumber": 277,
-    "isotopeSymbol": "Mt-277",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "9.0 sec",
-    "halfLife_seconds": 9.0,
-    "decayModes": [
+    "ParentSymbol": "Mt",
+    "ParentZ": 109,
+    "MassNumber": 277,
+    "IsotopeSymbol": "Mt-277",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "9.0 sec",
+    "HalfLifeSeconds": 9.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 100.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 100.0
       },
       {
-        "mode": "alpha",
-        "branching_percent": null,
-        "daughter": "Bh-273",
-        "decayEnergy_MeV": 9.8997
+        "Mode": "alpha",
+        "Daughter": "Bh-273",
+        "DecayEnergy": 9.8997
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.673e+20,
-    "decayHeat_W_per_g": 4960000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.673e+20,
+    "DecayHeat": 4960000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (100% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Mt",
-    "parentZ": 109,
-    "massNumber": 278,
-    "isotopeSymbol": "Mt-278",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "6.0 sec",
-    "halfLife_seconds": 6.0,
-    "decayModes": [
+    "ParentSymbol": "Mt",
+    "ParentZ": 109,
+    "MassNumber": 278,
+    "IsotopeSymbol": "Mt-278",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "6.0 sec",
+    "HalfLifeSeconds": 6.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Bh-274",
-        "decayEnergy_MeV": 9.5802
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Bh-274",
+        "DecayEnergy": 9.5802
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2.501e+20,
-    "decayHeat_W_per_g": 383900000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2.501e+20,
+    "DecayHeat": 383900000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Ds",
-    "parentZ": 110,
-    "massNumber": 279,
-    "isotopeSymbol": "Ds-279",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "210.0 msec",
-    "halfLife_seconds": 0.21,
-    "decayModes": [
+    "ParentSymbol": "Ds",
+    "ParentZ": 110,
+    "MassNumber": 279,
+    "IsotopeSymbol": "Ds-279",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "210.0 msec",
+    "HalfLifeSeconds": 0.21,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 88.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 88.0
       },
       {
-        "mode": "alpha",
-        "branching_percent": 12.0,
-        "daughter": "Hs-275",
-        "decayEnergy_MeV": 10.1074
+        "Mode": "alpha",
+        "Branching": 12.0,
+        "Daughter": "Hs-275",
+        "DecayEnergy": 10.1074
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 7.12e+21,
-    "decayHeat_W_per_g": 187100000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 7.12e+21,
+    "DecayHeat": 187100000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (88% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (88% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Ds",
-    "parentZ": 110,
-    "massNumber": 281,
-    "isotopeSymbol": "Ds-281",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "14.0 sec",
-    "halfLife_seconds": 14.0,
-    "decayModes": [
+    "ParentSymbol": "Ds",
+    "ParentZ": 110,
+    "MassNumber": 281,
+    "IsotopeSymbol": "Ds-281",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "14.0 sec",
+    "HalfLifeSeconds": 14.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 90.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 90.0
       },
       {
-        "mode": "alpha",
-        "branching_percent": 10.0,
-        "daughter": "Hs-277",
-        "decayEnergy_MeV": 9.4731
+        "Mode": "alpha",
+        "Branching": 10.0,
+        "Daughter": "Hs-277",
+        "DecayEnergy": 9.4731
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.06e+20,
-    "decayHeat_W_per_g": 2845000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.06e+20,
+    "DecayHeat": 2845000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (90% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (90% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Ds",
-    "parentZ": 110,
-    "massNumber": 282,
-    "isotopeSymbol": "Ds-282",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "4.2 minute",
-    "halfLife_seconds": 252.0,
-    "decayModes": [
+    "ParentSymbol": "Ds",
+    "ParentZ": 110,
+    "MassNumber": 282,
+    "IsotopeSymbol": "Ds-282",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "4.2 minute",
+    "HalfLifeSeconds": 252.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Hs-278",
-        "decayEnergy_MeV": 9.1452
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Hs-278",
+        "DecayEnergy": 9.1452
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 5.87e+18,
-    "decayHeat_W_per_g": 8601000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 5.87e+18,
+    "DecayHeat": 8601000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Rg",
-    "parentZ": 111,
-    "massNumber": 280,
-    "isotopeSymbol": "Rg-280",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "4.3 sec",
-    "halfLife_seconds": 4.3,
-    "decayModes": [
+    "ParentSymbol": "Rg",
+    "ParentZ": 111,
+    "MassNumber": 280,
+    "IsotopeSymbol": "Rg-280",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "4.3 sec",
+    "HalfLifeSeconds": 4.3,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Mt-276",
-        "decayEnergy_MeV": 10.1493
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Mt-276",
+        "DecayEnergy": 10.1493
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 3.465e+20,
-    "decayHeat_W_per_g": 563400000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 3.465e+20,
+    "DecayHeat": 563400000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Rg",
-    "parentZ": 111,
-    "massNumber": 281,
-    "isotopeSymbol": "Rg-281",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "19.0 sec",
-    "halfLife_seconds": 19.0,
-    "decayModes": [
+    "ParentSymbol": "Rg",
+    "ParentZ": 111,
+    "MassNumber": 281,
+    "IsotopeSymbol": "Rg-281",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "19.0 sec",
+    "HalfLifeSeconds": 19.0,
+    "DecayModes": [
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 87.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 87.0
       },
       {
-        "mode": "alpha",
-        "branching_percent": 13.0,
-        "daughter": "Mt-277",
-        "decayEnergy_MeV": 9.9006
+        "Mode": "alpha",
+        "Branching": 13.0,
+        "Daughter": "Mt-277",
+        "DecayEnergy": 9.9006
       }
     ],
-    "dominantEmission": "neutron",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 7.814e+19,
-    "decayHeat_W_per_g": 2031000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "neutron",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 7.814e+19,
+    "DecayHeat": 2031000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (87% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (87% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Rg",
-    "parentZ": 111,
-    "massNumber": 282,
-    "isotopeSymbol": "Rg-282",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "130.0 sec",
-    "halfLife_seconds": 130.0,
-    "decayModes": [
+    "ParentSymbol": "Rg",
+    "ParentZ": 111,
+    "MassNumber": 282,
+    "IsotopeSymbol": "Rg-282",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "130.0 sec",
+    "HalfLifeSeconds": 130.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Mt-278",
-        "decayEnergy_MeV": 9.5504
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Mt-278",
+        "DecayEnergy": 9.5504
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 1.138e+19,
-    "decayHeat_W_per_g": 17410000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 1.138e+19,
+    "DecayHeat": 17410000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Cn",
-    "parentZ": 112,
-    "massNumber": 283,
-    "isotopeSymbol": "Cn-283",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "4.7 sec",
-    "halfLife_seconds": 4.7,
-    "decayModes": [
+    "ParentSymbol": "Cn",
+    "ParentZ": 112,
+    "MassNumber": 283,
+    "IsotopeSymbol": "Cn-283",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "4.7 sec",
+    "HalfLifeSeconds": 4.7,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 81.0,
-        "daughter": "Ds-279",
-        "decayEnergy_MeV": 9.8876
+        "Mode": "alpha",
+        "Branching": 81.0,
+        "Daughter": "Ds-279",
+        "DecayEnergy": 9.8876
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 19.0,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 19.0
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 3.136e+20,
-    "decayHeat_W_per_g": 2169000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 3.136e+20,
+    "DecayHeat": 2169000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (19% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; undergoes spontaneous fission (19% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Cn",
-    "parentZ": 112,
-    "massNumber": 285,
-    "isotopeSymbol": "Cn-285",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "30.0 sec",
-    "halfLife_seconds": 30.0,
-    "decayModes": [
+    "ParentSymbol": "Cn",
+    "ParentZ": 112,
+    "MassNumber": 285,
+    "IsotopeSymbol": "Cn-285",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "30.0 sec",
+    "HalfLifeSeconds": 30.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Ds-281",
-        "decayEnergy_MeV": 9.3883
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Ds-281",
+        "DecayEnergy": 9.3883
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 4.879e+19,
-    "decayHeat_W_per_g": 73390000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 4.879e+19,
+    "DecayHeat": 73390000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Cn",
-    "parentZ": 112,
-    "massNumber": 286,
-    "isotopeSymbol": "Cn-286",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "30.0 sec",
-    "halfLife_seconds": 30.0,
-    "decayModes": [
+    "ParentSymbol": "Cn",
+    "ParentZ": 112,
+    "MassNumber": 286,
+    "IsotopeSymbol": "Cn-286",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "30.0 sec",
+    "HalfLifeSeconds": 30.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Ds-282",
-        "decayEnergy_MeV": 9.2346
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Ds-282",
+        "DecayEnergy": 9.2346
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 4.862e+19,
-    "decayHeat_W_per_g": 71940000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 4.862e+19,
+    "DecayHeat": 71940000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Nh",
-    "parentZ": 113,
-    "massNumber": 285,
-    "isotopeSymbol": "Nh-285",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "4.6 sec",
-    "halfLife_seconds": 4.6,
-    "decayModes": [
+    "ParentSymbol": "Nh",
+    "ParentZ": 113,
+    "MassNumber": 285,
+    "IsotopeSymbol": "Nh-285",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "4.6 sec",
+    "HalfLifeSeconds": 4.6,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Rg-281",
-        "decayEnergy_MeV": 10.0096
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Rg-281",
+        "DecayEnergy": 10.0096
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 3.182e+20,
-    "decayHeat_W_per_g": 510300000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 3.182e+20,
+    "DecayHeat": 510300000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Nh",
-    "parentZ": 113,
-    "massNumber": 286,
-    "isotopeSymbol": "Nh-286",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "12.0 sec",
-    "halfLife_seconds": 12.0,
-    "decayModes": [
+    "ParentSymbol": "Nh",
+    "ParentZ": 113,
+    "MassNumber": 286,
+    "IsotopeSymbol": "Nh-286",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "12.0 sec",
+    "HalfLifeSeconds": 12.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Rg-282",
-        "decayEnergy_MeV": 9.7898
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Rg-282",
+        "DecayEnergy": 9.7898
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 1.215e+20,
-    "decayHeat_W_per_g": 190600000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 1.215e+20,
+    "DecayHeat": 190600000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Nh",
-    "parentZ": 113,
-    "massNumber": 290,
-    "isotopeSymbol": "Nh-290",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "8.0 sec",
-    "halfLife_seconds": 8.0,
-    "decayModes": [
+    "ParentSymbol": "Nh",
+    "ParentZ": 113,
+    "MassNumber": 290,
+    "IsotopeSymbol": "Nh-290",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "8.0 sec",
+    "HalfLifeSeconds": 8.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 66.6667,
-        "daughter": "Rg-286",
-        "decayEnergy_MeV": 9.3799
+        "Mode": "alpha",
+        "Branching": 66.6667,
+        "Daughter": "Rg-286",
+        "DecayEnergy": 9.3799
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": 33.3333,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission",
+        "Branching": 33.3333
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "penetrating",
-    "specificActivity_Bq_per_g": 1.798e+20,
-    "decayHeat_W_per_g": 1957000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "penetrating",
+    "SpecificActivity": 1.798e+20,
+    "DecayHeat": 1957000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; source branchings summed to 150%; normalized to 100% (uncertain/superheavy data); undergoes spontaneous fission (33.3333% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; source branchings summed to 150%; normalized to 100% (uncertain/superheavy data); undergoes spontaneous fission (33.3333% branch), emitting fast neutrons (~185 MeV recoverable per fission, included in decayHeat); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Fl",
-    "parentZ": 114,
-    "massNumber": 288,
-    "isotopeSymbol": "Fl-288",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "653.0 msec",
-    "halfLife_seconds": 0.653,
-    "decayModes": [
+    "ParentSymbol": "Fl",
+    "ParentZ": 114,
+    "MassNumber": 288,
+    "IsotopeSymbol": "Fl-288",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "653.0 msec",
+    "HalfLifeSeconds": 0.653,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Cn-284",
-        "decayEnergy_MeV": 10.0767
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Cn-284",
+        "DecayEnergy": 10.0767
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2.218e+21,
-    "decayHeat_W_per_g": 3581000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2.218e+21,
+    "DecayHeat": 3581000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Fl",
-    "parentZ": 114,
-    "massNumber": 289,
-    "isotopeSymbol": "Fl-289",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "2.1 sec",
-    "halfLife_seconds": 2.1,
-    "decayModes": [
+    "ParentSymbol": "Fl",
+    "ParentZ": 114,
+    "MassNumber": 289,
+    "IsotopeSymbol": "Fl-289",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "2.1 sec",
+    "HalfLifeSeconds": 2.1,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Cn-285",
-        "decayEnergy_MeV": 9.9546
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Cn-285",
+        "DecayEnergy": 9.9546
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 6.873e+20,
-    "decayHeat_W_per_g": 1096000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 6.873e+20,
+    "DecayHeat": 1096000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Fl",
-    "parentZ": 114,
-    "massNumber": 290,
-    "isotopeSymbol": "Fl-290",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "80.0 sec",
-    "halfLife_seconds": 80.0,
-    "decayModes": [
+    "ParentSymbol": "Fl",
+    "ParentZ": 114,
+    "MassNumber": 290,
+    "IsotopeSymbol": "Fl-290",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "80.0 sec",
+    "HalfLifeSeconds": 80.0,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 66.6667,
-        "daughter": "Cn-286",
-        "decayEnergy_MeV": 9.8559
+        "Mode": "alpha",
+        "Branching": 66.6667,
+        "Daughter": "Cn-286",
+        "DecayEnergy": 9.8559
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       },
       {
-        "mode": "beta-plus",
-        "branching_percent": 33.3333,
-        "daughter": "Nh-290",
-        "decayEnergy_MeV": 0.4154
+        "Mode": "beta-plus",
+        "Branching": 33.3333,
+        "Daughter": "Nh-290",
+        "DecayEnergy": 0.4154
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 1.798e+19,
-    "decayHeat_W_per_g": 19330000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 1.798e+19,
+    "DecayHeat": 19330000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; source branchings summed to 150%; normalized to 100% (uncertain/superheavy data); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; source branchings summed to 150%; normalized to 100% (uncertain/superheavy data); decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Mc",
-    "parentZ": 115,
-    "massNumber": 288,
-    "isotopeSymbol": "Mc-288",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "177.0 msec",
-    "halfLife_seconds": 0.177,
-    "decayModes": [
+    "ParentSymbol": "Mc",
+    "ParentZ": 115,
+    "MassNumber": 288,
+    "IsotopeSymbol": "Mc-288",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "177.0 msec",
+    "HalfLifeSeconds": 0.177,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Nh-284",
-        "decayEnergy_MeV": 10.6495
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Nh-284",
+        "DecayEnergy": 10.6495
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 8.183e+21,
-    "decayHeat_W_per_g": 13960000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 8.183e+21,
+    "DecayHeat": 13960000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Mc",
-    "parentZ": 115,
-    "massNumber": 289,
-    "isotopeSymbol": "Mc-289",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "410.0 msec",
-    "halfLife_seconds": 0.41,
-    "decayModes": [
+    "ParentSymbol": "Mc",
+    "ParentZ": 115,
+    "MassNumber": 289,
+    "IsotopeSymbol": "Mc-289",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "410.0 msec",
+    "HalfLifeSeconds": 0.41,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Nh-285",
-        "decayEnergy_MeV": 10.4902
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Nh-285",
+        "DecayEnergy": 10.4902
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 3.52e+21,
-    "decayHeat_W_per_g": 5917000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 3.52e+21,
+    "DecayHeat": 5917000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Mc",
-    "parentZ": 115,
-    "massNumber": 290,
-    "isotopeSymbol": "Mc-290",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "840.0 msec",
-    "halfLife_seconds": 0.84,
-    "decayModes": [
+    "ParentSymbol": "Mc",
+    "ParentZ": 115,
+    "MassNumber": 290,
+    "IsotopeSymbol": "Mc-290",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "840.0 msec",
+    "HalfLifeSeconds": 0.84,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Nh-286",
-        "decayEnergy_MeV": 10.4101
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Nh-286",
+        "DecayEnergy": 10.4101
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 1.712e+21,
-    "decayHeat_W_per_g": 2856000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 1.712e+21,
+    "DecayHeat": 2856000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Lv",
-    "parentZ": 116,
-    "massNumber": 291,
-    "isotopeSymbol": "Lv-291",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "26.0 msec",
-    "halfLife_seconds": 0.026,
-    "decayModes": [
+    "ParentSymbol": "Lv",
+    "ParentZ": 116,
+    "MassNumber": 291,
+    "IsotopeSymbol": "Lv-291",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "26.0 msec",
+    "HalfLifeSeconds": 0.026,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Fl-287",
-        "decayEnergy_MeV": 10.8899
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Fl-287",
+        "DecayEnergy": 10.8899
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 5.513e+22,
-    "decayHeat_W_per_g": 96190000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 5.513e+22,
+    "DecayHeat": 96190000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Lv",
-    "parentZ": 116,
-    "massNumber": 292,
-    "isotopeSymbol": "Lv-292",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "16.0 msec",
-    "halfLife_seconds": 0.016,
-    "decayModes": [
+    "ParentSymbol": "Lv",
+    "ParentZ": 116,
+    "MassNumber": 292,
+    "IsotopeSymbol": "Lv-292",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "16.0 msec",
+    "HalfLifeSeconds": 0.016,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Fl-288",
-        "decayEnergy_MeV": 10.7911
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Fl-288",
+        "DecayEnergy": 10.7911
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 8.928e+22,
-    "decayHeat_W_per_g": 154400000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 8.928e+22,
+    "DecayHeat": 154400000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Lv",
-    "parentZ": 116,
-    "massNumber": 293,
-    "isotopeSymbol": "Lv-293",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "70.0 msec",
-    "halfLife_seconds": 0.07,
-    "decayModes": [
+    "ParentSymbol": "Lv",
+    "ParentZ": 116,
+    "MassNumber": 293,
+    "IsotopeSymbol": "Lv-293",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "70.0 msec",
+    "HalfLifeSeconds": 0.07,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Fl-289",
-        "decayEnergy_MeV": 10.6775
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Fl-289",
+        "DecayEnergy": 10.6775
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2.034e+22,
-    "decayHeat_W_per_g": 34790000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2.034e+22,
+    "DecayHeat": 34790000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Ts",
-    "parentZ": 117,
-    "massNumber": 293,
-    "isotopeSymbol": "Ts-293",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "25.0 msec",
-    "halfLife_seconds": 0.025,
-    "decayModes": [
+    "ParentSymbol": "Ts",
+    "ParentZ": 117,
+    "MassNumber": 293,
+    "IsotopeSymbol": "Ts-293",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "25.0 msec",
+    "HalfLifeSeconds": 0.025,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Mc-289",
-        "decayEnergy_MeV": 11.3202
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Mc-289",
+        "DecayEnergy": 11.3202
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 5.695e+22,
-    "decayHeat_W_per_g": 103300000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 5.695e+22,
+    "DecayHeat": 103300000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Ts",
-    "parentZ": 117,
-    "massNumber": 294,
-    "isotopeSymbol": "Ts-294",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "70.0 msec",
-    "halfLife_seconds": 0.07,
-    "decayModes": [
+    "ParentSymbol": "Ts",
+    "ParentZ": 117,
+    "MassNumber": 294,
+    "IsotopeSymbol": "Ts-294",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "70.0 msec",
+    "HalfLifeSeconds": 0.07,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Mc-290",
-        "decayEnergy_MeV": 11.1796
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Mc-290",
+        "DecayEnergy": 11.1796
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2.027e+22,
-    "decayHeat_W_per_g": 36300000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2.027e+22,
+    "DecayHeat": 36300000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Og",
-    "parentZ": 118,
-    "massNumber": 294,
-    "isotopeSymbol": "Og-294",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "0.7 msec",
-    "halfLife_seconds": 0.0007,
-    "decayModes": [
+    "ParentSymbol": "Og",
+    "ParentZ": 118,
+    "MassNumber": 294,
+    "IsotopeSymbol": "Og-294",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "0.7 msec",
+    "HalfLifeSeconds": 0.0007,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Lv-290",
-        "decayEnergy_MeV": 11.8679
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Lv-290",
+        "DecayEnergy": 11.8679
       },
       {
-        "mode": "spontaneous-fission",
-        "branching_percent": null,
-        "daughter": null,
-        "decayEnergy_MeV": null
+        "Mode": "spontaneous-fission"
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2.027e+24,
-    "decayHeat_W_per_g": 3854000000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2.027e+24,
+    "DecayHeat": 3854000000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   },
   {
-    "parentSymbol": "Og",
-    "parentZ": 118,
-    "massNumber": 295,
-    "isotopeSymbol": "Og-295",
-    "naturalAbundance_percent": 0,
-    "stability": "radioactive",
-    "halfLife": "680.0 msec",
-    "halfLife_seconds": 0.68,
-    "decayModes": [
+    "ParentSymbol": "Og",
+    "ParentZ": 118,
+    "MassNumber": 295,
+    "IsotopeSymbol": "Og-295",
+    "NaturalAbundance": 0,
+    "Stability": "radioactive",
+    "HalfLife": "680.0 msec",
+    "HalfLifeSeconds": 0.68,
+    "DecayModes": [
       {
-        "mode": "alpha",
-        "branching_percent": 100.0,
-        "daughter": "Lv-291",
-        "decayEnergy_MeV": 11.7003
+        "Mode": "alpha",
+        "Branching": 100.0,
+        "Daughter": "Lv-291",
+        "DecayEnergy": 11.7003
       }
     ],
-    "dominantEmission": "alpha",
-    "suggestedRadiationVector": "contact-only",
-    "specificActivity_Bq_per_g": 2.079e+21,
-    "decayHeat_W_per_g": 3898000000.0,
-    "nuclearFlags": {
-      "fissile": false,
-      "fertile": false,
-      "fusionable": false
+    "DominantEmission": "alpha",
+    "RadiationVector": "contact-only",
+    "SpecificActivity": 2.079e+21,
+    "DecayHeat": 3898000000.0,
+    "NuclearFlags": {
+      "Fissile": false,
+      "Fertile": false,
+      "Fusionable": false
     },
-    "notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
-    "value_confidence": "estimated"
+    "Notes": "decay data from NUBASE2020 (outside ICRP-107 set); some branchings may be partial; decay modes/branching/daughters from NUBASE2020 (via mendeleev); decayEnergy_MeV are total Q-values from AME2020 atomic masses; specificActivity computed from half-life and atomic mass; decayHeat is an estimate (recoverable energy: alpha=Q, beta-~Q/3, beta+ adds annihilation, EC~5%, SF~185 MeV; neutrino loss not fully modeled); superheavy nuclide: half-life and branchings have large experimental uncertainty (few-atom statistics); atomic mass is partly AME2020 extrapolation, so computed decayEnergy/Q-values are estimates",
+    "ValueConfidence": "estimated"
   }
 ]
