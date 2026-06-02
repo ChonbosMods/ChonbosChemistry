@@ -56,6 +56,18 @@ class ResourceBufferTest {
     }
 
     @Test
+    void codecRoundTripsEmptyUnlockedBuffer() {
+        ResourceBuffer b = ResourceBuffer.withCapacity(1000);
+        assertNull(b.resourceId());
+        assertEquals(0, b.amount());
+        BsonValue encoded = ResourceBuffer.CODEC.encode(b, EmptyExtraInfo.EMPTY);
+        ResourceBuffer decoded = ResourceBuffer.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
+        assertNull(decoded.resourceId());
+        assertEquals(0, decoded.amount());
+        assertEquals(1000, decoded.capacity());
+    }
+
+    @Test
     void codecRoundTripsViaEncode() {
         ResourceBuffer b = ResourceBuffer.withCapacity(1000);
         b.insert("compound:water", 42, false);
