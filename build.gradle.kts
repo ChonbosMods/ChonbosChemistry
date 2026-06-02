@@ -17,3 +17,11 @@ dependencies {
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
+
+// Bundle the chemistry reference data into the jar so the registry can load it via
+// getResourceAsStream at runtime (and on the test classpath). data/ stays at repo root
+// as the source of truth; its contents land at the resource root (e.g. /elements.json).
+sourceSets["main"].resources {
+    srcDir("data")
+    exclude("**/README.md")
+}
