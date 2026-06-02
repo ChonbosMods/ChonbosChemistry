@@ -42,6 +42,9 @@ public final class MachineBlockState implements Component<ChunkStore>, TransferN
         .append(new KeyedCodec<>("Ports", PortConfig.CODEC), (o, v) -> o.ports = v, o -> o.ports).add()
         .append(new KeyedCodec<>("Work", WorkState.CODEC), (o, v) -> o.work = v, o -> o.work).add()
         .append(new KeyedCodec<>("Throughput", Codec.INTEGER), (o, v) -> o.throughput = v, o -> o.throughput).add()
+        // Test-rig flag: when true the tick system refills this node's energy buffer each tick so it
+        // acts as an infinite power source (e.g. a creative Power Cell), no generator/recipe needed.
+        .append(new KeyedCodec<>("CreativeSource", Codec.BOOLEAN), (o, v) -> o.creativeSource = v, o -> o.creativeSource).add()
         .build();
 
     private static final int DEFAULT_THROUGHPUT = 100;
@@ -51,6 +54,7 @@ public final class MachineBlockState implements Component<ChunkStore>, TransferN
     private PortConfig ports = PortConfig.of(List.of());
     private WorkState work = new WorkState();
     private int throughput = DEFAULT_THROUGHPUT;
+    private boolean creativeSource;
 
     /** Public no-arg constructor for the codec supplier. */
     public MachineBlockState() {
@@ -130,6 +134,22 @@ public final class MachineBlockState implements Component<ChunkStore>, TransferN
         return throughput;
     }
 
+    /**
+     * @return whether this machine is a creative (infinite) power source: when true, the tick system
+     *     tops up its energy buffer to full each tick before the transport pass so it can always push.
+     */
+    public boolean isCreativeSource() {
+        return creativeSource;
+    }
+
+    public void setCreativeSource(boolean creativeSource) {
+        this.creativeSource = creativeSource;
+    }
+
+    /**
+     * Deep copy via codec round-trip: this is for placement/copy only (one-time block placement),
+     * NOT the per-tick hot path. The tick system mutates the live component in place and never clones.
+     */
     @Override
     public Component<ChunkStore> clone() {
         return CODEC.decode(CODEC.encode(this, EmptyExtraInfo.EMPTY), EmptyExtraInfo.EMPTY);
