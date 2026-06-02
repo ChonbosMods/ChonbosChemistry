@@ -1,5 +1,7 @@
 package com.chonbosmods.chemistry;
 
+import com.chonbosmods.chemistry.api.registry.Chemistry;
+import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 
@@ -38,6 +40,10 @@ public class ChonbosChemistry extends JavaPlugin {
     @Override
     protected void setup() {
         getLogger().atInfo().log("Chonbo's Chemistry setting up...");
+        InMemorySubstanceRegistry registry = InMemorySubstanceRegistry.loadFromResources();
+        Chemistry.set(registry);
+        getLogger().atInfo().log("Loaded " + registry.elements().size() + " elements, "
+            + registry.compounds().size() + " compounds, " + registry.isotopes().size() + " isotopes.");
     }
 
     @Override
@@ -47,6 +53,7 @@ public class ChonbosChemistry extends JavaPlugin {
 
     @Override
     protected void shutdown() {
+        Chemistry.clear();
         getLogger().atInfo().log("Chonbo's Chemistry shutting down...");
     }
 }
