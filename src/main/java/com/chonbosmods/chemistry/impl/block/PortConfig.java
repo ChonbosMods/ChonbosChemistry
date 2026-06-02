@@ -1,7 +1,7 @@
 package com.chonbosmods.chemistry.impl.block;
 
+import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.api.io.PortDirection;
-import com.chonbosmods.chemistry.api.substance.Phase;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * The full set of configurable {@link Port}s on a machine, and the query "which ports
- * carry phase X in direction Y" that the transport layer asks each tick (design §5.3).
+ * carry channel X in direction Y" that the transport layer asks each tick (design §5.3).
  */
 public final class PortConfig {
 
@@ -30,11 +30,11 @@ public final class PortConfig {
         return c;
     }
 
-    /** @return the ports whose phase and direction both match. */
-    public List<Port> portsFor(Phase phase, PortDirection direction) {
+    /** @return the ports whose channel and direction both match. */
+    public List<Port> portsFor(PortChannel channel, PortDirection direction) {
         List<Port> matches = new ArrayList<>();
         for (Port p : ports) {
-            if (p.phase() == phase && p.direction() == direction) {
+            if (p.channel() == channel && p.direction() == direction) {
                 matches.add(p);
             }
         }
