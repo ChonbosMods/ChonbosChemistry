@@ -35,6 +35,22 @@ class WorkStateTest {
     }
 
     @Test
+    void nonPositiveDurationNeverCompletesButAccumulates() {
+        WorkState w = new WorkState();
+        assertFalse(w.advance(5.0f, 0f, true)); // duration <= 0 never completes
+        assertTrue(w.active());                 // still goes active
+        assertEquals(5.0f, w.progress(), 1e-6); // progress still accumulates
+    }
+
+    @Test
+    void exactDurationDoesNotCompleteThisTick() {
+        WorkState w = new WorkState();
+        assertFalse(w.advance(1.0f, 2.0f, true)); // 1.0 of 2.0s
+        assertFalse(w.advance(1.0f, 2.0f, true)); // exactly 2.0; strict > means no completion
+        assertEquals(2.0f, w.progress(), 1e-6);   // progress sits exactly at duration
+    }
+
+    @Test
     void codecRoundTripsViaEncode() {
         WorkState w = new WorkState();
         w.advance(1.0f, 2.0f, true);

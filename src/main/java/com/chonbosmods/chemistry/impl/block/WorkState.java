@@ -41,6 +41,10 @@ public final class WorkState {
      *       divide/loop issues, but progress is still accumulated and the state still goes active.</li>
      * </ul>
      *
+     * <p>Completes at most one unit per call: a {@code dt} larger than {@code duration} does not
+     * drain multiple completions, so the caller is expected to keep {@code dt} small relative to
+     * {@code duration}.
+     *
      * @return {@code true} iff one unit completed this call.
      */
     public boolean advance(float dt, float duration, boolean hasInputs) {
