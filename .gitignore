@@ -52,3 +52,5 @@ run/
 *.log
 auth.*
 assets/
+### Worktrees ###
+.worktrees/
