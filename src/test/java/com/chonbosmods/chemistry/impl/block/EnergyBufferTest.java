@@ -2,16 +2,11 @@ package com.chonbosmods.chemistry.impl.block;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.EmptyExtraInfo;
-import com.hypixel.hytale.codec.util.RawJsonReader;
+import org.bson.BsonValue;
 import org.junit.jupiter.api.Test;
 
 class EnergyBufferTest {
-
-    private static <T> T decode(Codec<T> c, String json) throws Exception {
-        return c.decodeJson(RawJsonReader.fromJsonString(json), EmptyExtraInfo.EMPTY);
-    }
 
     @Test
     void receiveClampsToCapacityAndReturnsAccepted() {
@@ -37,9 +32,12 @@ class EnergyBufferTest {
     }
 
     @Test
-    void codecRoundTripsStoredAndCapacity() throws Exception {
-        EnergyBuffer b = decode(EnergyBuffer.CODEC, "{\"Stored\":30,\"Capacity\":100}");
-        assertEquals(30, b.getStored());
-        assertEquals(100, b.getMaxStored());
+    void codecRoundTripsStoredAndCapacity() {
+        EnergyBuffer b = EnergyBuffer.withCapacity(100);
+        b.receiveEnergy(30, false);
+        BsonValue encoded = EnergyBuffer.CODEC.encode(b, EmptyExtraInfo.EMPTY);
+        EnergyBuffer reDecoded = EnergyBuffer.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
+        assertEquals(30, reDecoded.getStored());
+        assertEquals(100, reDecoded.getMaxStored());
     }
 }
