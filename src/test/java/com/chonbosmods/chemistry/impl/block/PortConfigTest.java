@@ -30,6 +30,19 @@ class PortConfigTest {
     }
 
     @Test
+    void emptyConfigReturnsNoPorts() {
+        PortConfig empty = PortConfig.of(java.util.List.of());
+        assertTrue(empty.portsFor(Phase.GAS, PortDirection.OUTPUT).isEmpty());
+        assertTrue(empty.ports().isEmpty());
+    }
+
+    @Test
+    void decodesAbsentPortsKeyAsEmpty() throws Exception {
+        PortConfig cfg = decode(PortConfig.CODEC, "{}");
+        assertTrue(cfg.ports().isEmpty());
+    }
+
+    @Test
     void portCodecRoundTrips() throws Exception {
         Port p = decode(Port.CODEC, "{\"Face\":2,\"Phase\":\"liquid\",\"Direction\":\"output\"}");
         assertEquals(2, p.faceIndex());
