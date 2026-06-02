@@ -1,9 +1,13 @@
 package com.chonbosmods.chemistry;
 
 import com.chonbosmods.chemistry.api.registry.Chemistry;
+import com.chonbosmods.chemistry.impl.block.MachineBlockState;
+import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 
 import javax.annotation.Nonnull;
 
@@ -28,6 +32,9 @@ public class ChonbosChemistry extends JavaPlugin {
 
     private static ChonbosChemistry instance;
 
+    private ComponentType<ChunkStore, MachineBlockState> machineComponentType;
+    private ComponentType<ChunkStore, TankBlockState> tankComponentType;
+
     public ChonbosChemistry(@Nonnull JavaPluginInit init) {
         super(init);
         instance = this;
@@ -37,6 +44,16 @@ public class ChonbosChemistry extends JavaPlugin {
         return instance;
     }
 
+    /** The {@link ChunkStore} component type backing machine blocks (used by the ticking system + GUI). */
+    public ComponentType<ChunkStore, MachineBlockState> machineComponentType() {
+        return machineComponentType;
+    }
+
+    /** The {@link ChunkStore} component type backing tank blocks (used by the ticking system + GUI). */
+    public ComponentType<ChunkStore, TankBlockState> tankComponentType() {
+        return tankComponentType;
+    }
+
     @Override
     protected void setup() {
         getLogger().atInfo().log("Chonbo's Chemistry setting up...");
@@ -44,6 +61,12 @@ public class ChonbosChemistry extends JavaPlugin {
         Chemistry.set(registry);
         getLogger().atInfo().log("Loaded " + registry.elements().size() + " elements, "
             + registry.compounds().size() + " compounds, " + registry.isotopes().size() + " isotopes.");
+
+        machineComponentType = getChunkStoreRegistry()
+            .registerComponent(MachineBlockState.class, "MachineBlockState", MachineBlockState.CODEC);
+        tankComponentType = getChunkStoreRegistry()
+            .registerComponent(TankBlockState.class, "TankBlockState", TankBlockState.CODEC);
+        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, TankBlockState.");
     }
 
     @Override
