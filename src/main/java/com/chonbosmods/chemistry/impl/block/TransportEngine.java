@@ -8,6 +8,10 @@ import com.chonbosmods.chemistry.api.io.PortDirection;
  * The push-based, lossless transport algorithm: each tick a source node offers what it can out of
  * each OUTPUT port to the adjacent node, capped by throughput and the receiver's free space.
  *
+ * <p>{@link TransferNode#throughput(PortChannel)} is the cap per OUTPUT port per push, not a
+ * per-channel-per-tick total: every OUTPUT port loops independently, so a node with N output ports
+ * of a channel can move up to N times its throughput in a single push.
+ *
  * <p>Transfer is <b>simulate-then-commit</b>: the movable amount is computed with {@code simulate=true}
  * on both sides, then the agreed {@code min} is committed with {@code simulate=false} on both sides.
  * This is lossless and never voids resources or energy.
@@ -80,7 +84,7 @@ public final class TransportEngine {
                 }
                 String id = srcBuf.resourceId(); // re-read: may become null after a full drain
                 if (id == null) {
-                    break;
+                    break; // optimization only, not a correctness guard: a drained buffer's extract returns 0 anyway
                 }
                 int cap = source.throughput(channel);
                 int offered = srcBuf.extract(cap, true);

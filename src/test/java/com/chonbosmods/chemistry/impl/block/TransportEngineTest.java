@@ -64,6 +64,13 @@ class TransportEngineTest {
         return map::get;
     }
 
+    private static NeighborView pair(int dirA, TransferNode a, int dirB, TransferNode b) {
+        Map<Integer, TransferNode> map = new HashMap<>();
+        map.put(dirA, a);
+        map.put(dirB, b);
+        return map::get;
+    }
+
     private static EnergyBuffer energy(int capacity, int fill) {
         EnergyBuffer b = EnergyBuffer.withCapacity(capacity);
         if (fill > 0) {
@@ -177,6 +184,32 @@ class TransportEngineTest {
         assertEquals(0, dstEnergy.getStored());
     }
 
+    @Test
+    void twoOutputPortsEachMoveUpToThroughput() {
+        // throughput is PER OUTPUT PORT: two POWER OUTPUT ports each emit up to 40, so the source
+        // (energy 100, throughput 40) drops by 80 and each receiver gains 40.
+        EnergyBuffer srcEnergy = energy(100, 100);
+        FakeNode source = new FakeNode(
+            PortConfig.of(List.of(
+                Port.of(0, PortChannel.POWER, PortDirection.OUTPUT),
+                Port.of(1, PortChannel.POWER, PortDirection.OUTPUT))),
+            srcEnergy, 40);
+        EnergyBuffer dstEnergyA = energy(1000, 0);
+        FakeNode dstA = new FakeNode(
+            PortConfig.of(List.of(Port.of(0, PortChannel.POWER, PortDirection.INPUT))),
+            dstEnergyA, 40);
+        EnergyBuffer dstEnergyB = energy(1000, 0);
+        FakeNode dstB = new FakeNode(
+            PortConfig.of(List.of(Port.of(0, PortChannel.POWER, PortDirection.INPUT))),
+            dstEnergyB, 40);
+
+        TransportEngine.pushEnergy(source, pair(0, dstA, 1, dstB));
+
+        assertEquals(40, dstEnergyA.getStored());
+        assertEquals(40, dstEnergyB.getStored());
+        assertEquals(20, srcEnergy.getStored());
+    }
+
     // --- Resource tests (FLUID channel) -------------------------------------
 
     @Test
@@ -244,6 +277,44 @@ class TransportEngineTest {
             null, 30).withResource(PortChannel.FLUID, dstBuf);
 
         assertDoesNotThrow(() -> TransportEngine.pushResources(source, single(0, dst)));
+        assertEquals(0, dstBuf.amount());
+    }
+
+    @Test
+    void pushesItemChannelLikeFluid() {
+        // same happy-path shape as the FLUID test but on the ITEM channel, proving the channel
+        // loop is not FLUID-specific.
+        ResourceBuffer srcBuf = resource(100, "element:iron", 100);
+        FakeNode source = new FakeNode(
+            PortConfig.of(List.of(Port.of(0, PortChannel.ITEM, PortDirection.OUTPUT))),
+            null, 30).withResource(PortChannel.ITEM, srcBuf);
+        ResourceBuffer dstBuf = resource(50, null, 0);
+        FakeNode dst = new FakeNode(
+            PortConfig.of(List.of(Port.of(1, PortChannel.ITEM, PortDirection.INPUT))),
+            null, 30).withResource(PortChannel.ITEM, dstBuf);
+
+        TransportEngine.pushResources(source, single(0, dst));
+
+        assertEquals(30, dstBuf.amount());
+        assertEquals("element:iron", dstBuf.resourceId());
+        assertEquals(70, srcBuf.amount());
+    }
+
+    @Test
+    void resourceNeighborWithoutInputPortIsSkipped() {
+        // neighbour can hold the fluid but exposes no FLUID INPUT port → nothing moves.
+        ResourceBuffer srcBuf = resource(100, "compound:water", 100);
+        FakeNode source = new FakeNode(
+            PortConfig.of(List.of(Port.of(0, PortChannel.FLUID, PortDirection.OUTPUT))),
+            null, 30).withResource(PortChannel.FLUID, srcBuf);
+        ResourceBuffer dstBuf = resource(50, null, 0);
+        FakeNode dst = new FakeNode(
+            PortConfig.of(List.of(Port.of(1, PortChannel.FLUID, PortDirection.OUTPUT))),
+            null, 30).withResource(PortChannel.FLUID, dstBuf);
+
+        TransportEngine.pushResources(source, single(0, dst));
+
+        assertEquals(100, srcBuf.amount());
         assertEquals(0, dstBuf.amount());
     }
 }

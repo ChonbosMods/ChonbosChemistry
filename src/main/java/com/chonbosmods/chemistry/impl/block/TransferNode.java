@@ -19,6 +19,10 @@ public interface TransferNode {
     /** @return the resource buffer for a fluid/gas/item channel, or null if this node has none for that channel. */
     ResourceBuffer resource(PortChannel channel);
 
-    /** @return max units movable out per push for this channel (throughput cap). */
+    /**
+     * @return max units movable out of a single OUTPUT port per push for this channel: this is a
+     *     per-output-port cap, not a per-channel-per-tick total, so a node with N OUTPUT ports of
+     *     this channel can emit up to N times this value in one push.
+     */
     int throughput(PortChannel channel);
 }
