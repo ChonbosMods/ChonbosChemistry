@@ -36,6 +36,10 @@ public final class Network {
     private long stored;
     private String lockedResourceId; // null when unlocked; always null for POWER
 
+    // Monotonic per-network counter used to rotate the fair-split remainder recipient across
+    // distribute calls. Transient runtime state only: NOT persisted and NOT part of any codec.
+    private int rotation;
+
     public Network(PortChannel channel) {
         this.channel = channel;
     }
@@ -74,6 +78,14 @@ public final class Network {
 
     public PortChannel channel() {
         return channel;
+    }
+
+    /**
+     * @return the next rotation offset for fair-split remainder placement, post-incrementing the
+     *     internal counter so successive calls cycle the recipient. Transient: never serialized.
+     */
+    public int nextRotation() {
+        return rotation++;
     }
 
     /**

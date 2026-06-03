@@ -102,13 +102,16 @@ public final class NetworkTransfer {
         if (deliverBudget <= 0) {
             return 0;
         }
-        long delivered = deliverTo(net, pureAcceptors, deliverBudget);
+        // Pass a fresh monotonic rotation offset per pass so the fair-split remainder recipient
+        // cycles across ticks: equal acceptors with a stable order receive equally over time
+        // instead of the first one permanently winning the leftover ±1 units.
+        long delivered = deliverTo(net, pureAcceptors, deliverBudget, net.nextRotation());
         long remainingBudget = deliverBudget - delivered;
         if (remainingBudget > 0) {
             // Re-clamp to what is still stored (deliveries to pure acceptors already drained the buffer).
             remainingBudget = Math.min(remainingBudget, net.stored());
             if (remainingBudget > 0) {
-                delivered += deliverTo(net, bufferAcceptors, remainingBudget);
+                delivered += deliverTo(net, bufferAcceptors, remainingBudget, net.nextRotation());
             }
         }
         return delivered;
@@ -153,10 +156,12 @@ public final class NetworkTransfer {
 
     /**
      * Fair-splits at most {@code budget} units out of the network buffer across {@code acceptors}.
+     * The {@code rotationOffset} cycles which acceptor receives the integer-division remainder so a
+     * stable acceptor order does not permanently favour the first acceptor.
      *
      * @return the total delivered (extracted from the net and accepted).
      */
-    private static long deliverTo(Network net, List<Acceptor> acceptors, long budget) {
+    private static long deliverTo(Network net, List<Acceptor> acceptors, long budget, int rotationOffset) {
         if (budget <= 0 || acceptors.isEmpty() || net.stored() == 0) {
             return 0;
         }
@@ -165,7 +170,7 @@ public final class NetworkTransfer {
         for (int i = 0; i < acceptors.size(); i++) {
             caps[i] = Math.max(0L, acceptors.get(i).capacityFor(r));
         }
-        long[] alloc = FairSplitDistributor.allocate(budget, caps);
+        long[] alloc = FairSplitDistributor.allocate(budget, caps, rotationOffset);
 
         long delivered = 0;
         for (int i = 0; i < acceptors.size(); i++) {

@@ -1,6 +1,7 @@
 package com.chonbosmods.chemistry.impl.block.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import java.util.List;
@@ -243,6 +244,34 @@ class NetworkPriorityTest {
             assertEquals(500, storage.stored(), "storage unchanged at tick " + tick);
             assertEquals(0, net.stored(), "network buffer unchanged at tick " + tick);
         }
+    }
+
+    // --- Scenario F: infinite source + two equal sinks: remainder rotates so neither starves. ---
+
+    @Test
+    void twoEqualSinks_remainderRotates_cumulativeDeliveryStaysBalanced() {
+        // budget 5/tick over two equal sinks each able to take less than their full share: integer
+        // division gives floor 2 each + remainder 1. WITHOUT rotation the same sink always gets the
+        // extra unit ([3,2] every tick) and the cumulative gap grows unbounded. WITH per-tick rotation
+        // the extra unit alternates ([3,2],[2,3],...) so the two sinks stay within 1 of each other.
+        Network net = powerNet();
+        FakeProvider cell = new FakeProvider(null, 0, true); // infinite source
+        FakeAcceptor sinkA = new FakeAcceptor(100_000);
+        FakeAcceptor sinkB = new FakeAcceptor(100_000);
+
+        for (int tick = 1; tick <= 6; tick++) {
+            NetworkTransfer.distribute(
+                net, List.of(cell), List.of(sinkA, sinkB),
+                List.of(), List.of());
+            long gap = Math.abs(sinkA.received() - sinkB.received());
+            assertTrue(gap <= 1,
+                "cumulative delivery gap must stay <= 1 at tick " + tick
+                    + " (A=" + sinkA.received() + ", B=" + sinkB.received() + ")");
+        }
+        // Sanity: total delivered across 6 ticks is 30, split as evenly as possible (15/15).
+        assertEquals(30, sinkA.received() + sinkB.received());
+        assertEquals(15, sinkA.received());
+        assertEquals(15, sinkB.received());
     }
 
     // --- Scenario E: two storages, no pure endpoints: no transfer between them (stable v1). ---

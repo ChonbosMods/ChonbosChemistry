@@ -186,4 +186,73 @@ class FairSplitDistributorTest {
             assertFair(caps, r);
         }
     }
+
+    // --- Rotation overload: cycles the remainder recipient across calls. ---
+
+    @Test
+    void rotationOffsetZeroMatchesDefault() {
+        long[] caps = {200, 200};
+        long[] r = FairSplitDistributor.allocate(5, caps, 0);
+        assertArrayEquals(new long[] {3, 2}, r);
+        assertInvariants(5, caps, r);
+        assertFair(caps, r);
+    }
+
+    @Test
+    void rotationOffsetOneShiftsRemainder() {
+        long[] caps = {200, 200};
+        long[] r = FairSplitDistributor.allocate(5, caps, 1);
+        assertArrayEquals(new long[] {2, 3}, r);
+        assertInvariants(5, caps, r);
+        assertFair(caps, r);
+    }
+
+    @Test
+    void rotationWrapsAroundActiveCount() {
+        // With 2 active acceptors, offset 2 wraps to offset 0.
+        long[] caps = {200, 200};
+        assertArrayEquals(
+                FairSplitDistributor.allocate(5, caps, 0),
+                FairSplitDistributor.allocate(5, caps, 2));
+        // And offset 3 wraps to offset 1.
+        assertArrayEquals(
+                FairSplitDistributor.allocate(5, caps, 1),
+                FairSplitDistributor.allocate(5, caps, 3));
+    }
+
+    @Test
+    void defaultAllocateEqualsRotationOffsetZero() {
+        long[] caps = {3, 3, 3};
+        assertArrayEquals(
+                FairSplitDistributor.allocate(8, caps),
+                FairSplitDistributor.allocate(8, caps, 0));
+    }
+
+    @Test
+    void rotationDistributesRemainderOverThreeAcceptors() {
+        // 8 over three equal sinks: floor 2 each, remainder 2 placed starting at the offset.
+        long[] caps = {3, 3, 3};
+        assertArrayEquals(new long[] {3, 3, 2}, FairSplitDistributor.allocate(8, caps, 0));
+        assertArrayEquals(new long[] {2, 3, 3}, FairSplitDistributor.allocate(8, caps, 1));
+        assertArrayEquals(new long[] {3, 2, 3}, FairSplitDistributor.allocate(8, caps, 2));
+    }
+
+    @Test
+    void fuzzInvariantsHoldWithRotation() {
+        Random rng = new Random(1337L);
+        for (int iter = 0; iter < 50_000; iter++) {
+            int n = 1 + rng.nextInt(6); // [1,6]
+            long[] caps = new long[n];
+            for (int i = 0; i < n; i++) {
+                caps[i] = -3 + rng.nextInt(40); // [-3,36]
+            }
+            long amount = -5 + rng.nextInt(200); // [-5,194]
+            int offset = rng.nextInt(20); // arbitrary, including >= n to exercise wrapping
+
+            long[] r = FairSplitDistributor.allocate(amount, caps, offset);
+
+            assertInvariants(amount, caps, r);
+            assertFair(caps, r);
+        }
+    }
 }
