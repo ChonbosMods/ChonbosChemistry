@@ -158,6 +158,33 @@ class NetworkEndpointsTest {
     }
 
     @Test
+    void collect_machineBorderingTwoMemberPipes_isCollectedOnce() {
+        // An L of three connected POWER pipes: (5,5,5)-(5,6,5)-(6,5,5). A single OUTPUT-power machine at
+        // (6,6,5) is face-adjacent to TWO of them: (5,6,5) on its -X face and (6,5,5) on its -Y face.
+        // Without dedup it would be wrapped as a provider TWICE (double share); we assert exactly one.
+        NetworkManager manager = new NetworkManager();
+        PipeGridView grid = (px, py, pz) -> {
+            long k = NetworkManager.packKey(px, py, pz);
+            if (k == NetworkManager.packKey(5, 5, 5)
+                || k == NetworkManager.packKey(5, 6, 5)
+                || k == NetworkManager.packKey(6, 5, 5)) {
+                return PipeNode.of(PortChannel.POWER, 1);
+            }
+            return null;
+        };
+        Network net = manager.getOrBuildNetwork(5, 5, 5, grid);
+
+        FakeLookup lookup = new FakeLookup();
+        lookup.put(6, 6, 5, new FakePorts(
+            portConfig(PortChannel.POWER, PortDirection.OUTPUT),
+            EnergyBuffer.withCapacity(1000L), Map.of()));
+
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        assertEquals(1, endpoints.providers().size());
+        assertEquals(0, endpoints.acceptors().size());
+    }
+
+    @Test
     void collect_emptyNeighbours_yieldsEmptyLists() {
         NetworkManager manager = new NetworkManager();
         Network net = manager.getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));

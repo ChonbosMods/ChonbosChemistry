@@ -95,7 +95,7 @@ public class ChonbosChemistry extends JavaPlugin {
 
         // Per-tick driver: creative-refill then work pass. Must be registered AFTER the components above.
         // (No longer pushes resources to neighbors: the NetworkTickSystem below does that over pipes.)
-        getChunkStoreRegistry().registerSystem(new MachineTickSystem(machineComponentType, tankComponentType));
+        getChunkStoreRegistry().registerSystem(new MachineTickSystem(machineComponentType));
         getLogger().atInfo().log("Registered MachineTickSystem (creative-refill then work).");
 
         // Transport network cache (per-world) + the events that invalidate it on pipe topology changes

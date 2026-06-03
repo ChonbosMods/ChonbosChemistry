@@ -23,20 +23,19 @@ import javax.annotation.Nonnull;
  *
  * <ol>
  *   <li>(optional) creative-source refill: if the node is flagged a creative power source, its energy
- *       buffer is topped up to full so it always has power to push;</li>
- *   <li>a TRANSPORT pass: push energy then resources to neighbors via {@link TransportEngine};</li>
- *   <li>a WORK pass: advance the node's {@link WorkState} (currently a stub: see step 3 below).</li>
+ *       buffer is topped up to full so it always has power to feed the network;</li>
+ *   <li>a WORK pass: advance the node's {@link WorkState} (currently a stub: see below).</li>
  * </ol>
  *
  * <h2>Defensive contract</h2>
- * This runs every server tick on hot ECS data. It MUST NEVER throw on a missing neighbor, component,
- * chunk, or world: every lookup is null/validity guarded and skipped on failure. It also never calls
+ * This runs every server tick on hot ECS data. It MUST NEVER throw on a missing component, chunk, or
+ * world: every lookup is null/validity guarded and skipped on failure. It also never calls
  * {@code clone()} (it mutates the live component in place).
  *
  * <h2>Query scope</h2>
- * The query matches the machine component type only. Tanks ({@link TankBlockState}) are passive: they
- * are not ticked themselves but participate as neighbors reached through the {@link NeighborView}
- * (both machine and tank types are resolved when looking up an adjacent {@link TransferNode}).
+ * The query matches the machine component type only. Tanks ({@link TankBlockState}) are passive and are
+ * not ticked here. Resource transport between blocks is done by {@code NetworkTickSystem} over pipe
+ * networks, not by this system.
  */
 public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
 
@@ -54,7 +53,6 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
     private static final float LOG_INTERVAL_SECONDS = 1.0f;
 
     private final ComponentType<ChunkStore, MachineBlockState> machineType;
-    private final ComponentType<ChunkStore, TankBlockState> tankType;
     private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType;
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType;
 
@@ -65,10 +63,8 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
     private final java.util.Map<String, long[]> lastReadout = new java.util.HashMap<>();
 
     public MachineTickSystem(
-            @Nonnull ComponentType<ChunkStore, MachineBlockState> machineType,
-            @Nonnull ComponentType<ChunkStore, TankBlockState> tankType) {
+            @Nonnull ComponentType<ChunkStore, MachineBlockState> machineType) {
         this.machineType = machineType;
-        this.tankType = tankType;
         // Resolved here (not per-tick): these built-in component types are stable for the world's life.
         this.blockInfoType = BlockModule.BlockStateInfo.getComponentType();
         this.blockChunkType = BlockChunk.getComponentType();

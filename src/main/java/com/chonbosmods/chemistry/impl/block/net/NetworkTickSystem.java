@@ -51,10 +51,14 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType;
     private final NetworkService networkService;
 
-    /** Per-world last-seen world tick, to detect when to reset {@link #processedAnchors}. */
+    /** Per-world last-seen world tick, to detect when to reset that world's processed-anchor set. */
     private final Map<World, Long> lastTickByWorld = new IdentityHashMap<>();
-    /** Anchors of networks already distributed this world-tick (dedup so each network runs once). */
-    private final Set<Long> processedAnchors = new HashSet<>();
+    /**
+     * Per-world set of anchors already distributed this world-tick (dedup so each network runs once).
+     * Keyed per world so two worlds (whose anchors are world-agnostic packed keys) can't collide or
+     * clear each other's set; each world's set is reset when THAT world's tick advances.
+     */
+    private final Map<World, Set<Long>> processedAnchorsByWorld = new IdentityHashMap<>();
 
     public NetworkTickSystem(
             @Nonnull ComponentType<ChunkStore, PipeNode> pipeType,
@@ -119,7 +123,9 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
             return;
         }
 
-        // Reset the per-tick dedup set when this world advances a tick.
+        // Reset this world's per-tick dedup set when this world advances a tick.
+        Set<Long> processedAnchors =
+            processedAnchorsByWorld.computeIfAbsent(world, w -> new HashSet<>());
         Long last = lastTickByWorld.get(world);
         long now = world.getTick();
         if (last == null || last != now) {

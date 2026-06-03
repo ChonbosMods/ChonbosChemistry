@@ -7,7 +7,9 @@ import com.chonbosmods.chemistry.impl.block.PortConfig;
 import com.chonbosmods.chemistry.impl.block.ResourceBuffer;
 import com.chonbosmods.chemistry.impl.block.net.MachineLookup.MachinePorts;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Collects a {@link Network}'s {@link Provider}s and {@link Acceptor}s by walking each member pipe's
@@ -50,13 +52,21 @@ public final class NetworkEndpoints {
         PortChannel channel = net.channel();
         List<Provider> providers = new ArrayList<>();
         List<Acceptor> acceptors = new ArrayList<>();
+        // A neighbour block bordering two member pipes of THIS network would otherwise be wrapped twice
+        // (a double share in the fair-split). Dedup by neighbour block position: once a position has
+        // contributed, skip it on subsequent member-pipe hits.
+        Set<Long> visitedNeighbours = new HashSet<>();
 
         for (long memberKey : net.memberKeys()) {
             int px = NetworkManager.unpackX(memberKey);
             int py = NetworkManager.unpackY(memberKey);
             int pz = NetworkManager.unpackZ(memberKey);
             for (int[] off : OFFSETS) {
-                MachinePorts neighbour = lookup.at(px + off[0], py + off[1], pz + off[2]);
+                int nx = px + off[0], ny = py + off[1], nz = pz + off[2];
+                if (!visitedNeighbours.add(NetworkManager.packKey(nx, ny, nz))) {
+                    continue; // this neighbour position already contributed for this network
+                }
+                MachinePorts neighbour = lookup.at(nx, ny, nz);
                 if (neighbour == null) {
                     continue;
                 }
