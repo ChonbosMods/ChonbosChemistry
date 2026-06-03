@@ -1,0 +1,111 @@
+$C = "../Common.ui";
+
+// Chonbo's Chemistry: machine / tank block GUI (snapshot v1).
+// Right-clicking a rig block opens this page; the server populates the selectors
+// below from the block's MachineBlockState / TankBlockState component.
+$C.@PageOverlay {
+  LayoutMode: Middle;
+
+  Group {
+    LayoutMode: Center;
+
+    $C.@DecoratedContainer {
+
+      #Title {
+        $C.@Title {
+          @Text = "Chemistry Block";
+        }
+      }
+
+      #Content {
+        Padding: (Full: 9, Top: 8);
+
+        Group #Panel {
+          Anchor: (Width: 380);
+          LayoutMode: Top;
+
+          // --- Block title row ---
+          Label #BlockTitle {
+            Anchor: (Top: 6, Bottom: 10);
+            Style: (FontSize: 16, TextColor: #dee2ee, FontName: "Secondary", RenderUppercase: true, HorizontalAlignment: Center);
+          }
+
+          // --- Energy gauge (hidden for tanks / energy-less machines) ---
+          Group #EnergySection {
+            Visible: false;
+            LayoutMode: Top;
+            Padding: (Bottom: 12);
+
+            Label #EnergyLabel {
+              Anchor: (Bottom: 4);
+              Style: (FontSize: 14, TextColor: #96a9be, HorizontalAlignment: Left);
+            }
+
+            $C.@ProgressBar #EnergyBar {
+              @Anchor = (Bottom: 2, Left: 0);
+              Value: 0.0;
+            }
+          }
+
+          // --- Resource rows (one per channel; toggled on when present) ---
+          Group #FluidSection {
+            Visible: false;
+            LayoutMode: Top;
+            Padding: (Bottom: 12);
+
+            Label #FluidLabel {
+              Anchor: (Bottom: 4);
+              Style: (FontSize: 14, TextColor: #96a9be, HorizontalAlignment: Left);
+            }
+
+            $C.@ProgressBar #FluidBar {
+              @Anchor = (Bottom: 2, Left: 0);
+              Value: 0.0;
+            }
+          }
+
+          Group #GasSection {
+            Visible: false;
+            LayoutMode: Top;
+            Padding: (Bottom: 12);
+
+            Label #GasLabel {
+              Anchor: (Bottom: 4);
+              Style: (FontSize: 14, TextColor: #96a9be, HorizontalAlignment: Left);
+            }
+
+            $C.@ProgressBar #GasBar {
+              @Anchor = (Bottom: 2, Left: 0);
+              Value: 0.0;
+            }
+          }
+
+          Group #ItemSection {
+            Visible: false;
+            LayoutMode: Top;
+            Padding: (Bottom: 12);
+
+            Label #ItemLabel {
+              Anchor: (Bottom: 4);
+              Style: (FontSize: 14, TextColor: #96a9be, HorizontalAlignment: Left);
+            }
+
+            $C.@ProgressBar #ItemBar {
+              @Anchor = (Bottom: 2, Left: 0);
+              Value: 0.0;
+            }
+          }
+
+          // --- Empty-state message (shown when the block carries no buffers) ---
+          Label #EmptyLabel {
+            Visible: false;
+            Anchor: (Top: 8, Bottom: 8);
+            Style: (FontSize: 14, TextColor: #778292, HorizontalAlignment: Center, Wrap: true);
+          }
+        }
+      }
+    }
+  }
+}
+
+$C.@BackButton {}

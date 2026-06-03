@@ -9,7 +9,21 @@
   "BlockType": {
     "Material": "Solid",
     "DrawType": "Cube",
-    "Flags": {},
+    "Flags": {
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "CC_MachinePanel"
+            }
+          }
+        ]
+      }
+    },
     "Gathering": {
       "Breaking": {
         "GatherType": "SoftBlocks"

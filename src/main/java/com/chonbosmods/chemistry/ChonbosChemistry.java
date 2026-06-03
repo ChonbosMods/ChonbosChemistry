@@ -4,8 +4,10 @@ import com.chonbosmods.chemistry.api.registry.Chemistry;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
+import com.chonbosmods.chemistry.impl.block.ui.MachinePanelPage;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenCustomUIInteraction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
@@ -72,6 +74,13 @@ public class ChonbosChemistry extends JavaPlugin {
         // Per-tick driver: transport pass then work pass. Must be registered AFTER the components above.
         getChunkStoreRegistry().registerSystem(new MachineTickSystem(machineComponentType, tankComponentType));
         getLogger().atInfo().log("Registered MachineTickSystem (transport then work).");
+
+        // Block GUI (Task B4): right-clicking a rig block resolves its block entity and opens a
+        // snapshot panel showing energy / resource-buffer gauges. The "CC_MachinePanel" id is
+        // referenced by each rig block's Interactions.Use (Type: OpenCustomUI, Page.Id) in JSON.
+        OpenCustomUIInteraction.registerBlockEntityCustomPage(
+            this, MachinePanelPage.class, "CC_MachinePanel", MachinePanelPage::new);
+        getLogger().atInfo().log("Registered CC_MachinePanel custom UI page (block GUI).");
     }
 
     @Override
