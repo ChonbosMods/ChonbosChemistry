@@ -164,12 +164,12 @@ public final class MachinePanelPage extends CustomUIPage {
     }
 
     /** "{amount} / {capacity} ({pct}%)" — the readable text gauge. */
-    private static String gaugeText(int amount, int capacity) {
+    private static String gaugeText(long amount, long capacity) {
         return amount + " / " + capacity + " (" + percent(amount, capacity) + "%)";
     }
 
-    private static int percent(int amount, int capacity) {
-        if (capacity <= 0) {
+    private static int percent(long amount, long capacity) {
+        if (capacity <= 0L) {
             return 0;
         }
         long p = Math.round(100.0 * amount / capacity);

@@ -9,25 +9,25 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 public final class EnergyBuffer implements EnergyHandler {
 
     public static final BuilderCodec<EnergyBuffer> CODEC = BuilderCodec.builder(EnergyBuffer.class, EnergyBuffer::new)
-        .append(new KeyedCodec<>("Stored", Codec.INTEGER), (o, v) -> o.stored = v, o -> o.stored).add()
-        .append(new KeyedCodec<>("Capacity", Codec.INTEGER), (o, v) -> o.capacity = v, o -> o.capacity).add()
+        .append(new KeyedCodec<>("Stored", Codec.LONG), (o, v) -> o.stored = v, o -> o.stored).add()
+        .append(new KeyedCodec<>("Capacity", Codec.LONG), (o, v) -> o.capacity = v, o -> o.capacity).add()
         .build();
 
-    private int stored;
-    private int capacity;
+    private long stored;
+    private long capacity;
 
     private EnergyBuffer() {
     }
 
-    public static EnergyBuffer withCapacity(int capacity) {
+    public static EnergyBuffer withCapacity(long capacity) {
         EnergyBuffer b = new EnergyBuffer();
         b.capacity = capacity;
         return b;
     }
 
     @Override
-    public int receiveEnergy(int amount, boolean simulate) {
-        int accepted = Math.max(0, Math.min(amount, capacity - stored));
+    public long receiveEnergy(long amount, boolean simulate) {
+        long accepted = Math.max(0L, Math.min(amount, capacity - stored));
         if (!simulate) {
             stored += accepted;
         }
@@ -35,8 +35,8 @@ public final class EnergyBuffer implements EnergyHandler {
     }
 
     @Override
-    public int extractEnergy(int amount, boolean simulate) {
-        int provided = Math.max(0, Math.min(amount, stored));
+    public long extractEnergy(long amount, boolean simulate) {
+        long provided = Math.max(0L, Math.min(amount, stored));
         if (!simulate) {
             stored -= provided;
         }
@@ -44,12 +44,12 @@ public final class EnergyBuffer implements EnergyHandler {
     }
 
     @Override
-    public int getStored() {
+    public long getStored() {
         return stored;
     }
 
     @Override
-    public int getMaxStored() {
+    public long getMaxStored() {
         return capacity;
     }
 }

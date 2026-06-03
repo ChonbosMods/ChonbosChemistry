@@ -54,8 +54,8 @@ public final class TransportEngine {
                 continue;
             }
             int cap = source.throughput(PortChannel.POWER);
-            int offered = src.extractEnergy(cap, true);
-            int accepted = dst.receiveEnergy(offered, true);
+            long offered = src.extractEnergy(cap, true);
+            long accepted = dst.receiveEnergy(offered, true);
             if (accepted > 0) {
                 src.extractEnergy(accepted, false);
                 dst.receiveEnergy(accepted, false);
