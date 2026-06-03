@@ -1,8 +1,10 @@
 package com.chonbosmods.chemistry.impl.block.net;
 
 import com.chonbosmods.chemistry.api.io.PortChannel;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * One channel's single virtual tank/battery (the shared-buffer model): the whole connected set
@@ -72,6 +74,15 @@ public final class Network {
 
     public PortChannel channel() {
         return channel;
+    }
+
+    /**
+     * The packed keys of this network's pipe segments (see {@link NetworkManager#packKey}). Used by the
+     * endpoint-collection pass to walk each pipe's 6 face-neighbours looking for machine/tank ports.
+     * Unmodifiable live view; iteration order is unspecified.
+     */
+    public Set<Long> memberKeys() {
+        return Collections.unmodifiableSet(members.keySet());
     }
 
     /** @return Σ member capacities (0 if empty). */

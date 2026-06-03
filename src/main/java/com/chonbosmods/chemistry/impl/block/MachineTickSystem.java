@@ -127,10 +127,8 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
             return;
         }
 
-        // Neighbor view: resolve the adjacent TransferNode (machine OR tank) in a given direction.
-        NeighborView view = direction -> neighborNode(world, store, x, y, z, direction);
-
-        // (optional) Creative source: refill energy to full BEFORE pushing so it always has power.
+        // (optional) Creative source: refill energy to full each tick so it always has power to feed
+        // the network (the NetworkTickSystem pulls from it via its OUTPUT ports).
         if (node.isCreativeSource()) {
             EnergyHandler energy = node.energy();
             if (energy != null) {
@@ -138,9 +136,9 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
             }
         }
 
-        // 3. TRANSPORT pass: push energy then resources to neighbors. Both are internally guarded.
-        TransportEngine.pushEnergy(node, view);
-        TransportEngine.pushResources(node, view);
+        // 3. TRANSPORT pass: REMOVED (H4). Resource movement is now done by NetworkTickSystem over pipe
+        // networks; the machine tick no longer pushes to adjacent blocks. (TransportEngine/NeighborView
+        // classes remain until their retirement in H8.)
 
         // 4. WORK pass.
         // TODO(recipes): no recipe system yet (Phase A WorkState exists but machines carry no recipe
@@ -154,33 +152,6 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
             logAccumulator = 0.0f;
             logActivity(node, x, y, z);
         }
-    }
-
-    /**
-     * Resolves the {@link TransferNode} adjacent to {@code (x,y,z)} in {@code direction}; null when
-     * absent. Fully guarded: returns null on out-of-range direction, missing block entity, or a
-     * neighbor that carries neither a machine nor a tank component.
-     */
-    private TransferNode neighborNode(
-            @Nonnull World world, @Nonnull Store<ChunkStore> store, int x, int y, int z, int direction) {
-        int[] pos = neighborPos(x, y, z, direction);
-        if (pos == null) {
-            return null;
-        }
-        // getBlockEntity already returns null for unloaded chunks and blocks without an entity.
-        Ref<ChunkStore> ref = BlockModule.getBlockEntity(world, pos[0], pos[1], pos[2]);
-        if (ref == null || !ref.isValid()) {
-            return null;
-        }
-        MachineBlockState machine = store.getComponent(ref, machineType);
-        if (machine != null) {
-            return machine;
-        }
-        TankBlockState tank = store.getComponent(ref, tankType);
-        if (tank != null) {
-            return tank;
-        }
-        return null;
     }
 
     /**

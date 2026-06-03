@@ -8,6 +8,17 @@ import org.junit.jupiter.api.Test;
 class NetworkTest {
 
     @Test
+    void memberKeysReflectsAddedAndRemovedMembers() {
+        Network net = new Network(PortChannel.POWER);
+        net.addMember(7L, 100, 8);
+        net.addMember(42L, 100, 8);
+        assertEquals(java.util.Set.of(7L, 42L), net.memberKeys());
+
+        net.removeMember(7L);
+        assertEquals(java.util.Set.of(42L), net.memberKeys());
+    }
+
+    @Test
     void powerAggregatesCapacityAndMinThroughput() {
         Network net = new Network(PortChannel.POWER);
         net.addMember(1, 100, 8);

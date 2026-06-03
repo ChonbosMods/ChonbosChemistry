@@ -5,6 +5,7 @@ import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
+import com.chonbosmods.chemistry.impl.block.net.NetworkTickSystem;
 import com.chonbosmods.chemistry.impl.block.net.PipeBreakEventSystem;
 import com.chonbosmods.chemistry.impl.block.net.PipeChunkUnloadEventSystem;
 import com.chonbosmods.chemistry.impl.block.net.PipeNode;
@@ -92,14 +93,20 @@ public class ChonbosChemistry extends JavaPlugin {
             .registerComponent(PipeNode.class, "PipeNode", PipeNode.CODEC);
         getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, TankBlockState, PipeNode.");
 
-        // Per-tick driver: transport pass then work pass. Must be registered AFTER the components above.
+        // Per-tick driver: creative-refill then work pass. Must be registered AFTER the components above.
+        // (No longer pushes resources to neighbors: the NetworkTickSystem below does that over pipes.)
         getChunkStoreRegistry().registerSystem(new MachineTickSystem(machineComponentType, tankComponentType));
-        getLogger().atInfo().log("Registered MachineTickSystem (transport then work).");
+        getLogger().atInfo().log("Registered MachineTickSystem (creative-refill then work).");
 
         // Transport network cache (per-world) + the events that invalidate it on pipe topology changes
         // (H3). Place/break fire on the EntityStore (the acting entity); chunk-unload fires on the
         // ChunkStore (the unloading chunk), so they register on their respective registries.
         networkService = new NetworkService();
+        // Per-tick pipe-network distribution (H4): for each pipe network, pull from OUTPUT-port machines
+        // and fair-split into INPUT-port machines once per tick. This is what moves resources now.
+        getChunkStoreRegistry().registerSystem(new NetworkTickSystem(
+            pipeComponentType, machineComponentType, tankComponentType, networkService));
+        getLogger().atInfo().log("Registered NetworkTickSystem (per-tick pipe-network distribution).");
         getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService));
         getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService));
         getChunkStoreRegistry().registerSystem(new PipeChunkUnloadEventSystem(networkService));
