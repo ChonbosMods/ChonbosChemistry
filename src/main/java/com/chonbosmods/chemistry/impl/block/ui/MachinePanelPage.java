@@ -23,12 +23,16 @@ import javax.annotation.Nonnull;
  *
  * <p>Right-clicking a machine or tank block opens this page. It reads the block's
  * {@link MachineBlockState} or {@link TankBlockState} component off the clicked block entity's
- * {@code Ref<ChunkStore>} and renders an energy gauge (machines with power only) plus one resource
- * row per non-null channel buffer (FLUID / GAS / ITEM), each showing amount/capacity and a fill bar.
+ * {@code Ref<ChunkStore>} and renders an energy readout (machines with power only) plus one row per
+ * non-null channel buffer (FLUID / GAS / ITEM), each showing {@code amount / capacity (pct%)}.
+ *
+ * <p>The UI template ({@code Pages/CC_MachinePanel.ui}) mirrors the proven Natural20 structure
+ * ({@code @PageOverlay} + {@code @Container} + plain {@code Label} rows; no {@code @ProgressBar}),
+ * so each gauge is a text label toggled visible and given its text here.
  *
  * <p><b>Snapshot only:</b> values are read once at {@link #build}. There is no live refresh tick.
- * A future live variant would hold a server task that calls {@link #sendUpdate(UICommandBuilder)}
- * with a freshly-built command set on an interval (see the marker comment in {@link #build}).
+ * A future live variant would re-run the population from a scheduled task via
+ * {@link #sendUpdate(UICommandBuilder)} (see the marker comment in {@link #build}).
  */
 public final class MachinePanelPage extends CustomUIPage {
 
@@ -48,9 +52,8 @@ public final class MachinePanelPage extends CustomUIPage {
             @Nonnull Store<EntityStore> store) {
         commandBuilder.append("Pages/CC_MachinePanel.ui");
 
-        // NOTE (future live refresh): for a live panel, factor the population below into a private
-        // method and re-run it from a scheduled task that calls sendUpdate(commandBuilder). v1 is a
-        // one-shot snapshot, so we populate inline here.
+        // NOTE (future live refresh): for a live panel, re-run the population below from a scheduled
+        // task that calls sendUpdate(commandBuilder). v1 is a one-shot snapshot, populated inline.
         if (!this.blockRef.isValid()) {
             this.showEmpty(commandBuilder, "Machine", "This block is no longer valid.");
             return;
@@ -74,7 +77,7 @@ public final class MachinePanelPage extends CustomUIPage {
         this.showEmpty(commandBuilder, "Machine", "This is not a chemistry block.");
     }
 
-    // Labels are built from Message.raw(...) literals rather than translation keys: the mod's
+    // Rows are built from Message.raw(...) literals rather than translation keys: the mod's
     // server.lang is generated + gitignored, so a snapshot panel shouldn't depend on lang entries.
     private void populateMachine(@Nonnull UICommandBuilder cmd, @Nonnull MachineBlockState machine) {
         cmd.set("#BlockTitle.TextSpans", Message.raw("Machine"));
@@ -83,23 +86,16 @@ public final class MachinePanelPage extends CustomUIPage {
 
         EnergyHandler energy = machine.energy();
         if (energy != null) {
-            int stored = energy.getStored();
-            int max = energy.getMaxStored();
-            this.setGauge(cmd, "#EnergySection", "#EnergyLabel", "#EnergyBar",
-                "Energy: " + amountText(stored, max), stored, max);
+            setRow(cmd, "#EnergyLabel", "Energy: " + gaugeText(energy.getStored(), energy.getMaxStored()));
             anything = true;
         }
 
-        anything |= this.setResourceRow(cmd, machine.resource(PortChannel.FLUID),
-            "#FluidSection", "#FluidLabel", "#FluidBar", "Fluid");
-        anything |= this.setResourceRow(cmd, machine.resource(PortChannel.GAS),
-            "#GasSection", "#GasLabel", "#GasBar", "Gas");
-        anything |= this.setResourceRow(cmd, machine.resource(PortChannel.ITEM),
-            "#ItemSection", "#ItemLabel", "#ItemBar", "Items");
+        anything |= this.setResourceRow(cmd, machine.resource(PortChannel.FLUID), "#FluidLabel", "Fluid");
+        anything |= this.setResourceRow(cmd, machine.resource(PortChannel.GAS), "#GasLabel", "Gas");
+        anything |= this.setResourceRow(cmd, machine.resource(PortChannel.ITEM), "#ItemLabel", "Items");
 
         if (!anything) {
-            cmd.set("#EmptyLabel.Visible", true);
-            cmd.set("#EmptyLabel.TextSpans", Message.raw("This block has no buffers to display."));
+            this.showEmptyRow(cmd);
         }
     }
 
@@ -110,71 +106,55 @@ public final class MachinePanelPage extends CustomUIPage {
         PortChannel channel = tank.channel();
         ResourceBuffer buffer = tank.resource(channel);
 
-        String section;
-        String label;
-        String bar;
+        String labelSelector;
         String channelName;
         switch (channel) {
             case GAS -> {
-                section = "#GasSection";
-                label = "#GasLabel";
-                bar = "#GasBar";
+                labelSelector = "#GasLabel";
                 channelName = "Gas";
             }
             case ITEM -> {
-                section = "#ItemSection";
-                label = "#ItemLabel";
-                bar = "#ItemBar";
+                labelSelector = "#ItemLabel";
                 channelName = "Items";
             }
             default -> { // FLUID (and POWER, which a tank should never carry, falls back here harmlessly)
-                section = "#FluidSection";
-                label = "#FluidLabel";
-                bar = "#FluidBar";
+                labelSelector = "#FluidLabel";
                 channelName = "Fluid";
             }
         }
 
-        boolean shown = this.setResourceRow(cmd, buffer, section, label, bar, channelName);
-        if (!shown) {
-            cmd.set("#EmptyLabel.Visible", true);
-            cmd.set("#EmptyLabel.TextSpans", Message.raw("This block has no buffers to display."));
+        if (!this.setResourceRow(cmd, buffer, labelSelector, channelName)) {
+            this.showEmptyRow(cmd);
         }
     }
 
     /**
-     * Populate a "Label + ProgressBar" row from a resource buffer.
+     * Populate one resource label row from a buffer.
      *
      * @return true if the row was shown (buffer non-null), false otherwise.
      */
     private boolean setResourceRow(
             @Nonnull UICommandBuilder cmd,
             ResourceBuffer buffer,
-            @Nonnull String section,
-            @Nonnull String label,
-            @Nonnull String bar,
+            @Nonnull String labelSelector,
             @Nonnull String channelName) {
         if (buffer == null) {
             return false;
         }
         String resourceId = buffer.resourceId();
         String name = resourceId == null ? "empty" : resourceId;
-        String labelText = channelName + " (" + name + "): " + amountText(buffer.amount(), buffer.capacity());
-        this.setGauge(cmd, section, label, bar, labelText, buffer.amount(), buffer.capacity());
+        setRow(cmd, labelSelector, channelName + " (" + name + "): " + gaugeText(buffer.amount(), buffer.capacity()));
         return true;
     }
 
-    private void setGauge(
-            @Nonnull UICommandBuilder cmd,
-            @Nonnull String section,
-            @Nonnull String label,
-            @Nonnull String bar,
-            @Nonnull String labelText,
-            int stored,
-            int max) {
-        cmd.set(section + ".Visible", true);
-        cmd.set(label + ".TextSpans", Message.raw(labelText));
-        cmd.set(bar + ".Value", fraction(stored, max));
+    private static void setRow(@Nonnull UICommandBuilder cmd, @Nonnull String labelSelector, @Nonnull String text) {
+        cmd.set(labelSelector + ".Visible", true);
+        cmd.set(labelSelector + ".TextSpans", Message.raw(text));
+    }
+
+    private void showEmptyRow(@Nonnull UICommandBuilder cmd) {
+        cmd.set("#EmptyLabel.Visible", true);
+        cmd.set("#EmptyLabel.TextSpans", Message.raw("This block has no buffers to display."));
     }
 
     private void showEmpty(@Nonnull UICommandBuilder cmd, @Nonnull String title, @Nonnull String message) {
@@ -183,18 +163,19 @@ public final class MachinePanelPage extends CustomUIPage {
         cmd.set("#EmptyLabel.TextSpans", Message.raw(message));
     }
 
-    private static String amountText(int amount, int capacity) {
-        return amount + " / " + capacity;
+    /** "{amount} / {capacity} ({pct}%)" — the readable text gauge. */
+    private static String gaugeText(int amount, int capacity) {
+        return amount + " / " + capacity + " (" + percent(amount, capacity) + "%)";
     }
 
-    private static float fraction(int amount, int capacity) {
+    private static int percent(int amount, int capacity) {
         if (capacity <= 0) {
-            return 0.0F;
+            return 0;
         }
-        float f = (float) amount / (float) capacity;
-        if (f < 0.0F) {
-            return 0.0F;
+        long p = Math.round(100.0 * amount / capacity);
+        if (p < 0L) {
+            return 0;
         }
-        return Math.min(f, 1.0F);
+        return (int) Math.min(p, 100L);
     }
 }
