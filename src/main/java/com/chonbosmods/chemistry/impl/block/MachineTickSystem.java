@@ -132,6 +132,17 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
             }
         }
 
+        // (optional) Burning sink: a machine that consumes its own buffered energy each tick. Uses the
+        // INTERNAL extract (the machine burning its own buffer, not an external port transfer), so the
+        // sink's stored value drops after the network fills it — making the TEMP change-only log move.
+        long drain = node.energyDrainPerTick();
+        if (drain > 0) {
+            EnergyHandler energy = node.energy();
+            if (energy != null) {
+                energy.extractEnergyInternal(drain, false);
+            }
+        }
+
         // 3. TRANSPORT pass: REMOVED (H4). Resource movement is now done by NetworkTickSystem over pipe
         // networks; the machine tick no longer pushes to adjacent blocks. (TransportEngine/NeighborView
         // classes remain until their retirement in H8.)

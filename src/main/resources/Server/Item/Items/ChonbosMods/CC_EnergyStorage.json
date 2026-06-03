@@ -1,6 +1,6 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.CC_EnergySink.name"
+    "Name": "server.items.CC_EnergyStorage.name"
   },
   "Categories": [
     "Blocks.Cloth"
@@ -45,7 +45,7 @@
         "MachineBlockState": {
           "Energy": {
             "Stored": 0,
-            "Capacity": 200
+            "Capacity": 5000
           },
           "Resources": [],
           "Ports": {
@@ -55,7 +55,13 @@
               { "Face": 2, "Channel": "power", "Direction": "input" },
               { "Face": 3, "Channel": "power", "Direction": "input" },
               { "Face": 4, "Channel": "power", "Direction": "input" },
-              { "Face": 5, "Channel": "power", "Direction": "input" }
+              { "Face": 5, "Channel": "power", "Direction": "input" },
+              { "Face": 0, "Channel": "power", "Direction": "output" },
+              { "Face": 1, "Channel": "power", "Direction": "output" },
+              { "Face": 2, "Channel": "power", "Direction": "output" },
+              { "Face": 3, "Channel": "power", "Direction": "output" },
+              { "Face": 4, "Channel": "power", "Direction": "output" },
+              { "Face": 5, "Channel": "power", "Direction": "output" }
             ]
           },
           "Work": {
@@ -63,8 +69,7 @@
             "Active": false
           },
           "Throughput": 1000,
-          "CreativeSource": false,
-          "EnergyDrainPerTick": 2
+          "CreativeSource": false
         }
       }
     }

@@ -99,6 +99,32 @@ class MachineBlockStateTest {
     }
 
     @Test
+    void energyDrainPerTickDefaultsToZeroWhenAbsent() {
+        // sample() never sets a drain, and the codec key is omitted on encode for a 0 value — decode
+        // must restore 0, not trip the primitive-null check.
+        MachineBlockState state = sample();
+        assertEquals(0L, state.energyDrainPerTick());
+
+        BsonValue encoded = MachineBlockState.CODEC.encode(state, EmptyExtraInfo.EMPTY);
+        MachineBlockState decoded = MachineBlockState.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
+        assertEquals(0L, decoded.energyDrainPerTick());
+    }
+
+    @Test
+    void energyDrainPerTickRoundTripsWhenSet() {
+        MachineBlockState state = sample();
+        state.setEnergyDrainPerTick(7L);
+
+        BsonValue encoded = MachineBlockState.CODEC.encode(state, EmptyExtraInfo.EMPTY);
+        MachineBlockState decoded = MachineBlockState.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
+        assertEquals(7L, decoded.energyDrainPerTick());
+
+        // clone() is a codec round-trip, so the field must survive a clone too.
+        MachineBlockState copy = (MachineBlockState) state.clone();
+        assertEquals(7L, copy.energyDrainPerTick());
+    }
+
+    @Test
     void energyOptionalRoundTripsWhenAbsent() {
         Map<PortChannel, ResourceBuffer> resources = new EnumMap<>(PortChannel.class);
         ResourceBuffer gas = ResourceBuffer.withCapacity(200);

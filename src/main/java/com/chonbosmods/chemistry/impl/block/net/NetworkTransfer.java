@@ -12,10 +12,14 @@ import java.util.List;
  * never leaves one side without arriving at the other) and honors the network's FLUID/GAS type-lock.
  *
  * <p>Pure logic: JDK only, no Hytale APIs. Per-provider/per-acceptor rate limits live inside their
- * own {@code extract}/{@code insert}; this class does not deal with rates.
+ * own {@code extract}/{@code insert}; this class handles the network-wide throughput cap.
  *
- * <p>NOTE (scope): this pass is intentionally NOT bounded by {@link Network#throughput()} —
- * throughput-rate limiting is applied by the integration tick layer later.
+ * <p>NOTE (throughput cap): {@link Network#throughput()} is a PER-CALL (= per-tick) budget applied to
+ * EACH phase independently. Phase 1 pulls at most {@code throughput} units from providers into the
+ * buffer (also bounded by free space); Phase 2 delivers at most {@code throughput} units out of the
+ * buffer to acceptors (fair-split of {@code min(stored, throughput)}). A network with
+ * {@code throughput() == 0} (e.g. empty membership) moves nothing. This is what makes energy visibly
+ * crawl through pipes: a full source no longer dumps to a sink in a single tick.
  */
 public final class NetworkTransfer {
 
@@ -31,12 +35,24 @@ public final class NetworkTransfer {
         boolean typeLocked =
                 net.channel() == PortChannel.FLUID || net.channel() == PortChannel.GAS;
 
-        // Phase 1 — fill the network buffer from providers.
+        // Per-call (per-tick) throughput budget. A 0-throughput network (empty membership) moves
+        // nothing on either phase.
+        long throughput = net.throughput();
+        if (throughput <= 0) {
+            return 0;
+        }
+
+        // Phase 1 — fill the network buffer from providers, capped at the throughput budget.
+        long pulledBudget = throughput;
         for (Provider provider : providers) {
+            if (pulledBudget <= 0) {
+                break; // spent this call's pull budget.
+            }
             long freeSpace = net.capacity() - net.stored();
             if (freeSpace <= 0) {
                 break; // network full — backpressure, stop pulling.
             }
+            long room = Math.min(freeSpace, pulledBudget); // pull at most the remaining budget.
             String r = provider.resourceId();
             if (typeLocked) {
                 if (r == null) {
@@ -47,12 +63,13 @@ public final class NetworkTransfer {
                     continue; // type-lock: different resource, skip.
                 }
             }
-            long offered = provider.extract(freeSpace, true);
+            long offered = provider.extract(room, true);
             long accepted = net.insert(r, offered, true);
             long moved = Math.min(offered, accepted);
             if (moved > 0) {
                 provider.extract(moved, false);
                 net.insert(r, moved, false);
+                pulledBudget -= moved;
             }
         }
 
@@ -65,7 +82,10 @@ public final class NetworkTransfer {
         for (int i = 0; i < acceptors.size(); i++) {
             caps[i] = Math.max(0L, acceptors.get(i).capacityFor(r));
         }
-        long[] alloc = FairSplitDistributor.allocate(net.stored(), caps);
+        // Deliver at most the throughput budget out of the buffer this call; the remainder stays
+        // stored (visibly held in transit) for the next tick.
+        long deliverBudget = Math.min(net.stored(), throughput);
+        long[] alloc = FairSplitDistributor.allocate(deliverBudget, caps);
 
         long delivered = 0;
         for (int i = 0; i < acceptors.size(); i++) {

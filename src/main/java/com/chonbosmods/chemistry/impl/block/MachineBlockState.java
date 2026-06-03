@@ -4,15 +4,20 @@ import com.chonbosmods.chemistry.api.energy.EnergyHandler;
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.EmptyExtraInfo;
+import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
+import com.hypixel.hytale.codec.schema.SchemaContext;
+import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nonnull;
+import org.bson.BsonValue;
 
 /**
  * The persistent ECS state a machine block carries on the {@link ChunkStore}: its energy buffer,
@@ -33,6 +38,31 @@ import java.util.Map;
  */
 public final class MachineBlockState implements Component<ChunkStore>, TransferNode {
 
+    /**
+     * A non-primitive {@code Codec<Long>} delegating to {@link Codec#LONG}. {@code Codec.LONG} is a
+     * {@code PrimitiveCodec}, which makes {@code BuilderField} reject a null (absent optional) value
+     * before it reaches the setter. This identity wrapper is NOT a {@code PrimitiveCodec}, so an
+     * absent/explicit-null optional key decodes to null and the field setter can apply a default.
+     * (Same pattern as {@link EnergyBuffer}'s {@code OPTIONAL_LONG}.)
+     */
+    private static final Codec<Long> OPTIONAL_LONG = new Codec<>() {
+        @Override
+        public Long decode(BsonValue bsonValue, ExtraInfo extraInfo) {
+            return Codec.LONG.decode(bsonValue, extraInfo);
+        }
+
+        @Override
+        public BsonValue encode(Long value, ExtraInfo extraInfo) {
+            return Codec.LONG.encode(value, extraInfo);
+        }
+
+        @Nonnull
+        @Override
+        public Schema toSchema(@Nonnull SchemaContext context) {
+            return Codec.LONG.toSchema(context);
+        }
+    };
+
     public static final BuilderCodec<MachineBlockState> CODEC = BuilderCodec.builder(MachineBlockState.class, MachineBlockState::new)
         // Energy is optional: a node may carry no power. EnergyBuffer.CODEC is an object codec, so a
         // null value is simply omitted on encode and decodes back to null.
@@ -45,6 +75,13 @@ public final class MachineBlockState implements Component<ChunkStore>, TransferN
         // Test-rig flag: when true the tick system refills this node's energy buffer each tick so it
         // acts as an infinite power source (e.g. a creative Power Cell), no generator/recipe needed.
         .append(new KeyedCodec<>("CreativeSource", Codec.BOOLEAN), (o, v) -> o.creativeSource = v, o -> o.creativeSource).add()
+        // Test-rig "burning sink" flag: when > 0 the tick system extracts this many energy units from
+        // this node's own buffer each tick (the machine consuming its own power), so a sink's stored
+        // value visibly drains. OPTIONAL with default 0 — see OPTIONAL_LONG above for why an absent or
+        // explicit-null key must reach the setter (3-arg KeyedCodec not-required) where it coalesces
+        // to 0 rather than tripping the primitive non-null check.
+        .append(new KeyedCodec<>("EnergyDrainPerTick", OPTIONAL_LONG, false),
+                (o, v) -> o.energyDrainPerTick = v == null ? 0L : v, o -> o.energyDrainPerTick).add()
         .build();
 
     private static final int DEFAULT_THROUGHPUT = 100;
@@ -55,6 +92,9 @@ public final class MachineBlockState implements Component<ChunkStore>, TransferN
     private WorkState work = new WorkState();
     private int throughput = DEFAULT_THROUGHPUT;
     private boolean creativeSource;
+    // Energy units this machine burns from its own buffer each tick (0 = no self-drain). Default 0 so
+    // an absent codec key leaves a normal machine non-draining.
+    private long energyDrainPerTick;
 
     /** Public no-arg constructor for the codec supplier. */
     public MachineBlockState() {
@@ -144,6 +184,19 @@ public final class MachineBlockState implements Component<ChunkStore>, TransferN
 
     public void setCreativeSource(boolean creativeSource) {
         this.creativeSource = creativeSource;
+    }
+
+    /**
+     * @return energy units this machine burns from its own buffer each tick (0 = none). Drives the
+     *     test-rig "burning sink": the tick system calls {@code extractEnergyInternal(drain, false)}
+     *     so the sink's stored energy visibly drains after the network fills it.
+     */
+    public long energyDrainPerTick() {
+        return energyDrainPerTick;
+    }
+
+    public void setEnergyDrainPerTick(long energyDrainPerTick) {
+        this.energyDrainPerTick = energyDrainPerTick;
     }
 
     /**

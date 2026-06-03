@@ -7,15 +7,16 @@ package com.chonbosmods.chemistry.impl.block.net;
  */
 public final class PipeTiers {
 
-    // [TUNE] placeholder base values. Capacity scales 1000 per tier step; throughput 100 per step.
-    private static final long BASE_CAPACITY = 1000L;
-    private static final int BASE_THROUGHPUT = 100;
+    // [TUNE] placeholder base values, tuned to a deliberate crawl so flow is watchable in-game.
+    // Capacity scales 500 per tier step; throughput 5 per step (tier 0 = 500 cap / 5 throughput).
+    private static final long BASE_CAPACITY = 500L;
+    private static final int BASE_THROUGHPUT = 5;
 
     private PipeTiers() {
     }
 
     /**
-     * Per-segment buffer capacity for a pipe of {@code tier}. [TUNE] {@code base 1000 * (tier+1)};
+     * Per-segment buffer capacity for a pipe of {@code tier}. [TUNE] {@code base 500 * (tier+1)};
      * negative tiers are clamped to tier 0 so the value stays positive and monotonic.
      */
     public static long capacityForTier(int tier) {
@@ -25,7 +26,7 @@ public final class PipeTiers {
 
     /**
      * Per-segment throughput (transfer rate) for a pipe of {@code tier}. [TUNE]
-     * {@code base 100 * (tier+1)}; negative tiers are clamped to tier 0.
+     * {@code base 5 * (tier+1)}; negative tiers are clamped to tier 0.
      */
     public static int throughputForTier(int tier) {
         int t = Math.max(0, tier);

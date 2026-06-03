@@ -125,7 +125,7 @@ class NetworkTransferTest {
     @Test
     void powerEvenSplit() {
         Network net = new Network(PortChannel.POWER);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
         FakeAcceptor a = new FakeAcceptor(1000);
         FakeAcceptor b = new FakeAcceptor(1000);
 
@@ -141,7 +141,7 @@ class NetworkTransferTest {
     @Test
     void powerNearFull() {
         Network net = new Network(PortChannel.POWER);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
         FakeAcceptor a = new FakeAcceptor(10);
         FakeAcceptor b = new FakeAcceptor(1000);
 
@@ -157,7 +157,7 @@ class NetworkTransferTest {
     @Test
     void backpressureNetworkFull() {
         Network net = new Network(PortChannel.POWER);
-        net.addMember(1, 50, 8);
+        net.addMember(1, 50, 1_000_000);
         FakeProvider p = new FakeProvider(null, 100);
 
         long delivered = NetworkTransfer.distribute(net, List.of(p), List.of());
@@ -176,7 +176,7 @@ class NetworkTransferTest {
     @Test
     void backpressureAcceptorsFull() {
         Network net = new Network(PortChannel.POWER);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
         // Pre-fill the buffer.
         NetworkTransfer.distribute(net, List.of(new FakeProvider(null, 100)), List.of());
         assertEquals(100, net.stored());
@@ -192,7 +192,7 @@ class NetworkTransferTest {
     @Test
     void fluidTypeLockAtProvider() {
         Network net = new Network(PortChannel.FLUID);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
 
         FakeFluidAcceptor oxygen = new FakeFluidAcceptor("oxygen", 1000);
         FakeFluidAcceptor helium = new FakeFluidAcceptor("helium", 1000);
@@ -215,7 +215,7 @@ class NetworkTransferTest {
     void fluidTypeLockBuffersWhenAcceptorsCannotTake() {
         // Same lock behavior, but with no matching acceptor the buffer retains the lock.
         Network net = new Network(PortChannel.FLUID);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
 
         FakeFluidAcceptor helium = new FakeFluidAcceptor("helium", 1000);
         long delivered = NetworkTransfer.distribute(
@@ -232,7 +232,7 @@ class NetworkTransferTest {
     @Test
     void losslessLyingAcceptor() {
         Network net = new Network(PortChannel.POWER);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
         NetworkTransfer.distribute(net, List.of(new FakeProvider(null, 100)), List.of());
         assertEquals(100, net.stored());
 
@@ -247,12 +247,93 @@ class NetworkTransferTest {
     @Test
     void emptyNoProvidersNoAcceptors() {
         Network net = new Network(PortChannel.POWER);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
 
         long delivered = NetworkTransfer.distribute(net, List.of(), List.of());
 
         assertEquals(0, delivered);
         assertEquals(0, net.stored());
         assertNull(net.lockedResourceId());
+    }
+
+    // --- Throughput cap: the per-call (per-tick) budget on EACH phase. ---
+
+    @Test
+    void throughputCapsProviderPullPerCall() {
+        // Provider has 1000 available, network throughput 10: only 10 enters the buffer per call,
+        // even though there is plenty of free space and plenty offered.
+        Network net = new Network(PortChannel.POWER);
+        net.addMember(1, 1000, 10);
+        FakeProvider p = new FakeProvider(null, 1000);
+
+        long delivered = NetworkTransfer.distribute(net, List.of(p), List.of());
+
+        assertEquals(0, delivered);          // no acceptors
+        assertEquals(10, net.stored());      // exactly the throughput budget pulled
+        assertEquals(990, p.available());    // provider keeps the rest
+
+        // A second call pulls another 10 — energy visibly accumulates over ticks.
+        NetworkTransfer.distribute(net, List.of(p), List.of());
+        assertEquals(20, net.stored());
+        assertEquals(980, p.available());
+    }
+
+    @Test
+    void throughputCapsAcceptorDeliveryPerCall() {
+        // Buffer holds 100, throughput 10, a hungry acceptor: only 10 delivered per call, so it
+        // takes multiple calls to drain (pipes visibly hold energy in transit).
+        Network net = new Network(PortChannel.POWER);
+        // Pre-fill the buffer to 100 at high throughput, then lower throughput to the bottleneck 10
+        // by re-adding the same member key (addMember replaces in place; throughput is MIN-of-members).
+        net.addMember(1, 1000, 1_000_000);
+        NetworkTransfer.distribute(net, List.of(new FakeProvider(null, 100)), List.of());
+        assertEquals(100, net.stored());
+        net.addMember(1, 1000, 10);
+        assertEquals(10, net.throughput());
+
+        FakeAcceptor a = new FakeAcceptor(1000);
+        long delivered = NetworkTransfer.distribute(net, List.of(), List.of(a));
+        assertEquals(10, delivered);         // exactly the budget delivered
+        assertEquals(90, net.stored());      // buffer still holds the rest in transit
+        assertEquals(990, a.room());         // acceptor got 10
+
+        long delivered2 = NetworkTransfer.distribute(net, List.of(), List.of(a));
+        assertEquals(10, delivered2);
+        assertEquals(80, net.stored());
+    }
+
+    @Test
+    void throughputBudgetIsFairlySplitAcrossAcceptors() {
+        // A 10-unit budget across two equal hungry acceptors splits 5/5 within the budget.
+        Network net = new Network(PortChannel.POWER);
+        net.addMember(1, 1000, 1_000_000);
+        NetworkTransfer.distribute(net, List.of(new FakeProvider(null, 100)), List.of());
+        net.addMember(1, 1000, 10);
+        assertEquals(100, net.stored());
+        assertEquals(10, net.throughput());
+
+        FakeAcceptor a = new FakeAcceptor(1000);
+        FakeAcceptor b = new FakeAcceptor(1000);
+        long delivered = NetworkTransfer.distribute(net, List.of(), List.of(a, b));
+
+        assertEquals(10, delivered);     // only the budget moved
+        assertEquals(995, a.room());     // got 5
+        assertEquals(995, b.room());     // got 5
+        assertEquals(90, net.stored());  // remainder held in transit
+    }
+
+    @Test
+    void zeroThroughputMovesNothing() {
+        // An empty network (no members) has throughput 0 and must move nothing.
+        Network net = new Network(PortChannel.POWER);
+        assertEquals(0, net.throughput());
+        assertEquals(0, net.capacity());
+
+        FakeProvider p = new FakeProvider(null, 100);
+        long delivered = NetworkTransfer.distribute(net, List.of(p), List.of(new FakeAcceptor(1000)));
+
+        assertEquals(0, delivered);
+        assertEquals(0, net.stored());
+        assertEquals(100, p.available());
     }
 }

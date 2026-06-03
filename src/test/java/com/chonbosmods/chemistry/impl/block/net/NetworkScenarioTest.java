@@ -158,7 +158,7 @@ class NetworkScenarioTest {
     @Test
     void typeLockEndToEndThenClearsOnEmpty() {
         Network net = new Network(PortChannel.FLUID);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
 
         FakeFluidAcceptor oxygenSink = new FakeFluidAcceptor("oxygen", 1000);
         FakeFluidAcceptor heliumSink = new FakeFluidAcceptor("helium", 1000);
@@ -194,7 +194,7 @@ class NetworkScenarioTest {
     @Test
     void backpressureFullAcceptorsVoidNothing() {
         Network net = new Network(PortChannel.POWER);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
 
         FakeProvider p1 = new FakeProvider(null, 60);
         FakeProvider p2 = new FakeProvider(null, 40);
@@ -221,7 +221,7 @@ class NetworkScenarioTest {
     @Test
     void multiSourceAccumulatesThenFairSplits() {
         Network net = new Network(PortChannel.POWER);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
 
         FakeProvider p30 = new FakeProvider(null, 30);
         FakeProvider p40 = new FakeProvider(null, 40);
@@ -256,7 +256,7 @@ class NetworkScenarioTest {
     @Test
     void interleavedZeroCapacityAcceptorKeepsIndexAlignment() {
         Network net = new Network(PortChannel.POWER);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
 
         // Pre-fill the buffer to exactly 100.
         NetworkTransfer.distribute(net, List.of(new FakeProvider(null, 100)), List.of());
@@ -282,7 +282,7 @@ class NetworkScenarioTest {
     @Test
     void lyingAcceptorStrandsRemainderButLosesNothing() {
         Network net = new Network(PortChannel.POWER);
-        net.addMember(1, 1000, 8);
+        net.addMember(1, 1000, 1_000_000);
 
         FakeProvider p = new FakeProvider(null, 100);
         long originalTotal = p.available(); // 100

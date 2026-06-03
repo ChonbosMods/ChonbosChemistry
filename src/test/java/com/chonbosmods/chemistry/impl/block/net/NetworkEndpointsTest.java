@@ -211,12 +211,14 @@ class NetworkEndpointsTest {
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
         long moved = NetworkTransfer.distribute(net, endpoints.providers(), endpoints.acceptors());
 
-        // Single tier-1 pipe network has capacity 1000: one pass fills the buffer from the 1000-stored
-        // source then fair-splits all of it into the 1000-room sink. Source empties, sink fills, buffer
-        // ends empty, and 1000 was delivered to acceptors.
-        assertEquals(1000L, moved);
-        assertEquals(0L, source.getStored());
-        assertEquals(1000L, sink.getStored());
-        assertEquals(0L, net.stored());
+        // Single tier-1 pipe network: the per-tick throughput cap bounds EACH phase, so one pass pulls
+        // at most `throughput` from the source into the buffer and delivers at most `throughput` of it
+        // to the sink. Energy now crawls: it takes many passes to move the full 1000 (this is the
+        // "pipes visibly hold energy in transit" behavior). One pass moves exactly the throughput.
+        long tput = PipeTiers.throughputForTier(1);
+        assertEquals(tput, moved);
+        assertEquals(1000L - tput, source.getStored());
+        assertEquals(tput, sink.getStored());
+        assertEquals(0L, net.stored()); // all that entered the buffer this pass also left it.
     }
 }
