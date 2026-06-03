@@ -16,10 +16,17 @@ import java.util.Set;
  * 6 face-neighbours and adapting any port-bearing machine/tank found there (via {@link MachineLookup})
  * to the network's channel.
  *
- * <p>A neighbour with an OUTPUT port of the network's channel becomes a {@link Provider} (it feeds the
- * network); one with an INPUT port becomes an {@link Acceptor} (it drains the network). POWER endpoints
- * adapt through their {@link EnergyHandler}; FLUID/GAS endpoints through their {@link ResourceBuffer}
- * for that channel. ITEM is not handled here (no buffer adapter for items yet).
+ * <p>Endpoints are classified by their port set (H6 FIX 2):
+ * <ul>
+ *   <li>OUTPUT-only neighbour → a PURE {@link Provider} (a source: it feeds the network);
+ *   <li>INPUT-only neighbour → a PURE {@link Acceptor} (a sink: it drains the network);
+ *   <li>neighbour with BOTH an OUTPUT and an INPUT port (e.g. a storage battery) → a BUFFER endpoint:
+ *       it contributes ONE entry to the buffer-provider list AND one to the buffer-acceptor list.
+ * </ul>
+ * This split lets {@link NetworkTransfer} prioritise real sources/sinks over storage and so avoids the
+ * self-churn where a storage block re-supplies its own energy each tick and starves the actual source.
+ * POWER endpoints adapt through their {@link EnergyHandler}; FLUID/GAS endpoints through their
+ * {@link ResourceBuffer} for that channel. ITEM is not handled here (no buffer adapter for items yet).
  *
  * <p>Face-precise geometry is deferred: like the existing transport code, ANY matching-channel
  * OUTPUT/INPUT port qualifies a neighbour, regardless of which face it sits on. Requiring the port to
@@ -36,22 +43,32 @@ public final class NetworkEndpoints {
     private NetworkEndpoints() {
     }
 
-    /** The providers + acceptors collected around a network, ready for {@link NetworkTransfer#distribute}. */
-    public record Endpoints(List<Provider> providers, List<Acceptor> acceptors) {
+    /**
+     * The endpoints collected around a network, classified for {@link NetworkTransfer#distribute}:
+     * pure sources, pure sinks, and storage (BOTH-port) endpoints split into a buffer-provider and a
+     * buffer-acceptor view. Never null; any list may be empty.
+     */
+    public record Endpoints(
+            List<Provider> pureProviders,
+            List<Acceptor> pureAcceptors,
+            List<Provider> bufferProviders,
+            List<Acceptor> bufferAcceptors) {
     }
 
     /**
-     * Walks every member pipe's face-neighbours and collects endpoints matching {@code net}'s channel.
+     * Walks every member pipe's face-neighbours and collects endpoints matching {@code net}'s channel,
+     * classifying each by its port set (see {@link Endpoints}).
      *
      * @param net    the network whose channel/members drive the search.
      * @param lookup live (or fake) block access for resolving a neighbour's ports.
-     * @return the collected providers (OUTPUT ports) and acceptors (INPUT ports). Never null; either
-     *     list may be empty.
+     * @return the classified endpoints. Never null; any list may be empty.
      */
     public static Endpoints collect(Network net, MachineLookup lookup) {
         PortChannel channel = net.channel();
-        List<Provider> providers = new ArrayList<>();
-        List<Acceptor> acceptors = new ArrayList<>();
+        List<Provider> pureProviders = new ArrayList<>();
+        List<Acceptor> pureAcceptors = new ArrayList<>();
+        List<Provider> bufferProviders = new ArrayList<>();
+        List<Acceptor> bufferAcceptors = new ArrayList<>();
         // A neighbour block bordering two member pipes of THIS network would otherwise be wrapped twice
         // (a double share in the fair-split). Dedup by neighbour block position: once a position has
         // contributed, skip it on subsequent member-pipe hits.
@@ -75,21 +92,32 @@ public final class NetworkEndpoints {
                     continue;
                 }
                 // Face-precise matching deferred: any matching-channel port on the neighbour qualifies.
-                if (!ports.portsFor(channel, PortDirection.OUTPUT).isEmpty()) {
+                boolean hasOutput = !ports.portsFor(channel, PortDirection.OUTPUT).isEmpty();
+                boolean hasInput = !ports.portsFor(channel, PortDirection.INPUT).isEmpty();
+                if (hasOutput && hasInput) {
+                    // Storage endpoint: contributes to BOTH buffer lists (when its adapters resolve).
                     Provider provider = providerFor(channel, neighbour);
                     if (provider != null) {
-                        providers.add(provider);
+                        bufferProviders.add(provider);
                     }
-                }
-                if (!ports.portsFor(channel, PortDirection.INPUT).isEmpty()) {
                     Acceptor acceptor = acceptorFor(channel, neighbour);
                     if (acceptor != null) {
-                        acceptors.add(acceptor);
+                        bufferAcceptors.add(acceptor);
+                    }
+                } else if (hasOutput) {
+                    Provider provider = providerFor(channel, neighbour);
+                    if (provider != null) {
+                        pureProviders.add(provider);
+                    }
+                } else if (hasInput) {
+                    Acceptor acceptor = acceptorFor(channel, neighbour);
+                    if (acceptor != null) {
+                        pureAcceptors.add(acceptor);
                     }
                 }
             }
         }
-        return new Endpoints(providers, acceptors);
+        return new Endpoints(pureProviders, pureAcceptors, bufferProviders, bufferAcceptors);
     }
 
     private static Provider providerFor(PortChannel channel, MachinePorts endpoint) {

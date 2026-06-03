@@ -356,6 +356,48 @@ class NetworkManagerTest {
         assertEquals(0, mgr.cachedNetworkCount());
     }
 
+    // --- H6: splitEvenly pure helper (network buffer write-back). ---
+
+    @Test
+    void splitEvenlyDistributesEvenlyWithNoRemainder() {
+        long[] got = NetworkManager.splitEvenly(12, 3);
+        assertArrayEquals(new long[] {4, 4, 4}, got);
+    }
+
+    @Test
+    void splitEvenlyHandsRemainderToTheFirstSlots() {
+        // 13 over 3 -> base 4 each, remainder 1 to the first slot.
+        assertArrayEquals(new long[] {5, 4, 4}, NetworkManager.splitEvenly(13, 3));
+        // 14 over 3 -> base 4 each, remainder 2 to the first two slots.
+        assertArrayEquals(new long[] {5, 5, 4}, NetworkManager.splitEvenly(14, 3));
+    }
+
+    @Test
+    void splitEvenlyZeroPartsReturnsEmpty() {
+        assertArrayEquals(new long[0], NetworkManager.splitEvenly(12, 0));
+        assertArrayEquals(new long[0], NetworkManager.splitEvenly(0, 0));
+    }
+
+    @Test
+    void splitEvenlyZeroTotalReturnsAllZeros() {
+        assertArrayEquals(new long[] {0, 0, 0}, NetworkManager.splitEvenly(0, 3));
+    }
+
+    @Test
+    void splitEvenlyConservesTotalAcrossSlots() {
+        long[] got = NetworkManager.splitEvenly(100, 7);
+        long sum = 0;
+        for (long v : got) {
+            sum += v;
+        }
+        assertEquals(100, sum);
+        assertEquals(7, got.length);
+        // Every slot is base or base+1; the first slots carry the remainder.
+        for (int i = 0; i < got.length; i++) {
+            assertTrue(got[i] == 14 || got[i] == 15, "slot " + i + " = " + got[i]);
+        }
+    }
+
     @Test
     void selfAndNeighborsReturnsTheSevenExpectedPositions() {
         int[][] got = NetworkManager.selfAndNeighbors(10, 20, 30);

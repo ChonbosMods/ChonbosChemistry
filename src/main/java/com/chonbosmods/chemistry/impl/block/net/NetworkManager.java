@@ -177,6 +177,17 @@ public final class NetworkManager {
             network.addMember(key, PipeTiers.capacityForTier(tier), PipeTiers.throughputForTier(tier));
             anchorByPipe.put(key, anchor);
         }
+        // H6 FIX 1a — re-hydrate the shared buffer from each member's persisted share. The per-tick
+        // write-back (NetworkTickSystem) keeps these shares == the live buffer, so pooling them on a
+        // rebuild makes invalidation lossless. This is idempotent across rebuilds: shares only change
+        // via the write-back, never via pooling, so re-pooling the same shares yields the same total.
+        // POWER ignores resourceId; insert clamps to capacity.
+        for (PipeNode p : memberNodes) {
+            long share = p.bufferShare();
+            if (share > 0) {
+                network.insert(p.resourceId(), share, false);
+            }
+        }
         networksByAnchor.put(anchor, network);
         return network;
     }
@@ -210,7 +221,9 @@ public final class NetworkManager {
      * @return the number of cached networks dropped.
      */
     public int invalidateChunk(int chunkX, int chunkZ) {
-        // TODO(H6): persist buffer shares before drop.
+        // H6 FIX 1: no explicit persist needed here. The per-tick write-back (NetworkTickSystem) keeps
+        // each member's bufferShare current as of the last tick; dropping the cached Network is lossless
+        // because a later rebuild re-pools those shares.
         Set<Long> anchorsToDrop = new HashSet<>();
         for (long pipeKey : anchorByPipe.keySet()) {
             int bx = unpackX(pipeKey);
@@ -250,6 +263,34 @@ public final class NetworkManager {
             out[i + 1][0] = x + OFFSETS[i][0];
             out[i + 1][1] = y + OFFSETS[i][1];
             out[i + 1][2] = z + OFFSETS[i][2];
+        }
+        return out;
+    }
+
+    /**
+     * Splits {@code total} as evenly as possible across {@code parts} slots, handing the integer-division
+     * remainder one unit at a time to the FIRST slots (ascending index) so the result is deterministic.
+     * Pure helper used by the per-tick buffer write-back ({@code NetworkTickSystem}) to distribute a
+     * network's {@code stored()} back over its member pipe shares.
+     *
+     * <p>Guarantees {@code sum(result) == total} (for {@code parts > 0}) and every slot is
+     * {@code total/parts} or one more. {@code parts <= 0} yields an empty array (nothing to write);
+     * {@code total <= 0} yields all-zero slots.
+     *
+     * @return a fresh {@code long[parts]}; empty when {@code parts <= 0}.
+     */
+    public static long[] splitEvenly(long total, int parts) {
+        if (parts <= 0) {
+            return new long[0];
+        }
+        long[] out = new long[parts];
+        if (total <= 0) {
+            return out; // all zeros
+        }
+        long base = total / parts;
+        long remainder = total - base * parts; // 0 <= remainder < parts
+        for (int i = 0; i < parts; i++) {
+            out[i] = base + (i < remainder ? 1 : 0);
         }
         return out;
     }

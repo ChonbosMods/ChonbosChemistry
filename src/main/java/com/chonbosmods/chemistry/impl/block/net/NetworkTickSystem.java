@@ -33,10 +33,12 @@ import javax.annotation.Nonnull;
  * set, reset whenever {@link World#getTick()} advances (keyed per world so multiple worlds don't clear
  * each other's set).
  *
- * <h2>Buffer persistence</h2>
- * The cached {@link Network}'s in-memory {@code stored} carries across ticks (a freshly built network
- * starts empty and fills from providers over successive ticks). Syncing that back to
- * {@code PipeNode.bufferShare} is H6's concern and is intentionally NOT done here.
+ * <h2>Buffer persistence (H6 FIX 1)</h2>
+ * After each network's distribute pass, the network's {@code stored()} is split evenly across its member
+ * pipes ({@link NetworkManager#splitEvenly}) and written back to each {@link PipeNode}'s
+ * {@code bufferShare}/{@code resourceId}. This keeps the persisted shares fresh as of the last tick end,
+ * so that when a place/break event invalidates a network (between ticks, same thread) and it rebuilds,
+ * {@link NetworkManager#getOrBuildNetwork} re-pools those shares and the energy/fluid survives.
  *
  * <h2>Defensive contract</h2>
  * Runs every server tick on hot ECS data: every lookup is guarded and skipped on failure; never throws
@@ -146,6 +148,31 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
 
         MachineLookup lookup = new WorldMachineLookup(world, store, machineType, tankType);
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
-        NetworkTransfer.distribute(net, endpoints.providers(), endpoints.acceptors());
+        NetworkTransfer.distribute(net, endpoints);
+
+        // H6 FIX 1 — persist the post-distribute buffer back onto the member pipe shares so an
+        // invalidation/rebuild (place/break between ticks) re-pools it losslessly.
+        writeBackBuffer(net, grid);
+    }
+
+    /**
+     * Splits the network's {@code stored()} evenly across its member pipes and writes each share (and the
+     * locked resource id; null for POWER/empty) onto the pipe's {@link PipeNode}. A missing pipe at a
+     * member position is skipped defensively.
+     */
+    private static void writeBackBuffer(Network net, PipeGridView grid) {
+        Long[] keys = net.memberKeys().toArray(new Long[0]);
+        long[] shares = NetworkManager.splitEvenly(net.stored(), keys.length);
+        String resourceId = net.lockedResourceId();
+        for (int i = 0; i < keys.length; i++) {
+            long key = keys[i];
+            PipeNode pipe = grid.pipeAt(
+                NetworkManager.unpackX(key), NetworkManager.unpackY(key), NetworkManager.unpackZ(key));
+            if (pipe == null) {
+                continue; // pipe gone from the live grid — skip
+            }
+            pipe.setBufferShare(shares[i]);
+            pipe.setResourceId(resourceId);
+        }
     }
 }

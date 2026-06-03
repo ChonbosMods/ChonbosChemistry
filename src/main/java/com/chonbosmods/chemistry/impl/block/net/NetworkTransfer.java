@@ -20,6 +20,19 @@ import java.util.List;
  * buffer to acceptors (fair-split of {@code min(stored, throughput)}). A network with
  * {@code throughput() == 0} (e.g. empty membership) moves nothing. This is what makes energy visibly
  * crawl through pipes: a full source no longer dumps to a sink in a single tick.
+ *
+ * <h2>Source/storage priority (H6 FIX 2)</h2>
+ * Endpoints are split into PURE providers/acceptors (sources/sinks) and BUFFER providers/acceptors
+ * (storage blocks with both ports). To avoid a storage block self-churning (re-supplying its own energy
+ * each tick and starving the real source):
+ * <ul>
+ *   <li>Phase 1 pulls from PURE providers first; it pulls from buffer providers only when budget
+ *       remains AND at least one pure acceptor exists (i.e. there is real demand to discharge into).
+ *   <li>Phase 2 fair-splits to PURE acceptors first; any remaining budget then fair-splits to buffer
+ *       acceptors (storage charges only the surplus the sinks did not take).
+ * </ul>
+ * Both phases keep the single per-tick throughput budget split across the priority tiers (the tiers
+ * never sum above {@code throughput}), and every move is still simulate-then-commit min (lossless).
  */
 public final class NetworkTransfer {
 
@@ -27,11 +40,43 @@ public final class NetworkTransfer {
     }
 
     /**
-     * Runs one provider -> buffer -> fair-split-acceptor pass.
+     * Convenience overload running one pass from the classified {@link NetworkEndpoints.Endpoints}.
+     *
+     * @return total units delivered to acceptors this call.
+     */
+    public static long distribute(Network net, NetworkEndpoints.Endpoints endpoints) {
+        return distribute(
+                net,
+                endpoints.pureProviders(),
+                endpoints.pureAcceptors(),
+                endpoints.bufferProviders(),
+                endpoints.bufferAcceptors());
+    }
+
+    /**
+     * Back-compat overload: a pass with only pure providers/acceptors and no storage endpoints.
      *
      * @return total units delivered to acceptors this call.
      */
     public static long distribute(Network net, List<Provider> providers, List<Acceptor> acceptors) {
+        return distribute(net, providers, acceptors, List.of(), List.of());
+    }
+
+    /**
+     * Runs one provider -> buffer -> fair-split-acceptor pass with source/storage priority.
+     *
+     * @param pureProviders   sources (OUTPUT-only), pulled first.
+     * @param pureAcceptors   sinks (INPUT-only), filled first.
+     * @param bufferProviders storage provider views, pulled only when budget remains and demand exists.
+     * @param bufferAcceptors storage acceptor views, charged only from the surplus budget.
+     * @return total units delivered to acceptors this call.
+     */
+    public static long distribute(
+            Network net,
+            List<Provider> pureProviders,
+            List<Acceptor> pureAcceptors,
+            List<Provider> bufferProviders,
+            List<Acceptor> bufferAcceptors) {
         boolean typeLocked =
                 net.channel() == PortChannel.FLUID || net.channel() == PortChannel.GAS;
 
@@ -42,17 +87,48 @@ public final class NetworkTransfer {
             return 0;
         }
 
-        // Phase 1 — fill the network buffer from providers, capped at the throughput budget.
+        // Phase 1 — fill the network buffer from PURE providers first, capped at the throughput budget.
         long pulledBudget = throughput;
+        pulledBudget = pullFrom(net, pureProviders, pulledBudget, typeLocked);
+        // Then pull from BUFFER providers only when budget remains AND a pure acceptor (real demand)
+        // exists; otherwise storage would churn its own energy and starve the real source.
+        if (pulledBudget > 0 && !pureAcceptors.isEmpty()) {
+            pulledBudget = pullFrom(net, bufferProviders, pulledBudget, typeLocked);
+        }
+
+        // Phase 2 — deliver out of the buffer: PURE acceptors first, then BUFFER acceptors from the
+        // leftover of the SAME per-tick budget.
+        long deliverBudget = Math.min(net.stored(), throughput);
+        if (deliverBudget <= 0) {
+            return 0;
+        }
+        long delivered = deliverTo(net, pureAcceptors, deliverBudget);
+        long remainingBudget = deliverBudget - delivered;
+        if (remainingBudget > 0) {
+            // Re-clamp to what is still stored (deliveries to pure acceptors already drained the buffer).
+            remainingBudget = Math.min(remainingBudget, net.stored());
+            if (remainingBudget > 0) {
+                delivered += deliverTo(net, bufferAcceptors, remainingBudget);
+            }
+        }
+        return delivered;
+    }
+
+    /**
+     * Pulls into the network buffer from {@code providers}, spending at most {@code budget} units.
+     *
+     * @return the budget remaining after this pull.
+     */
+    private static long pullFrom(Network net, List<Provider> providers, long budget, boolean typeLocked) {
         for (Provider provider : providers) {
-            if (pulledBudget <= 0) {
+            if (budget <= 0) {
                 break; // spent this call's pull budget.
             }
             long freeSpace = net.capacity() - net.stored();
             if (freeSpace <= 0) {
                 break; // network full — backpressure, stop pulling.
             }
-            long room = Math.min(freeSpace, pulledBudget); // pull at most the remaining budget.
+            long room = Math.min(freeSpace, budget); // pull at most the remaining budget.
             String r = provider.resourceId();
             if (typeLocked) {
                 if (r == null) {
@@ -69,12 +145,19 @@ public final class NetworkTransfer {
             if (moved > 0) {
                 provider.extract(moved, false);
                 net.insert(r, moved, false);
-                pulledBudget -= moved;
+                budget -= moved;
             }
         }
+        return budget;
+    }
 
-        // Phase 2 — fair-split the buffer to acceptors.
-        if (net.stored() == 0 || acceptors.isEmpty()) {
+    /**
+     * Fair-splits at most {@code budget} units out of the network buffer across {@code acceptors}.
+     *
+     * @return the total delivered (extracted from the net and accepted).
+     */
+    private static long deliverTo(Network net, List<Acceptor> acceptors, long budget) {
+        if (budget <= 0 || acceptors.isEmpty() || net.stored() == 0) {
             return 0;
         }
         String r = net.lockedResourceId(); // null for POWER.
@@ -82,10 +165,7 @@ public final class NetworkTransfer {
         for (int i = 0; i < acceptors.size(); i++) {
             caps[i] = Math.max(0L, acceptors.get(i).capacityFor(r));
         }
-        // Deliver at most the throughput budget out of the buffer this call; the remainder stays
-        // stored (visibly held in transit) for the next tick.
-        long deliverBudget = Math.min(net.stored(), throughput);
-        long[] alloc = FairSplitDistributor.allocate(deliverBudget, caps);
+        long[] alloc = FairSplitDistributor.allocate(budget, caps);
 
         long delivered = 0;
         for (int i = 0; i < acceptors.size(); i++) {

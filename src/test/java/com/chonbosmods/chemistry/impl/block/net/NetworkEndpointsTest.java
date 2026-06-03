@@ -101,8 +101,10 @@ class NetworkEndpointsTest {
             EnergyBuffer.withCapacity(1000L), Map.of()));
 
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
-        assertEquals(1, endpoints.providers().size());
-        assertEquals(1, endpoints.acceptors().size());
+        assertEquals(1, endpoints.pureProviders().size());
+        assertEquals(1, endpoints.pureAcceptors().size());
+        assertEquals(0, endpoints.bufferProviders().size());
+        assertEquals(0, endpoints.bufferAcceptors().size());
     }
 
     @Test
@@ -117,8 +119,8 @@ class NetworkEndpointsTest {
             null, Map.of(PortChannel.FLUID, ResourceBuffer.withCapacity(1000))));
 
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
-        assertEquals(0, endpoints.providers().size());
-        assertEquals(0, endpoints.acceptors().size());
+        assertEquals(0, endpoints.pureProviders().size());
+        assertEquals(0, endpoints.pureAcceptors().size());
     }
 
     @Test
@@ -132,8 +134,8 @@ class NetworkEndpointsTest {
             portConfig(PortChannel.POWER, PortDirection.OUTPUT), null, Map.of()));
 
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
-        assertEquals(0, endpoints.providers().size());
-        assertEquals(0, endpoints.acceptors().size());
+        assertEquals(0, endpoints.pureProviders().size());
+        assertEquals(0, endpoints.pureAcceptors().size());
     }
 
     @Test
@@ -152,9 +154,9 @@ class NetworkEndpointsTest {
             null, Map.of(PortChannel.FLUID, ResourceBuffer.withCapacity(1000))));
 
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
-        assertEquals(1, endpoints.providers().size());
-        assertEquals(1, endpoints.acceptors().size());
-        assertEquals("oxygen", endpoints.providers().get(0).resourceId());
+        assertEquals(1, endpoints.pureProviders().size());
+        assertEquals(1, endpoints.pureAcceptors().size());
+        assertEquals("oxygen", endpoints.pureProviders().get(0).resourceId());
     }
 
     @Test
@@ -180,8 +182,51 @@ class NetworkEndpointsTest {
             EnergyBuffer.withCapacity(1000L), Map.of()));
 
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
-        assertEquals(1, endpoints.providers().size());
-        assertEquals(0, endpoints.acceptors().size());
+        assertEquals(1, endpoints.pureProviders().size());
+        assertEquals(0, endpoints.pureAcceptors().size());
+    }
+
+    @Test
+    void collect_storageWithBothPorts_classifiedAsBufferProviderAndBufferAcceptor() {
+        // A storage battery: a single neighbour that has BOTH a POWER OUTPUT and a POWER INPUT port.
+        // It must contribute ONE entry to bufferProviders AND ONE to bufferAcceptors (never to the
+        // pure lists), so the priority logic can treat it as storage rather than a source/sink.
+        NetworkManager manager = new NetworkManager();
+        Network net = manager.getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));
+
+        FakeLookup lookup = new FakeLookup();
+        PortConfig both = PortConfig.of(List.of(
+            Port.of(0, PortChannel.POWER, PortDirection.OUTPUT),
+            Port.of(1, PortChannel.POWER, PortDirection.INPUT)));
+        lookup.put(6, 5, 5, new FakePorts(both, EnergyBuffer.withCapacity(1000L), Map.of()));
+
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        assertEquals(0, endpoints.pureProviders().size());
+        assertEquals(0, endpoints.pureAcceptors().size());
+        assertEquals(1, endpoints.bufferProviders().size());
+        assertEquals(1, endpoints.bufferAcceptors().size());
+    }
+
+    @Test
+    void collect_pureProviderAndStorageTogether_areClassifiedSeparately() {
+        // A pure source (OUTPUT only) at +X and a storage (BOTH) at -X on the same POWER network.
+        NetworkManager manager = new NetworkManager();
+        Network net = manager.getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));
+
+        FakeLookup lookup = new FakeLookup();
+        lookup.put(6, 5, 5, new FakePorts(
+            portConfig(PortChannel.POWER, PortDirection.OUTPUT),
+            EnergyBuffer.withCapacity(1000L), Map.of()));
+        PortConfig both = PortConfig.of(List.of(
+            Port.of(0, PortChannel.POWER, PortDirection.OUTPUT),
+            Port.of(1, PortChannel.POWER, PortDirection.INPUT)));
+        lookup.put(4, 5, 5, new FakePorts(both, EnergyBuffer.withCapacity(1000L), Map.of()));
+
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        assertEquals(1, endpoints.pureProviders().size());
+        assertEquals(0, endpoints.pureAcceptors().size());
+        assertEquals(1, endpoints.bufferProviders().size());
+        assertEquals(1, endpoints.bufferAcceptors().size());
     }
 
     @Test
@@ -189,8 +234,10 @@ class NetworkEndpointsTest {
         NetworkManager manager = new NetworkManager();
         Network net = manager.getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, new FakeLookup());
-        assertEquals(0, endpoints.providers().size());
-        assertEquals(0, endpoints.acceptors().size());
+        assertEquals(0, endpoints.pureProviders().size());
+        assertEquals(0, endpoints.pureAcceptors().size());
+        assertEquals(0, endpoints.bufferProviders().size());
+        assertEquals(0, endpoints.bufferAcceptors().size());
     }
 
     @Test
@@ -209,7 +256,7 @@ class NetworkEndpointsTest {
             portConfig(PortChannel.POWER, PortDirection.INPUT), sink, Map.of()));
 
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
-        long moved = NetworkTransfer.distribute(net, endpoints.providers(), endpoints.acceptors());
+        long moved = NetworkTransfer.distribute(net, endpoints);
 
         // Single tier-1 pipe network: the per-tick throughput cap bounds EACH phase, so one pass pulls
         // at most `throughput` from the source into the buffer and delivers at most `throughput` of it
