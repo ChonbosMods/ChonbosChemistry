@@ -1,6 +1,19 @@
 # Energy + I/O Plumbing — Design (First Vertical Slice)
 
-**Status:** Design validated (brainstorm 2026-06-02), ready for implementation planning.
+**Status:** ⚠️ **PARTIALLY SUPERSEDED (2026-06-03)** by the transport-network pivot. Originally design-validated (brainstorm 2026-06-02) and built ~80% as described. Kept as the historical record of the slice that was actually shipped.
+
+> ### Pivot notice — read before relying on this doc
+> A later analysis (HyProTech / `dev.zkiller.energystorage` / `org.pfc.redstone`) reversed the transport model. The new direction is in **`docs/machines-and-power-design.md` §13** and the implementation plan **`docs/plans/2026-06-03-transport-network-rework-plan.md`**.
+>
+> **Superseded by the pivot:**
+> - **§5 transport** — adjacency push + "adjacency flows with zero cables" is **removed**. Transport now runs entirely on **cached pipe-networks** with a shared network buffer + max-min fair-split (design §13.2/§13.7). **Pipes are required** (design §5.4); no zero-cable adjacency.
+> - **§5 cable buffering** — the per-cable bucket-brigade internal buffer that "crawls" is replaced by one fungible **network** buffer (= Σ pipe capacities); no per-hop latency.
+> - **§3 `EnergyHandler`** — now `long` (not `int`) and gains internal/external paths + rate caps + ratio helpers (design §7/§16.1; int→long migration done).
+> - **§8** adjacency port rules (two-outputs/input-pulls-from-adjacent) → re-expressed as provider/acceptor on a network.
+> - **§10** the rig's "adjacency-with-zero-cables" property is retired; rigs now route through pipes.
+>
+> **Still valid:** the api/impl split (§3); the ECS block-entity + own `EntityTickingSystem<ChunkStore>` substrate and ticking decision (§2, §5 work-pass); codec persistence (§4); the GUI approach (§6); tank-carry-with-contents (§7); the chunk-unload/stall/run-dry rules (§8); and the **§2 Hytale API table** (still accurate ground truth, reused by the new plan's integration phase).
+
 **Scope:** The shared block-infrastructure skeleton every machine/tank/cable plugs into: stateful ticking blocks, the energy standard, phased resource buffers, configurable ports, adjacency/cable transport, and a block-bound GUI. No chemistry recipes yet — this slice proves the architecture end-to-end with a trivial test rig.
 
 Parent design: [`docs/machines-and-power-design.md`](../machines-and-power-design.md) (the seven machines, folded into ChonbosChemistry — see its §0). Foundation design: `~/Downloads/chemistry-foundation-design.md`.

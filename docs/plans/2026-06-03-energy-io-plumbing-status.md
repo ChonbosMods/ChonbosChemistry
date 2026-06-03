@@ -1,6 +1,14 @@
 # Energy + I/O Plumbing — Status & Handoff (2026-06-03)
 
-> **For the next Claude:** This is a mid-flight handoff for the "Energy + I/O plumbing" slice of ChonbosChemistry. Read this top-to-bottom, then continue at **§7 Next steps** (Tasks B5 + B6). The slice is the shared block infrastructure (energy standard, phased resource buffers, ports, adjacency/cable transport, ticking, block GUI) that all future machines plug into.
+> ⚠️ **DIRECTION CHANGED (2026-06-03, later same day) — do NOT continue at B5/B6 as written.**
+> The transport model was reversed after a reference-mod analysis: adjacency push is replaced by **cached pipe-networks** (shared network buffer + max-min fair-split, pipes required). The energy API migrated **int→long** (done, committed). New direction:
+> - Architecture: **`docs/machines-and-power-design.md` §13** (transport), §7/§16.1 (energy API).
+> - **Active plan: `docs/plans/2026-06-03-transport-network-rework-plan.md`** — supersedes §7 below. B5 (tank-carry) → that plan's Task H6; B6 (remove TEMP logging) → its Task H8; `TransportEngine`/`CableHopTest` are being **retired**.
+> - §3 "What's done" stays accurate as a record of the adjacency slice; the **beans are reused** (EnergyBuffer/ResourceBuffer/Port/PortConfig/MachineBlockState/ticking/GUI), the **adjacency push is not**.
+>
+> Original handoff preserved below for history.
+
+> **For the next Claude (original, pre-pivot):** This is a mid-flight handoff for the "Energy + I/O plumbing" slice of ChonbosChemistry. Read this top-to-bottom, then continue at **§7 Next steps** (Tasks B5 + B6). The slice is the shared block infrastructure (energy standard, phased resource buffers, ports, adjacency/cable transport, ticking, block GUI) that all future machines plug into.
 
 ## 1. TL;DR
 
