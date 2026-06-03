@@ -4,7 +4,11 @@ import com.chonbosmods.chemistry.api.registry.Chemistry;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
+import com.chonbosmods.chemistry.impl.block.net.NetworkService;
+import com.chonbosmods.chemistry.impl.block.net.PipeBreakEventSystem;
+import com.chonbosmods.chemistry.impl.block.net.PipeChunkUnloadEventSystem;
 import com.chonbosmods.chemistry.impl.block.net.PipeNode;
+import com.chonbosmods.chemistry.impl.block.net.PipePlaceEventSystem;
 import com.chonbosmods.chemistry.impl.block.ui.MachinePanelPage;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
 import com.hypixel.hytale.component.ComponentType;
@@ -40,6 +44,9 @@ public class ChonbosChemistry extends JavaPlugin {
     private ComponentType<ChunkStore, TankBlockState> tankComponentType;
     private ComponentType<ChunkStore, PipeNode> pipeComponentType;
 
+    /** Per-world cache of transport pipe networks: shared by the invalidation events and the tick. */
+    private NetworkService networkService;
+
     public ChonbosChemistry(@Nonnull JavaPluginInit init) {
         super(init);
         instance = this;
@@ -64,6 +71,11 @@ public class ChonbosChemistry extends JavaPlugin {
         return pipeComponentType;
     }
 
+    /** The per-world {@link NetworkService} caching pipe transport networks (used by events + tick). */
+    public NetworkService networkService() {
+        return networkService;
+    }
+
     @Override
     protected void setup() {
         getLogger().atInfo().log("Chonbo's Chemistry setting up...");
@@ -83,6 +95,15 @@ public class ChonbosChemistry extends JavaPlugin {
         // Per-tick driver: transport pass then work pass. Must be registered AFTER the components above.
         getChunkStoreRegistry().registerSystem(new MachineTickSystem(machineComponentType, tankComponentType));
         getLogger().atInfo().log("Registered MachineTickSystem (transport then work).");
+
+        // Transport network cache (per-world) + the events that invalidate it on pipe topology changes
+        // (H3). Place/break fire on the EntityStore (the acting entity); chunk-unload fires on the
+        // ChunkStore (the unloading chunk), so they register on their respective registries.
+        networkService = new NetworkService();
+        getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService));
+        getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService));
+        getChunkStoreRegistry().registerSystem(new PipeChunkUnloadEventSystem(networkService));
+        getLogger().atInfo().log("Registered pipe-network invalidation events (place, break, chunk unload).");
 
         // Block GUI (Task B4): right-clicking a rig block resolves its block entity and opens a
         // snapshot panel showing energy / resource-buffer gauges. The "CC_MachinePanel" id is

@@ -196,6 +196,64 @@ public final class NetworkManager {
         anchorByPipe.values().removeIf(a -> a.equals(anchor));
     }
 
+    /**
+     * Drops every cached network that has at least one member pipe in the 32-wide chunk column
+     * {@code (chunkX, chunkZ)} (block X in {@code [chunkX*32, chunkX*32+31]}, block Z likewise; the
+     * chunk spans all Y). Used by the H3 chunk-unload event: when a chunk leaves memory its pipes are
+     * gone from the live grid, so any network touching it must rebuild lazily on next access. Safe
+     * no-op when no cached network intersects the column.
+     *
+     * <p>Whole networks are dropped, not just the in-chunk members: a network can straddle a chunk
+     * boundary, and a partially-unloaded network would build wrong topology. Dropping it forces a clean
+     * lazy rebuild over whatever is still loaded.
+     *
+     * @return the number of cached networks dropped.
+     */
+    public int invalidateChunk(int chunkX, int chunkZ) {
+        // TODO(H6): persist buffer shares before drop.
+        Set<Long> anchorsToDrop = new HashSet<>();
+        for (long pipeKey : anchorByPipe.keySet()) {
+            int bx = unpackX(pipeKey);
+            int bz = unpackZ(pipeKey);
+            if ((bx >> CHUNK_BITS) == chunkX && (bz >> CHUNK_BITS) == chunkZ) {
+                anchorsToDrop.add(anchorByPipe.get(pipeKey));
+            }
+        }
+        if (anchorsToDrop.isEmpty()) {
+            return 0;
+        }
+        for (long anchor : anchorsToDrop) {
+            networksByAnchor.remove(anchor);
+        }
+        anchorByPipe.values().removeIf(anchorsToDrop::contains);
+        return anchorsToDrop.size();
+    }
+
+    /** Chunk columns are 32 blocks wide; blockX -&gt; chunkX is {@code blockX >> 5} (mirrors {@code ChunkUtil}). */
+    private static final int CHUNK_BITS = 5;
+
+    /**
+     * The 7 positions a single-block topology change invalidates: the changed block itself plus its 6
+     * face-neighbours, in the order {@code self, +X, -X, +Y, -Y, +Z, -Z} (matching {@link #OFFSETS}).
+     * A break splits a network and a place can merge same-channel networks; dropping self and all face
+     * neighbours forces a correct lazy rebuild on either side of the change. Pure helper (no world
+     * access): the event systems map each returned position through {@link #invalidate}.
+     *
+     * @return a fresh {@code int[7][3]} of {@code {x,y,z}} triples.
+     */
+    public static int[][] selfAndNeighbors(int x, int y, int z) {
+        int[][] out = new int[1 + OFFSETS.length][3];
+        out[0][0] = x;
+        out[0][1] = y;
+        out[0][2] = z;
+        for (int i = 0; i < OFFSETS.length; i++) {
+            out[i + 1][0] = x + OFFSETS[i][0];
+            out[i + 1][1] = y + OFFSETS[i][1];
+            out[i + 1][2] = z + OFFSETS[i][2];
+        }
+        return out;
+    }
+
     /** Number of distinct cached networks (one per discovered connected component). */
     public int cachedNetworkCount() {
         return networksByAnchor.size();

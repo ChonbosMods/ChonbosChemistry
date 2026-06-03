@@ -289,4 +289,87 @@ class NetworkManagerTest {
             assertEquals(s[2], NetworkManager.unpackZ(key), "z for " + java.util.Arrays.toString(s));
         }
     }
+
+    // --- H3: chunk invalidation + self/neighbor helper ---
+
+    @Test
+    void invalidateChunkDropsNetworksInThatColumnAndLeavesOthers() {
+        // Network A lives in chunk column (0,0): blocks 0..31. Network B lives in chunk column (1,0):
+        // blocks 32..63. Different channels would also separate them, but distance alone keeps them
+        // distinct connected components here.
+        FakePipeGrid grid = new FakePipeGrid()
+            .put(1, 4, 2, power(0))   // chunk (0,0)
+            .put(2, 4, 2, power(0))   // chunk (0,0), adjacent -> same network A
+            .put(40, 7, 5, power(0)); // chunk (1,0) -> separate network B
+        NetworkManager mgr = new NetworkManager();
+
+        mgr.getOrBuildNetwork(1, 4, 2, grid);
+        mgr.getOrBuildNetwork(40, 7, 5, grid);
+        assertEquals(2, mgr.cachedNetworkCount(), "two distinct networks cached up front");
+
+        int dropped = mgr.invalidateChunk(0, 0);
+
+        assertEquals(1, dropped, "exactly network A (in chunk column 0,0) dropped");
+        assertEquals(1, mgr.cachedNetworkCount(), "network B (chunk 1,0) untouched");
+        assertNull(mgr.anchorOf(1, 4, 2), "network A member no longer cached");
+        assertNull(mgr.anchorOf(2, 4, 2), "network A member no longer cached");
+        assertNotNull(mgr.anchorOf(40, 7, 5), "network B member still cached");
+    }
+
+    @Test
+    void invalidateChunkDropsWholeNetworkEvenWhenItStraddlesTheBoundary() {
+        // A network straddling chunk (0,0) and (1,0): block 31 (chunk 0) adjacent to block 32 (chunk 1).
+        FakePipeGrid grid = new FakePipeGrid()
+            .put(31, 0, 0, power(0))
+            .put(32, 0, 0, power(0));
+        NetworkManager mgr = new NetworkManager();
+        mgr.getOrBuildNetwork(31, 0, 0, grid);
+        assertEquals(1, mgr.cachedNetworkCount());
+
+        // Unloading EITHER column must drop the whole straddling network.
+        int dropped = mgr.invalidateChunk(1, 0);
+
+        assertEquals(1, dropped);
+        assertEquals(0, mgr.cachedNetworkCount(), "straddling network fully dropped");
+        assertNull(mgr.anchorOf(31, 0, 0), "the in-other-chunk member is dropped too");
+    }
+
+    @Test
+    void invalidateChunkIsNoOpWhenNothingCachedThere() {
+        FakePipeGrid grid = new FakePipeGrid().put(0, 0, 0, power(0));
+        NetworkManager mgr = new NetworkManager();
+        mgr.getOrBuildNetwork(0, 0, 0, grid);
+
+        assertEquals(0, mgr.invalidateChunk(99, 99), "no network in chunk (99,99)");
+        assertEquals(1, mgr.cachedNetworkCount(), "existing network untouched");
+    }
+
+    @Test
+    void invalidateChunkHandlesNegativeChunkColumns() {
+        // block -1 is in chunk column -1 (since -1 >> 5 == -1).
+        FakePipeGrid grid = new FakePipeGrid().put(-1, 3, -1, power(0));
+        NetworkManager mgr = new NetworkManager();
+        mgr.getOrBuildNetwork(-1, 3, -1, grid);
+        assertEquals(1, mgr.cachedNetworkCount());
+
+        assertEquals(1, mgr.invalidateChunk(-1, -1), "negative chunk column matched");
+        assertEquals(0, mgr.cachedNetworkCount());
+    }
+
+    @Test
+    void selfAndNeighborsReturnsTheSevenExpectedPositions() {
+        int[][] got = NetworkManager.selfAndNeighbors(10, 20, 30);
+
+        assertEquals(7, got.length, "self + 6 face neighbours");
+        // Order is self, +X, -X, +Y, -Y, +Z, -Z (matching the canonical OFFSETS).
+        int[][] expected = {
+            {10, 20, 30},
+            {11, 20, 30}, {9, 20, 30},
+            {10, 21, 30}, {10, 19, 30},
+            {10, 20, 31}, {10, 20, 29},
+        };
+        for (int i = 0; i < expected.length; i++) {
+            assertArrayEquals(expected[i], got[i], "position " + i);
+        }
+    }
 }
