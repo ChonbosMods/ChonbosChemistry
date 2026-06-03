@@ -70,6 +70,41 @@ class NetworkTest {
     }
 
     @Test
+    void fluidInsertNullResourceRejected() {
+        Network net = new Network(PortChannel.FLUID);
+        net.addMember(1, 100, 8);
+
+        // null is never a valid thing to store on a type-locked channel: reject it,
+        // leaving stored and the lock untouched.
+        assertEquals(0, net.insert(null, 10, false));
+        assertEquals(0, net.stored());
+        assertNull(net.lockedResourceId());
+
+        // proving the rejected null did not corrupt state: a normal insert still locks.
+        assertEquals(10, net.insert("oxygen", 10, false));
+        assertEquals("oxygen", net.lockedResourceId());
+
+        // POWER legitimately uses a null resourceId and must be unaffected.
+        Network power = new Network(PortChannel.POWER);
+        power.addMember(1, 100, 8);
+        assertEquals(10, power.insert(null, 10, false));
+    }
+
+    @Test
+    void removeMemberNonexistentKeyIsNoop() {
+        Network net = new Network(PortChannel.POWER);
+        net.addMember(1, 100, 8);
+        net.addMember(2, 25, 4);
+        long capBefore = net.capacity();
+        int throughputBefore = net.throughput();
+
+        net.removeMember(999); // absent key
+
+        assertEquals(capBefore, net.capacity());
+        assertEquals(throughputBefore, net.throughput());
+    }
+
+    @Test
     void emptyNetworkAcceptsNothing() {
         Network net = new Network(PortChannel.POWER);
         assertEquals(0, net.capacity());

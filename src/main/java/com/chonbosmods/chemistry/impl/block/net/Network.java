@@ -99,7 +99,8 @@ public final class Network {
 
     /**
      * @return amount accepted (≤ free space). For FLUID/GAS, rejects (returns 0) when locked to a
-     *     different resource; a non-simulate accept of &gt;0 sets the lock. POWER ignores
+     *     different resource or when {@code resourceId} is null (never a valid stored resource on a
+     *     type-locked channel); a non-simulate accept of &gt;0 sets the lock. POWER ignores
      *     {@code resourceId} and never locks. Negative/zero {@code amount} → 0.
      */
     public long insert(String resourceId, long amount, boolean simulate) {
@@ -107,6 +108,9 @@ public final class Network {
             return 0;
         }
         boolean typeLocked = channel == PortChannel.FLUID || channel == PortChannel.GAS;
+        if (typeLocked && resourceId == null) {
+            return 0; // null is never a valid resource to store on a type-locked channel
+        }
         if (typeLocked && lockedResourceId != null && !lockedResourceId.equals(resourceId)) {
             return 0;
         }
