@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hypixel.hytale.codec.EmptyExtraInfo;
+import org.bson.BsonDocument;
 import org.bson.BsonValue;
 import org.junit.jupiter.api.Test;
 
@@ -99,5 +100,59 @@ class EnergyBufferTest {
         assertEquals(42, decoded.getStored());
         assertEquals(10, decoded.getMaxReceive());
         assertEquals(5, decoded.getMaxExtract());
+    }
+
+    /**
+     * Legacy / rig-block JSON only specifies Stored + Capacity (the rate keys were added later).
+     * A document lacking MaxReceive/MaxExtract must decode to UNCAPPED rates (Long.MAX_VALUE),
+     * not to 0 (which the interface contract reads as "no external input/output", making the
+     * block silently energy-inert) and not to a decode error.
+     */
+    @Test
+    void legacyDocumentMissingRateKeysDecodesToUncapped() {
+        // Build a full document, then strip the rate keys to mimic legacy/pre-existing data.
+        EnergyBuffer full = EnergyBuffer.withCapacityAndRates(1000, 10, 5);
+        full.receiveEnergyInternal(30, false);
+        BsonDocument doc = EnergyBuffer.CODEC.encode(full, EmptyExtraInfo.EMPTY).asDocument();
+        doc.remove("MaxReceive");
+        doc.remove("MaxExtract");
+        assertTrue(doc.containsKey("Stored") && doc.containsKey("Capacity"),
+            "precondition: legacy doc still carries Stored + Capacity");
+
+        EnergyBuffer decoded = EnergyBuffer.CODEC.decode(doc, EmptyExtraInfo.EMPTY);
+
+        assertEquals(Long.MAX_VALUE, decoded.getMaxReceive(), "missing MaxReceive -> uncapped");
+        assertEquals(Long.MAX_VALUE, decoded.getMaxExtract(), "missing MaxExtract -> uncapped");
+        // External receive must NOT be clamped to 0: it should accept what the internal path accepts.
+        long external = decoded.receiveEnergy(500, true);
+        long internal = decoded.receiveEnergyInternal(500, true);
+        assertEquals(internal, external, "uncapped external receive equals internal accept");
+        assertTrue(external > 0, "uncapped buffer is not energy-inert");
+    }
+
+    @Test
+    void internalSimulateDoesNotMutate() {
+        EnergyBuffer b = EnergyBuffer.withCapacity(1000);
+        b.receiveEnergyInternal(100, false);
+        assertEquals(100, b.getStored());
+        assertEquals(50, b.receiveEnergyInternal(50, true), "simulate reports movable amount");
+        assertEquals(50, b.extractEnergyInternal(50, true), "simulate reports movable amount");
+        assertEquals(100, b.getStored(), "simulate leaves stored unchanged");
+    }
+
+    @Test
+    void maxReceiveZeroBlocksExternalInput() {
+        EnergyBuffer b = EnergyBuffer.withCapacityAndRates(1000, 0, 1000);
+        assertEquals(0, b.receiveEnergy(100, false), "maxReceive=0 blocks external input");
+        assertEquals(0, b.getStored());
+        assertEquals(100, b.receiveEnergyInternal(100, false), "internal fill still works");
+        assertEquals(100, b.getStored());
+    }
+
+    @Test
+    void externalReceiveClampedByFreeCapacityNotJustRate() {
+        EnergyBuffer b = EnergyBuffer.withCapacityAndRates(30, 1000, 1000); // rate >> capacity
+        assertEquals(30, b.receiveEnergy(100, false), "bounded by free capacity, not rate");
+        assertEquals(30, b.getStored());
     }
 }
