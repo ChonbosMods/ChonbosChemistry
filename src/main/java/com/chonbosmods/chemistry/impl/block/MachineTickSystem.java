@@ -61,6 +61,9 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
     /** TEMP B6-remove: per-system accumulator gating the debug log. */
     private float logAccumulator;
 
+    /** TEMP B6-remove: last logged readout per block position, so we print only on change. */
+    private final java.util.Map<String, long[]> lastReadout = new java.util.HashMap<>();
+
     public MachineTickSystem(
             @Nonnull ComponentType<ChunkStore, MachineBlockState> machineType,
             @Nonnull ComponentType<ChunkStore, TankBlockState> tankType) {
@@ -180,28 +183,51 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
         return null;
     }
 
-    /** TEMP B6-remove: log the ticked machine's energy + per-channel resource amounts. */
+    /**
+     * TEMP B6-remove: log the ticked machine's energy + per-channel resource amounts, but ONLY when
+     * the readout changed since last interval (so steady/idle blocks stay quiet), with a (+/-) delta.
+     */
     private void logActivity(@Nonnull MachineBlockState node, int x, int y, int z) {
         ChonbosChemistry plugin = ChonbosChemistry.getInstance();
         if (plugin == null) {
             return;
         }
-        StringBuilder sb = new StringBuilder("[B2 tick] machine@(")
-            .append(x).append(',').append(y).append(',').append(z).append(") ");
         EnergyHandler energy = node.energy();
-        if (energy != null) {
-            sb.append("energy=").append(energy.getStored()).append('/').append(energy.getMaxStored());
-        } else {
-            sb.append("energy=none");
+        ResourceBuffer fluid = node.resource(PortChannel.FLUID);
+        ResourceBuffer gas = node.resource(PortChannel.GAS);
+        ResourceBuffer item = node.resource(PortChannel.ITEM);
+        long[] cur = {
+            energy != null ? energy.getStored() : -1,
+            fluid != null ? fluid.amount() : -1,
+            gas != null ? gas.amount() : -1,
+            item != null ? item.amount() : -1,
+        };
+        String key = x + "," + y + "," + z;
+        long[] prev = lastReadout.get(key);
+        if (prev != null && java.util.Arrays.equals(prev, cur)) {
+            return; // unchanged since last interval — stay quiet
         }
-        for (PortChannel channel : new PortChannel[] {PortChannel.ITEM, PortChannel.FLUID, PortChannel.GAS}) {
-            ResourceBuffer buf = node.resource(channel);
-            if (buf != null) {
-                sb.append(' ').append(channel.jsonValue()).append('=')
-                    .append(buf.amount()).append('/').append(buf.capacity());
-            }
-        }
+        lastReadout.put(key, cur);
+
+        StringBuilder sb = new StringBuilder("[CC] (")
+            .append(x).append(',').append(y).append(',').append(z).append(')');
+        appendChannel(sb, "energy", cur[0], energy != null ? energy.getMaxStored() : -1, prev != null ? prev[0] : -1);
+        appendChannel(sb, "fluid", cur[1], fluid != null ? fluid.capacity() : -1, prev != null ? prev[1] : -1);
+        appendChannel(sb, "gas", cur[2], gas != null ? gas.capacity() : -1, prev != null ? prev[2] : -1);
+        appendChannel(sb, "item", cur[3], item != null ? item.capacity() : -1, prev != null ? prev[3] : -1);
         plugin.getLogger().atInfo().log(sb.toString());
+    }
+
+    /** TEMP B6-remove: append " label=cur/cap(+delta)" for a present channel (cur &lt; 0 = absent). */
+    private static void appendChannel(@Nonnull StringBuilder sb, @Nonnull String label, long cur, long cap, long prev) {
+        if (cur < 0) {
+            return;
+        }
+        sb.append(' ').append(label).append('=').append(cur).append('/').append(cap);
+        if (prev >= 0 && prev != cur) {
+            long d = cur - prev;
+            sb.append('(').append(d >= 0 ? "+" : "").append(d).append(')');
+        }
     }
 
     // --- pure, ECS-free helpers (unit-tested in MachineTickSystemTest) ---
