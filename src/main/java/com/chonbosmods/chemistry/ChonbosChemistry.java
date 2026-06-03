@@ -7,7 +7,6 @@ import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
 import com.chonbosmods.chemistry.impl.block.net.NetworkTickSystem;
 import com.chonbosmods.chemistry.impl.block.net.PipeBreakEventSystem;
-import com.chonbosmods.chemistry.impl.block.net.PipeChunkUnloadEventSystem;
 import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import com.chonbosmods.chemistry.impl.block.net.PipePlaceEventSystem;
 import com.chonbosmods.chemistry.impl.block.ui.MachinePanelPage;
@@ -109,8 +108,14 @@ public class ChonbosChemistry extends JavaPlugin {
         getLogger().atInfo().log("Registered NetworkTickSystem (per-tick pipe-network distribution).");
         getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService));
         getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService));
-        getChunkStoreRegistry().registerSystem(new PipeChunkUnloadEventSystem(networkService));
-        getLogger().atInfo().log("Registered pipe-network invalidation events (place, break, chunk unload).");
+        // NOTE: NO ChunkUnloadEvent handler. In Server 0.5.3 the engine's ChunkUnloadingSystem dispatches
+        // ChunkUnloadEvent from PARALLEL worker threads (forEachEntityParallel), and delivering it to an
+        // EntityEventSystem forks a command buffer that asserts it is on the WorldThread -> the WorldThread
+        // dies (IllegalStateException: Assert not in thread). So chunk-unload cache eviction cannot use a
+        // system handler here. Cached networks for unloaded chunks are a minor memory concern only: they
+        // rebuild lazily on next access and are still invalidated on pipe place/break. TODO(H6): persist
+        // buffer shares + evict on unload via a WorldThread-safe hook (NetworkManager.invalidateChunk is ready).
+        getLogger().atInfo().log("Registered pipe-network invalidation events (place, break).");
 
         // Block GUI (Task B4): right-clicking a rig block resolves its block entity and opens a
         // snapshot panel showing energy / resource-buffer gauges. The "CC_MachinePanel" id is
