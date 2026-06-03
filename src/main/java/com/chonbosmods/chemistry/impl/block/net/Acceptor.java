@@ -13,6 +13,10 @@ public interface Acceptor {
     /**
      * Insert up to {@code amount} of {@code resourceId}.
      *
+     * <p>Losslessness contract relied on by {@link NetworkTransfer}: a {@code simulate == true} call
+     * must faithfully predict the amount a subsequent {@code simulate == false} (commit) call with
+     * that amount will move. Simulate is a side-effect-free dry run whose result the commit honors.
+     *
      * @return amount actually accepted; {@code simulate == true} means no mutation.
      */
     long insert(String resourceId, long amount, boolean simulate);

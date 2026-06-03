@@ -12,6 +12,10 @@ public interface Provider {
     /**
      * Pull up to {@code max} out of this provider.
      *
+     * <p>Losslessness contract relied on by {@link NetworkTransfer}: a {@code simulate == true} call
+     * must faithfully predict the amount a subsequent {@code simulate == false} (commit) call with
+     * that amount will move. Simulate is a side-effect-free dry run whose result the commit honors.
+     *
      * @return amount actually provided; {@code simulate == true} means no mutation.
      */
     long extract(long max, boolean simulate);
