@@ -188,6 +188,14 @@ A higher-level pure scenario over N2–N4 asserting the §8 rules: a FLUID netwo
 
 > Each task: **spike** the real signatures in `patcher/hytale-server/`, **implement**, **verify** boot-clean via `./gradlew devServer` (user runs in-game). Reference `@hytale-events`, `@hytale-ecs`, `@hytale-codec-config`, `@hytale-ui` skills as needed.
 
+### Phase H reconciliation with the pipe-model design (2026-06-03)
+This phase now integrates the user's parallel `docs/plans/2026-06-03-transmitter-pipe-models-design.md` (10 topology `.blockymodel` files already shipped under `src/main/resources/Common/Blocks/ChonbosMods/Pipes/`). Decisions:
+- **Pipes carry a dedicated `PipeNode` component** (DECIDED), not `MachineBlockState`. `PipeNode` = `{channel, tier, persisted bufferShare}`; ports live only on machines/tanks. The pipe-model doc's "MachineBlockState" wording referred to today's placeholder; `PipeNode` inherits onto the 9 shape `State.Definitions` exactly the same way (any `BlockEntity.Components` does).
+- **Visual auto-connect is engine-driven** via `BlockType.ConnectedBlockRuleSet` (`CustomTemplate` + `TemplateShapeAssetId` + per-family `FaceTags`), synced server→client. **Phase H writes NO manual pipe visual-state code** — the planned `setBlockInteractionState` for pipe connection shapes is dropped. The logical `NetworkManager` BFS enforces same-channel connection independently, matching the FaceTag visual layer.
+- **Four families map 1:1 to `PortChannel {POWER, FLUID, GAS, ITEM}`** with per-family FaceTags (`CC_PowerFace`/`CC_FluidFace`/`CC_GasFace`/`CC_ItemFace`) so a family connects only to its own kind. This plan wires POWER/FLUID/GAS; ITEM is the later item-pipe plan.
+- **H5 now owns the block-def integration** the pipe-model doc delegated to "the network-logic instance": upgrade `CC_PowerCable` to `DrawType: Model` + `State.Definitions` (the 10 shapes) + `ConnectedBlockRuleSet`, swap its placeholder `MachineBlockState` → `PipeNode`, and author the 4 `…ConnectedBlockTemplate.json` assets (one per family FaceTag). Create the FLUID/GAS pipe base blocks likewise.
+- **`PipeNode.bufferShare` is `long`** for all channels (energy needs `long`; fluid/gas amounts fit), with a `resourceId` for the fluid/gas type-lock on the share. Keeps one component shape across channels (resolved from H6's persistence need).
+
 ### Task H1: `PipeNode` ECS component
 - Create `impl/block/net/PipeNode implements Component<ChunkStore>`: fields `PortChannel channel`, `int tier`, plus the persisted **buffer share** (`long energyShare` OR a `ResourceBuffer` for fluid/gas — see H6) and a transient cached network handle. `BuilderCodec` + `clone()`. Register in `ChonbosChemistry.setup()` via `getChunkStoreRegistry().registerComponent(PipeNode.class, "PipeNode", PipeNode.CODEC)`; expose the `ComponentType`.
 - **Spike:** mirror the existing `MachineBlockState` registration.
