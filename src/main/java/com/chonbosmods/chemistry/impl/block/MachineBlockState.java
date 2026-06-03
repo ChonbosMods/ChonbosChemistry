@@ -4,20 +4,15 @@ import com.chonbosmods.chemistry.api.energy.EnergyHandler;
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.EmptyExtraInfo;
-import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
-import com.hypixel.hytale.codec.schema.SchemaContext;
-import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
-import org.bson.BsonValue;
 
 /**
  * The persistent ECS state a machine block carries on the {@link ChunkStore}: its energy buffer,
@@ -39,29 +34,11 @@ import org.bson.BsonValue;
 public final class MachineBlockState implements Component<ChunkStore>, TransferNode {
 
     /**
-     * A non-primitive {@code Codec<Long>} delegating to {@link Codec#LONG}. {@code Codec.LONG} is a
-     * {@code PrimitiveCodec}, which makes {@code BuilderField} reject a null (absent optional) value
-     * before it reaches the setter. This identity wrapper is NOT a {@code PrimitiveCodec}, so an
-     * absent/explicit-null optional key decodes to null and the field setter can apply a default.
-     * (Same pattern as {@link EnergyBuffer}'s {@code OPTIONAL_LONG}.)
+     * Shared non-primitive {@code Codec<Long>} (also a {@code RawJsonCodec<Long>}) for optional Long
+     * keys whose absent/null value must reach the setter. See {@link OptionalLongCodec} for the full
+     * rationale (PrimitiveCodec-null-bypass invariant + raw-JSON path).
      */
-    private static final Codec<Long> OPTIONAL_LONG = new Codec<>() {
-        @Override
-        public Long decode(BsonValue bsonValue, ExtraInfo extraInfo) {
-            return Codec.LONG.decode(bsonValue, extraInfo);
-        }
-
-        @Override
-        public BsonValue encode(Long value, ExtraInfo extraInfo) {
-            return Codec.LONG.encode(value, extraInfo);
-        }
-
-        @Nonnull
-        @Override
-        public Schema toSchema(@Nonnull SchemaContext context) {
-            return Codec.LONG.toSchema(context);
-        }
-    };
+    private static final Codec<Long> OPTIONAL_LONG = OptionalLongCodec.INSTANCE;
 
     public static final BuilderCodec<MachineBlockState> CODEC = BuilderCodec.builder(MachineBlockState.class, MachineBlockState::new)
         // Energy is optional: a node may carry no power. EnergyBuffer.CODEC is an object codec, so a

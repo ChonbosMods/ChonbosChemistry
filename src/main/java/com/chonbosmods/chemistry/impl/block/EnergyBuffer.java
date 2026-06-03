@@ -2,42 +2,21 @@ package com.chonbosmods.chemistry.impl.block;
 
 import com.chonbosmods.chemistry.api.energy.EnergyHandler;
 import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.codec.schema.SchemaContext;
-import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.validation.Validators;
-import javax.annotation.Nonnull;
-import org.bson.BsonValue;
 
 /** A concrete {@link EnergyHandler}: a stored amount bounded by a fixed capacity, with per-buffer
  * external transfer rate caps. */
 public final class EnergyBuffer implements EnergyHandler {
 
     /**
-     * A non-primitive {@code Codec<Long>} delegating to {@link Codec#LONG}. {@code Codec.LONG} is a
-     * {@code PrimitiveCodec}, which makes {@code BuilderField} reject a null (absent optional) value
-     * before it reaches the setter. This identity wrapper is NOT a {@code PrimitiveCodec}, so an
-     * absent optional key decodes to null and the field setter can apply the uncapped default.
+     * Shared non-primitive {@code Codec<Long>} (also a {@code RawJsonCodec<Long>}) for optional Long
+     * keys whose absent/null value must reach the setter (here coalescing to the uncapped default).
+     * See {@link OptionalLongCodec} for the full rationale (PrimitiveCodec-null-bypass invariant +
+     * raw-JSON path).
      */
-    private static final Codec<Long> OPTIONAL_LONG = new Codec<>() {
-        @Override
-        public Long decode(BsonValue bsonValue, ExtraInfo extraInfo) {
-            return Codec.LONG.decode(bsonValue, extraInfo);
-        }
-
-        @Override
-        public BsonValue encode(Long value, ExtraInfo extraInfo) {
-            return Codec.LONG.encode(value, extraInfo);
-        }
-
-        @Nonnull
-        @Override
-        public Schema toSchema(@Nonnull SchemaContext context) {
-            return Codec.LONG.toSchema(context);
-        }
-    };
+    private static final Codec<Long> OPTIONAL_LONG = OptionalLongCodec.INSTANCE;
 
     public static final BuilderCodec<EnergyBuffer> CODEC = BuilderCodec.builder(EnergyBuffer.class, EnergyBuffer::new)
         .append(new KeyedCodec<>("Stored", Codec.LONG), (o, v) -> o.stored = v, o -> o.stored).add()
