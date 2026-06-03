@@ -3,7 +3,6 @@ package com.chonbosmods.chemistry.impl.block.ui;
 import com.chonbosmods.chemistry.ChonbosChemistry;
 import com.chonbosmods.chemistry.api.energy.EnergyHandler;
 import com.chonbosmods.chemistry.api.io.PortChannel;
-import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.ResourceBuffer;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
