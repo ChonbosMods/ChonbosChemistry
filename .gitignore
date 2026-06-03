@@ -54,3 +54,9 @@ auth.*
 assets/
 ### Worktrees ###
 .worktrees/
+
+# Generated solid-substance asset pack (produced by generateSolidSubstanceAssets)
+src/main/resources/Common/Items/Chemistry/Substance_Textures/
+src/main/resources/Common/Icons/ItemsGenerated/Chem_Solid_*.png
+src/main/resources/Server/Item/Items/Chemistry/
+src/main/resources/Server/Languages/en-US/server.lang
