@@ -29,6 +29,6 @@ public final class PipeTiers {
      */
     public static int throughputForTier(int tier) {
         int t = Math.max(0, tier);
-        return BASE_THROUGHPUT * (t + 1);
+        return (int) Math.min(Integer.MAX_VALUE, (long) BASE_THROUGHPUT * (t + 1L));
     }
 }

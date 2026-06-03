@@ -199,6 +199,80 @@ class NetworkManagerTest {
     }
 
     @Test
+    void cyclicLoopTerminatesAsOneNetworkOfFour() {
+        // A closed ring of 4 POWER pipes in the XY plane: each pipe is face-adjacent to two others,
+        // forming a cycle. BFS must mark-on-enqueue so it terminates (no infinite loop / stack overflow).
+        FakePipeGrid grid = new FakePipeGrid()
+            .put(0, 0, 0, power(0))
+            .put(1, 0, 0, power(0))
+            .put(1, 1, 0, power(0))
+            .put(0, 1, 0, power(0));
+        NetworkManager mgr = new NetworkManager();
+
+        Network net = mgr.getOrBuildNetwork(0, 0, 0, grid);
+
+        assertNotNull(net);
+        // 4 members aggregated, single connected component, call returned (no hang).
+        assertEquals(4 * PipeTiers.capacityForTier(0), net.capacity());
+        assertEquals(1, mgr.cachedNetworkCount());
+    }
+
+    @Test
+    void packKeyRejectsCoordinatesOutOfRange() {
+        // Just above MAX on x and just below MIN on z must both be rejected.
+        assertThrows(IllegalArgumentException.class,
+            () -> NetworkManager.packKey(NetworkManager.MAX_COORD + 1, 0, 0));
+        assertThrows(IllegalArgumentException.class,
+            () -> NetworkManager.packKey(0, 0, NetworkManager.MIN_COORD - 1));
+    }
+
+    @Test
+    void bfsAtWorldEdgeSkipsOutOfRangeNeighbourWithoutThrowing() {
+        // A pipe sitting at the max packable X coord: its +X neighbour is out of range and must be
+        // skipped (not packed), so discovery yields a 1-member network without throwing.
+        FakePipeGrid grid = new FakePipeGrid()
+            .put(NetworkManager.MAX_COORD, 0, 0, power(0));
+        NetworkManager mgr = new NetworkManager();
+
+        Network net = assertDoesNotThrow(
+            () -> mgr.getOrBuildNetwork(NetworkManager.MAX_COORD, 0, 0, grid));
+
+        assertNotNull(net);
+        assertEquals(PipeTiers.capacityForTier(0), net.capacity());
+        assertEquals(1, mgr.cachedNetworkCount());
+    }
+
+    @Test
+    void crossOriginRunsShareAnchorAndAggregates() {
+        // Same 3-pipe straight run built at two world locations on two fresh managers must produce
+        // networks with identical capacity + throughput (shape-equivalent). Within a single manager,
+        // building from either end returns the same cached instance with the same anchor id.
+        FakePipeGrid gridA = new FakePipeGrid()
+            .put(0, 0, 0, power(0))
+            .put(1, 0, 0, power(0))
+            .put(2, 0, 0, power(0));
+        FakePipeGrid gridB = new FakePipeGrid()
+            .put(2, 0, 0, power(0))
+            .put(3, 0, 0, power(0))
+            .put(4, 0, 0, power(0));
+        NetworkManager mgrA = new NetworkManager();
+        NetworkManager mgrB = new NetworkManager();
+
+        Network netA = mgrA.getOrBuildNetwork(0, 0, 0, gridA);
+        Network netB = mgrB.getOrBuildNetwork(2, 0, 0, gridB);
+
+        // Identical aggregate shape regardless of world origin.
+        assertEquals(netA.capacity(), netB.capacity());
+        assertEquals(netA.throughput(), netB.throughput());
+        assertEquals(netA.channel(), netB.channel());
+
+        // Within mgrA, building from the far end returns the same cached instance and same anchor.
+        Network sameA = mgrA.getOrBuildNetwork(2, 0, 0, gridA);
+        assertSame(netA, sameA);
+        assertEquals(mgrA.anchorOf(0, 0, 0), mgrA.anchorOf(2, 0, 0));
+    }
+
+    @Test
     void packKeyRoundTripsForNegativeCoordinates() {
         int[][] samples = {
             {0, 0, 0},
