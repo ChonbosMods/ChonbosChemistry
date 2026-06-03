@@ -4,6 +4,7 @@ import com.chonbosmods.chemistry.api.registry.Chemistry;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
+import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import com.chonbosmods.chemistry.impl.block.ui.MachinePanelPage;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
 import com.hypixel.hytale.component.ComponentType;
@@ -37,6 +38,7 @@ public class ChonbosChemistry extends JavaPlugin {
 
     private ComponentType<ChunkStore, MachineBlockState> machineComponentType;
     private ComponentType<ChunkStore, TankBlockState> tankComponentType;
+    private ComponentType<ChunkStore, PipeNode> pipeComponentType;
 
     public ChonbosChemistry(@Nonnull JavaPluginInit init) {
         super(init);
@@ -57,6 +59,11 @@ public class ChonbosChemistry extends JavaPlugin {
         return tankComponentType;
     }
 
+    /** The {@link ChunkStore} component type backing pipe blocks (used by the transport network layer). */
+    public ComponentType<ChunkStore, PipeNode> pipeComponentType() {
+        return pipeComponentType;
+    }
+
     @Override
     protected void setup() {
         getLogger().atInfo().log("Chonbo's Chemistry setting up...");
@@ -69,7 +76,9 @@ public class ChonbosChemistry extends JavaPlugin {
             .registerComponent(MachineBlockState.class, "MachineBlockState", MachineBlockState.CODEC);
         tankComponentType = getChunkStoreRegistry()
             .registerComponent(TankBlockState.class, "TankBlockState", TankBlockState.CODEC);
-        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, TankBlockState.");
+        pipeComponentType = getChunkStoreRegistry()
+            .registerComponent(PipeNode.class, "PipeNode", PipeNode.CODEC);
+        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, TankBlockState, PipeNode.");
 
         // Per-tick driver: transport pass then work pass. Must be registered AFTER the components above.
         getChunkStoreRegistry().registerSystem(new MachineTickSystem(machineComponentType, tankComponentType));
