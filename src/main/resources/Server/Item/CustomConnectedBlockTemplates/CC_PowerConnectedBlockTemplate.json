@@ -2873,6 +2873,627 @@
         ]
       },
       "PatternsToMatchAnyOf": []
+    },
+    "six_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "five_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "five_down_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_3horiz_ud_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "cross_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "fourbent_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_3horiz_up_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_3horiz_down_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_straight_ud_ns_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_straight_ud_ew_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "tee_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "tripod_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "tripod_down_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_tee_up_ns_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_tee_up_ew_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_tee_down_ns_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_tee_down_ew_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_branch_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "elbow_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "straight_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "straight_vertical_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_elbow_up_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_elbow_down_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "end_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_up_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_down_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "node_on": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
     }
   }
 }

@@ -10,8 +10,10 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.math.util.ChunkUtil;
+import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.accessor.BlockAccessor;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.HashSet;
@@ -148,10 +150,60 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
 
         MachineLookup lookup = new WorldMachineLookup(world, store, machineType, tankType);
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
-        NetworkTransfer.distribute(net, endpoints);
+        long delivered = NetworkTransfer.distribute(net, endpoints);
 
         // H6 FIX 1: persist the post-distribute buffer back onto the member pipe shares so an
         // invalidation/rebuild (place/break between ticks) re-pools it losslessly.
         NetworkManager.writeBackShares(net, grid);
+
+        // Visual ON/OFF: a network is "energized" if it currently holds energy OR moved any this tick.
+        // The OR on delivered is critical: in steady flow the buffer is pulled and fully delivered
+        // within one tick, ending at stored()==0, yet the cables must still read as ON.
+        boolean energized = net.stored() > 0 || delivered > 0;
+        applyPoweredVisual(world, net, energized);
+    }
+
+    /**
+     * Flips every member cable of {@code net} to its powered or unpowered texture state to match
+     * {@code energized}. Reads each placed cable's current interaction-state name and only issues a
+     * block swap when the desired state name actually differs (the engine's
+     * {@code setBlockInteractionState} additionally no-ops on an equal name, but we avoid even the call
+     * and the BlockType lookups on the steady-state path). Fully guarded: a missing chunk/block/state
+     * for any member is skipped and never throws on the world thread.
+     */
+    private void applyPoweredVisual(@Nonnull World world, @Nonnull Network net, boolean energized) {
+        for (long key : net.memberKeys()) {
+            try {
+                int mx = NetworkManager.unpackX(key);
+                int my = NetworkManager.unpackY(key);
+                int mz = NetworkManager.unpackZ(key);
+
+                BlockAccessor accessor = world.getChunkIfLoaded(ChunkUtil.indexChunkFromBlock(mx, mz));
+                if (accessor == null) {
+                    continue; // chunk not loaded; its cable will re-resolve when it next ticks
+                }
+                BlockType bt = accessor.getBlockType(mx, my, mz);
+                if (bt == null || bt == BlockType.EMPTY) {
+                    continue; // not our block anymore (race with a break); skip
+                }
+
+                // Current placed interaction-state name (null for the base/default block).
+                String current = bt.getStateForBlock(bt);
+                String desired = energized
+                        ? PipePowerStates.poweredOf(current)
+                        : PipePowerStates.unpoweredOf(current);
+
+                // Only swap on a real change. Treat a null/"" current as "default" for the compare so
+                // we never redundantly swap a base block to "default".
+                String normalized = (current == null || current.isEmpty()) ? "default" : current;
+                if (desired.equals(normalized)) {
+                    continue;
+                }
+                // force=false: the engine also re-checks equality before swapping (belt and braces).
+                accessor.setBlockInteractionState(mx, my, mz, bt, desired, false);
+            } catch (Throwable ignored) {
+                // A single member's visual swap must never crash the tick.
+            }
+        }
     }
 }
