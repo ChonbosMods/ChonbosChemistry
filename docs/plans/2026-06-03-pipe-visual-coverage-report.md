@@ -197,3 +197,22 @@ BLOCKYMODEL FILES NEEDED:
 
 Total: 12 files (or potentially fewer if some can share models via clever mirroring)
 ```
+
+---
+
+## IMPLEMENTED 2026-06-03 (modeling instance)
+
+All 12 report shapes built + wired. **Plus 4 additional shapes the gap list missed** (13 combos):
+- `tripod_down` {2-adjacent-horiz + D} — 4 combos (rotatable)
+- `five_down` {N,S,E,W,D} — 1 combo
+- `vertical_branch` {U,D + 1 horiz} — 4 combos (rotatable)
+- `vertical_3horiz_ud` {U,D + 3 horiz} — 4 combos (rotatable)
+
+Status:
+- 16 new `.blockymodel` files in `Common/Blocks/ChonbosMods/Pipes/` (27 models total incl. node).
+- All 4 `CC_*ConnectedBlockTemplate.json` regenerated from `models/_cc_pipes/gen_template.py`:
+  27 shapes, full 6-face Include/Exclude rules, connection-count-DESC order, `MaterialName` key removed.
+- `CC_PowerCable.json`: 26 State.Definitions + 27 TemplateShapeBlockPatterns (PipeNode BlockEntity untouched).
+- **Verified by exhaustive simulation: all 64 neighbor combinations resolve to exactly one shape**
+  (engine transform semantics per this report: yaw cycle N→E→S→W, MirrorX/Z, U/D fixed).
+  Simulation also caught + fixed: `straight` needed IsCardinallyRotatable or {E,W} had no pattern.

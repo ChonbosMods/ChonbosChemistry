@@ -1,0 +1,30 @@
+{
+  "ConnectsToOtherMaterials": true,
+  "DontUpdateAfterInitialPlacement": true,
+  "DefaultShape": "machine",
+  "Shapes": {
+    "machine": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "South": [
+          "CC_PowerFace"
+        ],
+        "East": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_PowerFace"
+        ],
+        "Up": [
+          "CC_PowerFace"
+        ],
+        "Down": [
+          "CC_PowerFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    }
+  }
+}
