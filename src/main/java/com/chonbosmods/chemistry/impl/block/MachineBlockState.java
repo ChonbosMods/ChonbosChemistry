@@ -17,8 +17,9 @@ import java.util.Map;
 /**
  * The persistent ECS state a machine block carries on the {@link ChunkStore}: its energy buffer,
  * its per-channel resource buffers, its port configuration, its work progress, and its transport
- * throughput cap. Wraps the Phase A beans and exposes them through {@link TransferNode} so the
- * transport engine can drive any machine uniformly.
+ * throughput cap. Wraps the Phase A beans and exposes them through accessors
+ * ({@code ports()}/{@code energy()}/{@code resource(channel)}/{@code throughput(channel)}) that the
+ * network endpoint adapters and GUI read directly.
  *
  * <h2>Resources codec design</h2>
  * The in-memory shape is an {@code EnumMap<PortChannel, ResourceBuffer>} (fast lookup by channel),
@@ -31,7 +32,7 @@ import java.util.Map;
  * Deep copy is performed by a codec round-trip (encode then decode), reusing the tested bean codecs.
  * This guarantees each placed block receives fully independent buffers.
  */
-public final class MachineBlockState implements Component<ChunkStore>, TransferNode {
+public final class MachineBlockState implements Component<ChunkStore> {
 
     /**
      * Shared non-primitive {@code Codec<Long>} (also a {@code RawJsonCodec<Long>}) for optional Long
@@ -54,7 +55,7 @@ public final class MachineBlockState implements Component<ChunkStore>, TransferN
         .append(new KeyedCodec<>("CreativeSource", Codec.BOOLEAN), (o, v) -> o.creativeSource = v, o -> o.creativeSource).add()
         // Test-rig "burning sink" flag: when > 0 the tick system extracts this many energy units from
         // this node's own buffer each tick (the machine consuming its own power), so a sink's stored
-        // value visibly drains. OPTIONAL with default 0 — see OPTIONAL_LONG above for why an absent or
+        // value visibly drains. OPTIONAL with default 0: see OPTIONAL_LONG above for why an absent or
         // explicit-null key must reach the setter (3-arg KeyedCodec not-required) where it coalesces
         // to 0 rather than tripping the primitive non-null check.
         .append(new KeyedCodec<>("EnergyDrainPerTick", OPTIONAL_LONG, false),
@@ -115,30 +116,28 @@ public final class MachineBlockState implements Component<ChunkStore>, TransferN
         return list.toArray(new ChanneledResource[0]);
     }
 
-    // --- TransferNode ---
+    // --- port/energy/resource accessors (read directly by network adapters + GUI) ---
 
-    @Override
     public PortConfig ports() {
         return ports;
     }
 
-    @Override
+    /** @return the energy handler, or null if this node carries no power. */
     public EnergyHandler energy() {
         return energy;
     }
 
-    @Override
+    /** @return the resource buffer for a fluid/gas/item channel, or null if this node has none. */
     public ResourceBuffer resource(PortChannel channel) {
         return resources.get(channel);
     }
 
     /**
-     * {@inheritDoc}
+     * @return max units movable out of a single OUTPUT port per push for this channel.
      *
      * <p>Channel-agnostic for now: every channel shares the single configurable {@code throughput}
      * field. A later task may split this into per-channel caps if machines need it.
      */
-    @Override
     public int throughput(PortChannel channel) {
         return throughput;
     }

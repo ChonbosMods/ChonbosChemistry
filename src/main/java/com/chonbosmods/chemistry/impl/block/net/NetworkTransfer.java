@@ -87,7 +87,7 @@ public final class NetworkTransfer {
             return 0;
         }
 
-        // Phase 1 — fill the network buffer from PURE providers first, capped at the throughput budget.
+        // Phase 1: fill the network buffer from PURE providers first, capped at the throughput budget.
         long pulledBudget = throughput;
         pulledBudget = pullFrom(net, pureProviders, pulledBudget, typeLocked);
         // Then pull from BUFFER providers only when budget remains AND a pure acceptor (real demand)
@@ -96,7 +96,7 @@ public final class NetworkTransfer {
             pulledBudget = pullFrom(net, bufferProviders, pulledBudget, typeLocked);
         }
 
-        // Phase 2 — deliver out of the buffer: PURE acceptors first, then BUFFER acceptors from the
+        // Phase 2: deliver out of the buffer: PURE acceptors first, then BUFFER acceptors from the
         // leftover of the SAME per-tick budget.
         long deliverBudget = Math.min(net.stored(), throughput);
         if (deliverBudget <= 0) {
@@ -129,7 +129,7 @@ public final class NetworkTransfer {
             }
             long freeSpace = net.capacity() - net.stored();
             if (freeSpace <= 0) {
-                break; // network full — backpressure, stop pulling.
+                break; // network full : backpressure, stop pulling.
             }
             long room = Math.min(freeSpace, budget); // pull at most the remaining budget.
             String r = provider.resourceId();

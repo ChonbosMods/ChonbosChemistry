@@ -150,29 +150,8 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
         NetworkTransfer.distribute(net, endpoints);
 
-        // H6 FIX 1 — persist the post-distribute buffer back onto the member pipe shares so an
+        // H6 FIX 1: persist the post-distribute buffer back onto the member pipe shares so an
         // invalidation/rebuild (place/break between ticks) re-pools it losslessly.
-        writeBackBuffer(net, grid);
-    }
-
-    /**
-     * Splits the network's {@code stored()} evenly across its member pipes and writes each share (and the
-     * locked resource id; null for POWER/empty) onto the pipe's {@link PipeNode}. A missing pipe at a
-     * member position is skipped defensively.
-     */
-    private static void writeBackBuffer(Network net, PipeGridView grid) {
-        Long[] keys = net.memberKeys().toArray(new Long[0]);
-        long[] shares = NetworkManager.splitEvenly(net.stored(), keys.length);
-        String resourceId = net.lockedResourceId();
-        for (int i = 0; i < keys.length; i++) {
-            long key = keys[i];
-            PipeNode pipe = grid.pipeAt(
-                NetworkManager.unpackX(key), NetworkManager.unpackY(key), NetworkManager.unpackZ(key));
-            if (pipe == null) {
-                continue; // pipe gone from the live grid — skip
-            }
-            pipe.setBufferShare(shares[i]);
-            pipe.setResourceId(resourceId);
-        }
+        NetworkManager.writeBackShares(net, grid);
     }
 }

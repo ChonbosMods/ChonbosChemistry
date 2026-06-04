@@ -19,7 +19,7 @@ import java.util.List;
  * Deep copy via a codec round-trip (encode then decode), reusing the tested bean codecs, so each
  * placed tank receives an independent buffer.
  */
-public final class TankBlockState implements Component<ChunkStore>, TransferNode {
+public final class TankBlockState implements Component<ChunkStore> {
 
     public static final BuilderCodec<TankBlockState> CODEC = BuilderCodec.builder(TankBlockState.class, TankBlockState::new)
         .append(new KeyedCodec<>("Buffer", ResourceBuffer.CODEC), (o, v) -> o.buffer = v, o -> o.buffer).add()
@@ -52,30 +52,28 @@ public final class TankBlockState implements Component<ChunkStore>, TransferNode
         return channel;
     }
 
-    // --- TransferNode ---
+    // --- port/energy/resource accessors (read directly by network adapters + GUI) ---
 
-    @Override
     public PortConfig ports() {
         return ports;
     }
 
-    @Override
+    /** @return null: a tank carries no power. */
     public EnergyHandler energy() {
         return null;
     }
 
-    @Override
+    /** @return the buffer for this tank's channel, or null for any other channel. */
     public ResourceBuffer resource(PortChannel c) {
         return c == channel ? buffer : null;
     }
 
     /**
-     * {@inheritDoc}
+     * @return max units movable out of a single OUTPUT port per push for this channel.
      *
      * <p>Channel-agnostic: the single configurable {@code throughput} field applies to whatever
      * channel this tank serves.
      */
-    @Override
     public int throughput(PortChannel c) {
         return throughput;
     }

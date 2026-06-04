@@ -20,9 +20,8 @@ import javax.annotation.Nonnull;
  * beyond lookup + adapt); verified on devServer, not unit-tested.
  *
  * <p>Both {@link MachineBlockState} and {@link TankBlockState} already expose
- * {@code ports()}/{@code energy()}/{@code resource(channel)} (via {@code TransferNode}), so each maps
- * to a {@link MachinePorts} view directly. Machine takes precedence when both are present (mirrors
- * {@code MachineTickSystem.neighborNode}).
+ * {@code ports()}/{@code energy()}/{@code resource(channel)}, so each maps to a {@link MachinePorts}
+ * view directly. Machine takes precedence when both are present at a position.
  */
 public final class WorldMachineLookup implements MachineLookup {
 
@@ -59,7 +58,7 @@ public final class WorldMachineLookup implements MachineLookup {
         return null;
     }
 
-    /** Functional view over a block-state's three TransferNode accessors. */
+    /** Functional view over a block-state's per-channel resource accessor. */
     private interface ResourceFn {
         ResourceBuffer apply(PortChannel channel);
     }

@@ -18,8 +18,8 @@ public final class SolidSubstanceAssets {
     private SolidSubstanceAssets() {}
 
     /**
-     * Asset/item id for a substance, keyed on its (unique) name. Formulas are NOT unique — polymers
-     * like Cellulose and Starch share {@code (C6H10O5)n} — so the name is the safe identity.
+     * Asset/item id for a substance, keyed on its (unique) name. Formulas are NOT unique: polymers
+     * like Cellulose and Starch share {@code (C6H10O5)n}, so the name is the safe identity.
      */
     public static String assetId(Substance s) {
         return assetId(s instanceof Element, s.name());
@@ -27,7 +27,7 @@ public final class SolidSubstanceAssets {
 
     /**
      * Asset/item id, namespaced by kind, sanitized to {@code [A-Za-z0-9_]} with each underscore
-     * segment title-cased — Hytale's AssetStore requires PascalCase-per-segment item keys.
+     * segment title-cased: Hytale's AssetStore requires PascalCase-per-segment item keys.
      */
     public static String assetId(boolean isElement, String identity) {
         String kind = isElement ? "Element" : "Compound";

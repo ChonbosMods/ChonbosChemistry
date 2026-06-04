@@ -177,7 +177,7 @@ public final class NetworkManager {
             network.addMember(key, PipeTiers.capacityForTier(tier), PipeTiers.throughputForTier(tier));
             anchorByPipe.put(key, anchor);
         }
-        // H6 FIX 1a — re-hydrate the shared buffer from each member's persisted share. The per-tick
+        // H6 FIX 1a: re-hydrate the shared buffer from each member's persisted share. The per-tick
         // write-back (NetworkTickSystem) keeps these shares == the live buffer, so pooling them on a
         // rebuild makes invalidation lossless. This is idempotent across rebuilds: shares only change
         // via the write-back, never via pooling, so re-pooling the same shares yields the same total.
@@ -268,9 +268,33 @@ public final class NetworkManager {
     }
 
     /**
+     * Splits the network's {@code stored()} evenly across its member pipes and writes each share (and the
+     * locked resource id; null for POWER/empty) back onto the pipe's {@link PipeNode}. Shared by the
+     * per-tick write-back ({@code NetworkTickSystem}) and its headless regression test so both exercise
+     * identical logic. A missing pipe at a member position is skipped defensively.
+     */
+    public static void writeBackShares(Network net, PipeGridView grid) {
+        // Snapshot the member keys into a fixed-order array: splitEvenly assigns the remainder by ascending
+        // ARRAY index, but memberKeys() is HashSet-ordered, so which specific pipes get the +1 remainder
+        // unit is non-deterministic across membership changes. Only the TOTAL written back is guaranteed.
+        Long[] keys = net.memberKeys().toArray(new Long[0]);
+        long[] shares = splitEvenly(net.stored(), keys.length);
+        String resourceId = net.lockedResourceId();
+        for (int i = 0; i < keys.length; i++) {
+            long key = keys[i];
+            PipeNode pipe = grid.pipeAt(unpackX(key), unpackY(key), unpackZ(key));
+            if (pipe == null) {
+                continue; // pipe gone from the live grid: skip
+            }
+            pipe.setBufferShare(shares[i]);
+            pipe.setResourceId(resourceId);
+        }
+    }
+
+    /**
      * Splits {@code total} as evenly as possible across {@code parts} slots, handing the integer-division
      * remainder one unit at a time to the FIRST slots (ascending index) so the result is deterministic.
-     * Pure helper used by the per-tick buffer write-back ({@code NetworkTickSystem}) to distribute a
+     * Pure helper used by the per-tick buffer write-back ({@link #writeBackShares}) to distribute a
      * network's {@code stored()} back over its member pipe shares.
      *
      * <p>Guarantees {@code sum(result) == total} (for {@code parts > 0}) and every slot is

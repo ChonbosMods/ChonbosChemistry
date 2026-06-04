@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
  * image. {@code icon_master.png} is the white-liquid jar rendered in Blockbench; {@code
  * icon_liquid_mask.png} is the same render with only the liquid node visible (its silhouette marks
  * which icon pixels are liquid). Multiplying the masked pixels by the substance color reproduces the
- * in-world jar as a 2D icon — without rendering 205 times.
+ * in-world jar as a 2D icon: without rendering 205 times.
  */
 public final class SubstanceIcon {
 

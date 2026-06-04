@@ -279,7 +279,7 @@ public final class MachinePanelPage extends CustomUIPage {
         cmd.set("#EmptyLabel.TextSpans", Message.raw(message));
     }
 
-    /** "{amount} / {capacity} ({pct}%)" — the readable text gauge. */
+    /** "{amount} / {capacity} ({pct}%)": the readable text gauge. */
     private static String gaugeText(long amount, long capacity) {
         return amount + " / " + capacity + " (" + percent(amount, capacity) + "%)";
     }

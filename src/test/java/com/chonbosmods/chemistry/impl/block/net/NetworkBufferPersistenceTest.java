@@ -47,23 +47,13 @@ class NetworkBufferPersistenceTest {
     }
 
     /**
-     * Mirror of {@code NetworkTickSystem}'s per-tick write-back: split the network's stored total
-     * evenly across its members and persist each share (and the locked resource id) onto the pipe.
+     * Drives the SAME per-tick write-back the tick system runs ({@link NetworkManager#writeBackShares}):
+     * split the network's stored total evenly across its members and persist each share (and the locked
+     * resource id) onto the pipe. Calling the shared production method (not a copy) keeps this test
+     * honest about the real logic.
      */
-    private static void writeBack(Network net, NetworkManager mgr, FakePipeGrid grid) {
-        Long[] keys = net.memberKeys().toArray(new Long[0]);
-        long[] shares = NetworkManager.splitEvenly(net.stored(), keys.length);
-        String resourceId = net.lockedResourceId();
-        for (int i = 0; i < keys.length; i++) {
-            long key = keys[i];
-            PipeNode pipe = grid.pipeAt(
-                NetworkManager.unpackX(key), NetworkManager.unpackY(key), NetworkManager.unpackZ(key));
-            if (pipe == null) {
-                continue; // missing pipe — skip defensively
-            }
-            pipe.setBufferShare(shares[i]);
-            pipe.setResourceId(resourceId);
-        }
+    private static void writeBack(Network net, FakePipeGrid grid) {
+        NetworkManager.writeBackShares(net, grid);
     }
 
     private static PipeNode power(int tier) {
@@ -85,7 +75,7 @@ class NetworkBufferPersistenceTest {
         assertEquals(12, net.stored());
 
         // End-of-tick write-back persists the buffer into the pipe shares.
-        writeBack(net, mgr, grid);
+        writeBack(net, grid);
         // 12 over 3 members -> 4 each.
         assertEquals(4, grid.pipeAt(0, 0, 0).bufferShare());
         assertEquals(4, grid.pipeAt(1, 0, 0).bufferShare());
@@ -115,7 +105,7 @@ class NetworkBufferPersistenceTest {
         NetworkManager mgr = new NetworkManager();
 
         Network net = mgr.getOrBuildNetwork(0, 0, 0, grid);
-        net.insert(null, 12, false); // buffer changed in memory only — no write-back
+        net.insert(null, 12, false); // buffer changed in memory only: no write-back
         assertEquals(12, net.stored());
 
         mgr.invalidate(1, 0, 0);
@@ -136,13 +126,13 @@ class NetworkBufferPersistenceTest {
 
         Network net = mgr.getOrBuildNetwork(0, 0, 0, grid);
         net.insert(null, 8, false);
-        writeBack(net, mgr, grid);
+        writeBack(net, grid);
 
         mgr.invalidate(0, 0, 0);
         Network r1 = mgr.getOrBuildNetwork(0, 0, 0, grid);
         assertEquals(8, r1.stored());
         // Write-back again on the rebuilt network (shares unchanged: 4 + 4), then rebuild once more.
-        writeBack(r1, mgr, grid);
+        writeBack(r1, grid);
         mgr.invalidate(0, 0, 0);
         Network r2 = mgr.getOrBuildNetwork(0, 0, 0, grid);
         assertEquals(8, r2.stored(), "pooling did not double-count across rebuilds");
@@ -154,7 +144,7 @@ class NetworkBufferPersistenceTest {
         NetworkManager mgr = new NetworkManager();
         Network net = mgr.getOrBuildNetwork(0, 0, 0, grid);
         net.insert(null, 5, false);
-        writeBack(net, mgr, grid);
+        writeBack(net, grid);
         assertNull(grid.pipeAt(0, 0, 0).resourceId(), "POWER never carries a resource id");
         assertEquals(5, grid.pipeAt(0, 0, 0).bufferShare());
     }

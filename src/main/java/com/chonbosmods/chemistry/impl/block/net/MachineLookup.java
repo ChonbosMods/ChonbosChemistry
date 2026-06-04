@@ -13,7 +13,7 @@ import com.chonbosmods.chemistry.impl.block.ResourceBuffer;
  * <p>The real implementation (built in the tick task) wraps the world + machine/tank component types;
  * unit tests pass a fake backed by an in-memory map. Both {@code MachineBlockState} and
  * {@code TankBlockState} adapt to {@link MachinePorts} trivially (they already expose
- * {@code ports()}/{@code energy()}/{@code resource(channel)} via {@code TransferNode}).
+ * {@code ports()}/{@code energy()}/{@code resource(channel)}).
  */
 public interface MachineLookup {
 
