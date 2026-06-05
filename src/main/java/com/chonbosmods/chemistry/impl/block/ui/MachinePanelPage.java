@@ -1,10 +1,7 @@
 package com.chonbosmods.chemistry.impl.block.ui;
 
 import com.chonbosmods.chemistry.ChonbosChemistry;
-import com.chonbosmods.chemistry.api.energy.EnergyHandler;
-import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
-import com.chonbosmods.chemistry.impl.block.ResourceBuffer;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.chonbosmods.chemistry.impl.block.net.Network;
 import com.chonbosmods.chemistry.impl.block.net.NetworkManager;
@@ -28,37 +25,35 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
 
 /**
- * Server-side block GUI for Chonbo's Chemistry rig blocks (Task B4, snapshot v1).
+ * Server-side block GUI for Chonbo's Chemistry rig blocks (Task B4; live since the 2026-06-05
+ * live-refresh design, {@code docs/plans/2026-06-05-live-refresh-panel-design.md}).
  *
- * <p>Interacting (Interact key, default F) with a machine, tank, or pipe block opens this page. It
- * reads the block's {@link MachineBlockState} or {@link TankBlockState} component off the clicked
- * block entity's {@code Ref<ChunkStore>} and renders an energy readout (machines with power only)
- * plus one row per non-null channel buffer (FLUID / GAS / ITEM), each showing
- * {@code amount / capacity (pct%)}.
+ * <p>Interacting (Interact key, default F) with a machine, tank, or pipe block opens this page. The
+ * panel's content is computed as a {@link PanelSnapshot} (pure, unit-tested render model) from the
+ * block's {@link MachineBlockState} / {@link TankBlockState} component, or, for a {@link PipeNode
+ * pipe}, from its resolved shared-buffer {@link Network} (the NETWORK readout: stored/capacity, pipe
+ * count, bottleneck throughput).
  *
- * <p>For a {@link PipeNode pipe} block there is no per-block buffer to show: a pipe is one segment of
- * a shared-buffer {@link Network}. This page instead resolves the pipe's network (via
- * {@code NetworkService.forWorld(world).getOrBuildNetwork(...)}) and renders the NETWORK readout: the
- * unified shared buffer ({@code stored / capacity (pct%)}), the pipe (member) count, and the network's
- * bottleneck throughput per tick. Pipes are POWER-only today, but the channel name in the title is
- * derived from {@link Network#channel()} so this reads correctly if FLUID/GAS pipes arrive later.
+ * <p><b>Live refresh:</b> after a successful {@link #build}, the page registers itself with the
+ * plugin's {@link PanelRefreshService}; every {@link PanelRefreshService#REFRESH_INTERVAL_TICKS}
+ * ticks {@code PanelRefreshSystem} drives {@link #refresh()}, which recomputes the snapshot and
+ * {@link #sendUpdate(UICommandBuilder)}s a pure delta of {@code set} commands (no template
+ * re-append). If the block or its network is gone, or the player ref died, the panel auto-closes and
+ * drops out of the registry. Empty-state pages (invalid ref at open, non-chemistry block, network
+ * unavailable at open) never register: they stay static snapshots.
  *
  * <p>The UI template ({@code Pages/CC_MachinePanel.ui}) mirrors the proven Natural20 structure
- * ({@code @PageOverlay} + {@code @Container} + plain {@code Label} rows; no {@code @ProgressBar}),
- * so each gauge is a text label toggled visible and given its text here.
+ * ({@code @PageOverlay} + {@code @Container} + plain {@code Label} rows; no {@code @ProgressBar});
+ * each gauge is a text label. {@link PanelSnapshot} sets every row's visibility explicitly on every
+ * pass, so rows whose buffer vanishes hide instead of freezing.
  *
- * <p><b>Snapshot only:</b> values are read once at {@link #build}. There is no live refresh tick.
- * A future live variant would re-run the population from a scheduled task via
- * {@link #sendUpdate(UICommandBuilder)} (see the marker comment in {@link #build}).
- *
- * <p><b>Threading:</b> {@link #build} runs on the WorldThread: the engine processes the Interact
- * interaction inside an {@code EntityTickingSystem} (its {@code TickInteractionManagerSystem}), whose
- * {@code firstRun} calls {@code PageManager.openCustomPage} which invokes {@link #build} synchronously
- * in that same call stack. That is the same thread {@code NetworkTickSystem} runs on, so calling
- * {@code getOrBuildNetwork} here is safe against the per-world {@code NetworkManager} cache (plain
- * HashMaps, single-threaded-per-world).
+ * <p><b>Threading:</b> {@link #build} runs on the WorldThread (the engine's interaction tick calls
+ * {@code PageManager.openCustomPage} synchronously), and {@code PanelRefreshSystem} is a
+ * world-store ticking system, so {@link #refresh()} runs on the same WorldThread: calling
+ * {@code NetworkManager.getOrBuildNetwork} is safe in both paths (per-world cache, plain HashMaps,
+ * single-threaded-per-world).
  */
-public final class MachinePanelPage extends CustomUIPage {
+public final class MachinePanelPage extends CustomUIPage implements PanelRefreshService.LivePanel {
 
     @Nonnull
     private final Ref<ChunkStore> blockRef;
@@ -67,6 +62,9 @@ public final class MachinePanelPage extends CustomUIPage {
     private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType =
         BlockModule.BlockStateInfo.getComponentType();
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType = BlockChunk.getComponentType();
+
+    /** The world this page registered under (null until a successful build registers it). */
+    private World registeredWorld;
 
     public MachinePanelPage(@Nonnull PlayerRef playerRef, @Nonnull Ref<ChunkStore> blockRef) {
         super(playerRef, CustomPageLifetime.CanDismissOrCloseThroughInteraction);
@@ -81,11 +79,57 @@ public final class MachinePanelPage extends CustomUIPage {
             @Nonnull Store<EntityStore> store) {
         commandBuilder.append("Pages/CC_MachinePanel.ui");
 
-        // NOTE (future live refresh): for a live panel, re-run the population below from a scheduled
-        // task that calls sendUpdate(commandBuilder). v1 is a one-shot snapshot, populated inline.
+        PanelSnapshot snapshot = this.computeSnapshot();
+        applySnapshot(commandBuilder, snapshot);
+
+        // Live registration: only pages showing a real block/network refresh; empty-state pages stay
+        // static snapshots (there is nothing live to watch).
+        if (snapshot.live()) {
+            World world = this.resolveWorld();
+            if (world != null) {
+                this.registeredWorld = world;
+                ChonbosChemistry.getInstance().panelRefreshService().register(world, this);
+            }
+        }
+    }
+
+    /**
+     * Recompute and re-send the panel (PanelRefreshService.LivePanel). Runs on this world's
+     * WorldThread. Auto-closes (and reports dead) when the block, its network, or the player is gone.
+     */
+    @Override
+    public boolean refresh() {
+        if (!this.playerRef.isValid()) {
+            return false; // player gone; engine tears the page down, nothing to send
+        }
+        PanelSnapshot snapshot = this.computeSnapshot();
+        if (!snapshot.live()) {
+            this.close(); // block broken / network gone mid-view: auto-close (design decision)
+            return false;
+        }
+        UICommandBuilder update = new UICommandBuilder();
+        applySnapshot(update, snapshot);
+        this.sendUpdate(update);
+        return true;
+    }
+
+    @Override
+    public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
+        if (this.registeredWorld != null) {
+            ChonbosChemistry.getInstance().panelRefreshService().deregister(this.registeredWorld, this);
+            this.registeredWorld = null;
+        }
+        super.onDismiss(ref, store);
+    }
+
+    /**
+     * Compute the current render model for the viewed block. Never throws: every failure path
+     * (invalid ref, missing component, unreachable world/network) yields a non-live empty snapshot.
+     */
+    @Nonnull
+    private PanelSnapshot computeSnapshot() {
         if (!this.blockRef.isValid()) {
-            this.showEmpty(commandBuilder, "Machine", "This block is no longer valid.");
-            return;
+            return PanelSnapshot.empty("Machine", "This block is no longer valid.");
         }
 
         Store<ChunkStore> blockStore = this.blockRef.getStore();
@@ -93,205 +137,83 @@ public final class MachinePanelPage extends CustomUIPage {
 
         MachineBlockState machine = blockStore.getComponent(this.blockRef, mod.machineComponentType());
         if (machine != null) {
-            this.populateMachine(commandBuilder, machine);
-            return;
+            return PanelSnapshot.forMachine(machine);
         }
 
         TankBlockState tank = blockStore.getComponent(this.blockRef, mod.tankComponentType());
         if (tank != null) {
-            this.populateTank(commandBuilder, tank);
-            return;
+            return PanelSnapshot.forTank(tank);
         }
 
         PipeNode pipe = blockStore.getComponent(this.blockRef, mod.pipeComponentType());
         if (pipe != null) {
-            this.populatePipe(commandBuilder, blockStore, mod);
-            return;
+            return this.computePipeSnapshot(blockStore, mod);
         }
 
-        this.showEmpty(commandBuilder, "Machine", "This is not a chemistry block.");
+        return PanelSnapshot.empty("Machine", "This is not a chemistry block.");
     }
 
     /**
-     * Render the NETWORK readout for a pipe block. A pipe carries no per-block buffer: it is one
-     * segment of a shared-buffer {@link Network}, so we decode the pipe's world position, resolve its
-     * network, and show the network's aggregate buffer + member count + bottleneck throughput.
-     *
-     * <p>Null-safe at every step: this page must NEVER throw. Any failure to decode the position, reach
-     * the world, or resolve the network falls back to {@code showEmpty(.., "Pipe", "Network unavailable.")}.
-     * Calling {@code getOrBuildNetwork} is safe here because {@link #build} runs on the WorldThread (see
-     * the class javadoc).
+     * Render model for a pipe block: resolve its network (WorldThread-safe, see class javadoc) and
+     * show the network's aggregate buffer + member count + bottleneck throughput. Null-safe at every
+     * step; any failure falls back to the non-live "Network unavailable." empty state.
      */
-    private void populatePipe(
-            @Nonnull UICommandBuilder cmd,
-            @Nonnull Store<ChunkStore> blockStore,
-            @Nonnull ChonbosChemistry mod) {
+    @Nonnull
+    private PanelSnapshot computePipeSnapshot(@Nonnull Store<ChunkStore> blockStore, @Nonnull ChonbosChemistry mod) {
         // Decode the clicked block's world (x,y,z) via BlockStateInfo + BlockChunk (same technique as
         // NetworkTickSystem), but reading the components off this.blockRef rather than an ArchetypeChunk.
         BlockModule.BlockStateInfo info = blockStore.getComponent(this.blockRef, this.blockInfoType);
         if (info == null) {
-            this.showEmpty(cmd, "Pipe", "Network unavailable.");
-            return;
+            return PanelSnapshot.empty("Pipe", "Network unavailable.");
         }
         Ref<ChunkStore> chunkRef = info.getChunkRef();
         if (chunkRef == null || !chunkRef.isValid()) {
-            this.showEmpty(cmd, "Pipe", "Network unavailable.");
-            return;
+            return PanelSnapshot.empty("Pipe", "Network unavailable.");
         }
         BlockChunk blockChunk = chunkRef.getStore().getComponent(chunkRef, this.blockChunkType);
         if (blockChunk == null) {
-            this.showEmpty(cmd, "Pipe", "Network unavailable.");
-            return;
+            return PanelSnapshot.empty("Pipe", "Network unavailable.");
         }
         int blockIndex = info.getIndex();
         int x = (blockChunk.getX() << 5) | ChunkUtil.xFromBlockInColumn(blockIndex);
         int y = ChunkUtil.yFromBlockInColumn(blockIndex);
         int z = (blockChunk.getZ() << 5) | ChunkUtil.zFromBlockInColumn(blockIndex);
 
-        ChunkStore external = blockStore.getExternalData();
-        if (external == null) {
-            this.showEmpty(cmd, "Pipe", "Network unavailable.");
-            return;
-        }
-        World world = external.getWorld();
+        World world = this.resolveWorld();
         if (world == null) {
-            this.showEmpty(cmd, "Pipe", "Network unavailable.");
-            return;
+            return PanelSnapshot.empty("Pipe", "Network unavailable.");
         }
 
-        // Resolve (and cache) the network. Safe on the WorldThread (see class javadoc). A null result
-        // means there is no pipe at this position any more (e.g. broken mid-interaction).
+        // Resolve (and cache) the network. A null result means there is no pipe at this position any
+        // more (e.g. broken mid-interaction / mid-view).
         NetworkManager manager = mod.networkService().forWorld(world);
         WorldPipeGridView grid = new WorldPipeGridView(world, blockStore, mod.pipeComponentType());
         Network net = manager.getOrBuildNetwork(x, y, z, grid);
         if (net == null) {
-            this.showEmpty(cmd, "Pipe", "Network unavailable.");
-            return;
+            return PanelSnapshot.empty("Pipe", "Network unavailable.");
         }
-
-        // Title carries the channel name (pipes are POWER-only today, but write it generically).
-        String channelName = channelDisplayName(net.channel());
-        cmd.set("#BlockTitle.TextSpans", Message.raw(channelName + " Pipe Network"));
-
-        // Row 1: the unified shared buffer (stored / capacity (pct%)).
-        setRow(cmd, "#EnergyLabel", "Network: " + gaugeText(net.stored(), net.capacity()));
-        // Row 2: how big the network is + its bottleneck throughput. Reuse the (hidden) fluid row.
-        int pipeCount = net.memberKeys().size();
-        setRow(cmd, "#FluidLabel", "Pipes: " + pipeCount + " • Throughput: " + net.throughput() + "/tick");
+        return PanelSnapshot.forNetwork(net);
     }
 
-    /** Human-readable channel name for the pipe network title ("Power" / "Fluid" / "Gas" / "Items"). */
-    private static String channelDisplayName(PortChannel channel) {
-        if (channel == null) {
-            return "Power";
+    /** The viewed block's world, off the block ref's external ChunkStore. Null on any failure. */
+    private World resolveWorld() {
+        if (!this.blockRef.isValid()) {
+            return null;
         }
-        return switch (channel) {
-            case FLUID -> "Fluid";
-            case GAS -> "Gas";
-            case ITEM -> "Items";
-            default -> "Power"; // POWER (and any future addition) reads as Power until specialised
-        };
+        ChunkStore external = this.blockRef.getStore().getExternalData();
+        return external == null ? null : external.getWorld();
     }
 
-    // Rows are built from Message.raw(...) literals rather than translation keys: the mod's
-    // server.lang is generated + gitignored, so a snapshot panel shouldn't depend on lang entries.
-    private void populateMachine(@Nonnull UICommandBuilder cmd, @Nonnull MachineBlockState machine) {
-        cmd.set("#BlockTitle.TextSpans", Message.raw("Machine"));
-
-        boolean anything = false;
-
-        EnergyHandler energy = machine.energy();
-        if (energy != null) {
-            setRow(cmd, "#EnergyLabel", "Energy: " + gaugeText(energy.getStored(), energy.getMaxStored()));
-            anything = true;
-        }
-
-        anything |= this.setResourceRow(cmd, machine.resource(PortChannel.FLUID), "#FluidLabel", "Fluid");
-        anything |= this.setResourceRow(cmd, machine.resource(PortChannel.GAS), "#GasLabel", "Gas");
-        anything |= this.setResourceRow(cmd, machine.resource(PortChannel.ITEM), "#ItemLabel", "Items");
-
-        if (!anything) {
-            this.showEmptyRow(cmd);
-        }
-    }
-
-    private void populateTank(@Nonnull UICommandBuilder cmd, @Nonnull TankBlockState tank) {
-        cmd.set("#BlockTitle.TextSpans", Message.raw("Tank"));
-
-        // A tank serves exactly one channel and carries no power.
-        PortChannel channel = tank.channel();
-        ResourceBuffer buffer = tank.resource(channel);
-
-        String labelSelector;
-        String channelName;
-        switch (channel) {
-            case GAS -> {
-                labelSelector = "#GasLabel";
-                channelName = "Gas";
-            }
-            case ITEM -> {
-                labelSelector = "#ItemLabel";
-                channelName = "Items";
-            }
-            default -> { // FLUID (and POWER, which a tank should never carry, falls back here harmlessly)
-                labelSelector = "#FluidLabel";
-                channelName = "Fluid";
+    /** Write a snapshot to a command builder: title + every row's explicit visibility and text. */
+    private static void applySnapshot(@Nonnull UICommandBuilder cmd, @Nonnull PanelSnapshot snapshot) {
+        // Rows are Message.raw(...) literals rather than translation keys: the mod's server.lang is
+        // generated + gitignored, so the panel shouldn't depend on lang entries.
+        cmd.set("#BlockTitle.TextSpans", Message.raw(snapshot.title()));
+        for (PanelSnapshot.Row row : snapshot.rows()) {
+            cmd.set(row.selector() + ".Visible", row.visible());
+            if (row.visible()) {
+                cmd.set(row.selector() + ".TextSpans", Message.raw(row.text()));
             }
         }
-
-        if (!this.setResourceRow(cmd, buffer, labelSelector, channelName)) {
-            this.showEmptyRow(cmd);
-        }
-    }
-
-    /**
-     * Populate one resource label row from a buffer.
-     *
-     * @return true if the row was shown (buffer non-null), false otherwise.
-     */
-    private boolean setResourceRow(
-            @Nonnull UICommandBuilder cmd,
-            ResourceBuffer buffer,
-            @Nonnull String labelSelector,
-            @Nonnull String channelName) {
-        if (buffer == null) {
-            return false;
-        }
-        String resourceId = buffer.resourceId();
-        String name = resourceId == null ? "empty" : resourceId;
-        setRow(cmd, labelSelector, channelName + " (" + name + "): " + gaugeText(buffer.amount(), buffer.capacity()));
-        return true;
-    }
-
-    private static void setRow(@Nonnull UICommandBuilder cmd, @Nonnull String labelSelector, @Nonnull String text) {
-        cmd.set(labelSelector + ".Visible", true);
-        cmd.set(labelSelector + ".TextSpans", Message.raw(text));
-    }
-
-    private void showEmptyRow(@Nonnull UICommandBuilder cmd) {
-        cmd.set("#EmptyLabel.Visible", true);
-        cmd.set("#EmptyLabel.TextSpans", Message.raw("This block has no buffers to display."));
-    }
-
-    private void showEmpty(@Nonnull UICommandBuilder cmd, @Nonnull String title, @Nonnull String message) {
-        cmd.set("#BlockTitle.TextSpans", Message.raw(title));
-        cmd.set("#EmptyLabel.Visible", true);
-        cmd.set("#EmptyLabel.TextSpans", Message.raw(message));
-    }
-
-    /** "{amount} / {capacity} ({pct}%)": the readable text gauge. */
-    private static String gaugeText(long amount, long capacity) {
-        return amount + " / " + capacity + " (" + percent(amount, capacity) + "%)";
-    }
-
-    private static int percent(long amount, long capacity) {
-        if (capacity <= 0L) {
-            return 0;
-        }
-        long p = Math.round(100.0 * amount / capacity);
-        if (p < 0L) {
-            return 0;
-        }
-        return (int) Math.min(p, 100L);
     }
 }

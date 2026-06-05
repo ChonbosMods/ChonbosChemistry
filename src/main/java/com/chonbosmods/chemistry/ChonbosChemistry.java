@@ -12,6 +12,8 @@ import com.chonbosmods.chemistry.impl.block.net.PipeBreakEventSystem;
 import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import com.chonbosmods.chemistry.impl.block.net.PipePlaceEventSystem;
 import com.chonbosmods.chemistry.impl.block.ui.MachinePanelPage;
+import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshService;
+import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshSystem;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenCustomUIInteraction;
@@ -49,6 +51,9 @@ public class ChonbosChemistry extends JavaPlugin {
     /** Per-world cache of transport pipe networks: shared by the invalidation events and the tick. */
     private NetworkService networkService;
 
+    /** Per-world registry + cadence for live panel refresh (pages register; PanelRefreshSystem ticks). */
+    private PanelRefreshService panelRefreshService;
+
     public ChonbosChemistry(@Nonnull JavaPluginInit init) {
         super(init);
         instance = this;
@@ -76,6 +81,11 @@ public class ChonbosChemistry extends JavaPlugin {
     /** The per-world {@link NetworkService} caching pipe transport networks (used by events + tick). */
     public NetworkService networkService() {
         return networkService;
+    }
+
+    /** The live-panel refresh registry ({@code MachinePanelPage} registers/deregisters itself here). */
+    public PanelRefreshService panelRefreshService() {
+        return panelRefreshService;
     }
 
     @Override
@@ -134,6 +144,13 @@ public class ChonbosChemistry extends JavaPlugin {
         OpenCustomUIInteraction.registerBlockEntityCustomPage(
             this, MachinePanelPage.class, "CC_MachinePanel", MachinePanelPage::new);
         getLogger().atInfo().log("Registered CC_MachinePanel custom UI page (block GUI).");
+
+        // Live panel refresh (2026-06-05 design): pages register with the service after a successful
+        // build; this query-less per-world pulse refreshes them every 10th tick on the WorldThread.
+        panelRefreshService = new PanelRefreshService();
+        getEntityStoreRegistry().registerSystem(new PanelRefreshSystem(panelRefreshService));
+        getLogger().atInfo().log("Registered PanelRefreshSystem (live panel refresh, every "
+            + PanelRefreshService.REFRESH_INTERVAL_TICKS + " ticks).");
     }
 
     @Override
