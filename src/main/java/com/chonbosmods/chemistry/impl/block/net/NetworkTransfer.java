@@ -33,6 +33,15 @@ import java.util.List;
  * </ul>
  * Both phases keep the single per-tick throughput budget split across the priority tiers (the tiers
  * never sum above {@code throughput}), and every move is still simulate-then-commit min (lossless).
+ *
+ * <h2>Storage balancing (Phase 3, 2026-06-05 design)</h2>
+ * After the priority phases, storage endpoints drift toward {@link WaterFill} targets: capacity-blind
+ * equal levels (a 5000-cap and a 1000-cap battery hold the same amount until the small one clamps
+ * full, then the big one absorbs its share). Balancing spends only the LEFTOVER budget
+ * ({@code min(unspent pull, unspent deliver)}), so real sources and sinks always outrank it, and it
+ * is churn-free: targets are a pure function of total stored + capacities, movement needs a &ge;1
+ * surplus and a &ge;1 deficit, and pulls are capped at the deliverable deficit so nothing strands in
+ * the net buffer. See {@code docs/plans/2026-06-05-storage-balancing-design.md}.
  */
 public final class NetworkTransfer {
 
@@ -50,7 +59,8 @@ public final class NetworkTransfer {
                 endpoints.pureProviders(),
                 endpoints.pureAcceptors(),
                 endpoints.bufferProviders(),
-                endpoints.bufferAcceptors());
+                endpoints.bufferAcceptors(),
+                endpoints.storages());
     }
 
     /**
@@ -59,7 +69,22 @@ public final class NetworkTransfer {
      * @return total units delivered to acceptors this call.
      */
     public static long distribute(Network net, List<Provider> providers, List<Acceptor> acceptors) {
-        return distribute(net, providers, acceptors, List.of(), List.of());
+        return distribute(net, providers, acceptors, List.of(), List.of(), List.of());
+    }
+
+    /**
+     * Back-compat overload: storage endpoints as split provider/acceptor views only (no paired
+     * gauges), so no balancing phase runs.
+     *
+     * @return total units delivered to acceptors this call.
+     */
+    public static long distribute(
+            Network net,
+            List<Provider> pureProviders,
+            List<Acceptor> pureAcceptors,
+            List<Provider> bufferProviders,
+            List<Acceptor> bufferAcceptors) {
+        return distribute(net, pureProviders, pureAcceptors, bufferProviders, bufferAcceptors, List.of());
     }
 
     /**
@@ -71,17 +96,26 @@ public final class NetworkTransfer {
      * @param bufferAcceptors storage acceptor views, charged only from the surplus budget.
      * @return total units delivered to acceptors this call.
      */
+    /**
+     * Runs one provider -> buffer -> fair-split-acceptor pass with source/storage priority, then a
+     * storage-balancing phase ({@link #balance}) on whatever per-tick budget is left over.
+     *
+     * @param storages paired storage views (gauges + provider/acceptor) for the balancing phase;
+     *     typically the same underlying blocks as {@code bufferProviders}/{@code bufferAcceptors}.
+     * @return total units delivered to acceptors this call (balancing deliveries included).
+     */
     public static long distribute(
             Network net,
             List<Provider> pureProviders,
             List<Acceptor> pureAcceptors,
             List<Provider> bufferProviders,
-            List<Acceptor> bufferAcceptors) {
+            List<Acceptor> bufferAcceptors,
+            List<StorageEndpoint> storages) {
         boolean typeLocked =
                 net.channel() == PortChannel.FLUID || net.channel() == PortChannel.GAS;
 
         // Per-call (per-tick) throughput budget. A 0-throughput network (empty membership) moves
-        // nothing on either phase.
+        // nothing on any phase.
         long throughput = net.throughput();
         if (throughput <= 0) {
             return 0;
@@ -98,20 +132,149 @@ public final class NetworkTransfer {
 
         // Phase 2: deliver out of the buffer: PURE acceptors first, then BUFFER acceptors from the
         // leftover of the SAME per-tick budget.
+        long delivered = 0;
         long deliverBudget = Math.min(net.stored(), throughput);
-        if (deliverBudget <= 0) {
+        if (deliverBudget > 0) {
+            // Pass a fresh monotonic rotation offset per pass so the fair-split remainder recipient
+            // cycles across ticks: equal acceptors with a stable order receive equally over time
+            // instead of the first one permanently winning the leftover ±1 units.
+            delivered = deliverTo(net, pureAcceptors, deliverBudget, net.nextRotation());
+            long remainingBudget = deliverBudget - delivered;
+            if (remainingBudget > 0) {
+                // Re-clamp to what is still stored (deliveries to pure acceptors already drained the buffer).
+                remainingBudget = Math.min(remainingBudget, net.stored());
+                if (remainingBudget > 0) {
+                    delivered += deliverTo(net, bufferAcceptors, remainingBudget, net.nextRotation());
+                }
+            }
+        }
+
+        // Phase 3 (balancing): storage drifts toward water-fill targets on LEFTOVER budget only:
+        // bounded by both the unspent pull budget and the unspent deliver budget, so real sources and
+        // sinks always outrank balancing and the per-phase throughput caps still hold.
+        long balanceBudget = Math.min(pulledBudget, throughput - delivered);
+        delivered += balance(net, storages, balanceBudget, typeLocked);
+        return delivered;
+    }
+
+    /**
+     * One storage-balancing step (2026-06-05 design): every storage drifts toward its
+     * {@link WaterFill} target: capacity-blind equal levels, capacity only as a clamp. Donors
+     * (above target) feed the net buffer; the pulled amount fair-splits across recipients (below
+     * target) by deficit, so recipients fill at equal per-tick rates.
+     *
+     * <p>Churn-free by construction: targets are a pure function of total stored (unchanged by
+     * internal moves) and capacities, movement requires a &ge;1 surplus AND a &ge;1 deficit, and the
+     * pull is capped at the total deliverable deficit so nothing strands in the net buffer to be
+     * redistributed off-target by the next tick's phase 2.
+     *
+     * @return units delivered into recipients this step.
+     */
+    private static long balance(Network net, List<StorageEndpoint> storages, long budget, boolean typeLocked) {
+        int n = storages.size();
+        if (budget <= 0 || n < 2) {
             return 0;
         }
-        // Pass a fresh monotonic rotation offset per pass so the fair-split remainder recipient
-        // cycles across ticks: equal acceptors with a stable order receive equally over time
-        // instead of the first one permanently winning the leftover ±1 units.
-        long delivered = deliverTo(net, pureAcceptors, deliverBudget, net.nextRotation());
-        long remainingBudget = deliverBudget - delivered;
-        if (remainingBudget > 0) {
-            // Re-clamp to what is still stored (deliveries to pure acceptors already drained the buffer).
-            remainingBudget = Math.min(remainingBudget, net.stored());
-            if (remainingBudget > 0) {
-                delivered += deliverTo(net, bufferAcceptors, remainingBudget, net.nextRotation());
+
+        long[] caps = new long[n];
+        long[] stored = new long[n];
+        long total = 0;
+        for (int i = 0; i < n; i++) {
+            caps[i] = Math.max(0L, storages.get(i).capacity());
+            stored[i] = Math.min(Math.max(0L, storages.get(i).stored()), caps[i]);
+            total += stored[i];
+        }
+        long[] targets = WaterFill.targets(caps, total);
+
+        // The substance this balancing step will carry: the net's lock when set, else (type-locked
+        // channels with an empty net) the first donor's held resource. null for POWER. Computing
+        // deficits against the CARRIED substance matters: a recipient already holding water reports
+        // capacityFor(null) == 0, which would stall balancing after the first step.
+        String balanceId = net.lockedResourceId();
+        if (typeLocked && balanceId == null) {
+            for (int i = 0; i < n; i++) {
+                if (stored[i] - targets[i] > 0) {
+                    String r = storages.get(i).provider().resourceId();
+                    if (r != null) {
+                        balanceId = r;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Deliverable deficits (clamped by what each recipient can physically take right now).
+        long[] deficits = new long[n];
+        long totalDeficit = 0;
+        for (int i = 0; i < n; i++) {
+            long deficit = targets[i] - stored[i];
+            if (deficit <= 0) {
+                continue;
+            }
+            deficits[i] = Math.min(deficit, Math.max(0L, storages.get(i).acceptor().capacityFor(balanceId)));
+            totalDeficit += deficits[i];
+        }
+        if (totalDeficit <= 0) {
+            return 0; // everyone at/above target (floor remainder stays on donors): fixpoint.
+        }
+
+        // Pull from donors: capped by their surplus, the leftover budget, AND the total deliverable
+        // deficit (pulling more would strand resource in the net buffer = next-tick churn).
+        long pullCap = Math.min(budget, totalDeficit);
+        long pulled = 0;
+        for (int i = 0; i < n && pulled < pullCap; i++) {
+            long surplus = stored[i] - targets[i];
+            if (surplus <= 0) {
+                continue;
+            }
+            long freeSpace = net.capacity() - net.stored();
+            if (freeSpace <= 0) {
+                break; // net buffer full: backpressure, stop pulling.
+            }
+            long want = Math.min(Math.min(surplus, pullCap - pulled), freeSpace);
+            Provider provider = storages.get(i).provider();
+            String r = provider.resourceId();
+            if (typeLocked) {
+                if (r == null) {
+                    continue; // can't store null on a type-locked channel.
+                }
+                String locked = net.lockedResourceId();
+                if (locked != null && !locked.equals(r)) {
+                    continue; // type-lock: different resource, skip.
+                }
+            }
+            long offered = provider.extract(want, true);
+            long accepted = net.insert(r, offered, true);
+            long moved = Math.min(offered, accepted);
+            if (moved > 0) {
+                provider.extract(moved, false);
+                net.insert(r, moved, false);
+                pulled += moved;
+            }
+        }
+        if (pulled <= 0) {
+            return 0;
+        }
+
+        // Deliver exactly what was pulled, fair-split across recipients by deficit (re-read the lock:
+        // the pull above may have just locked an empty fluid/gas net to the balanced substance).
+        String r = net.lockedResourceId();
+        long[] alloc = FairSplitDistributor.allocate(pulled, deficits, net.nextRotation());
+        long delivered = 0;
+        for (int i = 0; i < n; i++) {
+            if (alloc[i] <= 0) {
+                continue;
+            }
+            Acceptor acceptor = storages.get(i).acceptor();
+            long accepted = acceptor.insert(r, alloc[i], true);
+            long moved = Math.min(alloc[i], accepted);
+            if (moved > 0) {
+                // Extract from net only what was truly accepted, so a lying capacityFor cannot
+                // make the network lose resource; a partial accept strands at most the difference
+                // in the net buffer, which next tick's phase 2 hands back out.
+                net.extract(moved, false);
+                acceptor.insert(r, moved, false);
+                delivered += moved;
             }
         }
         return delivered;

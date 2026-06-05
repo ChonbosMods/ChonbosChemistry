@@ -52,7 +52,8 @@ public final class NetworkEndpoints {
             List<Provider> pureProviders,
             List<Acceptor> pureAcceptors,
             List<Provider> bufferProviders,
-            List<Acceptor> bufferAcceptors) {
+            List<Acceptor> bufferAcceptors,
+            List<StorageEndpoint> storages) {
     }
 
     /**
@@ -69,6 +70,7 @@ public final class NetworkEndpoints {
         List<Acceptor> pureAcceptors = new ArrayList<>();
         List<Provider> bufferProviders = new ArrayList<>();
         List<Acceptor> bufferAcceptors = new ArrayList<>();
+        List<StorageEndpoint> storages = new ArrayList<>();
         // A neighbour block bordering two member pipes of THIS network would otherwise be wrapped twice
         // (a double share in the fair-split). Dedup by neighbour block position: once a position has
         // contributed, skip it on subsequent member-pipe hits.
@@ -95,14 +97,13 @@ public final class NetworkEndpoints {
                 boolean hasOutput = !ports.portsFor(channel, PortDirection.OUTPUT).isEmpty();
                 boolean hasInput = !ports.portsFor(channel, PortDirection.INPUT).isEmpty();
                 if (hasOutput && hasInput) {
-                    // Storage endpoint: contributes to BOTH buffer lists (when its adapters resolve).
-                    Provider provider = providerFor(channel, neighbour);
-                    if (provider != null) {
-                        bufferProviders.add(provider);
-                    }
-                    Acceptor acceptor = acceptorFor(channel, neighbour);
-                    if (acceptor != null) {
-                        bufferAcceptors.add(acceptor);
+                    // Storage endpoint: contributes the PAIRED gauge view (for the balancing phase)
+                    // whose provider/acceptor halves also feed the two buffer lists.
+                    StorageEndpoint storage = storageFor(channel, neighbour);
+                    if (storage != null) {
+                        storages.add(storage);
+                        bufferProviders.add(storage.provider());
+                        bufferAcceptors.add(storage.acceptor());
                     }
                 } else if (hasOutput) {
                     Provider provider = providerFor(channel, neighbour);
@@ -117,7 +118,19 @@ public final class NetworkEndpoints {
                 }
             }
         }
-        return new Endpoints(pureProviders, pureAcceptors, bufferProviders, bufferAcceptors);
+        return new Endpoints(pureProviders, pureAcceptors, bufferProviders, bufferAcceptors, storages);
+    }
+
+    private static StorageEndpoint storageFor(PortChannel channel, MachinePorts endpoint) {
+        if (channel == PortChannel.POWER) {
+            EnergyHandler energy = endpoint.energy();
+            return energy == null ? null : EndpointAdapters.powerStorage(energy);
+        }
+        if (channel == PortChannel.FLUID || channel == PortChannel.GAS) {
+            ResourceBuffer buffer = endpoint.resource(channel);
+            return buffer == null ? null : EndpointAdapters.resourceStorage(buffer);
+        }
+        return null; // ITEM unsupported here
     }
 
     private static Provider providerFor(PortChannel channel, MachinePorts endpoint) {

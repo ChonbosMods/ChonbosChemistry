@@ -208,6 +208,36 @@ class NetworkEndpointsTest {
     }
 
     @Test
+    void collect_storageWithBothPorts_alsoYieldsPairedStorageEndpoint() {
+        // Balancing (2026-06-05 design) needs the PAIRED view with live gauges: the same storage that
+        // feeds bufferProviders/bufferAcceptors must surface once in storages().
+        NetworkManager manager = new NetworkManager();
+        Network net = manager.getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));
+
+        FakeLookup lookup = new FakeLookup();
+        PortConfig both = PortConfig.of(List.of(
+            Port.of(0, PortChannel.POWER, PortDirection.OUTPUT),
+            Port.of(1, PortChannel.POWER, PortDirection.INPUT)));
+        EnergyBuffer battery = EnergyBuffer.withCapacity(1000L);
+        battery.receiveEnergy(250L, false);
+        lookup.put(6, 5, 5, new FakePorts(both, battery, Map.of()));
+
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        assertEquals(1, endpoints.storages().size());
+        StorageEndpoint storage = endpoints.storages().get(0);
+        assertEquals(250L, storage.stored(), "gauges must read the live buffer");
+        assertEquals(1000L, storage.capacity());
+
+        // Pure endpoints never appear in storages().
+        FakeLookup pureOnly = new FakeLookup();
+        pureOnly.put(6, 5, 5, new FakePorts(
+            portConfig(PortChannel.POWER, PortDirection.OUTPUT),
+            EnergyBuffer.withCapacity(1000L), Map.of()));
+        Network net2 = new NetworkManager().getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));
+        assertEquals(0, NetworkEndpoints.collect(net2, pureOnly).storages().size());
+    }
+
+    @Test
     void collect_pureProviderAndStorageTogether_areClassifiedSeparately() {
         // A pure source (OUTPUT only) at +X and a storage (BOTH) at -X on the same POWER network.
         NetworkManager manager = new NetworkManager();

@@ -96,6 +96,62 @@ public final class EndpointAdapters {
         };
     }
 
+    // --- Storage (paired) views for balancing ---
+
+    /** A POWER {@link StorageEndpoint} over an {@link EnergyHandler}: paired views + live gauges. */
+    public static StorageEndpoint powerStorage(EnergyHandler energy) {
+        Provider provider = powerProvider(energy);
+        Acceptor acceptor = powerAcceptor(energy);
+        return new StorageEndpoint() {
+            @Override
+            public long stored() {
+                return energy.getStored();
+            }
+
+            @Override
+            public long capacity() {
+                return energy.getMaxStored();
+            }
+
+            @Override
+            public Provider provider() {
+                return provider;
+            }
+
+            @Override
+            public Acceptor acceptor() {
+                return acceptor;
+            }
+        };
+    }
+
+    /** A FLUID/GAS {@link StorageEndpoint} over a {@link ResourceBuffer}: int gauges widened to long. */
+    public static StorageEndpoint resourceStorage(ResourceBuffer buffer) {
+        Provider provider = resourceProvider(buffer);
+        Acceptor acceptor = resourceAcceptor(buffer);
+        return new StorageEndpoint() {
+            @Override
+            public long stored() {
+                return buffer.amount();
+            }
+
+            @Override
+            public long capacity() {
+                return buffer.capacity();
+            }
+
+            @Override
+            public Provider provider() {
+                return provider;
+            }
+
+            @Override
+            public Acceptor acceptor() {
+                return acceptor;
+            }
+        };
+    }
+
     /** Clamp a {@code long} budget to non-negative {@code int} range for an int-based buffer. */
     private static int clampToInt(long value) {
         if (value <= 0L) {
