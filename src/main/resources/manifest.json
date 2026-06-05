@@ -11,7 +11,7 @@
     ],
     "Website": "https://github.com/ChonbosMods/ChonbosChemistry",
     "DisabledByDefault": false,
-    "IncludesAssetPack": false,
+    "IncludesAssetPack": true,
     "Dependencies": {},
     "OptionalDependencies": {},
     "ServerVersion": "0.5.x",

@@ -1,0 +1,106 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CC_FluidSink.name"
+  },
+  "Categories": [
+    "Blocks.Cloth"
+  ],
+  "PlayerAnimationsId": "Block",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Cube",
+    "Flags": {
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "CC_MachinePanel"
+            }
+          }
+        ]
+      }
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "SoftBlocks"
+      }
+    },
+    "BlockParticleSetId": "Dust",
+    "BlockSoundSetId": "Cloth",
+    "PhysicalMaterialId": "Wool",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/Cloth_White.png"
+      }
+    ],
+    "ParticleColor": "#f5f5f5",
+    "TextureComputedColor": "#EEEEEE",
+    "BlockEntity": {
+      "Components": {
+        "MachineBlockState": {
+          "Resources": [
+            {
+              "Channel": "fluid",
+              "Buffer": {
+                "Amount": 0,
+                "Capacity": 100000
+              }
+            }
+          ],
+          "Ports": {
+            "Ports": [
+              {
+                "Face": 0,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 1,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 2,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 3,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 4,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 5,
+                "Channel": "fluid",
+                "Direction": "input"
+              }
+            ]
+          },
+          "Work": {
+            "Progress": 0.0,
+            "Active": false
+          },
+          "Throughput": 1000,
+          "CreativeSource": false
+        }
+      }
+    },
+    "ConnectedBlockRuleSet": {
+      "Type": "CustomTemplate",
+      "TemplateShapeAssetId": "CC_FluidMachineTemplate",
+      "TemplateShapeBlockPatterns": {
+        "machine": "CC_FluidSink"
+      }
+    }
+  }
+}

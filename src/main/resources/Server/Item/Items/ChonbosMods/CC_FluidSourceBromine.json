@@ -1,0 +1,107 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CC_FluidSourceBromine.name"
+  },
+  "Categories": [
+    "Blocks.Cloth"
+  ],
+  "PlayerAnimationsId": "Block",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Cube",
+    "Flags": {
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "CC_MachinePanel"
+            }
+          }
+        ]
+      }
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "SoftBlocks"
+      }
+    },
+    "BlockParticleSetId": "Dust",
+    "BlockSoundSetId": "Cloth",
+    "PhysicalMaterialId": "Wool",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/Cloth_White.png"
+      }
+    ],
+    "ParticleColor": "#8B2500",
+    "TextureComputedColor": "#8B2500",
+    "BlockEntity": {
+      "Components": {
+        "MachineBlockState": {
+          "Resources": [
+            {
+              "Channel": "fluid",
+              "Buffer": {
+                "ResourceId": "element:bromine",
+                "Amount": 100000000,
+                "Capacity": 100000000
+              }
+            }
+          ],
+          "Ports": {
+            "Ports": [
+              {
+                "Face": 0,
+                "Channel": "fluid",
+                "Direction": "output"
+              },
+              {
+                "Face": 1,
+                "Channel": "fluid",
+                "Direction": "output"
+              },
+              {
+                "Face": 2,
+                "Channel": "fluid",
+                "Direction": "output"
+              },
+              {
+                "Face": 3,
+                "Channel": "fluid",
+                "Direction": "output"
+              },
+              {
+                "Face": 4,
+                "Channel": "fluid",
+                "Direction": "output"
+              },
+              {
+                "Face": 5,
+                "Channel": "fluid",
+                "Direction": "output"
+              }
+            ]
+          },
+          "Work": {
+            "Progress": 0.0,
+            "Active": false
+          },
+          "Throughput": 1000,
+          "CreativeSource": false
+        }
+      }
+    },
+    "ConnectedBlockRuleSet": {
+      "Type": "CustomTemplate",
+      "TemplateShapeAssetId": "CC_FluidMachineTemplate",
+      "TemplateShapeBlockPatterns": {
+        "machine": "CC_FluidSourceBromine"
+      }
+    }
+  }
+}

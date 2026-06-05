@@ -1,0 +1,441 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CC_FluidPipe.name"
+  },
+  "Categories": [
+    "Blocks.Cloth"
+  ],
+  "PlayerAnimationsId": "Block",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Model",
+    "Opacity": "Transparent",
+    "Effect": [
+      "Water"
+    ],
+    "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_node.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Weight": 1,
+        "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_off.png"
+      }
+    ],
+    "Flags": {
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "CC_MachinePanel"
+            }
+          }
+        ]
+      }
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "SoftBlocks"
+      }
+    },
+    "BlockParticleSetId": "Dust",
+    "BlockSoundSetId": "Cloth",
+    "PhysicalMaterialId": "Wool",
+    "ParticleColor": "#f5f5f5",
+    "TextureComputedColor": "#EEEEEE",
+    "State": {
+      "Definitions": {
+        "Straight": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_straight.blockymodel"
+        },
+        "Straight_Vertical": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_straight_vertical.blockymodel"
+        },
+        "Elbow": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_elbow.blockymodel"
+        },
+        "Tee": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_tee.blockymodel"
+        },
+        "Cross": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_cross.blockymodel"
+        },
+        "End": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_end.blockymodel"
+        },
+        "Tripod": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_tripod.blockymodel"
+        },
+        "Fourbent": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_fourbent.blockymodel"
+        },
+        "Five": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_five.blockymodel"
+        },
+        "Six": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_six.blockymodel"
+        },
+        "Vertical_End_Up": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_end_up.blockymodel"
+        },
+        "Vertical_End_Down": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_end_down.blockymodel"
+        },
+        "Vertical_Elbow_Up": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_elbow_up.blockymodel"
+        },
+        "Vertical_Elbow_Down": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_elbow_down.blockymodel"
+        },
+        "Vertical_Tee_Up_Ns": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_tee_up_ns.blockymodel"
+        },
+        "Vertical_Tee_Up_Ew": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_tee_up_ew.blockymodel"
+        },
+        "Vertical_Tee_Down_Ns": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_tee_down_ns.blockymodel"
+        },
+        "Vertical_Tee_Down_Ew": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_tee_down_ew.blockymodel"
+        },
+        "Vertical_3horiz_Up": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_3horiz_up.blockymodel"
+        },
+        "Vertical_3horiz_Down": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_3horiz_down.blockymodel"
+        },
+        "Vertical_Straight_Ud_Ns": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_straight_ud_ns.blockymodel"
+        },
+        "Vertical_Straight_Ud_Ew": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_straight_ud_ew.blockymodel"
+        },
+        "Tripod_Down": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_tripod_down.blockymodel"
+        },
+        "Five_Down": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_five_down.blockymodel"
+        },
+        "Vertical_Branch": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_branch.blockymodel"
+        },
+        "Vertical_3horiz_Ud": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_3horiz_ud.blockymodel"
+        },
+        "On": {
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Straight_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_straight.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Straight_Vertical_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_straight_vertical.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Elbow_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_elbow.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Tee_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_tee.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Cross_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_cross.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "End_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_end.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Tripod_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_tripod.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Fourbent_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_fourbent.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Five_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_five.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Six_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_six.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_End_Up_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_end_up.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_End_Down_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_end_down.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_Elbow_Up_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_elbow_up.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_Elbow_Down_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_elbow_down.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_Tee_Up_Ns_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_tee_up_ns.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_Tee_Up_Ew_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_tee_up_ew.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_Tee_Down_Ns_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_tee_down_ns.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_Tee_Down_Ew_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_tee_down_ew.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_3horiz_Up_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_3horiz_up.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_3horiz_Down_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_3horiz_down.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_Straight_Ud_Ns_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_straight_ud_ns.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_Straight_Ud_Ew_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_straight_ud_ew.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Tripod_Down_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_tripod_down.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Five_Down_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_five_down.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_Branch_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_branch.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        },
+        "Vertical_3horiz_Ud_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/FluidPipe_vertical_3horiz_ud.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/fluidpipe_on.png"
+            }
+          ]
+        }
+      }
+    },
+    "ConnectedBlockRuleSet": {
+      "Type": "CustomTemplate",
+      "TemplateShapeAssetId": "CC_FluidConnectedBlockTemplate",
+      "TemplateShapeBlockPatterns": {
+        "node": "CC_FluidPipe",
+        "straight": "*CC_FluidPipe_State_Definitions_Straight",
+        "straight_vertical": "*CC_FluidPipe_State_Definitions_Straight_Vertical",
+        "elbow": "*CC_FluidPipe_State_Definitions_Elbow",
+        "tee": "*CC_FluidPipe_State_Definitions_Tee",
+        "cross": "*CC_FluidPipe_State_Definitions_Cross",
+        "end": "*CC_FluidPipe_State_Definitions_End",
+        "tripod": "*CC_FluidPipe_State_Definitions_Tripod",
+        "fourbent": "*CC_FluidPipe_State_Definitions_Fourbent",
+        "five": "*CC_FluidPipe_State_Definitions_Five",
+        "six": "*CC_FluidPipe_State_Definitions_Six",
+        "vertical_end_up": "*CC_FluidPipe_State_Definitions_Vertical_End_Up",
+        "vertical_end_down": "*CC_FluidPipe_State_Definitions_Vertical_End_Down",
+        "vertical_elbow_up": "*CC_FluidPipe_State_Definitions_Vertical_Elbow_Up",
+        "vertical_elbow_down": "*CC_FluidPipe_State_Definitions_Vertical_Elbow_Down",
+        "vertical_tee_up_ns": "*CC_FluidPipe_State_Definitions_Vertical_Tee_Up_Ns",
+        "vertical_tee_up_ew": "*CC_FluidPipe_State_Definitions_Vertical_Tee_Up_Ew",
+        "vertical_tee_down_ns": "*CC_FluidPipe_State_Definitions_Vertical_Tee_Down_Ns",
+        "vertical_tee_down_ew": "*CC_FluidPipe_State_Definitions_Vertical_Tee_Down_Ew",
+        "vertical_3horiz_up": "*CC_FluidPipe_State_Definitions_Vertical_3horiz_Up",
+        "vertical_3horiz_down": "*CC_FluidPipe_State_Definitions_Vertical_3horiz_Down",
+        "vertical_straight_ud_ns": "*CC_FluidPipe_State_Definitions_Vertical_Straight_Ud_Ns",
+        "vertical_straight_ud_ew": "*CC_FluidPipe_State_Definitions_Vertical_Straight_Ud_Ew",
+        "tripod_down": "*CC_FluidPipe_State_Definitions_Tripod_Down",
+        "five_down": "*CC_FluidPipe_State_Definitions_Five_Down",
+        "vertical_branch": "*CC_FluidPipe_State_Definitions_Vertical_Branch",
+        "vertical_3horiz_ud": "*CC_FluidPipe_State_Definitions_Vertical_3horiz_Ud",
+        "node_on": "*CC_FluidPipe_State_Definitions_On",
+        "straight_on": "*CC_FluidPipe_State_Definitions_Straight_On",
+        "straight_vertical_on": "*CC_FluidPipe_State_Definitions_Straight_Vertical_On",
+        "elbow_on": "*CC_FluidPipe_State_Definitions_Elbow_On",
+        "tee_on": "*CC_FluidPipe_State_Definitions_Tee_On",
+        "cross_on": "*CC_FluidPipe_State_Definitions_Cross_On",
+        "end_on": "*CC_FluidPipe_State_Definitions_End_On",
+        "tripod_on": "*CC_FluidPipe_State_Definitions_Tripod_On",
+        "fourbent_on": "*CC_FluidPipe_State_Definitions_Fourbent_On",
+        "five_on": "*CC_FluidPipe_State_Definitions_Five_On",
+        "six_on": "*CC_FluidPipe_State_Definitions_Six_On",
+        "vertical_end_up_on": "*CC_FluidPipe_State_Definitions_Vertical_End_Up_On",
+        "vertical_end_down_on": "*CC_FluidPipe_State_Definitions_Vertical_End_Down_On",
+        "vertical_elbow_up_on": "*CC_FluidPipe_State_Definitions_Vertical_Elbow_Up_On",
+        "vertical_elbow_down_on": "*CC_FluidPipe_State_Definitions_Vertical_Elbow_Down_On",
+        "vertical_tee_up_ns_on": "*CC_FluidPipe_State_Definitions_Vertical_Tee_Up_Ns_On",
+        "vertical_tee_up_ew_on": "*CC_FluidPipe_State_Definitions_Vertical_Tee_Up_Ew_On",
+        "vertical_tee_down_ns_on": "*CC_FluidPipe_State_Definitions_Vertical_Tee_Down_Ns_On",
+        "vertical_tee_down_ew_on": "*CC_FluidPipe_State_Definitions_Vertical_Tee_Down_Ew_On",
+        "vertical_3horiz_up_on": "*CC_FluidPipe_State_Definitions_Vertical_3horiz_Up_On",
+        "vertical_3horiz_down_on": "*CC_FluidPipe_State_Definitions_Vertical_3horiz_Down_On",
+        "vertical_straight_ud_ns_on": "*CC_FluidPipe_State_Definitions_Vertical_Straight_Ud_Ns_On",
+        "vertical_straight_ud_ew_on": "*CC_FluidPipe_State_Definitions_Vertical_Straight_Ud_Ew_On",
+        "tripod_down_on": "*CC_FluidPipe_State_Definitions_Tripod_Down_On",
+        "five_down_on": "*CC_FluidPipe_State_Definitions_Five_Down_On",
+        "vertical_branch_on": "*CC_FluidPipe_State_Definitions_Vertical_Branch_On",
+        "vertical_3horiz_ud_on": "*CC_FluidPipe_State_Definitions_Vertical_3horiz_Ud_On"
+      }
+    },
+    "BlockEntity": {
+      "Components": {
+        "PipeNode": {
+          "Channel": "fluid",
+          "Tier": 0
+        }
+      }
+    }
+  }
+}

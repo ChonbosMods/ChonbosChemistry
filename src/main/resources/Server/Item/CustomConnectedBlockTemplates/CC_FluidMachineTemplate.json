@@ -1,0 +1,30 @@
+{
+  "ConnectsToOtherMaterials": true,
+  "DontUpdateAfterInitialPlacement": true,
+  "DefaultShape": "machine",
+  "Shapes": {
+    "machine": {
+      "FaceTags": {
+        "North": [
+          "CC_FluidFace"
+        ],
+        "South": [
+          "CC_FluidFace"
+        ],
+        "East": [
+          "CC_FluidFace"
+        ],
+        "West": [
+          "CC_FluidFace"
+        ],
+        "Up": [
+          "CC_FluidFace"
+        ],
+        "Down": [
+          "CC_FluidFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    }
+  }
+}
