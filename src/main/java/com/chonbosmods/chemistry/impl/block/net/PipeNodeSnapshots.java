@@ -18,7 +18,7 @@ import java.util.Map;
  * and machines via the {@code CC_*MachineTemplate}s) triggers that pass on neighbors up to depth 3,
  * so a topology change silently destroys the wiped pipes' persisted network shares. POWER networks
  * mostly dodged it (a charged machine's break is cancelled and replaced by a bare
- * {@code setBlock(EMPTY)} that skips the neighbor pass: {@code MachineBreakEventSystem}); FLUID/GAS
+ * {@code setBlock(EMPTY)} that skips the neighbor pass: {@code CarryBreakEventSystem}); FLUID/GAS
  * additionally dropped wiped shares on rebuild because a null {@code resourceId} cannot re-pool
  * onto a type-locked channel.
  *

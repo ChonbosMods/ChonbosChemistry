@@ -1,6 +1,6 @@
 package com.chonbosmods.chemistry.impl.block;
 
-import com.chonbosmods.chemistry.api.energy.EnergyHandler;
+import com.hypixel.hytale.codec.EmptyExtraInfo;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.Archetype;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -19,47 +19,52 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.accessor.BlockAccessor;
+import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.List;
 import javax.annotation.Nonnull;
+import org.bson.BsonDocument;
+import org.bson.BsonValue;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 
 /**
- * Break-side glue (H7): when a player breaks a machine block whose {@link MachineBlockState} carries
- * stored energy, the dropped item is stamped with that energy under {@link MachineEnergyMetadata#KEY}
- * so {@link MachinePlaceEventSystem} can rehydrate it on placement.
+ * Break-side carry glue (H7, rebuilt on the native BlockHolder path 2026-06-05): when a player breaks
+ * a machine or tank with preservable contents ({@link BlockHolderCarry#shouldCarry}), the dropped
+ * item is stamped with the block entity's FULL encoded {@code Holder<ChunkStore>} under the engine's
+ * {@code "BlockHolder"} metadata key. Placement needs no mod code at all: the engine's
+ * {@code BlockPlaceUtils.onPlaceBlockSuccess} natively decodes that document and restores every
+ * component (energy, resource buffers + type-locks, work progress) via {@code WorldChunk.setState}.
+ * This supersedes the CC_StoredEnergy single-field carry and its place-side rehydration system.
  *
- * <h2>Mechanism (copied from the HyProTech reference)</h2>
+ * <h2>Mechanism (HyProTech-style cancel + custom drop)</h2>
  * {@link BreakBlockEvent} fires BEFORE the engine removes the block (verified in the decompiled 0.5.3
- * {@code BlockHarvestUtils.performBlockBreak}: the event is invoked, then {@code naturallyRemoveBlock}
- * spawns the vanilla drop). Because the engine's own drop is a plain stack we cannot stamp, we follow
- * HyProTech: read the live block entity at break time, and if it holds positive stored energy, CANCEL
- * the event and perform our own break on the next world tick: clear the block and spawn a single custom
- * drop carrying the energy metadata. An empty machine (or any non-machine block) is left entirely to the
- * engine: we do not cancel, so vanilla drops/sounds/particles are untouched.
+ * {@code BlockHarvestUtils.performBlockBreak}). Because the engine's own drop is a plain stack we
+ * cannot stamp, we CANCEL the event when contents are worth carrying and perform our own break on the
+ * next world tick: capture + encode the live block entity holder, clear the block (mirroring the
+ * vanilla connected-block neighbour pass, H8b), and spawn a single stamped drop. An empty machine/tank
+ * (or any other block) is left entirely to the engine: vanilla drops/sounds/particles untouched.
  *
- * <p>The deferred {@code world.execute(...)} runs the setBlock + drop on the WorldThread (same timing
- * trick HyProTech uses), guaranteeing chunk/section access is thread-safe.
- *
- * <p><b>Thin by design.</b> All testable logic lives in {@link MachineEnergyMetadata} (unit-tested);
- * this system is engine glue verified in-game. Defensive: it never throws (missing world, missing
- * block entity, or no energy all fall through to vanilla behaviour).
+ * <p><b>Thin by design.</b> The stamping seam and carry predicates live in {@link BlockHolderCarry}
+ * (unit-tested); this system is engine glue verified in-game. Defensive: it never throws, and an
+ * encode failure degrades to a plain (uncharged) drop rather than no drop.
  */
-public final class MachineBreakEventSystem extends EntityEventSystem<EntityStore, BreakBlockEvent> {
+public final class CarryBreakEventSystem extends EntityEventSystem<EntityStore, BreakBlockEvent> {
 
     private final ComponentType<ChunkStore, MachineBlockState> machineType;
+    private final ComponentType<ChunkStore, TankBlockState> tankType;
     private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.net.PipeNode> pipeType;
     private final com.chonbosmods.chemistry.impl.block.net.NetworkService networkService;
 
-    public MachineBreakEventSystem(
+    public CarryBreakEventSystem(
             @Nonnull ComponentType<ChunkStore, MachineBlockState> machineType,
+            @Nonnull ComponentType<ChunkStore, TankBlockState> tankType,
             @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.net.PipeNode> pipeType,
             @Nonnull com.chonbosmods.chemistry.impl.block.net.NetworkService networkService) {
         super(BreakBlockEvent.class);
         this.machineType = machineType;
+        this.tankType = tankType;
         this.pipeType = pipeType;
         this.networkService = networkService;
     }
@@ -85,16 +90,17 @@ public final class MachineBreakEventSystem extends EntityEventSystem<EntityStore
                 return;
             }
 
-            // Read the live machine block entity (still present: break fires pre-removal).
+            // Read the live block entity (still present: break fires pre-removal). Carry only when
+            // there are contents worth preserving; everything else stays fully vanilla.
             MachineBlockState machine = BlockModule.getComponent(machineType, world, pos.x(), pos.y(), pos.z());
-            if (machine == null) {
-                return; // not a machine block -> leave to vanilla.
+            boolean carry = BlockHolderCarry.shouldCarry(machine);
+            if (!carry) {
+                TankBlockState tank = BlockModule.getComponent(tankType, world, pos.x(), pos.y(), pos.z());
+                carry = BlockHolderCarry.shouldCarry(tank);
             }
-            EnergyHandler energy = machine.energy();
-            if (energy == null || energy.getStored() <= 0L) {
-                return; // no charge worth preserving -> leave to vanilla.
+            if (!carry) {
+                return;
             }
-            long stored = energy.getStored();
 
             // Resolve the item this block drops as (its own item form). Without one we cannot carry the
             // metadata, so bail to vanilla rather than dropping nothing.
@@ -112,21 +118,25 @@ public final class MachineBreakEventSystem extends EntityEventSystem<EntityStore
             world.execute(() -> {
                 try {
                     long chunkIndex = ChunkUtil.indexChunkFromBlock(x, z);
-                    com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk chunk =
-                        world.getChunkIfLoaded(chunkIndex);
+                    WorldChunk chunk = world.getChunkIfLoaded(chunkIndex);
                     if (chunk == null) {
                         return;
                     }
-                    // Confirm the block is still our machine before clearing (defensive against races).
+                    // Confirm the block is still there before clearing (defensive against races).
                     BlockType actual = chunk.getBlockType(x, y, z);
                     if (actual == null || actual == BlockType.EMPTY) {
                         return;
                     }
+
+                    // Capture + encode the FULL block entity NOW, before removal: the encode snapshots
+                    // every component into BSON, so the subsequent setBlock cannot touch it.
+                    BsonDocument holderDoc = encodeBlockEntity(chunk, x, y, z);
+
                     chunk.setBlock(x, y, z, BlockType.EMPTY);
 
                     // H8b: mirror the vanilla break path's connected-block neighbor pass
                     // (BlockHarvestUtils does this after removal) so adjacent pipes re-resolve their
-                    // shapes: without it, cables kept a phantom arm pointing at the removed machine.
+                    // shapes: without it, cables kept a phantom arm pointing at the removed block.
                     // The pass factory-resets re-resolved pipes' block entities, so RE-SNAPSHOT the
                     // surrounding pipes first: the event-time snapshots may already have been spent
                     // by a tick pass that ran between the (cancelled) event and this deferred break.
@@ -146,7 +156,8 @@ public final class MachineBreakEventSystem extends EntityEventSystem<EntityStore
                         // Visual reshape must never block the drop below.
                     }
 
-                    ItemStack drop = MachineEnergyMetadata.writeStoredEnergy(new ItemStack(dropItemId, 1), stored);
+                    // Stamp the encoded entity onto the drop; a failed encode degrades to a plain drop.
+                    ItemStack drop = BlockHolderCarry.stampStack(new ItemStack(dropItemId, 1), holderDoc);
                     spawnDrop(world, drop, x, y, z);
                 } catch (Throwable ignored) {
                     // Never let a break handler crash the world thread.
@@ -154,6 +165,23 @@ public final class MachineBreakEventSystem extends EntityEventSystem<EntityStore
             });
         } catch (Throwable ignored) {
             // Defensive: a break handler must never throw.
+        }
+    }
+
+    /**
+     * The block entity at (x,y,z) encoded as the engine's persistable entity document, or null on any
+     * failure (no entity, codec error): callers degrade to a plain drop.
+     */
+    private static BsonDocument encodeBlockEntity(WorldChunk chunk, int x, int y, int z) {
+        try {
+            Holder<ChunkStore> holder = chunk.getBlockComponentHolder(x, y, z);
+            if (holder == null) {
+                return null;
+            }
+            BsonValue encoded = ChunkStore.REGISTRY.getEntityCodec().encode(holder, EmptyExtraInfo.EMPTY);
+            return encoded == null || !encoded.isDocument() ? null : encoded.asDocument();
+        } catch (Throwable t) {
+            return null;
         }
     }
 

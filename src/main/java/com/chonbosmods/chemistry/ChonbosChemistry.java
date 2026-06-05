@@ -2,8 +2,7 @@ package com.chonbosmods.chemistry;
 
 import com.chonbosmods.chemistry.api.registry.Chemistry;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
-import com.chonbosmods.chemistry.impl.block.MachineBreakEventSystem;
-import com.chonbosmods.chemistry.impl.block.MachinePlaceEventSystem;
+import com.chonbosmods.chemistry.impl.block.CarryBreakEventSystem;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
@@ -121,14 +120,14 @@ public class ChonbosChemistry extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService, pipeComponentType));
         getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService, pipeComponentType));
 
-        // Machine contents-preservation (H7): a machine block broken with stored energy drops an item
-        // carrying that energy (MachineBreakEventSystem), and placing such an item rehydrates the new
-        // block entity's energy buffer (MachinePlaceEventSystem). Both fire on the EntityStore (the
-        // acting entity), like the pipe events above. Pure capture/restore logic lives in
-        // MachineEnergyMetadata (unit-tested); these systems are thin glue verified in-game.
-        getEntityStoreRegistry().registerSystem(new MachineBreakEventSystem(machineComponentType, pipeComponentType, networkService));
-        getEntityStoreRegistry().registerSystem(new MachinePlaceEventSystem(machineComponentType));
-        getLogger().atInfo().log("Registered machine energy break/place preservation events.");
+        // Contents-preservation (H7, rebuilt 2026-06-05 on the engine's native BlockHolder path): a
+        // machine or tank broken with contents drops an item carrying the FULL encoded block entity
+        // under "BlockHolder" (CarryBreakEventSystem). Placement needs no mod code: the engine's
+        // BlockPlaceUtils.onPlaceBlockSuccess natively restores every component. Pure stamping/predicate
+        // logic lives in BlockHolderCarry (unit-tested); the system is thin glue verified in-game.
+        getEntityStoreRegistry().registerSystem(new CarryBreakEventSystem(
+            machineComponentType, tankComponentType, pipeComponentType, networkService));
+        getLogger().atInfo().log("Registered CarryBreakEventSystem (BlockHolder contents carry).");
         // NOTE: NO ChunkUnloadEvent handler. In Server 0.5.3 the engine's ChunkUnloadingSystem dispatches
         // ChunkUnloadEvent from PARALLEL worker threads (forEachEntityParallel), and delivering it to an
         // EntityEventSystem forks a command buffer that asserts it is on the WorldThread -> the WorldThread
