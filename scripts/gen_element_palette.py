@@ -8,7 +8,7 @@ import json
 import math
 import colorsys
 from pathlib import Path
-from palette_lib import to_hex, parse_hex
+from palette_lib import to_hex, parse_hex, hsv_hex
 
 # symbol: (source, hex, exempt_reason_or_empty, rationale)
 CURATED = {
@@ -132,11 +132,6 @@ def tier_of(z):
     if z >= 104:
         return "superheavy"
     return "metal"
-
-
-def hsv_hex(h, s, v):
-    r, g, b = colorsys.hsv_to_rgb(h % 1.0, s, v)
-    return to_hex((round(r * 255), round(g * 255), round(b * 255)))
 
 
 def place(base_h, s0, v0, placed):

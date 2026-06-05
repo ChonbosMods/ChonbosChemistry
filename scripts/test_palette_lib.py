@@ -1,5 +1,5 @@
 import unittest
-from palette_lib import parse_hex, to_hex, hsv, rgb_distance, check_gates
+from palette_lib import parse_hex, to_hex, hsv, hsv_hex, rgb_distance, check_gates
 
 
 class PaletteLibTest(unittest.TestCase):
@@ -14,6 +14,14 @@ class PaletteLibTest(unittest.TestCase):
         _, s2, v2 = hsv((128, 128, 128))
         self.assertAlmostEqual(s2, 0.0)
         self.assertAlmostEqual(v2, 128 / 255)
+
+    def test_hsv_hex(self):
+        self.assertEqual(hsv_hex(0, 1, 1), "#FF0000")
+        # round-trips through hsv(parse_hex(...)) back to the same hue/sat/value
+        h, s, v = hsv(parse_hex(hsv_hex(0, 1, 1)))
+        self.assertAlmostEqual(h, 0.0)
+        self.assertAlmostEqual(s, 1.0)
+        self.assertAlmostEqual(v, 1.0)
 
     def test_rgb_distance(self):
         self.assertAlmostEqual(rgb_distance((0, 0, 0), (3, 4, 0)), 5.0)

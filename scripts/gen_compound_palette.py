@@ -20,7 +20,7 @@ import colorsys
 import json
 import math
 from pathlib import Path
-from palette_lib import to_hex, parse_hex
+from palette_lib import to_hex, parse_hex, hsv_hex
 
 MIN_DIST = 10.0   # must match the apply_palette compound min distance (distinct whites)
 
@@ -202,11 +202,6 @@ NONMETALS = {"H", "C", "N", "O", "S", "P", "Cl", "F", "Br", "I", "Se", "B", "Si"
 def blend(base_hex, tint_hex, pct):
     b, t = parse_hex(base_hex), parse_hex(tint_hex)
     return to_hex(tuple(round(bb + (tt - bb) * pct) for bb, tt in zip(b, t)))
-
-
-def hsv_hex(h, s, v):
-    r, g, b = colorsys.hsv_to_rgb(h % 1.0, s, v)
-    return to_hex((round(r * 255), round(g * 255), round(b * 255)))
 
 
 # Gate band the apply step enforces (mirror of apply_palette / palette_lib constants).

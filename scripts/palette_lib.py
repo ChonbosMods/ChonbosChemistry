@@ -20,6 +20,11 @@ def hsv(rgb):
     return colorsys.rgb_to_hsv(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255)
 
 
+def hsv_hex(h, s, v):
+    r, g, b = colorsys.hsv_to_rgb(h % 1.0, s, v)
+    return to_hex((round(r * 255), round(g * 255), round(b * 255)))
+
+
 def rgb_distance(a, b):
     return math.dist(a, b)
 
