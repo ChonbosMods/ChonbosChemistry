@@ -57,7 +57,7 @@ def apply(table_path, data_path, key_field, min_dist):
     for rec in records:
         rec["Color"] = by_key[rec[key_field]]["hex"]
         note = rec.get("Notes") or ""
-        if "placeholder for colorless" in note:
+        if STALE_NOTE.search(note):
             rec["Notes"] = strip_placeholder_note(note)
     Path(data_path).write_text(json.dumps(records, indent=2) + "\n")
     print(f"applied {len(rows)} colors -> {data_path}")
