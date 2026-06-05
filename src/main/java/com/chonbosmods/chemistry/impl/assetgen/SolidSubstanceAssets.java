@@ -1,5 +1,6 @@
 package com.chonbosmods.chemistry.impl.assetgen;
 
+import com.chonbosmods.chemistry.api.substance.Color;
 import com.chonbosmods.chemistry.api.substance.Element;
 import com.chonbosmods.chemistry.api.substance.Substance;
 
@@ -13,6 +14,7 @@ import com.chonbosmods.chemistry.api.substance.Substance;
 public final class SolidSubstanceAssets {
 
     public static final String MODEL = "Items/Chemistry/Solid.blockymodel";
+    public static final String MODEL_GLOW = "Items/Chemistry/SolidGlow.blockymodel";
     public static final String CATEGORY = "Blocks.Deco";
 
     private SolidSubstanceAssets() {}
@@ -51,12 +53,53 @@ public final class SolidSubstanceAssets {
     }
 
     /**
+     * 4-bit-per-channel light color for {@code BlockType.Light}, scaled so the brightest channel
+     * hits the tier's cap (NONE&rarr;null, FAINT&rarr;5, STRONG&rarr;10, FIERCE&rarr;15). Returns
+     * {@code null} when the tier emits no light or the color is black. Formatted {@code "#%X%X%X"}.
+     */
+    public static String lightJson(Color c, GlowTier tier) {
+        int cap = switch (tier) {
+            case NONE -> 0;
+            case FAINT -> 5;
+            case STRONG -> 10;
+            case FIERCE -> 15;
+        };
+        if (cap == 0) {
+            return null;
+        }
+        int max = Math.max(c.r(), Math.max(c.g(), c.b()));
+        if (max == 0) {
+            return null;
+        }
+        return "#%X%X%X".formatted(
+            (c.r() * cap + max / 2) / max,
+            (c.g() * cap + max / 2) / max,
+            (c.b() * cap + max / 2) / max);
+    }
+
+    /**
      * The {@code Server/Item/Items/...} JSON for one solid-substance item, modeled on the vanilla
      * {@code Deco_Mug}: a placeable model-block so the jar renders in-hand and can be placed. The
      * substance color rides on {@code BlockType.CustomModelTexture}. {@code Icon} is omitted so the
      * engine renders a per-substance icon from the tinted model.
+     *
+     * <p>Non-glowing default: uses the flat-liquid {@link #MODEL} and emits no light.
      */
     public static String itemJson(String id, String texturePath) {
+        return itemJson(id, texturePath, GlowTier.NONE, null);
+    }
+
+    /**
+     * As {@link #itemJson(String, String)}, but tier-aware: glowing tiers use the fullbright
+     * {@link #MODEL_GLOW}, and a non-null {@code lightColor} splices a {@code BlockType.Light}
+     * entry so placed glowing jars emit real light. {@code lightColor} comes from
+     * {@link #lightJson(Color, GlowTier)}; pass {@code null} (and {@link GlowTier#NONE}) to opt out.
+     */
+    public static String itemJson(String id, String texturePath, GlowTier tier, String lightColor) {
+        String model = tier == GlowTier.NONE ? MODEL : MODEL_GLOW;
+        String light = lightColor == null
+            ? ""
+            : "\n    \"Light\": { \"Color\": \"%s\" },".formatted(lightColor);
         return """
             {
               "TranslationProperties": { "Name": "server.items.%s.name" },
@@ -66,7 +109,7 @@ public final class SolidSubstanceAssets {
               "BlockType": {
                 "Material": "Solid",
                 "DrawType": "Model",
-                "Opacity": "Transparent",
+                "Opacity": "Transparent",%s
                 "CustomModel": "%s",
                 "CustomModelTexture": [ { "Weight": 1, "Texture": "%s" } ],
                 "CustomModelScale": 0.45,
@@ -80,6 +123,6 @@ public final class SolidSubstanceAssets {
               "PlayerAnimationsId": "Item",
               "Scale": 1.0
             }
-            """.formatted(id, CATEGORY, id, MODEL, texturePath);
+            """.formatted(id, CATEGORY, id, light, model, texturePath);
     }
 }
