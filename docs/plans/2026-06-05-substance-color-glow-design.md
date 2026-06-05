@@ -117,7 +117,7 @@ No new data fields. A pure derivation function (`impl.assetgen`, TDD) computes a
 **glow tier** per substance from what the registry already holds:
 
 - **Elements** (via their isotope list): any stable isotope → **none**. No stable
-  isotopes but geologically long-lived (Th, U, Bi) → **faint**. Properly hot
+  isotopes but geologically long-lived (Th, U) → **faint**. Properly hot
   (Tc, Pm, Po, Rn, Ra, Ac...) → **strong**. Synthetic short-lived (roughly Z≥100) →
   **fierce**.
 - **Compounds** (`IsRadioactive`, already isotope-aware): false → none; true → tier from
@@ -155,8 +155,10 @@ Automated checks:
    a documented exception list.
 3. **Schema integrity:** the existing full-dataset decode test (944 records) stays
    green; round-trip preserves everything but `Color`.
-4. **Glow unit tests:** `GlowDeriver` pinned on the tricky cases: Bi (radioactive but
-   ~10¹⁹ y → faint), Tc/Pm (no stable isotopes), W-180-style "observationally stable"
+4. **Glow unit tests:** `GlowDeriver` pinned on the tricky cases: Bi → none (the dataset
+   marks Bi-209 observationally stable, same rule as W-180: the design's original
+   'Bi → faint' assumption was contradicted by the data), Tc/Pm (no stable isotopes),
+   W-180-style "observationally stable"
    stays none (the README's non-monotonicity warning applies), compounds with and
    without resolvable isotopes.
 

@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  */
 public final class GlowDeriver {
 
-    /** Geologic threshold: longest-lived isotope at/above this half-life reads as FAINT (Th, U, Bi). */
+    /** Geologic threshold: longest-lived isotope at/above this half-life reads as FAINT (Th, U). */
     static final double FAINT_HALF_LIFE_SECONDS = 1e16;
     /** Synthetic short-lived superheavies (Fm and up) read as FIERCE. */
     static final int FIERCE_MIN_Z = 100;
@@ -68,6 +68,8 @@ public final class GlowDeriver {
         return best == GlowTier.NONE ? GlowTier.STRONG : best;
     }
 
+    // A compound reaches FIERCE only via a Z>=100 constituent element (see element tierFor),
+    // never via a notes-referenced nuclide: isotopeTier caps at STRONG by design.
     private static GlowTier isotopeTier(Isotope isotope) {
         if (isotope.stability() == Stability.STABLE) {
             return GlowTier.NONE;
