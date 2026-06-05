@@ -15,9 +15,16 @@ Boundary resolutions tracked in the brainstorm (see also foundation doc):
 - **Phase Changer (§11) vs. foundation §6.2 phase-transition machines** → reconcile to one machine. *(pending)*
 - **Decay model** → owned by foundation hooks; Decay Vault (§3) *consumes* them. *(pending)*
 
-### Implementation status (2026-06-04) — POWER transport COMPLETE, machines next
+### Implementation status (2026-06-05) — POWER + FLUID transport complete and polished, machines next
 
-The transport-network rework plan (`docs/plans/2026-06-03-transport-network-rework-plan.md`) is **fully executed** (Phase N + Phase H, all tasks) and **in-game verified by the user**. 225 headless tests green. Branch: `feat/solid-substance-assets` (the de-facto mainline: 54 commits ahead of `main`; pushed to origin except the user's latest UV fix; local `main` also has 11 unpushed commits incl. the registry merge).
+The transport-network rework plan (`docs/plans/2026-06-03-transport-network-rework-plan.md`) is **fully executed** (Phase N + Phase H, all tasks) and **in-game verified by the user**. Everything is consolidated on local `main` (285 headless tests green; ~102 commits unpushed to origin).
+
+**2026-06-05 quick-wins pass (all in-game verified):**
+- **Live panel refresh:** machine/tank/pipe panels update every 10 ticks while open (`PanelSnapshot` pure render model + `PanelRefreshService`/`PanelRefreshSystem`; auto-close on stale block). `docs/plans/2026-06-05-live-refresh-panel-design.md`.
+- **Storage balancing:** batteries AND fluid/gas tanks on one network drift to water-fill targets (capacity-blind equal levels, capacity only clamps) using leftover per-tick budget only; churn-free. `docs/plans/2026-06-05-storage-balancing-design.md`.
+- **BlockHolder contents carry:** tanks + machines carry FULL state (energy, buffers, type-locks, work progress) across break/place via the engine's native `"BlockHolder"` metadata path; place-side is zero mod code. Supersedes `CC_StoredEnergy`/`MachineEnergyMetadata` (removed). `docs/plans/2026-06-05-blockholder-carry-design.md`.
+- **Restart persistence:** spot-checked headlessly (codec round-trip into a fresh `NetworkManager`, fluid type-lock recovery) and in-game (server restart).
+- Plus (parallel session): **CC_FluidPipe live end-to-end** (bromine/ethanol sources, type-lock, H8/H8b wipe-recovery) and the **substance color/glow pass**.
 
 **Built and working (energy/POWER channel, end-to-end):**
 - **Energy standard (§7):** `api.energy.EnergyHandler` + `impl.block.EnergyBuffer`: `long` amounts, external (`maxReceive`/`maxExtract`-capped) vs internal transfer paths, ratio helpers, optional-codec rate fields (shared `OptionalLongCodec` incl. the raw-JSON path).
@@ -28,9 +35,9 @@ The transport-network rework plan (`docs/plans/2026-06-03-transport-network-rewo
 
 **Not started / deferred (the remaining roadmap):**
 1. **§3 + §9 machines & recipes: THE NEXT MILESTONE.** The `MachineTickSystem` work pass is still a stub; everything it needs (power, transport, buffers, run-dry rules, GUI scaffold, ON/OFF state mechanism per §16-style `State.Definitions` + `setBlockInteractionState`) now exists. Chemistry trio first (Synthesizer/Decomposer/Converter, recipes auto-derived from the dataset).
-2. **FLUID/GAS pipes:** deferred by explicit user decision until energy is fully fleshed out; the network layer is channel-generic (mostly assets + a tier table + `ResourceBuffer` endpoints).
-3. **ITEM pipes (§13.4) and NEUTRON pipes (§13.5):** own later plans. **§11 heat, §14 redstone, §15 electrified benches:** designed, not started.
-4. Small deferred items: pipe tooltip icon (Blockbench render staged at `~/Development/Hytale/models/staging/pipe-icon/`; NOTE pipe models use per-axis `stretch` which the Blockbench viewport ignores: bake stretch before screenshotting), live-refresh GUI (`sendUpdate` hook ready), battery↔battery balancing, tank/resource carry (use `BlockHolder`), chunk-unload eviction via a WorldThread-safe hook, real block-face-index alignment, network split/merge optimization (vs drop-and-rebuild), all `[TUNE]` numbers, server-restart pipe-energy persistence spot-check.
+2. **GAS pipes:** next transport step (FLUID is live as of 2026-06-04): the network layer is channel-generic, so this is mostly assets (gas pipe model/texture in progress on the art track) + a tier table + test sources. **ITEM pipes (§13.4) and NEUTRON pipes (§13.5):** own later plans.
+3. **§11 heat, §14 redstone, §15 electrified benches:** designed, not started.
+4. Small deferred items: pipe tooltip icon (Blockbench render staged at `~/Development/Hytale/models/staging/pipe-icon/`; NOTE pipe models use per-axis `stretch` which the Blockbench viewport ignores: bake stretch before screenshotting), chunk-unload eviction via a WorldThread-safe hook, real block-face-index alignment, network split/merge optimization (vs drop-and-rebuild), all `[TUNE]` numbers. *(Done 2026-06-05: live-refresh GUI, battery↔battery balancing, tank/resource carry via `BlockHolder`, restart persistence spot-check.)*
 
 ### Revision: transport architecture (supersedes the adjacency model)
 
