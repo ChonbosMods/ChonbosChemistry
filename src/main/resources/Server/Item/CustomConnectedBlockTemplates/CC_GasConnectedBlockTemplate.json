@@ -1,5 +1,5 @@
 {
-  "ConnectsToOtherMaterials": false,
+  "ConnectsToOtherMaterials": true,
   "DefaultShape": "node",
   "Shapes": {
     "six": {
@@ -126,6 +126,9 @@
         ],
         "Up": [
           "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
         ]
       },
       "PatternsToMatchAnyOf": [
@@ -227,6 +230,9 @@
           "CC_GasFace"
         ],
         "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
           "CC_GasFace"
         ],
         "Down": [
@@ -331,6 +337,9 @@
         "East": [
           "CC_GasFace"
         ],
+        "West": [
+          "CC_GasFace"
+        ],
         "Up": [
           "CC_GasFace"
         ],
@@ -341,7 +350,7 @@
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -441,6 +450,12 @@
         ],
         "West": [
           "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
         ]
       },
       "PatternsToMatchAnyOf": [
@@ -535,7 +550,13 @@
         "North": [
           "CC_GasFace"
         ],
+        "South": [
+          "CC_GasFace"
+        ],
         "East": [
+          "CC_GasFace"
+        ],
+        "West": [
           "CC_GasFace"
         ],
         "Up": [
@@ -548,7 +569,7 @@
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -646,14 +667,20 @@
         "East": [
           "CC_GasFace"
         ],
+        "West": [
+          "CC_GasFace"
+        ],
         "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
           "CC_GasFace"
         ]
       },
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -752,6 +779,12 @@
         "East": [
           "CC_GasFace"
         ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
         "Down": [
           "CC_GasFace"
         ]
@@ -759,7 +792,7 @@
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -853,6 +886,12 @@
           "CC_GasFace"
         ],
         "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
           "CC_GasFace"
         ],
         "Up": [
@@ -951,6 +990,12 @@
     },
     "vertical_straight_ud_ew": {
       "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
         "East": [
           "CC_GasFace"
         ],
@@ -1061,12 +1106,21 @@
         ],
         "East": [
           "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
         ]
       },
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -1158,17 +1212,26 @@
         "North": [
           "CC_GasFace"
         ],
+        "South": [
+          "CC_GasFace"
+        ],
         "East": [
           "CC_GasFace"
         ],
+        "West": [
+          "CC_GasFace"
+        ],
         "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
           "CC_GasFace"
         ]
       },
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -1260,7 +1323,16 @@
         "North": [
           "CC_GasFace"
         ],
+        "South": [
+          "CC_GasFace"
+        ],
         "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
           "CC_GasFace"
         ],
         "Down": [
@@ -1270,7 +1342,7 @@
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -1365,7 +1437,16 @@
         "South": [
           "CC_GasFace"
         ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
         "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
           "CC_GasFace"
         ]
       },
@@ -1458,6 +1539,12 @@
     },
     "vertical_tee_up_ew": {
       "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
         "East": [
           "CC_GasFace"
         ],
@@ -1465,6 +1552,9 @@
           "CC_GasFace"
         ],
         "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
           "CC_GasFace"
         ]
       },
@@ -1563,6 +1653,15 @@
         "South": [
           "CC_GasFace"
         ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
         "Down": [
           "CC_GasFace"
         ]
@@ -1656,10 +1755,19 @@
     },
     "vertical_tee_down_ew": {
       "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
         "East": [
           "CC_GasFace"
         ],
         "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
           "CC_GasFace"
         ],
         "Down": [
@@ -1758,6 +1866,15 @@
         "North": [
           "CC_GasFace"
         ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
         "Up": [
           "CC_GasFace"
         ],
@@ -1768,7 +1885,7 @@
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -1860,14 +1977,26 @@
         "North": [
           "CC_GasFace"
         ],
+        "South": [
+          "CC_GasFace"
+        ],
         "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
           "CC_GasFace"
         ]
       },
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -1961,12 +2090,24 @@
         ],
         "South": [
           "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
         ]
       },
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -2055,6 +2196,18 @@
     },
     "straight_vertical": {
       "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
         "Up": [
           "CC_GasFace"
         ],
@@ -2154,14 +2307,26 @@
         "North": [
           "CC_GasFace"
         ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
         "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
           "CC_GasFace"
         ]
       },
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -2253,6 +2418,18 @@
         "North": [
           "CC_GasFace"
         ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
         "Down": [
           "CC_GasFace"
         ]
@@ -2260,7 +2437,7 @@
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -2351,12 +2528,27 @@
       "FaceTags": {
         "North": [
           "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
         ]
       },
       "PatternsToMatchAnyOf": [
         {
           "Type": "Custom",
-          "TransformRulesToOrientation": true,
+          "TransformRulesToOrientation": false,
           "RulesToMatch": [
             {
               "Position": {
@@ -2445,7 +2637,22 @@
     },
     "vertical_end_up": {
       "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
         "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
           "CC_GasFace"
         ]
       },
@@ -2538,6 +2745,21 @@
     },
     "vertical_end_down": {
       "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
         "Down": [
           "CC_GasFace"
         ]
@@ -2630,6 +2852,627 @@
       ]
     },
     "node": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "six_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "five_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "five_down_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_3horiz_ud_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "cross_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "fourbent_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_3horiz_up_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_3horiz_down_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_straight_ud_ns_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_straight_ud_ew_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "tee_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "tripod_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "tripod_down_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_tee_up_ns_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_tee_up_ew_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_tee_down_ns_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_tee_down_ew_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_branch_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "elbow_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "straight_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "straight_vertical_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_elbow_up_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_elbow_down_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "end_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_up_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_down_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "node_on": {
       "FaceTags": {
         "North": [
           "CC_GasFace"

@@ -1,0 +1,30 @@
+{
+  "ConnectsToOtherMaterials": true,
+  "DontUpdateAfterInitialPlacement": true,
+  "DefaultShape": "machine",
+  "Shapes": {
+    "machine": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    }
+  }
+}
