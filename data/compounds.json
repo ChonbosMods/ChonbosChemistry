@@ -759,7 +759,7 @@
       "AntidoteNote": "fresh air; irrigation; supportive"
     },
     "IsRadioactive": false,
-    "Notes": "density given as gas at STP; fertilizer feedstock and refrigerant; colorless (white hex is placeholder)",
+    "Notes": "density given as gas at STP; fertilizer feedstock and refrigerant; colorless",
     "ValueConfidence": "measured"
   },
   {
@@ -2280,7 +2280,7 @@
       "Bioaccumulation": "none"
     },
     "IsRadioactive": false,
-    "Notes": "the universal solvent; colorless (hex is a faint placeholder tint)",
+    "Notes": "the universal solvent; colorless",
     "ValueConfidence": "measured"
   },
   {

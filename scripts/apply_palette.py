@@ -23,10 +23,17 @@ MIN_V, MAX_V, MIN_S = 0.45, 0.92, 0.10
 # boundaries (';') or unrelated parentheses.
 STALE_NOTE = re.compile(r"colorless in pure form\s*\(?[^();]*placeholder for colorless\)?\.?")
 
+# Some compound Notes keep the factually-fine "...colorless" prose but tack on a
+# parenthetical hex-claim, e.g. "colorless (hex is a faint placeholder tint)" or
+# "colorless (white hex is placeholder)". Under the game-color convention that
+# hex-claim is false, so strip only the parenthetical and keep the leading prose.
+STALE_HEX_PAREN = re.compile(r"\s*\((?:white )?hex is (?:a )?[^)]*placeholder[^)]*\)")
+
 
 def strip_placeholder_note(note):
     """Remove the stale colorless/placeholder clause and tidy leftover separators."""
     out = STALE_NOTE.sub("", note)
+    out = STALE_HEX_PAREN.sub("", out)
     out = re.sub(r"\s*;\s*;\s*", "; ", out)  # collapse '; ;' left by an embedded clause
     out = re.sub(r"\s{2,}", " ", out)        # squeeze any doubled whitespace
     return out.strip(" ;,")
@@ -57,7 +64,7 @@ def apply(table_path, data_path, key_field, min_dist):
     for rec in records:
         rec["Color"] = by_key[rec[key_field]]["hex"]
         note = rec.get("Notes") or ""
-        if STALE_NOTE.search(note):
+        if STALE_NOTE.search(note) or STALE_HEX_PAREN.search(note):
             rec["Notes"] = strip_placeholder_note(note)
     Path(data_path).write_text(json.dumps(records, indent=2) + "\n")
     print(f"applied {len(rows)} colors -> {data_path}")

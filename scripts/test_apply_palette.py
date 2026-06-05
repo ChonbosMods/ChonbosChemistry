@@ -89,5 +89,27 @@ class ApplyPaletteTest(unittest.TestCase):
         )
 
 
+    # --- real compound Notes patterns (Task 2 mandatory check) ---
+    # Two compounds end "...colorless (<...>placeholder<...>)". The placeholder
+    # parenthetical (a false hex-claim under the game-color convention) must be
+    # stripped, but the leading "...colorless" prose is factually fine and stays.
+    def test_strips_compound_water_placeholder_parenthetical(self):
+        note = "the universal solvent; colorless (hex is a faint placeholder tint)"
+        out = self._clean_note(note)
+        self.assertNotIn("placeholder", out)
+        self.assertEqual(out, "the universal solvent; colorless")
+
+    def test_strips_compound_ammonia_placeholder_parenthetical(self):
+        note = ("density given as gas at STP; fertilizer feedstock and refrigerant; "
+                "colorless (white hex is placeholder)")
+        out = self._clean_note(note)
+        self.assertNotIn("placeholder", out)
+        self.assertEqual(
+            out,
+            "density given as gas at STP; fertilizer feedstock and refrigerant; "
+            "colorless",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
