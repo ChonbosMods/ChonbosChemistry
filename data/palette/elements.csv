@@ -1,0 +1,119 @@
+key,source,hex,exempt,rationale
+H,discharge,#BFE3FF,,"pale ice blue, lightest gas"
+He,discharge,#FFD9A8,,peach discharge glow
+Li,flame,#E83A6A,,crimson flame
+Be,mineral,#6AD28C,,emerald/beryl green
+B,mineral,#9A7A50,,brown amorphous boron
+C,verified,#2B2B30,iconic dark,graphite near-black
+N,evocation,#9AD6D2,,cryogenic frost blue
+O,verified,#8FB8E8,,liquid oxygen is genuinely blue
+F,verified,#D8E85A,,pale acid yellow-green gas
+Ne,discharge,#FF6B3D,,neon sign red-orange
+Na,flame,#FFA53D,,sodium-lamp orange
+Mg,flame,#AAC2FD,,"blinding white flame, icy cast"
+Al,verified,#C8D0DC,low-sat metal,cool aluminium white
+Si,mineral,#6678B6,,blue-grey crystalline sheen
+P,verified,#E0E8A8,,white phosphorus waxy pale yellow
+S,verified,#F0D020,,bright sulfur yellow
+Cl,verified,#B8D832,,yellow-green gas (chloros)
+Ar,discharge,#B48CFF,,violet discharge
+K,flame,#C89AE8,,lilac flame
+Ca,flame,#E0915A,,brick-red flame
+Sc,systematic,#BD8484,,spaced metallic tint
+Ti,mineral,#D0B8EE,,titania white-violet
+V,ion,#4A9AA8,,vanadyl teal-blue
+Cr,spectral,#4AB850,,"chroma: the color element, emerald"
+Mn,ion,#C06A9A,,permanganate rose-violet
+Fe,verified,#9A8578,,warm grey with rust undertone
+Co,ion,#3A6AC8,,cobalt blue
+Ni,ion,#9AD060,,Ni(II) apple green
+Cu,verified,#C88040,,copper metal
+Zn,verified,#A4B6D2,,bluish-white cast
+Ga,systematic,#84BD95,,spaced metallic tint
+Ge,mineral,#98A8B8,,cool silver-blue semimetal
+As,evocation,#7FA86A,,"Paris green, the poisoner's pigment"
+Se,verified,#B05248,,red selenium allotrope
+Br,verified,#B84A1E,,"rust-red fuming liquid, brightened to band"
+Kr,discharge,#BCEAC6,,ghostly green-white discharge
+Rb,spectral,#C03A4A,,rubidus: deep red spectral lines
+Sr,flame,#E84A30,,scarlet flare red
+Y,systematic,#9A76A8,,spaced metallic tint
+Zr,mineral,#6AC8DA,,zircon gemstone blue
+Nb,evocation,#8A58E4,,anodized niobium violet
+Mo,mineral,#7E86BE,,dusty molybdenite blue
+Tc,fantasy,#6AA8A0,,"synthetic cyan-ash, the first artificial element"
+Ru,systematic,#BDB684,,spaced metallic tint
+Rh,spectral,#E08AA0,,rhodon: rose
+Pd,systematic,#79B1BD,,spaced metallic tint
+Ag,verified,#E8E8F0,low-sat metal,bright silver
+Cd,evocation,#D89A28,,cadmium yellow pigment
+In,spectral,#5A4AC8,,indigo spectral line
+Sn,verified,#C0B8A8,low-sat metal,warm pewter
+Sb,systematic,#9E6584,,spaced metallic tint
+Te,systematic,#A2D192,,spaced metallic tint
+I,verified,#8A5FAF,,"violet vapor (iodes), brightened to band"
+Xe,discharge,#88D8FF,,ice blue discharge
+Cs,spectral,#5FA0EE,,caesius: sky blue spectral lines
+Ba,flame,#7EBE3E,,apple green flame
+La,systematic,#746FD6,,lanthanide pastel wheel
+Ce,mineral,#E8D88A,,ceria pale gold
+Pr,spectral,#62CE3C,,praseo: leek green
+Nd,evocation,#B87AC8,,neodymium glass violet-pink
+Pm,systematic,#D69A7C,,lanthanide pastel wheel
+Sm,systematic,#7CD6B5,,lanthanide pastel wheel
+Eu,evocation,#F04A88,,the red phosphor of CRT screens
+Gd,systematic,#E087E8,,lanthanide pastel wheel
+Tb,evocation,#3EC078,,the green phosphor
+Dy,systematic,#C3D67C,,lanthanide pastel wheel
+Ho,systematic,#6FA3D6,,lanthanide pastel wheel
+Er,evocation,#F0A0BC,,erbium-pink glass
+Tm,systematic,#D66F85,,lanthanide pastel wheel
+Yb,systematic,#79E882,,lanthanide pastel wheel
+Lu,systematic,#B379E8,,lanthanide pastel wheel
+Hf,systematic,#D1C492,,spaced metallic tint
+Ta,evocation,#48A8E0,,anodized tantalum blue
+W,mineral,#647496,,wolframite steel-blue
+Re,systematic,#8C9FDB,,spaced metallic tint
+Os,verified,#7A8A9A,,genuinely blue-grey metal
+Ir,spectral,#9A80DA,,"iris: rainbow salts, violet lean"
+Pt,verified,#D8E0E8,low-sat metal,pale icy platinum
+Au,verified,#FFD24A,,gold
+Hg,verified,#C0C8D0,low-sat metal,quicksilver
+Tl,spectral,#88E03E,,thallos: green shoot
+Pb,verified,#505A7E,,dense cold blue-grey
+Bi,evocation,#DA7EC6,,iridescent hopper-crystal pink
+Po,fantasy,#D2602C,,alpha-heat ember
+At,fantasy,#6B4585,,"dusk-purple void halogen, never seen in bulk"
+Rn,discharge,#5FC4A8,,"ominous pale teal, the radioactive gas"
+Fr,fantasy,#A04A78,,"doomed alkali, magenta-ash"
+Ra,fantasy,#84F0A8,,"radium-dial green, doubles as glow hue"
+Ac,systematic,#AD5096,,actinide irradiated wheel
+Th,systematic,#6C9946,,actinide irradiated wheel
+Pa,systematic,#465499,,actinide irradiated wheel
+U,evocation,#A8F050,,uranium-glass green
+Np,spectral,#4A6AE8,,Neptune blue
+Pu,evocation,#76C0F4,,Cherenkov blue
+Am,systematic,#85463D,,actinide irradiated wheel
+Cm,systematic,#469969,,actinide irradiated wheel
+Bk,systematic,#814699,,actinide irradiated wheel
+Cf,systematic,#999946,,actinide irradiated wheel
+Es,systematic,#468199,,actinide irradiated wheel
+Fm,systematic,#853D5B,,actinide irradiated wheel
+Md,systematic,#509946,,actinide irradiated wheel
+No,systematic,#6050AD,,actinide irradiated wheel
+Lr,systematic,#85623D,,actinide irradiated wheel
+Rf,systematic,#40A88F,,synthetic exotic palette
+Db,systematic,#BD48B7,,synthetic exotic palette
+Sg,systematic,#3C9E33,,synthetic exotic palette
+Bh,systematic,#4F80D1,,synthetic exotic palette
+Hs,systematic,#D14F5A,,synthetic exotic palette
+Mt,systematic,#46DB66,,synthetic exotic palette
+Ds,systematic,#7D3CBD,,synthetic exotic palette
+Rg,systematic,#BDA548,,synthetic exotic palette
+Cn,systematic,#48B2BD,,synthetic exotic palette
+Nh,systematic,#D14FA0,,synthetic exotic palette
+Fl,systematic,#4ADB46,,synthetic exotic palette
+Mc,systematic,#3C41BD,,synthetic exotic palette
+Lv,systematic,#DB6C46,,synthetic exotic palette
+Ts,systematic,#46DB98,,synthetic exotic palette
+Og,systematic,#9840A8,,synthetic exotic palette

@@ -13,7 +13,7 @@
     "MeltingPoint": 13.99,
     "BoilingPoint": 20.271,
     "Appearance": "Colourless, odourless gaseous chemical element",
-    "Color": "#FFFFFF",
+    "Color": "#BFE3FF",
     "Electronegativity": 2.2,
     "OxidationStates": [
       -1,
@@ -26,7 +26,7 @@
       "H-2",
       "H-3"
     ],
-    "Notes": "colorless in pure form (white hex is a placeholder for colorless)",
+    "Notes": "",
     "ValueConfidence": "measured"
   },
   {
@@ -42,7 +42,7 @@
     "Density": 0.000164,
     "BoilingPoint": 4.222,
     "Appearance": "Colourless, odourless gaseous nonmetallic element",
-    "Color": "#FFFFFF",
+    "Color": "#FFD9A8",
     "OxidationStates": [],
     "ReactivityNote": "completely inert; forms no stable compounds",
     "AbundanceNote": "crustal abundance ~0.008 mg/kg (relatively scarce)",
@@ -50,7 +50,7 @@
       "He-3",
       "He-4"
     ],
-    "Notes": "does not solidify at 1 atm at any temperature (requires elevated pressure); colorless in pure form (white hex is a placeholder for colorless); unavailable/undefined values (null): meltingPoint, electronegativity",
+    "Notes": "does not solidify at 1 atm at any temperature (requires elevated pressure); unavailable/undefined values (null): meltingPoint, electronegativity",
     "ValueConfidence": "measured"
   },
   {
@@ -67,7 +67,7 @@
     "MeltingPoint": 453.65,
     "BoilingPoint": 1615.15,
     "Appearance": "Socket silvery metal",
-    "Color": "#C0C0C0",
+    "Color": "#E83A6A",
     "Electronegativity": 0.98,
     "OxidationStates": [
       1
@@ -95,7 +95,7 @@
     "MeltingPoint": 1560.15,
     "BoilingPoint": 2741.15,
     "Appearance": "Grey metallic element of group 2 of the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#6AD28C",
     "Electronegativity": 1.57,
     "OxidationStates": [
       2,
@@ -126,7 +126,7 @@
     "MeltingPoint": 2350.15,
     "BoilingPoint": 4273.15,
     "Appearance": "An element of group 13 of the periodic table",
-    "Color": "#9FA8A8",
+    "Color": "#9A7A50",
     "Electronegativity": 2.04,
     "OxidationStates": [
       3,
@@ -158,7 +158,7 @@
     "Density": 2.2,
     "BoilingPoint": 4098.15,
     "Appearance": "Carbon is a member of group 14 of the periodic table",
-    "Color": "#1A1A1A",
+    "Color": "#2B2B30",
     "Electronegativity": 2.55,
     "OxidationStates": [
       -4,
@@ -195,7 +195,7 @@
     "MeltingPoint": 63.15,
     "BoilingPoint": 77.355,
     "Appearance": "Colourless, gaseous element which belongs to group 15 of the periodic table",
-    "Color": "#FFFFFF",
+    "Color": "#9AD6D2",
     "Electronegativity": 3.04,
     "OxidationStates": [
       -3,
@@ -214,7 +214,7 @@
       "N-14",
       "N-15"
     ],
-    "Notes": "colorless in pure form (white hex is a placeholder for colorless)",
+    "Notes": "",
     "ValueConfidence": "measured"
   },
   {
@@ -231,7 +231,7 @@
     "MeltingPoint": 54.36,
     "BoilingPoint": 90.188,
     "Appearance": "A colourless, odourless gaseous element belonging to group 16 of the periodic table",
-    "Color": "#CFE8FF",
+    "Color": "#8FB8E8",
     "Electronegativity": 3.44,
     "OxidationStates": [
       -2,
@@ -264,7 +264,7 @@
     "MeltingPoint": 53.48,
     "BoilingPoint": 85.04,
     "Appearance": "A poisonous pale yellow gaseous element belonging to group 17 of the periodic table (The halogens)",
-    "Color": "#E8FF8A",
+    "Color": "#D8E85A",
     "Electronegativity": 3.98,
     "OxidationStates": [
       -1
@@ -291,7 +291,7 @@
     "MeltingPoint": 24.56,
     "BoilingPoint": 27.104,
     "Appearance": "Colourless gaseous element of group 18 on the periodic table (noble gases)",
-    "Color": "#FFB3A1",
+    "Color": "#FF6B3D",
     "OxidationStates": [],
     "ReactivityNote": "completely inert; forms no stable compounds",
     "AbundanceNote": "crustal abundance ~0.005 mg/kg (relatively scarce)",
@@ -317,7 +317,7 @@
     "MeltingPoint": 370.944,
     "BoilingPoint": 1156.09,
     "Appearance": "Soft silvery reactive element belonging to group 1 of the periodic table (alkali metals)",
-    "Color": "#D6D6D6",
+    "Color": "#FFA53D",
     "Electronegativity": 0.93,
     "OxidationStates": [
       1,
@@ -347,7 +347,7 @@
     "MeltingPoint": 923.15,
     "BoilingPoint": 1363.15,
     "Appearance": "Silvery metallic element belonging to group 2 of the periodic table (alkaline-earth metals)",
-    "Color": "#C9C9C9",
+    "Color": "#AAC2FD",
     "Electronegativity": 1.31,
     "OxidationStates": [
       2,
@@ -378,7 +378,7 @@
     "MeltingPoint": 933.473,
     "BoilingPoint": 2792.15,
     "Appearance": "Silvery-white lustrous metallic element of group 3 of the periodic table",
-    "Color": "#C8C8C8",
+    "Color": "#C8D0DC",
     "Electronegativity": 1.61,
     "OxidationStates": [
       3,
@@ -411,7 +411,7 @@
     "MeltingPoint": 1687.15,
     "BoilingPoint": 3538.15,
     "Appearance": "Metalloid element belonging to group 14 of the periodic table",
-    "Color": "#7C7C85",
+    "Color": "#6678B6",
     "Electronegativity": 1.9,
     "OxidationStates": [
       -4,
@@ -449,7 +449,7 @@
     "MeltingPoint": 317.3,
     "BoilingPoint": 553.65,
     "Appearance": "Non-metallic element belonging to group 15 of the periodic table",
-    "Color": "#B22222",
+    "Color": "#E0E8A8",
     "Electronegativity": 2.19,
     "OxidationStates": [
       -3,
@@ -486,7 +486,7 @@
     "MeltingPoint": 388.36,
     "BoilingPoint": 717.76,
     "Appearance": "Yellow, nonmetallic element belonging to group 16 of the periodic table",
-    "Color": "#E6C200",
+    "Color": "#F0D020",
     "Electronegativity": 2.58,
     "OxidationStates": [
       -2,
@@ -525,7 +525,7 @@
     "MeltingPoint": 171.65,
     "BoilingPoint": 239.11,
     "Appearance": "Halogen element",
-    "Color": "#C9E04A",
+    "Color": "#B8D832",
     "Electronegativity": 3.16,
     "OxidationStates": [
       -1,
@@ -561,7 +561,7 @@
     "MeltingPoint": 83.81,
     "BoilingPoint": 87.302,
     "Appearance": "Monatomic noble gas",
-    "Color": "#FFFFFF",
+    "Color": "#B48CFF",
     "OxidationStates": [],
     "ReactivityNote": "inert; no stable compounds under normal conditions",
     "AbundanceNote": "crustal abundance ~3.5 mg/kg (common)",
@@ -573,7 +573,7 @@
       "Ar-40",
       "Ar-42"
     ],
-    "Notes": "colorless in pure form (white hex is a placeholder for colorless); unavailable/undefined values (null): electronegativity",
+    "Notes": "unavailable/undefined values (null): electronegativity",
     "ValueConfidence": "measured"
   },
   {
@@ -590,7 +590,7 @@
     "MeltingPoint": 336.65,
     "BoilingPoint": 1032.15,
     "Appearance": "Soft silvery metallic element belonging to group 1 of the periodic table (alkali metals)",
-    "Color": "#D6D6D6",
+    "Color": "#C89AE8",
     "Electronegativity": 0.82,
     "OxidationStates": [
       1,
@@ -620,7 +620,7 @@
     "MeltingPoint": 1115.15,
     "BoilingPoint": 1757.15,
     "Appearance": "Soft grey metallic element belonging to group 2 of the periodic table",
-    "Color": "#D6D6D6",
+    "Color": "#E0915A",
     "Electronegativity": 1.0,
     "OxidationStates": [
       2,
@@ -656,7 +656,7 @@
     "MeltingPoint": 1814.15,
     "BoilingPoint": 3109.15,
     "Appearance": "Rare soft silvery metallic element belonging to group 3 of the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#BD8484",
     "Electronegativity": 1.36,
     "OxidationStates": [
       3,
@@ -689,7 +689,7 @@
     "MeltingPoint": 1943.15,
     "BoilingPoint": 3560.15,
     "Appearance": "White metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#D0B8EE",
     "Electronegativity": 1.54,
     "OxidationStates": [
       4,
@@ -727,7 +727,7 @@
     "MeltingPoint": 2183.15,
     "BoilingPoint": 3680.15,
     "Appearance": "Soft and ductile, bright white metal",
-    "Color": "#C0C0C0",
+    "Color": "#4A9AA8",
     "Electronegativity": 1.63,
     "OxidationStates": [
       5,
@@ -764,7 +764,7 @@
     "MeltingPoint": 2180.15,
     "BoilingPoint": 2944.15,
     "Appearance": "Hard silvery transition element",
-    "Color": "#C0C0C0",
+    "Color": "#4AB850",
     "Electronegativity": 1.66,
     "OxidationStates": [
       3,
@@ -804,7 +804,7 @@
     "MeltingPoint": 1519.15,
     "BoilingPoint": 2334.15,
     "Appearance": "Grey brittle metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#C06A9A",
     "Electronegativity": 1.55,
     "OxidationStates": [
       2,
@@ -843,7 +843,7 @@
     "MeltingPoint": 1811.15,
     "BoilingPoint": 3134.15,
     "Appearance": "Silvery malleable and ductile metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#9A8578",
     "Electronegativity": 1.83,
     "OxidationStates": [
       2,
@@ -886,7 +886,7 @@
     "MeltingPoint": 1768.15,
     "BoilingPoint": 3200.15,
     "Appearance": "Light grey transition element",
-    "Color": "#C0C0C0",
+    "Color": "#3A6AC8",
     "Electronegativity": 1.88,
     "OxidationStates": [
       2,
@@ -924,7 +924,7 @@
     "MeltingPoint": 1728.15,
     "BoilingPoint": 3186.15,
     "Appearance": "Malleable ductile silvery metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#9AD060",
     "Electronegativity": 1.91,
     "OxidationStates": [
       2,
@@ -966,7 +966,7 @@
     "MeltingPoint": 1357.77,
     "BoilingPoint": 2833.15,
     "Appearance": "Red-brown transition element",
-    "Color": "#B87333",
+    "Color": "#C88040",
     "Electronegativity": 1.9,
     "OxidationStates": [
       2,
@@ -1000,7 +1000,7 @@
     "MeltingPoint": 692.677,
     "BoilingPoint": 1180.15,
     "Appearance": "Blue-white metallic element",
-    "Color": "#BFC4C9",
+    "Color": "#A4B6D2",
     "Electronegativity": 1.65,
     "OxidationStates": [
       2,
@@ -1036,7 +1036,7 @@
     "MeltingPoint": 302.915,
     "BoilingPoint": 2502.15,
     "Appearance": "Soft silvery metallic element, belongs to group 13 of the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#84BD95",
     "Electronegativity": 1.81,
     "OxidationStates": [
       3,
@@ -1073,7 +1073,7 @@
     "MeltingPoint": 1211.4,
     "BoilingPoint": 3106.15,
     "Appearance": "Lustrous hard metalloid element, belongs to group 14 of the periodic table",
-    "Color": "#708090",
+    "Color": "#98A8B8",
     "Electronegativity": 2.01,
     "OxidationStates": [
       -4,
@@ -1115,7 +1115,7 @@
     "MeltingPoint": 1090.15,
     "BoilingPoint": 889.15,
     "Appearance": "Metalloid element of group 15",
-    "Color": "#6E7B7B",
+    "Color": "#7FA86A",
     "Electronegativity": 2.18,
     "OxidationStates": [
       -3,
@@ -1156,7 +1156,7 @@
     "MeltingPoint": 493.95,
     "BoilingPoint": 958.15,
     "Appearance": "Metalloid element, belongs to group 16 of the periodic table",
-    "Color": "#708090",
+    "Color": "#B05248",
     "Electronegativity": 2.55,
     "OxidationStates": [
       -2,
@@ -1199,7 +1199,7 @@
     "MeltingPoint": 265.95,
     "BoilingPoint": 331.95,
     "Appearance": "Halogen element",
-    "Color": "#8B2500",
+    "Color": "#B84A1E",
     "Electronegativity": 2.96,
     "OxidationStates": [
       -1,
@@ -1235,7 +1235,7 @@
     "MeltingPoint": 115.78,
     "BoilingPoint": 119.735,
     "Appearance": "Colorless gaseous element, belongs to the noble gases",
-    "Color": "#FFFFFF",
+    "Color": "#BCEAC6",
     "OxidationStates": [
       2,
       1
@@ -1253,7 +1253,7 @@
       "Kr-85",
       "Kr-86"
     ],
-    "Notes": "colorless in pure form (white hex is a placeholder for colorless); unavailable/undefined values (null): electronegativity",
+    "Notes": "unavailable/undefined values (null): electronegativity",
     "ValueConfidence": "measured"
   },
   {
@@ -1270,7 +1270,7 @@
     "MeltingPoint": 312.45,
     "BoilingPoint": 961.15,
     "Appearance": "Soft silvery metallic element, belongs to group 1 of the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#C03A4A",
     "Electronegativity": 0.82,
     "OxidationStates": [
       1,
@@ -1302,7 +1302,7 @@
     "MeltingPoint": 1050.15,
     "BoilingPoint": 1650.15,
     "Appearance": "Soft yellowish metallic element, belongs to group 2 of the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#E84A30",
     "Electronegativity": 0.95,
     "OxidationStates": [
       2,
@@ -1338,7 +1338,7 @@
     "MeltingPoint": 1795.15,
     "BoilingPoint": 3618.15,
     "Appearance": "Silvery-grey metallic element of group 3 on the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#9A76A8",
     "Electronegativity": 1.22,
     "OxidationStates": [
       3,
@@ -1372,7 +1372,7 @@
     "MeltingPoint": 2127.15,
     "BoilingPoint": 4679.15,
     "Appearance": "Grey-white metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#6AC8DA",
     "Electronegativity": 1.33,
     "OxidationStates": [
       4,
@@ -1410,7 +1410,7 @@
     "MeltingPoint": 2750.15,
     "BoilingPoint": 5014.15,
     "Appearance": "Soft, ductile grey-blue metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#8A58E4",
     "Electronegativity": 1.6,
     "OxidationStates": [
       5,
@@ -1448,7 +1448,7 @@
     "MeltingPoint": 2895.15,
     "BoilingPoint": 4912.15,
     "Appearance": "Silvery-white, hard metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#7E86BE",
     "Electronegativity": 2.16,
     "OxidationStates": [
       4,
@@ -1492,7 +1492,7 @@
     "MeltingPoint": 2430.15,
     "BoilingPoint": 4535.15,
     "Appearance": "Radioactive metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#6AA8A0",
     "Electronegativity": 2.1,
     "OxidationStates": [
       4,
@@ -1530,7 +1530,7 @@
     "MeltingPoint": 2606.15,
     "BoilingPoint": 4420.15,
     "Appearance": "Hard white metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#BDB684",
     "Electronegativity": 2.2,
     "OxidationStates": [
       3,
@@ -1575,7 +1575,7 @@
     "MeltingPoint": 2236.15,
     "BoilingPoint": 3968.15,
     "Appearance": "Silvery white metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#E08AA0",
     "Electronegativity": 2.28,
     "OxidationStates": [
       3,
@@ -1614,7 +1614,7 @@
     "MeltingPoint": 1827.95,
     "BoilingPoint": 3236.15,
     "Appearance": "Soft white ductile transition element",
-    "Color": "#C0C0C0",
+    "Color": "#79B1BD",
     "Electronegativity": 2.2,
     "OxidationStates": [
       2,
@@ -1653,7 +1653,7 @@
     "MeltingPoint": 1234.93,
     "BoilingPoint": 2435.15,
     "Appearance": "White lustrous soft metallic transition element",
-    "Color": "#E8E8E8",
+    "Color": "#E8E8F0",
     "Electronegativity": 1.93,
     "OxidationStates": [
       1,
@@ -1688,7 +1688,7 @@
     "MeltingPoint": 594.219,
     "BoilingPoint": 1040.15,
     "Appearance": "Soft bluish metal belonging to group 12 of the periodic table",
-    "Color": "#C0C0C8",
+    "Color": "#D89A28",
     "Electronegativity": 1.69,
     "OxidationStates": [
       2,
@@ -1726,7 +1726,7 @@
     "MeltingPoint": 429.748,
     "BoilingPoint": 2300.15,
     "Appearance": "Soft silvery element belonging to group 13 of the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#5A4AC8",
     "Electronegativity": 1.78,
     "OxidationStates": [
       3,
@@ -1761,7 +1761,7 @@
     "MeltingPoint": 505.078,
     "BoilingPoint": 2859.15,
     "Appearance": "Silvery malleable metallic element belonging to group 14 of the periodic table",
-    "Color": "#C8C8C8",
+    "Color": "#C0B8A8",
     "Electronegativity": 1.96,
     "OxidationStates": [
       -4,
@@ -1810,7 +1810,7 @@
     "MeltingPoint": 903.778,
     "BoilingPoint": 1860.15,
     "Appearance": "Element of group 15",
-    "Color": "#9AA1A8",
+    "Color": "#9E6584",
     "Electronegativity": 2.05,
     "OxidationStates": [
       -3,
@@ -1852,7 +1852,7 @@
     "MeltingPoint": 722.66,
     "BoilingPoint": 1261.15,
     "Appearance": "Silvery metalloid element of group 16",
-    "Color": "#C7C7C0",
+    "Color": "#A2D192",
     "Electronegativity": 2.1,
     "OxidationStates": [
       -2,
@@ -1897,7 +1897,7 @@
     "MeltingPoint": 386.85,
     "BoilingPoint": 457.55,
     "Appearance": "Dark violet nonmetallic element, belongs to group 17 of the periodic table",
-    "Color": "#4B2D6B",
+    "Color": "#8A5FAF",
     "Electronegativity": 2.66,
     "OxidationStates": [
       -1,
@@ -1936,7 +1936,7 @@
     "MeltingPoint": 161.4,
     "BoilingPoint": 165.051,
     "Appearance": "Colourless, odourless gas belonging to group 18 on the periodic table (the noble gases",
-    "Color": "#FFFFFF",
+    "Color": "#88D8FF",
     "Electronegativity": 2.6,
     "OxidationStates": [
       2,
@@ -1959,7 +1959,7 @@
       "Xe-134",
       "Xe-136"
     ],
-    "Notes": "colorless in pure form (white hex is a placeholder for colorless)",
+    "Notes": "",
     "ValueConfidence": "measured"
   },
   {
@@ -1976,7 +1976,7 @@
     "MeltingPoint": 301.65,
     "BoilingPoint": 944.15,
     "Appearance": "Soft silvery-white metallic element belonging to group 1 of the periodic table",
-    "Color": "#F0E68C",
+    "Color": "#5FA0EE",
     "Electronegativity": 0.79,
     "OxidationStates": [
       1,
@@ -2011,7 +2011,7 @@
     "MeltingPoint": 1000.15,
     "BoilingPoint": 2118.15,
     "Appearance": "Silvery-white reactive element, belonging to group 2 of the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#7EBE3E",
     "Electronegativity": 0.89,
     "OxidationStates": [
       2,
@@ -2048,7 +2048,7 @@
     "MeltingPoint": 1193.15,
     "BoilingPoint": 3737.15,
     "Appearance": "(From the Greek word lanthanein, to line hidden) Silvery metallic element belonging to group 3 of the periodic table and oft considered to be one of the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#746FD6",
     "Electronegativity": 1.1,
     "OxidationStates": [
       3,
@@ -2080,7 +2080,7 @@
     "MeltingPoint": 1072.15,
     "BoilingPoint": 3716.15,
     "Appearance": "Silvery metallic element, belongs to the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#E8D88A",
     "Electronegativity": 1.12,
     "OxidationStates": [
       3,
@@ -2117,7 +2117,7 @@
     "MeltingPoint": 1204.15,
     "BoilingPoint": 3793.15,
     "Appearance": "Soft silvery metallic element, belongs to the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#62CE3C",
     "Electronegativity": 1.13,
     "OxidationStates": [
       3,
@@ -2149,7 +2149,7 @@
     "MeltingPoint": 1289.15,
     "BoilingPoint": 3347.15,
     "Appearance": "Soft bright silvery metallic element, belongs to the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#B87AC8",
     "Electronegativity": 1.14,
     "OxidationStates": [
       3,
@@ -2185,7 +2185,7 @@
     "Density": 7.26,
     "MeltingPoint": 1315.15,
     "Appearance": "Soft silvery metallic element, belongs to the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#D69A7C",
     "OxidationStates": [
       3,
       2
@@ -2218,7 +2218,7 @@
     "MeltingPoint": 1345.15,
     "BoilingPoint": 2067.15,
     "Appearance": "Soft silvery metallic element, belongs to the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#7CD6B5",
     "Electronegativity": 1.17,
     "OxidationStates": [
       3,
@@ -2257,7 +2257,7 @@
     "MeltingPoint": 1095.15,
     "BoilingPoint": 1802.15,
     "Appearance": "Soft silvery metallic element belonging to the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#F04A88",
     "OxidationStates": [
       2,
       3,
@@ -2295,7 +2295,7 @@
     "MeltingPoint": 1586.15,
     "BoilingPoint": 3546.15,
     "Appearance": "Soft silvery metallic element belonging to the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#E087E8",
     "Electronegativity": 1.2,
     "OxidationStates": [
       3,
@@ -2337,7 +2337,7 @@
     "MeltingPoint": 1632.15,
     "BoilingPoint": 3503.15,
     "Appearance": "Silvery metallic element belonging to the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#3EC078",
     "OxidationStates": [
       3,
       0,
@@ -2373,7 +2373,7 @@
     "MeltingPoint": 1685.15,
     "BoilingPoint": 2840.15,
     "Appearance": "Metallic with a bright silvery-white lustre",
-    "Color": "#C0C0C0",
+    "Color": "#C3D67C",
     "Electronegativity": 1.22,
     "OxidationStates": [
       3,
@@ -2412,7 +2412,7 @@
     "MeltingPoint": 1745.15,
     "BoilingPoint": 2973.15,
     "Appearance": "Relatively soft and malleable silvery-white metallic element, which is stable in dry air at room temperature",
-    "Color": "#C0C0C0",
+    "Color": "#6FA3D6",
     "Electronegativity": 1.23,
     "OxidationStates": [
       3,
@@ -2443,7 +2443,7 @@
     "MeltingPoint": 1802.15,
     "BoilingPoint": 3141.15,
     "Appearance": "Soft silvery metallic element which belongs to the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#F0A0BC",
     "Electronegativity": 1.24,
     "OxidationStates": [
       3,
@@ -2480,7 +2480,7 @@
     "MeltingPoint": 1818.15,
     "BoilingPoint": 2223.15,
     "Appearance": "Soft grey metallic element that belongs to the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#D66F85",
     "Electronegativity": 1.25,
     "OxidationStates": [
       3,
@@ -2515,7 +2515,7 @@
     "MeltingPoint": 1097.15,
     "BoilingPoint": 1469.15,
     "Appearance": "Silvery metallic element of the lanthanoids",
-    "Color": "#C0C0C0",
+    "Color": "#79E882",
     "OxidationStates": [
       3,
       0,
@@ -2553,7 +2553,7 @@
     "MeltingPoint": 1936.15,
     "BoilingPoint": 3675.15,
     "Appearance": "Silvery-white rare-earth metal which is relatively stable in air",
-    "Color": "#C0C0C0",
+    "Color": "#B379E8",
     "Electronegativity": 1.0,
     "OxidationStates": [
       3,
@@ -2591,7 +2591,7 @@
     "MeltingPoint": 2506.15,
     "BoilingPoint": 4873.15,
     "Appearance": "Silvery lustrous metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#D1C492",
     "Electronegativity": 1.3,
     "OxidationStates": [
       4,
@@ -2632,7 +2632,7 @@
     "MeltingPoint": 3290.15,
     "BoilingPoint": 5728.15,
     "Appearance": "Heavy blue-grey metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#48A8E0",
     "Electronegativity": 1.5,
     "OxidationStates": [
       5,
@@ -2670,7 +2670,7 @@
     "MeltingPoint": 3687.15,
     "BoilingPoint": 5828.15,
     "Appearance": "White or grey metallic transition element,formerly called Wolfram",
-    "Color": "#C0C0C0",
+    "Color": "#647496",
     "Electronegativity": 1.7,
     "OxidationStates": [
       4,
@@ -2714,7 +2714,7 @@
     "MeltingPoint": 3458.15,
     "BoilingPoint": 5863.15,
     "Appearance": "Silvery-white metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#8C9FDB",
     "Electronegativity": 1.9,
     "OxidationStates": [
       4,
@@ -2756,7 +2756,7 @@
     "MeltingPoint": 3306.15,
     "BoilingPoint": 5281.15,
     "Appearance": "Hard blue-white metallic transition element",
-    "Color": "#9DAAB8",
+    "Color": "#7A8A9A",
     "Electronegativity": 2.2,
     "OxidationStates": [
       4,
@@ -2804,7 +2804,7 @@
     "MeltingPoint": 2719.15,
     "BoilingPoint": 4701.15,
     "Appearance": "Very hard and brittle, silvery metallic transition element",
-    "Color": "#C0C0C0",
+    "Color": "#9A80DA",
     "Electronegativity": 2.2,
     "OxidationStates": [
       3,
@@ -2847,7 +2847,7 @@
     "MeltingPoint": 2041.35,
     "BoilingPoint": 4098.15,
     "Appearance": "Attractive greyish-white metal",
-    "Color": "#E5E4E2",
+    "Color": "#D8E0E8",
     "Electronegativity": 2.2,
     "OxidationStates": [
       2,
@@ -2892,7 +2892,7 @@
     "MeltingPoint": 1337.33,
     "BoilingPoint": 3109.15,
     "Appearance": "Gold is gold colored",
-    "Color": "#FFD700",
+    "Color": "#FFD24A",
     "Electronegativity": 2.4,
     "OxidationStates": [
       3,
@@ -2931,7 +2931,7 @@
     "MeltingPoint": 234.321,
     "BoilingPoint": 629.769,
     "Appearance": "Heavy silvery liquid metallic element, belongs to the zinc group",
-    "Color": "#C0C0C0",
+    "Color": "#C0C8D0",
     "Electronegativity": 1.9,
     "OxidationStates": [
       1,
@@ -2969,7 +2969,7 @@
     "MeltingPoint": 577.15,
     "BoilingPoint": 1746.15,
     "Appearance": "Pure, unreacted thallium appears silvery-white and exhibits a metallic lustre",
-    "Color": "#B7B8BA",
+    "Color": "#88E03E",
     "Electronegativity": 1.8,
     "OxidationStates": [
       1,
@@ -3006,7 +3006,7 @@
     "MeltingPoint": 600.612,
     "BoilingPoint": 2022.15,
     "Appearance": "Heavy dull grey ductile metallic element, belongs to group 14",
-    "Color": "#575961",
+    "Color": "#505A7E",
     "Electronegativity": 1.8,
     "OxidationStates": [
       2,
@@ -3047,7 +3047,7 @@
     "MeltingPoint": 544.552,
     "BoilingPoint": 1837.15,
     "Appearance": "White crystalline metal with a pink tinge, belongs to group 15",
-    "Color": "#A9B0C6",
+    "Color": "#DA7EC6",
     "Electronegativity": 1.9,
     "OxidationStates": [
       3,
@@ -3087,7 +3087,7 @@
     "MeltingPoint": 527.15,
     "BoilingPoint": 1235.15,
     "Appearance": "Rare radioactive metallic element, belongs to group 16 of the periodic table",
-    "Color": "#9FA8A8",
+    "Color": "#D2602C",
     "Electronegativity": 2.0,
     "OxidationStates": [
       -2,
@@ -3120,7 +3120,7 @@
     "Density": 7.0,
     "MeltingPoint": 575.15,
     "Appearance": "Radioactive halogen element",
-    "Color": "#5A4A45",
+    "Color": "#6B4585",
     "Electronegativity": 2.2,
     "OxidationStates": [
       -1,
@@ -3153,7 +3153,7 @@
     "MeltingPoint": 202.15,
     "BoilingPoint": 211.45,
     "Appearance": "Colorless radioactive gaseous element, belongs to the noble gases",
-    "Color": "#FFFFFF",
+    "Color": "#5FC4A8",
     "OxidationStates": [
       2,
       6
@@ -3163,7 +3163,7 @@
     "IsotopeSymbols": [
       "Rn-222"
     ],
-    "Notes": "colorless in pure form (white hex is a placeholder for colorless); no stable or primordial isotopes; isotopeSymbols are the longest-lived / engineering-relevant nuclides; unavailable/undefined values (null): electronegativity",
+    "Notes": "no stable or primordial isotopes; isotopeSymbols are the longest-lived / engineering-relevant nuclides; unavailable/undefined values (null): electronegativity",
     "ValueConfidence": "measured"
   },
   {
@@ -3179,7 +3179,7 @@
     "Density": 1.87,
     "MeltingPoint": 294.15,
     "Appearance": "Radioactive element, belongs to group 1 of the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#A04A78",
     "Electronegativity": 0.7,
     "OxidationStates": [
       1
@@ -3207,7 +3207,7 @@
     "Density": 5.0,
     "MeltingPoint": 969.15,
     "Appearance": "Radioactive metallic transuranic element, belongs to group 2 of the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#84F0A8",
     "Electronegativity": 0.9,
     "OxidationStates": [
       2
@@ -3237,7 +3237,7 @@
     "MeltingPoint": 1323.15,
     "BoilingPoint": 3473.15,
     "Appearance": "Silvery radioactive metallic element, belongs to group 3 of the periodic table",
-    "Color": "#C0C0C0",
+    "Color": "#AD5096",
     "Electronegativity": 1.1,
     "OxidationStates": [
       3
@@ -3265,7 +3265,7 @@
     "MeltingPoint": 2023.15,
     "BoilingPoint": 5058.15,
     "Appearance": "Grey radioactive metallic element",
-    "Color": "#C0C0C0",
+    "Color": "#6C9946",
     "Electronegativity": 1.3,
     "OxidationStates": [
       4,
@@ -3300,7 +3300,7 @@
     "Density": 15.4,
     "MeltingPoint": 1845.15,
     "Appearance": "Radioactive metallic element, belongs to the actinoids",
-    "Color": "#C0C0C0",
+    "Color": "#465499",
     "Electronegativity": 1.5,
     "OxidationStates": [
       5,
@@ -3333,7 +3333,7 @@
     "MeltingPoint": 1408.15,
     "BoilingPoint": 4404.15,
     "Appearance": "White radioactive metallic element belonging to the actinoids",
-    "Color": "#C0C0C0",
+    "Color": "#A8F050",
     "Electronegativity": 1.7,
     "OxidationStates": [
       6,
@@ -3372,7 +3372,7 @@
     "Density": 20.2,
     "MeltingPoint": 917.15,
     "Appearance": "Radioactive metallic transuranic element, belongs to the actinoids",
-    "Color": "#C0C0C0",
+    "Color": "#4A6AE8",
     "Electronegativity": 1.3,
     "OxidationStates": [
       5,
@@ -3408,7 +3408,7 @@
     "MeltingPoint": 913.15,
     "BoilingPoint": 3501.15,
     "Appearance": "Dense silvery radioactive metallic transuranic element, belongs to the actinoids",
-    "Color": "#C0C0C0",
+    "Color": "#76C0F4",
     "Electronegativity": 1.3,
     "OxidationStates": [
       4,
@@ -3448,7 +3448,7 @@
     "Density": 12.0,
     "MeltingPoint": 1449.15,
     "Appearance": "Radioactive metallic transuranic element, belongs to the actinoids",
-    "Color": "#C0C0C0",
+    "Color": "#85463D",
     "OxidationStates": [
       3,
       2,
@@ -3479,7 +3479,7 @@
     "Density": 13.51,
     "MeltingPoint": 1618.15,
     "Appearance": "Radioactive metallic transuranic element",
-    "Color": "#C0C0C0",
+    "Color": "#469969",
     "OxidationStates": [
       3,
       4,
@@ -3514,7 +3514,7 @@
     "Density": 14.78,
     "MeltingPoint": 1259.15,
     "Appearance": "Radioactive metallic transuranic element",
-    "Color": "#C0C0C0",
+    "Color": "#814699",
     "OxidationStates": [
       3,
       2,
@@ -3544,7 +3544,7 @@
     "Density": 15.1,
     "MeltingPoint": 1173.15,
     "Appearance": "Radioactive metallic transuranic element",
-    "Color": "#C0C0C0",
+    "Color": "#999946",
     "OxidationStates": [
       3,
       2,
@@ -3578,7 +3578,7 @@
     "Density": 8.84,
     "MeltingPoint": 1133.15,
     "Appearance": "Appearance is unknown, however it is most probably metallic and silver or gray in color",
-    "Color": "#C0C0C0",
+    "Color": "#468199",
     "OxidationStates": [
       3,
       2,
@@ -3609,7 +3609,7 @@
     "Density": 9.7,
     "MeltingPoint": 1800.15,
     "Appearance": "Radioactive metallic transuranic element, belongs to the actinoids",
-    "Color": "#C0C0C0",
+    "Color": "#853D5B",
     "OxidationStates": [
       3,
       2
@@ -3636,7 +3636,7 @@
     "Density": 10.3,
     "MeltingPoint": 1100.15,
     "Appearance": "Radioactive metallic transuranic element",
-    "Color": "#C0C0C0",
+    "Color": "#509946",
     "OxidationStates": [
       3,
       2
@@ -3662,7 +3662,7 @@
     "Density": 9.9,
     "MeltingPoint": 1100.15,
     "Appearance": "Radioactive metallic transuranic element, belongs to the actinoids",
-    "Color": "#C0C0C0",
+    "Color": "#6050AD",
     "OxidationStates": [
       3,
       2
@@ -3690,7 +3690,7 @@
     "Density": 15.6,
     "MeltingPoint": 1900.15,
     "Appearance": "Appearance unknown, however it is most likely silvery-white or grey and metallic",
-    "Color": "#C0C0C0",
+    "Color": "#85623D",
     "OxidationStates": [
       3
     ],
@@ -3716,7 +3716,7 @@
     "Phase": "solid",
     "Density": 23.3,
     "Appearance": "Radioactive transactinide element",
-    "Color": "#C0C0C0",
+    "Color": "#40A88F",
     "OxidationStates": [
       4,
       3
@@ -3743,7 +3743,7 @@
     "Phase": "solid",
     "Density": 29.3,
     "Appearance": "Also known as Hahnium, Ha",
-    "Color": "#C0C0C0",
+    "Color": "#BD48B7",
     "OxidationStates": [
       3,
       4,
@@ -3769,7 +3769,7 @@
     "Phase": "solid",
     "Density": 35.0,
     "Appearance": "Half-life of 0",
-    "Color": "#C0C0C0",
+    "Color": "#3C9E33",
     "OxidationStates": [
       3,
       4,
@@ -3798,7 +3798,7 @@
     "Phase": "solid",
     "Density": 37.1,
     "Appearance": "Radioactive transition metal",
-    "Color": "#C0C0C0",
+    "Color": "#4F80D1",
     "OxidationStates": [
       3,
       4,
@@ -3827,7 +3827,7 @@
     "Phase": "solid",
     "Density": 40.7,
     "Appearance": "Radioactive transition metal first synthesized in 1984 by a German research team led by Peter Armbruster and Gottfried Muenzenberg at the Institute for Heavy Ion Research at Darmstadt",
-    "Color": "#C0C0C0",
+    "Color": "#D14F5A",
     "OxidationStates": [
       3,
       4,
@@ -3856,7 +3856,7 @@
     "Phase": "solid",
     "Density": 37.4,
     "Appearance": "Half-life of approximately 5 ms",
-    "Color": "#C0C0C0",
+    "Color": "#46DB66",
     "OxidationStates": [
       1,
       3,
@@ -3883,7 +3883,7 @@
     "Category": "transition metal",
     "Phase": "solid",
     "Density": 34.8,
-    "Color": "#C0C0C0",
+    "Color": "#7D3CBD",
     "OxidationStates": [
       2,
       4,
@@ -3910,7 +3910,7 @@
     "Category": "transition metal",
     "Phase": "solid",
     "Density": 28.7,
-    "Color": "#C0C0C0",
+    "Color": "#BDA548",
     "OxidationStates": [
       -1,
       3,
@@ -3937,7 +3937,7 @@
     "Category": "transition metal",
     "Phase": "solid",
     "Density": 14.0,
-    "Color": "#C0C0C0",
+    "Color": "#48B2BD",
     "OxidationStates": [
       2,
       4
@@ -3963,7 +3963,7 @@
     "Category": "post-transition metal",
     "Phase": "solid",
     "Density": 16.0,
-    "Color": "#C0C0C0",
+    "Color": "#D14FA0",
     "OxidationStates": [],
     "ReactivityNote": "low to moderate reactivity; many form protective oxide layers",
     "AbundanceNote": "synthetic or trace-only; no significant crustal abundance",
@@ -3986,7 +3986,7 @@
     "Category": "post-transition metal",
     "Phase": "solid",
     "Density": 9.928,
-    "Color": "#C0C0C0",
+    "Color": "#4ADB46",
     "OxidationStates": [],
     "ReactivityNote": "low to moderate reactivity; many form protective oxide layers",
     "AbundanceNote": "synthetic or trace-only; no significant crustal abundance",
@@ -4009,7 +4009,7 @@
     "Category": "post-transition metal",
     "Phase": "solid",
     "Density": 13.5,
-    "Color": "#C0C0C0",
+    "Color": "#3C41BD",
     "OxidationStates": [],
     "ReactivityNote": "low to moderate reactivity; many form protective oxide layers",
     "AbundanceNote": "synthetic or trace-only; no significant crustal abundance",
@@ -4032,7 +4032,7 @@
     "Category": "post-transition metal",
     "Phase": "solid",
     "Density": 12.9,
-    "Color": "#C0C0C0",
+    "Color": "#DB6C46",
     "OxidationStates": [
       -2,
       4
@@ -4058,7 +4058,7 @@
     "Category": "halogen",
     "Phase": "solid",
     "Density": 7.2,
-    "Color": "#C0C0C0",
+    "Color": "#46DB98",
     "OxidationStates": [
       -1,
       5
@@ -4083,7 +4083,7 @@
     "Category": "noble gas",
     "Phase": "solid",
     "Density": 7.0,
-    "Color": "#FFFFFF",
+    "Color": "#9840A8",
     "OxidationStates": [
       -1,
       1,
@@ -4097,7 +4097,7 @@
       "Og-294",
       "Og-295"
     ],
-    "Notes": "phase predicted/uncertain (predictions range from solid to gas); colorless in pure form (white hex is a placeholder for colorless); no stable or primordial isotopes; isotopeSymbols are the longest-lived / engineering-relevant nuclides; many bulk properties are predicted/estimated (rare or synthetic element); unavailable/undefined values (null): meltingPoint, boilingPoint, electronegativity",
+    "Notes": "phase predicted/uncertain (predictions range from solid to gas); no stable or primordial isotopes; isotopeSymbols are the longest-lived / engineering-relevant nuclides; many bulk properties are predicted/estimated (rare or synthetic element); unavailable/undefined values (null): meltingPoint, boilingPoint, electronegativity",
     "ValueConfidence": "estimated"
   }
 ]
