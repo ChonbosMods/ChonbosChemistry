@@ -30,6 +30,31 @@ MIN_DIST = 10.0   # must match the apply_palette compound min distance (distinct
 # reading as a faintly-tinted near-white. See gate-tuning notes in the task report.
 ECHO_BASE = "#EDE7D6"   # v=0.93: blends land just under the washout ceiling
 
+# -- Rule 0: ICONIC WHITES (highest priority) --
+# Substances whose real-world identity IS white: salt, sugar, chalk, titanium-white
+# and kin. These override echo/evocation/fallback so they read genuinely near-white
+# instead of a tinted pale. Each carries exempt "iconic white" so it skips the band
+# and saturation gates (like the iconic darks) and the exempt-vs-exempt distance gate.
+# Subtle warm/cool/matte variation keeps them tellable apart at close range while all
+# reading white (v>=0.90, s<=0.06). key: (hex, rationale).
+ICONIC_WHITE = {
+    "Titanium dioxide":   ("#F6F6F3", "the white pigment: purest white of all"),
+    "Sodium chloride":    ("#F3EFE7", "warm table-salt white"),
+    "Sucrose":            ("#F5F3ED", "sparkling sugar white"),
+    "Calcium carbonate":  ("#EFEBE1", "matte chalk white"),
+    "Sodium bicarbonate": ("#F2F0E8", "baking-soda white"),
+    "Zinc oxide":         ("#F4F2EC", "sunscreen white"),
+    "Starch":             ("#F0EEE4", "flour white"),
+    "Potassium nitrate":  ("#F1EFE9", "saltpeter crystal white"),
+    "Sodium hydroxide":   ("#EDEBE3", "caustic pellet white"),
+    "Magnesium oxide":    ("#F5F2ED", "burnt-magnesia brilliant white"),
+    "Barium sulfate":     ("#F4F1EE", "precipitate-test white"),
+    "Silver nitrate":     ("#EFEDE7", "white crystals, light-sensitive"),
+    "Arsenic trioxide":   ("#EEECE2", "'white arsenic' white powder"),
+    "Naphthalene":        ("#F2F0EA", "mothball white"),
+    "Calcium hydroxide":  ("#ECE9E0", "slaked-lime white"),
+}
+
 # -- Rule 1: CURATED verified (and iconic darks / alloys) --
 # key: (source, hex, exempt_reason_or_empty, rationale)
 VERIFIED = {
@@ -273,7 +298,14 @@ def build_rows(compounds, element_hex):
     # Pass 1: assign curated colors (anchors). These never move in the nudge pass.
     for c in compounds:
         name = c["Name"]
-        if name in VERIFIED:
+        if name in ICONIC_WHITE:
+            # Highest priority: iconic whites override echo/evocation/fallback. Hand-set
+            # near-white hex, exempt "iconic white" (skips band + sat gates and the
+            # exempt-vs-exempt distance gate), anchored (never moves in the nudge pass).
+            hexv, rat = ICONIC_WHITE[name]
+            rows[name] = (name, "verified", hexv, "iconic white", rat)
+            anchors.add(name)
+        elif name in VERIFIED:
             src, hexv, exempt, rat = VERIFIED[name]
             if src == "echo":
                 # Resolve the echo target now (parent metal's element color), then band.
