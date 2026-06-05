@@ -50,22 +50,77 @@
           "Channel": "fluid",
           "Ports": {
             "Ports": [
-              { "Face": 0, "Channel": "fluid", "Direction": "input" },
-              { "Face": 0, "Channel": "fluid", "Direction": "output" },
-              { "Face": 1, "Channel": "fluid", "Direction": "input" },
-              { "Face": 1, "Channel": "fluid", "Direction": "output" },
-              { "Face": 2, "Channel": "fluid", "Direction": "input" },
-              { "Face": 2, "Channel": "fluid", "Direction": "output" },
-              { "Face": 3, "Channel": "fluid", "Direction": "input" },
-              { "Face": 3, "Channel": "fluid", "Direction": "output" },
-              { "Face": 4, "Channel": "fluid", "Direction": "input" },
-              { "Face": 4, "Channel": "fluid", "Direction": "output" },
-              { "Face": 5, "Channel": "fluid", "Direction": "input" },
-              { "Face": 5, "Channel": "fluid", "Direction": "output" }
+              {
+                "Face": 0,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 0,
+                "Channel": "fluid",
+                "Direction": "output"
+              },
+              {
+                "Face": 1,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 1,
+                "Channel": "fluid",
+                "Direction": "output"
+              },
+              {
+                "Face": 2,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 2,
+                "Channel": "fluid",
+                "Direction": "output"
+              },
+              {
+                "Face": 3,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 3,
+                "Channel": "fluid",
+                "Direction": "output"
+              },
+              {
+                "Face": 4,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 4,
+                "Channel": "fluid",
+                "Direction": "output"
+              },
+              {
+                "Face": 5,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 5,
+                "Channel": "fluid",
+                "Direction": "output"
+              }
             ]
           },
           "Throughput": 1000
         }
+      }
+    },
+    "ConnectedBlockRuleSet": {
+      "Type": "CustomTemplate",
+      "TemplateShapeAssetId": "CC_FluidMachineTemplate",
+      "TemplateShapeBlockPatterns": {
+        "machine": "CC_FluidTank"
       }
     }
   }

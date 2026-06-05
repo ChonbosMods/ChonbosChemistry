@@ -54,12 +54,36 @@
           ],
           "Ports": {
             "Ports": [
-              { "Face": 0, "Channel": "fluid", "Direction": "input" },
-              { "Face": 1, "Channel": "fluid", "Direction": "input" },
-              { "Face": 2, "Channel": "fluid", "Direction": "input" },
-              { "Face": 3, "Channel": "fluid", "Direction": "input" },
-              { "Face": 4, "Channel": "fluid", "Direction": "input" },
-              { "Face": 5, "Channel": "fluid", "Direction": "input" }
+              {
+                "Face": 0,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 1,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 2,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 3,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 4,
+                "Channel": "fluid",
+                "Direction": "input"
+              },
+              {
+                "Face": 5,
+                "Channel": "fluid",
+                "Direction": "input"
+              }
             ]
           },
           "Work": {
@@ -69,6 +93,13 @@
           "Throughput": 1000,
           "CreativeSource": false
         }
+      }
+    },
+    "ConnectedBlockRuleSet": {
+      "Type": "CustomTemplate",
+      "TemplateShapeAssetId": "CC_FluidMachineTemplate",
+      "TemplateShapeBlockPatterns": {
+        "machine": "CC_FluidSink"
       }
     }
   }
