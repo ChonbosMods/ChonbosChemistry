@@ -37,6 +37,14 @@ class GlowDeriverTest {
     }
 
     @Test
+    void phosphorusGlowsFaintAsChemiluminescentException() {
+        // User decision (2026-06-05): phosphorus is a curated chemiluminescent exception to
+        // the nuclear-only rule. White P glows in the dark (the element is named light-bearer),
+        // so P reads FAINT despite having only stable isotopes (which would otherwise be NONE).
+        assertEquals(GlowTier.FAINT, element("P"));
+    }
+
+    @Test
     void geologicallyLongLivedGlowFaint() {
         assertEquals(GlowTier.FAINT, element("Th"));
         assertEquals(GlowTier.FAINT, element("U"));

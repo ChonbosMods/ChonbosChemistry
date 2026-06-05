@@ -6,6 +6,7 @@ import com.chonbosmods.chemistry.api.substance.Element;
 import com.chonbosmods.chemistry.api.substance.Isotope;
 import com.chonbosmods.chemistry.api.substance.Stability;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,10 +25,22 @@ public final class GlowDeriver {
 
     private static final Pattern ISOTOPE_REF = Pattern.compile("\\b([A-Z][a-z]?-\\d{1,3})\\b");
 
+    /**
+     * Chemiluminescent glow exceptions: visual glow without radioactivity. Currently white
+     * phosphorus only (user decision 2026-06-05: the element is named light-bearer and white P
+     * glows in the dark). Checked first in {@link #tierFor(Element, SubstanceRegistry)}, before
+     * the stable-isotope short-circuit, so it overrides the nuclear derivation.
+     */
+    private static final Map<String, GlowTier> CHEMILUMINESCENT = Map.of("P", GlowTier.FAINT);
+
     private GlowDeriver() {}
 
     /** Derives the glow tier of an element from its isotope list. */
     public static GlowTier tierFor(Element element, SubstanceRegistry registry) {
+        GlowTier override = CHEMILUMINESCENT.get(element.formula());
+        if (override != null) {
+            return override;
+        }
         List<Isotope> isotopes = registry.isotopesOf(element);
         if (isotopes.isEmpty() || isotopes.stream().anyMatch(i -> i.stability() == Stability.STABLE)) {
             return GlowTier.NONE;

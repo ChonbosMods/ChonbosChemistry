@@ -119,7 +119,9 @@ No new data fields. A pure derivation function (`impl.assetgen`, TDD) computes a
 - **Elements** (via their isotope list): any stable isotope → **none**. No stable
   isotopes but geologically long-lived (Th, U) → **faint**. Properly hot
   (Tc, Pm, Po, Rn, Ra, Ac...) → **strong**. Synthetic short-lived (roughly Z≥100) →
-  **fierce**.
+  **fierce**. Exception (user decision 2026-06-05): phosphorus glows FAINT as a curated
+  chemiluminescent exception: the only non-nuclear glow: implemented as an explicit
+  override map in GlowDeriver, not data.
 - **Compounds** (`IsRadioactive`, already isotope-aware): false → none; true → tier from
   the referenced isotope's stability data when resolvable, else strong.
 
