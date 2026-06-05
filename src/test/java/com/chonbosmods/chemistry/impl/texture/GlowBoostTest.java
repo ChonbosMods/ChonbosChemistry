@@ -42,4 +42,28 @@ class GlowBoostTest {
         // 0 + 255*35/100 = 89 = 0x59 ; 100 + 155*35/100 = 154 (100+54) = 0x9A
         assertEquals(0x599A59, out.getRGB(0, 0) & 0xFFFFFF);
     }
+
+    @Test
+    void preservesAlpha() {
+        BufferedImage img = new BufferedImage(2, 1, BufferedImage.TYPE_INT_ARGB);
+        img.setRGB(0, 0, 0x80006400); // inside mask, half alpha
+        img.setRGB(1, 0, 0x80006400); // outside mask
+        BufferedImage out = GlowBoost.apply(img, MASK, GlowTier.FIERCE);
+        // alpha 0x80 preserved, rgb blended toward white-hot like fierceBlendsTowardWhite
+        assertEquals(0x80599A59, out.getRGB(0, 0));
+    }
+
+    @Test
+    void boostKeepsWhiteHotAndZeroFloor() {
+        assertEquals(255, GlowBoost.boost(255, GlowTier.FIERCE)); // already white-hot
+        assertEquals(0, GlowBoost.boost(0, GlowTier.FAINT)); // 0*115/100 = 0
+        assertEquals(89, GlowBoost.boost(0, GlowTier.FIERCE)); // 0 + 255*35/100 = 89
+    }
+
+    @Test
+    void doesNotMutateSrc() {
+        BufferedImage src = onePixel(0x646464);
+        GlowBoost.apply(src, MASK, GlowTier.STRONG);
+        assertEquals(0xFF646464, src.getRGB(0, 0));
+    }
 }
