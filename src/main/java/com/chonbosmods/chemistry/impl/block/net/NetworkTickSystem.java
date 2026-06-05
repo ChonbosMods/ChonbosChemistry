@@ -139,6 +139,21 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
 
         NetworkManager manager = networkService.forWorld(world);
         PipeGridView grid = new WorldPipeGridView(world, store, pipeType);
+
+        // H8: restore any engine-wiped pipes from their pre-wipe snapshots BEFORE any rebuild this
+        // pass pools shares (events and tick systems share the world thread, so the restore always
+        // beats the first rebuild after a topology change). Restored positions are invalidated so
+        // their networks re-pool the restored shares. Cheap no-op when nothing is pending.
+        PipeNodeSnapshots snapshots = networkService.snapshotsForWorld(world);
+        if (!snapshots.isEmpty()) {
+            for (long restoredKey : snapshots.restorePending(grid, now)) {
+                manager.invalidate(
+                    NetworkManager.unpackX(restoredKey),
+                    NetworkManager.unpackY(restoredKey),
+                    NetworkManager.unpackZ(restoredKey));
+            }
+        }
+
         Network net = manager.getOrBuildNetwork(x, y, z, grid);
         if (net == null) {
             return;

@@ -3,12 +3,14 @@ package com.chonbosmods.chemistry.impl.block.net;
 import com.hypixel.hytale.component.Archetype;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.server.core.event.events.ecs.PlaceBlockEvent;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
 import org.joml.Vector3i;
@@ -31,10 +33,14 @@ import org.joml.Vector3i;
 public final class PipePlaceEventSystem extends EntityEventSystem<EntityStore, PlaceBlockEvent> {
 
     private final NetworkService networkService;
+    private final ComponentType<ChunkStore, PipeNode> pipeType;
 
-    public PipePlaceEventSystem(@Nonnull NetworkService networkService) {
+    public PipePlaceEventSystem(
+            @Nonnull NetworkService networkService,
+            @Nonnull ComponentType<ChunkStore, PipeNode> pipeType) {
         super(PlaceBlockEvent.class);
         this.networkService = networkService;
+        this.pipeType = pipeType;
     }
 
     @Override
@@ -52,6 +58,10 @@ public final class PipePlaceEventSystem extends EntityEventSystem<EntityStore, P
         if (world == null) {
             return;
         }
+        // H8: snapshot share-carrying pipes around the change BEFORE the engine's connected-block
+        // neighbor pass factory-resets any of them (a place re-resolves neighbor pipe shapes too).
+        PipeSnapshotScan.snapshotAround(
+            world, pipeType, networkService.snapshotsForWorld(world), pos.x(), pos.y(), pos.z());
         NetworkManager manager = networkService.forWorld(world);
         for (int[] p : NetworkManager.selfAndNeighbors(pos.x(), pos.y(), pos.z())) {
             manager.invalidate(p[0], p[1], p[2]);

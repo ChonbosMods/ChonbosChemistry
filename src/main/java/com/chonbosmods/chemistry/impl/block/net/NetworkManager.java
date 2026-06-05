@@ -182,10 +182,35 @@ public final class NetworkManager {
         // rebuild makes invalidation lossless. This is idempotent across rebuilds: shares only change
         // via the write-back, never via pooling, so re-pooling the same shares yields the same total.
         // POWER ignores resourceId; insert clamps to capacity.
+        //
+        // H8: two-pass pooling so a type-locked (FLUID/GAS) share whose resourceId was lost (engine
+        // block-entity wipe, see PipeNodeSnapshots) is not silently dropped by Network.insert's
+        // null-id rejection. Pass 1 pools shares that still know their resource (establishing the
+        // lock); pass 2 pools null-id shares under that recovered lock. If NO member knows the
+        // resource, the shares are unknowable and stay dropped (the snapshot layer prevents that
+        // case in practice).
+        boolean typeLocked = channel == PortChannel.FLUID || channel == PortChannel.GAS;
+        List<PipeNode> unknownResource = null;
         for (PipeNode p : memberNodes) {
             long share = p.bufferShare();
-            if (share > 0) {
-                network.insert(p.resourceId(), share, false);
+            if (share <= 0) {
+                continue;
+            }
+            if (typeLocked && p.resourceId() == null) {
+                if (unknownResource == null) {
+                    unknownResource = new ArrayList<>();
+                }
+                unknownResource.add(p);
+                continue;
+            }
+            network.insert(p.resourceId(), share, false);
+        }
+        if (unknownResource != null) {
+            String lock = network.lockedResourceId();
+            if (lock != null) {
+                for (PipeNode p : unknownResource) {
+                    network.insert(lock, p.bufferShare(), false);
+                }
             }
         }
         networksByAnchor.put(anchor, network);

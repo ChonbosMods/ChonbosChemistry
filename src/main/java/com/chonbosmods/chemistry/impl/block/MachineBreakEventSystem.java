@@ -51,10 +51,17 @@ import org.joml.Vector3i;
 public final class MachineBreakEventSystem extends EntityEventSystem<EntityStore, BreakBlockEvent> {
 
     private final ComponentType<ChunkStore, MachineBlockState> machineType;
+    private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.net.PipeNode> pipeType;
+    private final com.chonbosmods.chemistry.impl.block.net.NetworkService networkService;
 
-    public MachineBreakEventSystem(@Nonnull ComponentType<ChunkStore, MachineBlockState> machineType) {
+    public MachineBreakEventSystem(
+            @Nonnull ComponentType<ChunkStore, MachineBlockState> machineType,
+            @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.net.PipeNode> pipeType,
+            @Nonnull com.chonbosmods.chemistry.impl.block.net.NetworkService networkService) {
         super(BreakBlockEvent.class);
         this.machineType = machineType;
+        this.pipeType = pipeType;
+        this.networkService = networkService;
     }
 
     @Override
@@ -105,16 +112,39 @@ public final class MachineBreakEventSystem extends EntityEventSystem<EntityStore
             world.execute(() -> {
                 try {
                     long chunkIndex = ChunkUtil.indexChunkFromBlock(x, z);
-                    BlockAccessor accessor = world.getChunkIfLoaded(chunkIndex);
-                    if (accessor == null) {
+                    com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk chunk =
+                        world.getChunkIfLoaded(chunkIndex);
+                    if (chunk == null) {
                         return;
                     }
                     // Confirm the block is still our machine before clearing (defensive against races).
-                    BlockType actual = accessor.getBlockType(x, y, z);
+                    BlockType actual = chunk.getBlockType(x, y, z);
                     if (actual == null || actual == BlockType.EMPTY) {
                         return;
                     }
-                    accessor.setBlock(x, y, z, BlockType.EMPTY);
+                    chunk.setBlock(x, y, z, BlockType.EMPTY);
+
+                    // H8b: mirror the vanilla break path's connected-block neighbor pass
+                    // (BlockHarvestUtils does this after removal) so adjacent pipes re-resolve their
+                    // shapes: without it, cables kept a phantom arm pointing at the removed machine.
+                    // The pass factory-resets re-resolved pipes' block entities, so RE-SNAPSHOT the
+                    // surrounding pipes first: the event-time snapshots may already have been spent
+                    // by a tick pass that ran between the (cancelled) event and this deferred break.
+                    try {
+                        com.chonbosmods.chemistry.impl.block.net.PipeSnapshotScan.snapshotAround(
+                            world, pipeType, networkService.snapshotsForWorld(world), x, y, z);
+                        com.hypixel.hytale.server.core.universe.world.connectedblocks.ConnectedBlocksUtil
+                            .setConnectedBlockAndNotifyNeighbors(
+                                world.getChunkStore(),
+                                BlockType.getAssetMap().getIndex("Empty"),
+                                com.hypixel.hytale.server.core.asset.type.blocktype.config.RotationTuple.NONE,
+                                new Vector3i(0, 0, 0),
+                                new Vector3i(x, y, z),
+                                chunk,
+                                chunk.getBlockChunk());
+                    } catch (Throwable ignored) {
+                        // Visual reshape must never block the drop below.
+                    }
 
                     ItemStack drop = MachineEnergyMetadata.writeStoredEnergy(new ItemStack(dropItemId, 1), stored);
                     spawnDrop(world, drop, x, y, z);

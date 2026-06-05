@@ -108,15 +108,15 @@ public class ChonbosChemistry extends JavaPlugin {
         getChunkStoreRegistry().registerSystem(new NetworkTickSystem(
             pipeComponentType, machineComponentType, tankComponentType, networkService));
         getLogger().atInfo().log("Registered NetworkTickSystem (per-tick pipe-network distribution).");
-        getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService));
-        getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService));
+        getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService, pipeComponentType));
+        getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService, pipeComponentType));
 
         // Machine contents-preservation (H7): a machine block broken with stored energy drops an item
         // carrying that energy (MachineBreakEventSystem), and placing such an item rehydrates the new
         // block entity's energy buffer (MachinePlaceEventSystem). Both fire on the EntityStore (the
         // acting entity), like the pipe events above. Pure capture/restore logic lives in
         // MachineEnergyMetadata (unit-tested); these systems are thin glue verified in-game.
-        getEntityStoreRegistry().registerSystem(new MachineBreakEventSystem(machineComponentType));
+        getEntityStoreRegistry().registerSystem(new MachineBreakEventSystem(machineComponentType, pipeComponentType, networkService));
         getEntityStoreRegistry().registerSystem(new MachinePlaceEventSystem(machineComponentType));
         getLogger().atInfo().log("Registered machine energy break/place preservation events.");
         // NOTE: NO ChunkUnloadEvent handler. In Server 0.5.3 the engine's ChunkUnloadingSystem dispatches

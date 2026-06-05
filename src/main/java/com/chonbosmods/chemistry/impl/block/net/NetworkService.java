@@ -25,6 +25,9 @@ public final class NetworkService {
     /** world instance -> its lazily-created network cache. Identity-keyed (one World instance per world). */
     private final Map<World, NetworkManager> managers = new IdentityHashMap<>();
 
+    /** world instance -> its pending pre-wipe pipe snapshots (H8 wipe recovery). Identity-keyed. */
+    private final Map<World, PipeNodeSnapshots> snapshots = new IdentityHashMap<>();
+
     /**
      * The {@link NetworkManager} for {@code world}, creating (and remembering) one on first request.
      * Never null.
@@ -32,6 +35,16 @@ public final class NetworkService {
     @Nonnull
     public NetworkManager forWorld(@Nonnull World world) {
         return managers.computeIfAbsent(world, w -> new NetworkManager());
+    }
+
+    /**
+     * The {@link PipeNodeSnapshots} for {@code world}, creating (and remembering) one on first
+     * request. Never null. Written by the pipe place/break event systems (pre-wipe), drained by
+     * {@link NetworkTickSystem} at the start of each pass (restore-before-rebuild).
+     */
+    @Nonnull
+    public PipeNodeSnapshots snapshotsForWorld(@Nonnull World world) {
+        return snapshots.computeIfAbsent(world, w -> new PipeNodeSnapshots());
     }
 
     /** Number of worlds with a cached manager. Test/diagnostic accessor. */
