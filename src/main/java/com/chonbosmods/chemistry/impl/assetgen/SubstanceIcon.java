@@ -1,6 +1,7 @@
 package com.chonbosmods.chemistry.impl.assetgen;
 
 import com.chonbosmods.chemistry.api.substance.Color;
+import com.chonbosmods.chemistry.impl.texture.GlowBoost;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -18,6 +19,16 @@ public final class SubstanceIcon {
 
     /** Full-resolution copy of {@code master} with mask-marked (liquid) pixels multiplied by {@code color}. */
     public static BufferedImage tint(BufferedImage master, BufferedImage mask, Color color) {
+        return tint(master, mask, color, GlowTier.NONE);
+    }
+
+    /**
+     * Full-resolution copy of {@code master} with mask-marked (liquid) pixels multiplied by
+     * {@code color}, then brightened per {@code tier} via {@link GlowBoost#boost(int, GlowTier)} so
+     * glowing substances read brighter in their icon exactly as they do in the world texture. A
+     * {@link GlowTier#NONE} tier leaves the multiplied pixels untouched.
+     */
+    public static BufferedImage tint(BufferedImage master, BufferedImage mask, Color color, GlowTier tier) {
         int w = master.getWidth();
         int h = master.getHeight();
         BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
@@ -30,6 +41,11 @@ public final class SubstanceIcon {
                     int r = ((px >> 16) & 0xFF) * color.r() / 255;
                     int g = ((px >> 8) & 0xFF) * color.g() / 255;
                     int b = (px & 0xFF) * color.b() / 255;
+                    if (tier != GlowTier.NONE) {
+                        r = GlowBoost.boost(r, tier);
+                        g = GlowBoost.boost(g, tier);
+                        b = GlowBoost.boost(b, tier);
+                    }
                     px = (ma << 24) | (r << 16) | (g << 8) | b;
                 }
                 out.setRGB(x, y, px);
@@ -40,7 +56,15 @@ public final class SubstanceIcon {
 
     /** Tinted, square-cropped (to the jar silhouette, with padding), and scaled to {@code size} px. */
     public static BufferedImage render(BufferedImage master, BufferedImage mask, Color color, int size) {
-        BufferedImage tinted = tint(master, mask, color);
+        return render(master, mask, color, size, GlowTier.NONE);
+    }
+
+    /**
+     * As {@link #render(BufferedImage, BufferedImage, Color, int)}, but the liquid pixels are
+     * boosted per {@code tier} so a glowing substance's icon mirrors its brightened world texture.
+     */
+    public static BufferedImage render(BufferedImage master, BufferedImage mask, Color color, int size, GlowTier tier) {
+        BufferedImage tinted = tint(master, mask, color, tier);
         int w = tinted.getWidth();
         int h = tinted.getHeight();
         int minx = w;

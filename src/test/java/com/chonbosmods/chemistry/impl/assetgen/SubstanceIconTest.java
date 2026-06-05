@@ -32,6 +32,20 @@ class SubstanceIconTest {
     }
 
     @Test
+    void tintBoostsLiquidPixelForGlowingTier() {
+        // same white master * Color(200,30,40) = (0xC8,0x1E,0x28), then FAINT boost (x115/100):
+        // 200*115/100=230=0xE6, 30*115/100=34=0x22, 40*115/100=46=0x2E -> exceeds the unboosted value
+        BufferedImage master = argb(2, 2, 0xFFFFFFFF);
+        BufferedImage mask = argb(2, 2, 0x00000000);
+        mask.setRGB(0, 1, 0xFF00FF00); // (0,1) is liquid
+
+        BufferedImage out = SubstanceIcon.tint(master, mask, new Color(200, 30, 40), GlowTier.FAINT);
+
+        assertEquals(0xFFE6222E, out.getRGB(0, 1)); // liquid pixel multiplied then boosted
+        assertEquals(0xFFFFFFFF, out.getRGB(1, 0)); // glass pixel untouched (outside mask)
+    }
+
+    @Test
     void renderProducesSquareIconOfRequestedSize() {
         BufferedImage master = argb(8, 8, 0xFFFFFFFF);
         BufferedImage mask = argb(8, 8, 0x00000000);

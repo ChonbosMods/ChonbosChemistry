@@ -1,9 +1,12 @@
 package com.chonbosmods.chemistry.impl.assetgen;
 
 import com.chonbosmods.chemistry.api.substance.Color;
+import com.chonbosmods.chemistry.api.substance.Compound;
+import com.chonbosmods.chemistry.api.substance.Element;
 import com.chonbosmods.chemistry.api.substance.Phase;
 import com.chonbosmods.chemistry.api.substance.Substance;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
+import com.chonbosmods.chemistry.impl.texture.GlowBoost;
 import com.chonbosmods.chemistry.impl.texture.LiquidMask;
 import com.chonbosmods.chemistry.impl.texture.SubstanceLiquidTinter;
 import java.awt.image.BufferedImage;
@@ -11,8 +14,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.imageio.ImageIO;
 
@@ -57,6 +62,10 @@ public final class SubstanceAssetGenerator {
 
         StringBuilder lang = new StringBuilder();
         Set<String> seen = new HashSet<>();
+        Map<GlowTier, Integer> tierCounts = new EnumMap<>(GlowTier.class);
+        for (GlowTier t : GlowTier.values()) {
+            tierCounts.put(t, 0);
+        }
         for (Substance s : solids) {
             String id = SolidSubstanceAssets.assetId(s);
             if (!seen.add(id)) {
@@ -65,15 +74,31 @@ public final class SubstanceAssetGenerator {
             String texturePath = SolidSubstanceAssets.texturePath(id);
 
             Color c = s.color();
-            BufferedImage tinted = SubstanceLiquidTinter.tint(master, LIQUID_MASK, c);
-            ImageIO.write(tinted, "png", texDir.resolve(id + ".png").toFile());
-            ImageIO.write(SubstanceIcon.render(iconMaster, iconMask, c, 64), "png", iconDir.resolve(id + ".png").toFile());
+            GlowTier tier = s instanceof Element e
+                ? GlowDeriver.tierFor(e, registry)
+                : GlowDeriver.tierFor((Compound) s, registry);
+            tierCounts.merge(tier, 1, Integer::sum);
 
-            Files.writeString(itemDir.resolve(id + ".json"), SolidSubstanceAssets.itemJson(id, texturePath));
+            BufferedImage tinted = GlowBoost.apply(
+                SubstanceLiquidTinter.tint(master, LIQUID_MASK, c), LIQUID_MASK, tier);
+            ImageIO.write(tinted, "png", texDir.resolve(id + ".png").toFile());
+            ImageIO.write(
+                SubstanceIcon.render(iconMaster, iconMask, c, 64, tier),
+                "png", iconDir.resolve(id + ".png").toFile());
+
+            Files.writeString(
+                itemDir.resolve(id + ".json"),
+                SolidSubstanceAssets.itemJson(id, texturePath, tier, SolidSubstanceAssets.lightJson(c, tier)));
             lang.append("items.").append(id).append(".name = ").append(s.name()).append('\n');
         }
         Files.writeString(langDir.resolve("server.lang"), lang.toString());
 
         System.out.println("Generated " + solids.size() + " solid-substance items -> " + out);
+        System.out.printf(
+            "Glow tiers: NONE=%d FAINT=%d STRONG=%d FIERCE=%d%n",
+            tierCounts.get(GlowTier.NONE),
+            tierCounts.get(GlowTier.FAINT),
+            tierCounts.get(GlowTier.STRONG),
+            tierCounts.get(GlowTier.FIERCE));
     }
 }
