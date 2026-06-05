@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.chonbosmods.chemistry.api.io.PortChannel;
+import com.hypixel.hytale.codec.EmptyExtraInfo;
 import java.util.HashMap;
 import java.util.Map;
+import org.bson.BsonValue;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -147,5 +149,54 @@ class NetworkBufferPersistenceTest {
         writeBack(net, grid);
         assertNull(grid.pipeAt(0, 0, 0).resourceId(), "POWER never carries a resource id");
         assertEquals(5, grid.pipeAt(0, 0, 0).bufferShare());
+    }
+
+    /** Encode a node through the persistence codec and decode it back: the chunk save/load seam. */
+    private static PipeNode saveLoad(PipeNode node) {
+        BsonValue encoded = PipeNode.CODEC.encode(node, EmptyExtraInfo.EMPTY);
+        return PipeNode.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
+    }
+
+    @Test
+    void powerNetworkEnergySurvivesServerRestart() {
+        // Full restart shape: write-back -> every PipeNode through the persistence CODEC (chunk save +
+        // load) -> a brand-new NetworkManager (fresh process) pools the decoded shares.
+        FakePipeGrid grid = new FakePipeGrid()
+            .put(0, 0, 0, power(0))
+            .put(1, 0, 0, power(1))
+            .put(2, 0, 0, power(0));
+        NetworkManager mgr = new NetworkManager();
+        Network net = mgr.getOrBuildNetwork(0, 0, 0, grid);
+        net.insert(null, 11, false); // uneven total: exercises the split remainder too
+        writeBack(net, grid);
+
+        FakePipeGrid reloaded = new FakePipeGrid()
+            .put(0, 0, 0, saveLoad(grid.pipeAt(0, 0, 0)))
+            .put(1, 0, 0, saveLoad(grid.pipeAt(1, 0, 0)))
+            .put(2, 0, 0, saveLoad(grid.pipeAt(2, 0, 0)));
+        Network afterRestart = new NetworkManager().getOrBuildNetwork(0, 0, 0, reloaded);
+
+        assertEquals(11, afterRestart.stored(), "network energy survived the restart round-trip");
+        assertEquals(PortChannel.POWER, afterRestart.channel());
+    }
+
+    @Test
+    void fluidNetworkContentsAndTypeLockSurviveServerRestart() {
+        FakePipeGrid grid = new FakePipeGrid()
+            .put(0, 0, 0, PipeNode.of(PortChannel.FLUID, 0))
+            .put(1, 0, 0, PipeNode.of(PortChannel.FLUID, 0));
+        NetworkManager mgr = new NetworkManager();
+        Network net = mgr.getOrBuildNetwork(0, 0, 0, grid);
+        net.insert("element:bromine", 9, false);
+        writeBack(net, grid);
+
+        FakePipeGrid reloaded = new FakePipeGrid()
+            .put(0, 0, 0, saveLoad(grid.pipeAt(0, 0, 0)))
+            .put(1, 0, 0, saveLoad(grid.pipeAt(1, 0, 0)));
+        Network afterRestart = new NetworkManager().getOrBuildNetwork(0, 0, 0, reloaded);
+
+        assertEquals(9, afterRestart.stored(), "fluid contents survived the restart round-trip");
+        assertEquals("element:bromine", afterRestart.lockedResourceId(),
+            "type-lock recovered from the decoded pipe shares");
     }
 }
