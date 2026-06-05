@@ -8,13 +8,7 @@
 
 ## What is Chonbo's Chemistry?
 
-Chonbo's Chemistry is a **foundational library** for an interconnected family of chemistry mods on Hytale (the ChemLib-equivalent base layer). It is not "items for the periodic table": that's the visible surface. The real foundation is a **shared substance data model**, a **radiation engine**, a **payload-agnostic containment/affliction system**, and a **clean API** that everything else plugs into.
-
-Three guiding principles:
-
-- **Derive, don't author.** Store the few true inputs (elements, isotopes) carefully and compute everything else: molar mass, compound radioactivity, compound toxicity, generated item forms.
-- **Data-driven.** Substances, isotopes, compounds, and config bands are defined in JSON, so the family and third parties extend the system without code.
-- **One mechanism, many payloads.** Radiation, toxic gas, and breathable oxygen are the same exposure/containment machinery with different payloads. Built once.
+Chonbo's Chemistry is a chemistry mod for Hytale. The foundation is a **shared substance data model**, a **radiation engine**, a **payload-agnostic containment/affliction system**, and a **clean API** that everything else plugs into.
 
 ## Architecture
 
