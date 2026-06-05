@@ -35,7 +35,7 @@ The transport-network rework plan (`docs/plans/2026-06-03-transport-network-rewo
 
 **Not started / deferred (the remaining roadmap):**
 1. **§3 + §9 machines & recipes: THE NEXT MILESTONE.** The `MachineTickSystem` work pass is still a stub; everything it needs (power, transport, buffers, run-dry rules, GUI scaffold, ON/OFF state mechanism per §16-style `State.Definitions` + `setBlockInteractionState`) now exists. Chemistry trio first (Synthesizer/Decomposer/Converter, recipes auto-derived from the dataset).
-2. **GAS pipes:** next transport step (FLUID is live as of 2026-06-04): the network layer is channel-generic, so this is mostly assets (gas pipe model/texture in progress on the art track) + a tier table + test sources. **ITEM pipes (§13.4) and NEUTRON pipes (§13.5):** own later plans.
+2. **GAS pipes: DONE (2026-06-05, in-game verified).** `CC_GasPipe` + hydrogen/CO₂ test rig, pure asset clone of the fluid pattern (`docs/plans/2026-06-05-gas-channel-assets-design.md`); final gas art replaces the placeholder `GasTube_*`/`gastube_*` files in place. **ITEM pipes (§13.4) and NEUTRON pipes (§13.5):** own later plans.
 3. **§11 heat, §14 redstone, §15 electrified benches:** designed, not started.
 4. Small deferred items: pipe tooltip icon (Blockbench render staged at `~/Development/Hytale/models/staging/pipe-icon/`; NOTE pipe models use per-axis `stretch` which the Blockbench viewport ignores: bake stretch before screenshotting), chunk-unload eviction via a WorldThread-safe hook, real block-face-index alignment, network split/merge optimization (vs drop-and-rebuild), all `[TUNE]` numbers. *(Done 2026-06-05: live-refresh GUI, battery↔battery balancing, tank/resource carry via `BlockHolder`, restart persistence spot-check.)*
 
