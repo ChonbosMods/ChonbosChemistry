@@ -1,0 +1,154 @@
+key,source,hex,exempt,rationale
+Sulfuric acid,evocation,#E6DE9E,,oily concentrated straw-yellow
+Hydrochloric acid,evocation,#CEE6BE,,sharp pale chlorine-green
+Nitric acid,evocation,#E6C66F,,fuming-amber red nitric
+Phosphoric acid,evocation,#E4D8C0,,syrupy cola-acid amber-white
+Acetic acid,evocation,#E1D8AB,,vinegar pale straw
+Citric acid,evocation,#C8E060,,citrus zest yellow-green
+Carbonic acid,evocation,#C1DBE6,,carbonated fizz pale blue
+Hydrofluoric acid,evocation,#B3E6D4,,etched-glass frost
+Hydrocyanic acid,evocation,#D6D6A7,,bitter-almond pale ivory
+Boric acid,evocation,#C9E6B3,,eyewash faint green-white
+Formic acid,evocation,#E0B060,,ant/sting amber
+Oxalic acid,evocation,#E4E4C0,,rhubarb-sour pale
+Lactic acid,evocation,#DCCFAB,,milky sour cream-white
+Perchloric acid,evocation,#D7CC9F,,fuming oxidizer pale gold
+Sulfurous acid,evocation,#E6E3B2,,sharp sulfur pale yellow
+Nitrous acid,evocation,#BAD3E6,,pale-blue unstable solution
+Sodium hydroxide,verified,#EDEBE3,iconic white,caustic pellet white
+Potassium hydroxide,echo,#E3BFD1,,faint K-tinted white (echoes element palette)
+Calcium hydroxide,verified,#ECE9E0,iconic white,slaked-lime white
+Ammonia,evocation,#AFD1E1,,sharp cold pale blue
+Ammonium hydroxide,evocation,#A2C9DC,,household-ammonia pale blue
+Magnesium hydroxide,echo,#BCC5E0,,faint Mg-tinted white (echoes element palette)
+Aluminium hydroxide,echo,#DDDEB4,,faint Al-tinted white (echoes element palette)
+Lithium hydroxide,echo,#E6B5B5,,faint Li-tinted white (echoes element palette)
+Barium hydroxide,echo,#D0DCAE,,faint Ba-tinted white (echoes element palette)
+Sodium chloride,verified,#F3EFE7,iconic white,warm table-salt white
+Potassium chloride,echo,#E3B1CA,,faint K-tinted white (echoes element palette)
+Potassium nitrate,verified,#F1EFE9,iconic white,saltpeter crystal white
+Sodium nitrate,echo,#E6C89E,,faint Na-tinted white (echoes element palette)
+Ammonium nitrate,fallback,#D0D79F,,salt functional tint over base white
+Ammonium chloride,fallback,#DCE6BA,,salt functional tint over base white
+Ammonium sulfate,fallback,#C6D79F,,salt functional tint over base white
+Calcium carbonate,verified,#EFEBE1,iconic white,matte chalk white
+Sodium carbonate,echo,#E1C194,,faint Na-tinted white (echoes element palette)
+Sodium bicarbonate,verified,#F2F0E8,iconic white,baking-soda white
+Potassium carbonate,echo,#D9A9C1,,faint K-tinted white (echoes element palette)
+Calcium sulfate,echo,#E6CDB3,,faint Ca-tinted white (echoes element palette)
+Magnesium sulfate,echo,#AFBBE0,,faint Mg-tinted white (echoes element palette)
+Copper(II) sulfate,verified,#2A6FD8,,copper(II) sulfate pentahydrate blue
+Iron(II) sulfate,verified,#7FB77E,,pale blue-green copperas
+Zinc sulfate,echo,#CBCB96,,faint Zn-tinted white (echoes element palette)
+Calcium chloride,echo,#E1C5A8,,faint Ca-tinted white (echoes element palette)
+Magnesium chloride,echo,#A7B2D6,,faint Mg-tinted white (echoes element palette)
+Potassium permanganate,verified,#7A2A8A,,"permanganate violet, brightened to band"
+Sodium thiosulfate,echo,#DCB988,,faint Na-tinted white (echoes element palette)
+Silver nitrate,verified,#EFEDE7,iconic white,"white crystals, light-sensitive"
+Sodium sulfate,echo,#DCC388,,faint Na-tinted white (echoes element palette)
+Sodium fluoride,echo,#E1CB94,,faint Na-tinted white (echoes element palette)
+Borax,echo,#E6D597,,faint Na-tinted white (echoes element palette)
+Sodium hypochlorite,evocation,#A8E0CC,,pool-cyan bleach solution
+Calcium phosphate,echo,#DCBD9E,,faint Ca-tinted white (echoes element palette)
+Potassium iodide,echo,#D49DB8,,faint K-tinted white (echoes element palette)
+Sodium nitrite,echo,#DCCE88,,faint Na-tinted white (echoes element palette)
+Potassium chlorate,echo,#DEB4C1,,faint K-tinted white (echoes element palette)
+Ammonium perchlorate,fallback,#D4E6B3,,salt functional tint over base white
+Lead(II) nitrate,evocation,#C8C0A8,,"white lead salt, faint warm cast"
+Barium sulfate,verified,#F4F1EE,iconic white,precipitate-test white
+Potassium dichromate,verified,#E8702A,,bright dichromate orange
+Calcium hypochlorite,evocation,#C2E8DA,,pool-cyan chlorine bleaching powder
+Sodium silicate,echo,#DCD490,,faint Na-tinted white (echoes element palette)
+Water,verified,#C0E0F8,,thick-layer water blue
+Carbon dioxide,evocation,#ACDDD5,,exhaled gas faint cool pale
+Carbon monoxide,evocation,#9CBDD3,,"silent colorless gas, faint cool"
+Silicon dioxide,verified,#F4F3EF,iconic white,quartz-crystal white
+Iron(III) oxide,verified,#B0472A,,red-brown rust
+"Iron(II,III) oxide",verified,#262A2E,iconic dark,black magnetite
+Aluminium oxide,evocation,#C6DCAB,,corundum white
+Calcium oxide,evocation,#BCD79F,,caustic quicklime white
+Magnesium oxide,verified,#F5F2ED,iconic white,burnt-magnesia brilliant white
+Sulfur dioxide,evocation,#DAD59B,,burnt-match sulfurous pale
+Sulfur trioxide,evocation,#E6E1A8,,fuming acid-anhydride pale straw
+Nitrogen dioxide,verified,#B05A2A,,red-brown NO2 gas
+Nitrous oxide,evocation,#B5D19A,,laughing-gas faint sweet pale
+Zinc oxide,verified,#F4F2EC,iconic white,sunscreen white
+Titanium dioxide,verified,#F6F6F3,iconic white,the white pigment: purest white of all
+Copper(II) oxide,verified,#242022,iconic dark,black cupric oxide
+Hydrogen peroxide,evocation,#9DD7CB,,bleaching pale aqua
+Lead(II) oxide,verified,#E8B23A,,litharge yellow
+Manganese dioxide,verified,#2A2622,iconic dark,black/dark-brown pyrolusite
+Chromium(III) oxide,verified,#3A7A2A,,chrome-oxide green
+Lead dioxide,verified,#3A2A22,iconic dark,dark-brown plattnerite
+Tin(IV) oxide,evocation,#BCDCAB,,off-white stannic oxide
+Dinitrogen tetroxide,verified,#C08A5A,,"pale-brown, in equilibrium with NO2"
+Carbon steel,verified,#8A8E96,low-sat metal,lustrous neutral grey steel
+Stainless steel,verified,#A8B0B8,low-sat metal,bright cool corrosion-resistant grey
+Cast iron,verified,#3A3A40,iconic dark,dull dark grey brittle iron
+Brass,verified,#C8A951,,yellow-gold brass
+Bronze,verified,#A86B32,,reddish-brown bronze
+Solder (tin-lead),verified,#9CA0A6,low-sat metal,dull silver low-melt solder
+Pewter,verified,#9A9A9E,low-sat metal,dull silver-grey pewter
+Sterling silver,verified,#E2E2EA,low-sat metal,bright white silver
+White gold,verified,#DCDCE2,low-sat metal,white-silver precious metal
+Gunmetal,verified,#8C6A4A,,reddish bronze gunmetal
+Nichrome,verified,#9EA2AA,low-sat metal,silver-grey resistance wire
+Duralumin,verified,#C4CCD6,low-sat metal,light silver aluminium alloy
+Cupronickel,verified,#B0AEA6,low-sat metal,warm silver-grey cupronickel
+Wood's metal,verified,#9494A0,low-sat metal,dull silver fusible alloy
+Dental amalgam,verified,#AEB2BA,low-sat metal,silver metallic amalgam
+Methane,evocation,#98C6D7,,natural-gas flame pale blue
+Ethane,evocation,#B2DBE6,,light hydrocarbon gas blue-white
+Propane,evocation,#ABC4DC,,bottled-gas pale blue
+Butane,evocation,#9CB3D3,,lighter-fuel pale blue
+Ethylene,evocation,#BEE6BA,,ripening-agent faint green
+Acetylene,evocation,#D6E0A3,,carbide-lamp greenish white
+Ethanol,evocation,#C1E6E6,,clear spirit cool tint
+Methanol,evocation,#A2D6DC,,wood-spirit cool clear
+Isopropanol,evocation,#A2BFDC,,rubbing-alcohol cool clear
+Acetone,evocation,#B2DCAB,,nail-polish solvent pale
+Glucose,evocation,#D7C37E,,warm grape-sugar
+Sucrose,verified,#F5F3ED,iconic white,sparkling sugar white
+Cellulose,evocation,#ACD59E,,plant-fibre pale wood-white
+Starch,verified,#F0EEE4,iconic white,flour white
+Urea,evocation,#B6E6B3,,fertilizer/urine warm pale
+Glycerol,evocation,#A6DCA2,,sweet syrupy warm clear
+Benzene,evocation,#D1CF8F,,aromatic-solvent faint gold
+Toluene,evocation,#C2CF93,,paint-thinner pale gold
+Formaldehyde,evocation,#C1E6C4,,preservative sharp pale
+Ethylene glycol,evocation,#C1E6AD,,antifreeze green tint
+Caffeine,evocation,#C8A878,,coffee-bean warm brown
+Ascorbic acid,evocation,#E6DE5F,,vitamin-C citrus yellow
+Chloroform,evocation,#B3E6C3,,sweet dense anaesthetic pale
+Diethyl ether,evocation,#ABDCC3,,volatile anaesthetic ether pale
+Naphthalene,verified,#F2F0EA,iconic white,mothball white
+Phenol,evocation,#E6C9C1,,carbolic white-to-pink
+Acetic anhydride,evocation,#ABDCB3,,pungent acetyl pale straw
+Ethyl acetate,evocation,#A2DCAC,,fruity-ester pale green-gold
+Glycine,evocation,#AFE1BB,,sweet amino warm pale
+Nicotine,evocation,#D8BE72,,tobacco oily amber
+Hydrogen sulfide,evocation,#D4DA92,,rotten-egg sulfurous pale yellow
+Chlorine,verified,#B8D832,,yellow-green chlorine gas
+Phosgene,evocation,#C1E6CE,,fresh-hay war-gas pale green
+Sodium cyanide,verified,#F1EFE6,iconic white,deadly almond white
+Potassium cyanide,verified,#EFEDE4,iconic white,deadly almond white
+Arsenic trioxide,verified,#EEECE2,iconic white,'white arsenic' white powder
+Lead(II) acetate,evocation,#A2DCB8,,sugar-of-lead sweet white
+Mercury(II) chloride,evocation,#9FD7C1,,corrosive-sublimate white
+Tetraethyllead,evocation,#E0E6A0,,leaded-petrol oily pale
+Sodium azide,evocation,#A0D59E,,airbag-propellant white
+Hydrazine,evocation,#B3C9E6,,rocket-fuel fuming pale blue
+Methyl isocyanate,evocation,#B3E6DE,,sharp volatile pale
+Carbon tetrachloride,evocation,#A2DCD3,,dense dry-cleaning solvent pale
+DDT,evocation,#9ED5B2,,off-white pesticide crystal
+Strychnine,evocation,#B5DFCA,,bitter-white alkaloid
+Parathion,evocation,#D8C870,,pale-yellow garlic-odor insecticide
+Uranium dioxide,verified,#241F1C,iconic dark,black/brown ceramic
+Uranium hexafluoride,verified,#D6D2C8,low-sat metal,"colorless/white volatile crystals, faint warm grey"
+Triuranium octoxide,verified,#D4B83A,,yellowcake ochre: the iconic yellow (pure U3O8 is darker but the name owns the color)
+Uranyl nitrate,verified,#D8E84A,,fluorescent uranyl yellow-green
+Plutonium dioxide,verified,#3A2E1C,iconic dark,"yellow-brown to olive ceramic, dark"
+Thorium dioxide,evocation,#E6DEC8,,"white thoria ceramic, warm cast"
+Radium chloride,evocation,#EAD4A6,,white-to-buff self-luminous salt
+Americium dioxide,verified,#222020,iconic dark,black ceramic
+Caesium-137 chloride,echo,#E6D9B5,,"white CsCl, echoes caesium golden metal"
