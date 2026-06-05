@@ -63,9 +63,6 @@ public final class SubstanceAssetGenerator {
         StringBuilder lang = new StringBuilder();
         Set<String> seen = new HashSet<>();
         Map<GlowTier, Integer> tierCounts = new EnumMap<>(GlowTier.class);
-        for (GlowTier t : GlowTier.values()) {
-            tierCounts.put(t, 0);
-        }
         for (Substance s : solids) {
             String id = SolidSubstanceAssets.assetId(s);
             if (!seen.add(id)) {
@@ -94,11 +91,10 @@ public final class SubstanceAssetGenerator {
         Files.writeString(langDir.resolve("server.lang"), lang.toString());
 
         System.out.println("Generated " + solids.size() + " solid-substance items -> " + out);
-        System.out.printf(
-            "Glow tiers: NONE=%d FAINT=%d STRONG=%d FIERCE=%d%n",
-            tierCounts.get(GlowTier.NONE),
-            tierCounts.get(GlowTier.FAINT),
-            tierCounts.get(GlowTier.STRONG),
-            tierCounts.get(GlowTier.FIERCE));
+        StringBuilder summary = new StringBuilder("Glow tiers:");
+        for (GlowTier t : GlowTier.values()) {
+            summary.append(' ').append(t.name()).append('=').append(tierCounts.getOrDefault(t, 0));
+        }
+        System.out.println(summary);
     }
 }
