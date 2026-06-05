@@ -53,6 +53,9 @@ ICONIC_WHITE = {
     "Arsenic trioxide":   ("#EEECE2", "'white arsenic' white powder"),
     "Naphthalene":        ("#F2F0EA", "mothball white"),
     "Calcium hydroxide":  ("#ECE9E0", "slaked-lime white"),
+    "Sodium cyanide":     ("#F1EFE6", "deadly almond white"),
+    "Potassium cyanide":  ("#EFEDE4", "deadly almond white"),
+    "Silicon dioxide":    ("#F4F3EF", "quartz-crystal white"),
 }
 
 # -- Rule 1: CURATED verified (and iconic darks / alloys) --
@@ -81,7 +84,7 @@ VERIFIED = {
     "Uranium dioxide":      ("verified", "#241F1C", "iconic dark", "black/brown ceramic"),
     "Plutonium dioxide":    ("verified", "#3A2E1C", "iconic dark", "yellow-brown to olive ceramic, dark"),
     "Americium dioxide":    ("verified", "#222020", "iconic dark", "black ceramic"),
-    "Triuranium octoxide":  ("verified", "#3E3318", "iconic dark", "olive-green to black yellowcake, dark end"),
+    "Triuranium octoxide":  ("verified", "#D4B83A", "", "yellowcake ochre: the iconic yellow (pure U3O8 is darker but the name owns the color)"),
     "Lead dioxide":         ("verified", "#3A2A22", "iconic dark", "dark-brown plattnerite"),
     "Cast iron":            ("verified", "#3A3A40", "iconic dark", "dull dark grey brittle iron"),
 
@@ -105,8 +108,8 @@ VERIFIED = {
     "Uranium hexafluoride": ("verified", "#D6D2C8", "low-sat metal", "colorless/white volatile crystals, faint warm grey"),
     "Uranyl nitrate":       ("verified", "#D8E84A", "", "fluorescent uranyl yellow-green"),
     "Thorium dioxide":      ("evocation", "#E6DEC8", "", "white thoria ceramic, warm cast"),
-    "Radium chloride":      ("evocation", "#EAD8B4", "", "white-to-buff self-luminous salt"),
-    "Caesium-137 chloride": ("echo",     "",        "", "white CsCl, echoes caesium sky-blue"),
+    "Radium chloride":      ("evocation", "#EAD4A6", "", "white-to-buff self-luminous salt"),
+    "Caesium-137 chloride": ("echo",     "",        "", "white CsCl, echoes caesium golden metal"),
 }
 
 # -- Rule 2: CURATED evocation (organics + notable compounds) --
@@ -184,8 +187,6 @@ EVOCATION = {
     "Hydrogen sulfide":   ("#E0E4B0", "", "rotten-egg sulfurous pale yellow"),
     "Phosgene":           ("#E0E6D2", "", "fresh-hay war-gas pale green"),
     "Arsenic trioxide":   ("#E2E0D0", "", "white-arsenic odorless powder"),
-    "Sodium cyanide":     ("#E4E2D0", "", "almond-faint deadly white"),
-    "Potassium cyanide":  ("#E2E2CE", "", "almond-faint deadly white"),
     "Mercury(II) chloride":("#E6E2D6", "", "corrosive-sublimate white"),
     "Lead(II) acetate":   ("#E6E2CC", "", "sugar-of-lead sweet white"),
     "Tetraethyllead":     ("#E8DCB0", "", "leaded-petrol oily pale"),
@@ -198,7 +199,6 @@ EVOCATION = {
     "Carbon dioxide":     ("#D6E2E0", "", "exhaled gas faint cool pale"),
     "Sulfur dioxide":     ("#E4E0B0", "", "burnt-match sulfurous pale"),
     "Sulfur trioxide":    ("#E6E2B6", "", "fuming acid-anhydride pale straw"),
-    "Silicon dioxide":    ("#DCE2E0", "", "quartz glassy pale"),
     "Titanium dioxide":   ("#F0EEE6", "", "brilliant titanium-white pigment"),
     "Zinc oxide":         ("#ECEAE0", "", "calamine/sunscreen white"),
     "Tin(IV) oxide":      ("#E6E4D8", "", "off-white stannic oxide"),

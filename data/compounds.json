@@ -165,7 +165,7 @@
     "CompoundType": "acid",
     "Phase": "liquid",
     "Density": 1.05,
-    "Color": "#E6DBA8",
+    "Color": "#E1D8AB",
     "Appearance": "colorless liquid with pungent vinegar odor",
     "WaterSolubility": "miscible",
     "PropertyFlags": {
@@ -311,7 +311,7 @@
     "CompoundType": "acid",
     "Phase": "liquid",
     "Density": 0.69,
-    "Color": "#E0E0B5",
+    "Color": "#D6D6A7",
     "Appearance": "colorless volatile liquid/gas, faint bitter-almond odor",
     "WaterSolubility": "miscible",
     "PropertyFlags": {
@@ -467,7 +467,7 @@
     "CompoundType": "acid",
     "Phase": "liquid",
     "Density": 1.21,
-    "Color": "#E1D3AF",
+    "Color": "#DCCFAB",
     "Appearance": "colorless to yellow syrupy liquid",
     "WaterSolubility": "miscible",
     "PropertyFlags": {
@@ -504,7 +504,7 @@
     "CompoundType": "acid",
     "Phase": "liquid",
     "Density": 1.77,
-    "Color": "#DCD1A2",
+    "Color": "#D7CC9F",
     "Appearance": "colorless fuming liquid",
     "WaterSolubility": "miscible",
     "PropertyFlags": {
@@ -543,7 +543,7 @@
     "CompoundType": "acid",
     "Phase": "liquid",
     "Density": 1.03,
-    "Color": "#DCDBAA",
+    "Color": "#E6E3B2",
     "Appearance": "colorless solution, sharp sulfur odor",
     "WaterSolubility": "miscible",
     "PropertyFlags": {
@@ -850,7 +850,7 @@
     "CompoundType": "base",
     "Phase": "solid",
     "Density": 2.42,
-    "Color": "#D4C99D",
+    "Color": "#DDDEB4",
     "Appearance": "white amorphous powder",
     "WaterSolubility": "insoluble",
     "PropertyFlags": {
@@ -1075,7 +1075,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 2.26,
-    "Color": "#E6CBA5",
+    "Color": "#E6C89E",
     "Appearance": "white crystalline solid",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -1113,7 +1113,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 1.72,
-    "Color": "#D4D79F",
+    "Color": "#D0D79F",
     "Appearance": "white/grey hygroscopic prills",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -1152,7 +1152,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 1.53,
-    "Color": "#CAD79F",
+    "Color": "#DCE6BA",
     "Appearance": "white crystalline solid",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -1191,7 +1191,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 1.77,
-    "Color": "#D6E1B6",
+    "Color": "#C6D79F",
     "Appearance": "white/tan crystalline solid",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -1260,7 +1260,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 2.54,
-    "Color": "#E6C597",
+    "Color": "#E1C194",
     "Appearance": "white powder",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -1370,7 +1370,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 2.96,
-    "Color": "#E1C2A2",
+    "Color": "#E6CDB3",
     "Appearance": "white powder (gypsum/anhydrite)",
     "WaterSolubility": "low",
     "PropertyFlags": {
@@ -1554,7 +1554,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 2.15,
-    "Color": "#DCB995",
+    "Color": "#E1C5A8",
     "Appearance": "white deliquescent solid",
     "WaterSolubility": "very high (exothermic)",
     "PropertyFlags": {
@@ -1738,7 +1738,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 2.66,
-    "Color": "#DCC290",
+    "Color": "#DCC388",
     "Appearance": "white crystalline solid",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -1774,7 +1774,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 2.56,
-    "Color": "#E6CF97",
+    "Color": "#E1CB94",
     "Appearance": "white crystalline solid",
     "WaterSolubility": "moderate",
     "PropertyFlags": {
@@ -1813,7 +1813,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 1.73,
-    "Color": "#D7C285",
+    "Color": "#E6D597",
     "Appearance": "white/colorless crystalline powder",
     "WaterSolubility": "moderate",
     "PropertyFlags": {
@@ -1892,7 +1892,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 3.14,
-    "Color": "#DCCB95",
+    "Color": "#DCBD9E",
     "Appearance": "white amorphous solid",
     "WaterSolubility": "insoluble",
     "PropertyFlags": {
@@ -1960,7 +1960,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 2.17,
-    "Color": "#DCCB88",
+    "Color": "#DCCE88",
     "Appearance": "white to pale yellow solid",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -2037,7 +2037,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 1.95,
-    "Color": "#DAE6C1",
+    "Color": "#D4E6B3",
     "Appearance": "white crystalline solid",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -2226,7 +2226,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 2.4,
-    "Color": "#E1D894",
+    "Color": "#DCD490",
     "Appearance": "colorless to white glassy solid or syrupy solution",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -2368,7 +2368,7 @@
     "CompoundType": "oxide",
     "Phase": "solid",
     "Density": 2.65,
-    "Color": "#A0D8C5",
+    "Color": "#F4F3EF",
     "Appearance": "colorless/white crystalline (quartz) or amorphous",
     "WaterSolubility": "insoluble",
     "PropertyFlags": {
@@ -2467,7 +2467,7 @@
     "CompoundType": "oxide",
     "Phase": "solid",
     "Density": 3.95,
-    "Color": "#C0D79F",
+    "Color": "#C6DCAB",
     "Appearance": "white crystalline solid (corundum when crystalline)",
     "WaterSolubility": "insoluble",
     "PropertyFlags": {
@@ -2503,7 +2503,7 @@
     "CompoundType": "oxide",
     "Phase": "solid",
     "Density": 3.34,
-    "Color": "#C6DCAB",
+    "Color": "#BCD79F",
     "Appearance": "white caustic solid",
     "WaterSolubility": "reacts with water (exothermic)",
     "PropertyFlags": {
@@ -2578,7 +2578,7 @@
     "CompoundType": "oxide",
     "Phase": "gas",
     "Density": 0.00293,
-    "Color": "#D5CF8F",
+    "Color": "#DAD59B",
     "Appearance": "colorless gas, pungent suffocating odor",
     "WaterSolubility": "high (forms sulfurous acid)",
     "PropertyFlags": {
@@ -2615,7 +2615,7 @@
     "CompoundType": "oxide",
     "Phase": "liquid",
     "Density": 1.92,
-    "Color": "#E6E6AF",
+    "Color": "#E6E1A8",
     "Appearance": "colorless to white fuming liquid/solid",
     "WaterSolubility": "reacts violently with water",
     "PropertyFlags": {
@@ -2690,7 +2690,7 @@
     "CompoundType": "oxide",
     "Phase": "gas",
     "Density": 0.00185,
-    "Color": "#B9D19A",
+    "Color": "#B5D19A",
     "Appearance": "colorless gas, faint sweet odor",
     "WaterSolubility": "moderate",
     "PropertyFlags": {
@@ -2838,7 +2838,7 @@
     "CompoundType": "oxide",
     "Phase": "liquid",
     "Density": 1.45,
-    "Color": "#B8E6DD",
+    "Color": "#9DD7CB",
     "Appearance": "colorless liquid (concentrated has sharp odor)",
     "WaterSolubility": "miscible",
     "PropertyFlags": {
@@ -3020,7 +3020,7 @@
     "CompoundType": "oxide",
     "Phase": "solid",
     "Density": 6.95,
-    "Color": "#B7DCA2",
+    "Color": "#BCDCAB",
     "Appearance": "white/off-white powder",
     "WaterSolubility": "insoluble",
     "PropertyFlags": {
@@ -3908,7 +3908,7 @@
     "CompoundType": "organic",
     "Phase": "liquid",
     "Density": 0.784,
-    "Color": "#B6E1AF",
+    "Color": "#B2DCAB",
     "Appearance": "colorless liquid, sweet pungent odor",
     "WaterSolubility": "miscible",
     "PropertyFlags": {
@@ -3947,7 +3947,7 @@
     "CompoundType": "organic",
     "Phase": "solid",
     "Density": 1.54,
-    "Color": "#D7CA7E",
+    "Color": "#D7C37E",
     "Appearance": "white crystalline powder, sweet",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -4011,7 +4011,7 @@
     "CompoundType": "organic",
     "Phase": "solid",
     "Density": 1.5,
-    "Color": "#B0D59E",
+    "Color": "#ACD59E",
     "Appearance": "white fibrous solid",
     "WaterSolubility": "insoluble",
     "PropertyFlags": {
@@ -4076,7 +4076,7 @@
     "CompoundType": "organic",
     "Phase": "solid",
     "Density": 1.32,
-    "Color": "#AADCA2",
+    "Color": "#B6E6B3",
     "Appearance": "white crystalline solid",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -4108,7 +4108,7 @@
     "CompoundType": "organic",
     "Phase": "liquid",
     "Density": 1.26,
-    "Color": "#A1D79F",
+    "Color": "#A6DCA2",
     "Appearance": "colorless viscous sweet liquid",
     "WaterSolubility": "miscible",
     "PropertyFlags": {
@@ -4139,7 +4139,7 @@
     "CompoundType": "organic",
     "Phase": "liquid",
     "Density": 0.876,
-    "Color": "#CFD693",
+    "Color": "#D1CF8F",
     "Appearance": "colorless liquid, sweet aromatic odor",
     "WaterSolubility": "low",
     "PropertyFlags": {
@@ -4215,7 +4215,7 @@
     "CompoundType": "organic",
     "Phase": "gas",
     "Density": 0.000815,
-    "Color": "#ABDCAC",
+    "Color": "#C1E6C4",
     "Appearance": "colorless gas, pungent suffocating odor",
     "WaterSolubility": "high (as formalin)",
     "PropertyFlags": {
@@ -4363,7 +4363,7 @@
     "CompoundType": "organic",
     "Phase": "liquid",
     "Density": 1.49,
-    "Color": "#C1E6CD",
+    "Color": "#B3E6C3",
     "Appearance": "colorless dense liquid, sweet odor",
     "WaterSolubility": "low",
     "PropertyFlags": {
@@ -4402,7 +4402,7 @@
     "CompoundType": "organic",
     "Phase": "liquid",
     "Density": 0.713,
-    "Color": "#B6E1CB",
+    "Color": "#ABDCC3",
     "Appearance": "colorless volatile liquid, sweet odor",
     "WaterSolubility": "low",
     "PropertyFlags": {
@@ -4518,7 +4518,7 @@
     "CompoundType": "organic",
     "Phase": "liquid",
     "Density": 1.08,
-    "Color": "#B3E6B8",
+    "Color": "#ABDCB3",
     "Appearance": "colorless liquid, strong acetic/pungent odor",
     "WaterSolubility": "reacts with water",
     "PropertyFlags": {
@@ -4557,7 +4557,7 @@
     "CompoundType": "organic",
     "Phase": "liquid",
     "Density": 0.902,
-    "Color": "#9FD7A9",
+    "Color": "#A2DCAC",
     "Appearance": "colorless liquid, fruity odor",
     "WaterSolubility": "moderate",
     "PropertyFlags": {
@@ -4596,7 +4596,7 @@
     "CompoundType": "organic",
     "Phase": "solid",
     "Density": 1.61,
-    "Color": "#ABDCB6",
+    "Color": "#AFE1BB",
     "Appearance": "white crystalline solid, sweet",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -4628,7 +4628,7 @@
     "CompoundType": "organic",
     "Phase": "liquid",
     "Density": 1.01,
-    "Color": "#D8C078",
+    "Color": "#D8BE72",
     "Appearance": "colorless to pale yellow oily liquid (browns in air)",
     "WaterSolubility": "miscible",
     "PropertyFlags": {
@@ -4667,7 +4667,7 @@
     "CompoundType": "other",
     "Phase": "gas",
     "Density": 0.00139,
-    "Color": "#C5DA92",
+    "Color": "#D4DA92",
     "Appearance": "colorless gas, rotten-egg odor (deadens sense of smell)",
     "WaterSolubility": "moderate",
     "PropertyFlags": {
@@ -4742,7 +4742,7 @@
     "CompoundType": "other",
     "Phase": "gas",
     "Density": 0.00425,
-    "Color": "#B6E1C1",
+    "Color": "#C1E6CE",
     "Appearance": "colorless gas, faint fresh-hay odor",
     "WaterSolubility": "reacts with water",
     "PropertyFlags": {
@@ -4780,7 +4780,7 @@
     "CompoundType": "other",
     "Phase": "solid",
     "Density": 1.6,
-    "Color": "#9ED5B3",
+    "Color": "#F1EFE6",
     "Appearance": "white deliquescent solid, faint almond odor",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -4820,7 +4820,7 @@
     "CompoundType": "other",
     "Phase": "solid",
     "Density": 1.52,
-    "Color": "#C0DDB3",
+    "Color": "#EFEDE4",
     "Appearance": "white crystalline solid, faint almond odor",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -4899,7 +4899,7 @@
     "CompoundType": "other",
     "Phase": "solid",
     "Density": 3.25,
-    "Color": "#ABDCC0",
+    "Color": "#A2DCB8",
     "Appearance": "white crystalline solid, sweet taste",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -4937,7 +4937,7 @@
     "CompoundType": "other",
     "Phase": "solid",
     "Density": 5.43,
-    "Color": "#A2DCBB",
+    "Color": "#9FD7C1",
     "Appearance": "white crystalline solid",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -4977,7 +4977,7 @@
     "CompoundType": "other",
     "Phase": "liquid",
     "Density": 1.65,
-    "Color": "#D8DC90",
+    "Color": "#E0E6A0",
     "Appearance": "colorless to pale oily liquid, sweet odor",
     "WaterSolubility": "insoluble",
     "PropertyFlags": {
@@ -5016,7 +5016,7 @@
     "CompoundType": "other",
     "Phase": "solid",
     "Density": 1.85,
-    "Color": "#A2DAD2",
+    "Color": "#A0D59E",
     "Appearance": "white crystalline solid",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -5096,7 +5096,7 @@
     "CompoundType": "other",
     "Phase": "liquid",
     "Density": 0.92,
-    "Color": "#AFE1DE",
+    "Color": "#B3E6DE",
     "Appearance": "colorless liquid, sharp odor",
     "WaterSolubility": "reacts with water",
     "PropertyFlags": {
@@ -5134,7 +5134,7 @@
     "CompoundType": "other",
     "Phase": "liquid",
     "Density": 1.59,
-    "Color": "#9FAAD7",
+    "Color": "#A2DCD3",
     "Appearance": "colorless dense liquid, sweet odor",
     "WaterSolubility": "insoluble",
     "PropertyFlags": {
@@ -5173,7 +5173,7 @@
     "CompoundType": "other",
     "Phase": "solid",
     "Density": 1.56,
-    "Color": "#9ED0D5",
+    "Color": "#9ED5B2",
     "Appearance": "colorless to off-white crystalline solid",
     "WaterSolubility": "insoluble",
     "PropertyFlags": {
@@ -5213,7 +5213,7 @@
     "CompoundType": "other",
     "Phase": "solid",
     "Density": 1.36,
-    "Color": "#DACBAA",
+    "Color": "#B5DFCA",
     "Appearance": "white crystalline solid, intensely bitter",
     "WaterSolubility": "low",
     "PropertyFlags": {
@@ -5370,7 +5370,7 @@
     "CompoundType": "oxide",
     "Phase": "solid",
     "Density": 8.3,
-    "Color": "#3E3318",
+    "Color": "#D4B83A",
     "Appearance": "olive-green to black powder",
     "WaterSolubility": "insoluble",
     "PropertyFlags": {
@@ -5522,7 +5522,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 4.91,
-    "Color": "#EAD8B4",
+    "Color": "#EAD4A6",
     "Appearance": "white-to-buff crystalline solid (self-luminous, glows faintly)",
     "WaterSolubility": "high",
     "PropertyFlags": {
@@ -5597,7 +5597,7 @@
     "CompoundType": "salt",
     "Phase": "solid",
     "Density": 3.99,
-    "Color": "#B9D0DC",
+    "Color": "#E6D9B5",
     "Appearance": "white crystalline solid",
     "WaterSolubility": "high",
     "PropertyFlags": {

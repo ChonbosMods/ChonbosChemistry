@@ -41,7 +41,7 @@ CURATED = {
     "Na": ("flame",     "#FFA53D", "", "sodium-lamp orange"),
     "K":  ("flame",     "#C89AE8", "", "lilac flame"),
     "Rb": ("spectral",  "#C03A4A", "", "rubidus: deep red spectral lines"),
-    "Cs": ("spectral",  "#5FA0EE", "", "caesius: sky blue spectral lines"),
+    "Cs": ("verified",  "#E8C86A", "", "pale golden metal: one of only two colored metals"),
     "Fr": ("fantasy",   "#A04A78", "", "doomed alkali, magenta-ash"),
     # -- alkaline earth: flame tests + minerals --
     "Be": ("mineral",   "#6AD28C", "", "emerald/beryl green"),
