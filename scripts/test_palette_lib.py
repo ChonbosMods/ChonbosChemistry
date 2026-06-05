@@ -32,6 +32,26 @@ class PaletteLibTest(unittest.TestCase):
         self.assertNotIn("Dd", joined)
         self.assertEqual(len([e for e in errors if "Bb" in e and "Cc" not in e]), 0)
 
+    def test_vivid_bright_colors_pass(self):
+        # High-value but saturated colors are GOOD: they must not be flagged.
+        rows = [
+            {"key": "Go", "hex": "#FFD24A", "exempt": ""},  # gold, v=1.0 s=0.71
+            {"key": "Ne", "hex": "#FF6B3D", "exempt": ""},  # neon, v=1.0 s=0.76
+        ]
+        errors = check_gates(rows, min_v=0.45, max_v=0.92, min_s=0.10, min_dist=28)
+        self.assertEqual(errors, [])
+
+    def test_washed_out_near_white_fails(self):
+        # Pale near-whites that vanish in the tint pipeline must be flagged.
+        rows = [
+            {"key": "Wh", "hex": "#FAFAFA", "exempt": ""},  # v=0.98 s=0.0
+            {"key": "Cr", "hex": "#F0E8D8", "exempt": ""},  # v=0.94 s=0.10 washed out
+        ]
+        errors = check_gates(rows, min_v=0.45, max_v=0.92, min_s=0.10, min_dist=28)
+        joined = "\n".join(errors)
+        self.assertIn("Wh", joined)  # washout and/or saturation floor
+        self.assertTrue(any("Cr" in e and "washed out" in e for e in errors))
+
     def test_exempt_pairs_skip_distance_check(self):
         # Two exempt iconic-dark oxides with near-identical hexes: allowed to crowd.
         rows = [

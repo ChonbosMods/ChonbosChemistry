@@ -2,6 +2,10 @@
 import colorsys
 import math
 
+# A high-value color is only "washed out" (near-white, vanishes in the tint
+# pipeline) when it is also unsaturated. Vivid saturated brights pass.
+WASHOUT_MIN_S = 0.20
+
 
 def parse_hex(s):
     s = s.lstrip("#")
@@ -27,8 +31,11 @@ def check_gates(rows, min_v, max_v, min_s, min_dist):
         if r.get("exempt"):
             continue
         _, s, v = hsv(parse_hex(r["hex"]))
-        if not (min_v <= v <= max_v):
-            errors.append(f"{r['key']}: value {v:.2f} outside [{min_v}, {max_v}] ({r['hex']})")
+        key, hex = r["key"], r["hex"]
+        if v < min_v:
+            errors.append(f"{key}: value {v:.2f} below {min_v} (too dark) ({hex})")
+        elif v > max_v and s < WASHOUT_MIN_S:
+            errors.append(f"{key}: washed out: value {v:.2f} > {max_v} with saturation {s:.2f} < {WASHOUT_MIN_S} ({hex})")
         if s < min_s:
             errors.append(f"{r['key']}: saturation {s:.2f} below {min_s} ({r['hex']})")
     for i, a in enumerate(rows):
