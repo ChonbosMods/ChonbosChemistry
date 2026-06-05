@@ -32,6 +32,27 @@ class PaletteLibTest(unittest.TestCase):
         self.assertNotIn("Dd", joined)
         self.assertEqual(len([e for e in errors if "Bb" in e and "Cc" not in e]), 0)
 
+    def test_exempt_pairs_skip_distance_check(self):
+        # Two exempt iconic-dark oxides with near-identical hexes: allowed to crowd.
+        rows = [
+            {"key": "Uo", "hex": "#3A2A1A", "exempt": "iconic dark"},
+            {"key": "Pu", "hex": "#3B2A1A", "exempt": "iconic dark"},
+        ]
+        errors = check_gates(rows, min_v=0.45, max_v=0.92, min_s=0.10, min_dist=28)
+        dist_errors = [e for e in errors if "vs" in e]
+        self.assertEqual(dist_errors, [])
+
+        # Mixed pair (one exempt, one not) is still distance-checked.
+        rows2 = [
+            {"key": "Uo", "hex": "#3A2A1A", "exempt": "iconic dark"},
+            {"key": "Nn", "hex": "#3C2A1B", "exempt": ""},
+        ]
+        errors2 = check_gates(rows2, min_v=0.45, max_v=0.92, min_s=0.10, min_dist=28)
+        dist_errors2 = [e for e in errors2 if "vs" in e]
+        self.assertEqual(len(dist_errors2), 1)
+        self.assertIn("Uo", dist_errors2[0])
+        self.assertIn("Nn", dist_errors2[0])
+
 
 if __name__ == "__main__":
     unittest.main()

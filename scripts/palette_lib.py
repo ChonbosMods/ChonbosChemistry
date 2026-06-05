@@ -33,6 +33,8 @@ def check_gates(rows, min_v, max_v, min_s, min_dist):
             errors.append(f"{r['key']}: saturation {s:.2f} below {min_s} ({r['hex']})")
     for i, a in enumerate(rows):
         for b in rows[i + 1:]:
+            if a.get("exempt") and b.get("exempt"):
+                continue
             d = rgb_distance(parse_hex(a["hex"]), parse_hex(b["hex"]))
             if d < min_dist:
                 errors.append(f"{a['key']} vs {b['key']}: distance {d:.0f} < {min_dist}")
