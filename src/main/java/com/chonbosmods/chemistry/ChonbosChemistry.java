@@ -5,6 +5,7 @@ import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.CarryBreakEventSystem;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
+import com.chonbosmods.chemistry.impl.block.WrenchInteraction;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
 import com.chonbosmods.chemistry.impl.block.net.NetworkTickSystem;
 import com.chonbosmods.chemistry.impl.block.net.PipeBreakEventSystem;
@@ -15,6 +16,7 @@ import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshService;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshSystem;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenCustomUIInteraction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -143,6 +145,13 @@ public class ChonbosChemistry extends JavaPlugin {
         OpenCustomUIInteraction.registerBlockEntityCustomPage(
             this, MachinePanelPage.class, "CC_MachinePanel", MachinePanelPage::new);
         getLogger().atInfo().log("Registered CC_MachinePanel custom UI page (block GUI).");
+
+        // CC_Wrench (Task 9): a held tool whose Secondary interaction taps a pipe face to cycle its
+        // flow state, or a machine face to cycle its port. The JSON "Type" is this registered id; the
+        // item must set "UseLatestTarget": true so the clicked BlockFace flows through (spike Task 8).
+        getCodecRegistry(Interaction.CODEC).register(
+            "cc_wrench", WrenchInteraction.class, WrenchInteraction.CODEC);
+        getLogger().atInfo().log("Registered cc_wrench interaction (CC_Wrench pipe/machine face config).");
 
         // Live panel refresh (2026-06-05 design): pages register with the service after a successful
         // build; this query-less per-world pulse refreshes them every 10th tick on the WorldThread.

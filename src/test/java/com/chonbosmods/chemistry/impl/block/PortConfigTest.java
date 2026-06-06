@@ -111,4 +111,42 @@ class PortConfigTest {
         assertEquals(PortChannel.FLUID, b.channel());
         assertEquals(PortDirection.OUTPUT, b.direction());
     }
+
+    @Test
+    void withFacePortReplacesAnyExistingPortOnThatFaceNeverAppends() {
+        PortConfig cfg = PortConfig.of(List.of(
+            Port.of(0, PortChannel.FLUID, PortDirection.INPUT),
+            Port.of(1, PortChannel.POWER, PortDirection.OUTPUT)));
+        // Re-config face 0 to a different channel/direction: must replace, not add a second port.
+        PortConfig next = cfg.withFacePort(Port.of(0, PortChannel.GAS, PortDirection.OUTPUT));
+        assertEquals(2, next.ports().size());
+        assertEquals(1, next.portsFor(PortChannel.GAS, PortDirection.OUTPUT).size());
+        Port face0 = next.portAt(0, PortChannel.GAS);
+        assertNotNull(face0);
+        assertEquals(PortDirection.OUTPUT, face0.direction());
+        // Face 0 must carry no other port (the old FLUID/INPUT is gone).
+        assertNull(next.portAt(0, PortChannel.FLUID));
+        // The untouched face 1 survives unchanged.
+        Port face1 = next.portAt(1, PortChannel.POWER);
+        assertNotNull(face1);
+        assertEquals(PortDirection.OUTPUT, face1.direction());
+        // Source config is unchanged (immutable rebuild).
+        assertEquals(PortChannel.FLUID, cfg.portAt(0, PortChannel.FLUID).channel());
+    }
+
+    @Test
+    void withFacePortAddsWhenFaceHadNoPort() {
+        PortConfig cfg = PortConfig.of(List.of());
+        PortConfig next = cfg.withFacePort(Port.of(3, PortChannel.ITEM, PortDirection.INPUT));
+        assertEquals(1, next.ports().size());
+        assertNotNull(next.portAt(3, PortChannel.ITEM));
+    }
+
+    @Test
+    void withFacePortNullIsAnUnchangedCopy() {
+        PortConfig cfg = PortConfig.of(List.of(Port.of(2, PortChannel.POWER, PortDirection.INPUT)));
+        PortConfig next = cfg.withFacePort(null);
+        assertEquals(1, next.ports().size());
+        assertNotNull(next.portAt(2, PortChannel.POWER));
+    }
 }

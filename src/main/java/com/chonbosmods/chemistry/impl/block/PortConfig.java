@@ -59,4 +59,26 @@ public final class PortConfig {
     public List<Port> ports() {
         return ports;
     }
+
+    /**
+     * A new {@link PortConfig} with {@code port}'s face configured to exactly that port: every existing
+     * port on the same {@code faceIndex} is dropped first (replace-not-append), so a face never ends up
+     * carrying two ports under one-port-per-face (design 2026-06-05 §1). Used by the {@code CC_Wrench}
+     * to persist a cycled machine face. {@code this} is left unchanged.
+     *
+     * @param port the new port for its face; a null port returns an unchanged copy.
+     */
+    public PortConfig withFacePort(Port port) {
+        if (port == null) {
+            return PortConfig.of(ports);
+        }
+        List<Port> rebuilt = new ArrayList<>(ports.size() + 1);
+        for (Port p : ports) {
+            if (p.faceIndex() != port.faceIndex()) {
+                rebuilt.add(p);
+            }
+        }
+        rebuilt.add(port);
+        return PortConfig.of(rebuilt);
+    }
 }
