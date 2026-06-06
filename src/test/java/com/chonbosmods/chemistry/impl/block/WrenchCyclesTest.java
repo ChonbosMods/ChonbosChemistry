@@ -1,0 +1,165 @@
+package com.chonbosmods.chemistry.impl.block;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.chonbosmods.chemistry.api.io.FlowState;
+import com.chonbosmods.chemistry.api.io.PortChannel;
+import com.chonbosmods.chemistry.api.io.PortDirection;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+/** Pure tests for {@link WrenchCycles}: pipe-face flow cycling and machine-face capability cycling. */
+class WrenchCyclesTest {
+
+    // --- Pipe face toward a MACHINE: full four-state cycle, sneak reverses ---
+
+    @Test
+    void pipeTowardMachineForwardCycle() {
+        assertEquals(FlowState.PUSH, WrenchCycles.next(FlowState.NORMAL, WrenchCycles.Target.MACHINE));
+        assertEquals(FlowState.PULL, WrenchCycles.next(FlowState.PUSH, WrenchCycles.Target.MACHINE));
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.PULL, WrenchCycles.Target.MACHINE));
+        // wrap
+        assertEquals(FlowState.NORMAL, WrenchCycles.next(FlowState.NONE, WrenchCycles.Target.MACHINE));
+    }
+
+    @Test
+    void pipeTowardMachineReverseCycle() {
+        assertEquals(FlowState.PULL, WrenchCycles.previous(FlowState.NONE, WrenchCycles.Target.MACHINE));
+        assertEquals(FlowState.PUSH, WrenchCycles.previous(FlowState.PULL, WrenchCycles.Target.MACHINE));
+        assertEquals(FlowState.NORMAL, WrenchCycles.previous(FlowState.PUSH, WrenchCycles.Target.MACHINE));
+        // wrap backward: NORMAL -> NONE
+        assertEquals(FlowState.NONE, WrenchCycles.previous(FlowState.NORMAL, WrenchCycles.Target.MACHINE));
+    }
+
+    // --- Pipe face toward a PIPE (or air): only NORMAL <-> NONE ---
+
+    @Test
+    void pipeTowardPipeForwardCycle() {
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.NORMAL, WrenchCycles.Target.PIPE));
+        assertEquals(FlowState.NORMAL, WrenchCycles.next(FlowState.NONE, WrenchCycles.Target.PIPE));
+    }
+
+    @Test
+    void pipeTowardPipeReverseCycle() {
+        assertEquals(FlowState.NONE, WrenchCycles.previous(FlowState.NORMAL, WrenchCycles.Target.PIPE));
+        assertEquals(FlowState.NORMAL, WrenchCycles.previous(FlowState.NONE, WrenchCycles.Target.PIPE));
+    }
+
+    @Test
+    void pipeTowardPipeFromPushOrPullCollapsesToNone() {
+        // PUSH/PULL are endpoint-only and not part of the pipe-toward-pipe cycle: treat as NORMAL's
+        // neighbour so a stale state still advances into the two-state ring.
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.PUSH, WrenchCycles.Target.PIPE));
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.PULL, WrenchCycles.Target.PIPE));
+    }
+
+    // --- Machine capability cycle ---
+
+    private static MachineBlockState machine(boolean power, PortChannel... resourceChannels) {
+        EnergyBuffer energy = power ? EnergyBuffer.withCapacity(1000L) : null;
+        Map<PortChannel, ResourceBuffer> resources = new EnumMap<>(PortChannel.class);
+        for (PortChannel ch : resourceChannels) {
+            resources.put(ch, ResourceBuffer.withCapacity(1000));
+        }
+        return MachineBlockState.create(energy, resources, PortConfig.of(List.of()), new WorkState(), 100);
+    }
+
+    @Test
+    void machineSingleCapabilityWalksInputOutputClosedWrap() {
+        // Power-only machine: capability list = [POWER].
+        MachineBlockState m = machine(true);
+        int face = 2;
+
+        Port closed = WrenchCycles.nextPort(m, face, null);
+        // From nothing/closed -> first entry: (POWER, INPUT).
+        assertEquals(face, closed.faceIndex());
+        assertEquals(PortChannel.POWER, closed.channel());
+        assertEquals(PortDirection.INPUT, closed.direction());
+
+        Port out = WrenchCycles.nextPort(m, face, closed);
+        assertEquals(PortChannel.POWER, out.channel());
+        assertEquals(PortDirection.OUTPUT, out.direction());
+
+        Port nowClosed = WrenchCycles.nextPort(m, face, out);
+        assertEquals(PortDirection.CLOSED, nowClosed.direction());
+
+        // wrap: closed -> (POWER, INPUT)
+        Port wrapped = WrenchCycles.nextPort(m, face, nowClosed);
+        assertEquals(PortChannel.POWER, wrapped.channel());
+        assertEquals(PortDirection.INPUT, wrapped.direction());
+    }
+
+    @Test
+    void machineMultiCapabilityWalksAllChannelPairsInDeclarationOrder() {
+        // FLUID + POWER buffers: declaration order of PortChannel is ITEM, FLUID, GAS, POWER, so the
+        // capability order is [FLUID, POWER].
+        MachineBlockState m = machine(true, PortChannel.FLUID);
+        int face = 0;
+
+        Port p1 = WrenchCycles.nextPort(m, face, null);
+        assertEquals(PortChannel.FLUID, p1.channel());
+        assertEquals(PortDirection.INPUT, p1.direction());
+
+        Port p2 = WrenchCycles.nextPort(m, face, p1);
+        assertEquals(PortChannel.FLUID, p2.channel());
+        assertEquals(PortDirection.OUTPUT, p2.direction());
+
+        Port p3 = WrenchCycles.nextPort(m, face, p2);
+        assertEquals(PortChannel.POWER, p3.channel());
+        assertEquals(PortDirection.INPUT, p3.direction());
+
+        Port p4 = WrenchCycles.nextPort(m, face, p3);
+        assertEquals(PortChannel.POWER, p4.channel());
+        assertEquals(PortDirection.OUTPUT, p4.direction());
+
+        Port p5 = WrenchCycles.nextPort(m, face, p4);
+        assertEquals(PortDirection.CLOSED, p5.direction());
+
+        Port p6 = WrenchCycles.nextPort(m, face, p5);
+        assertEquals(PortChannel.FLUID, p6.channel());
+        assertEquals(PortDirection.INPUT, p6.direction());
+    }
+
+    @Test
+    void machineUnknownStateEntersAtFirstCycleEntry() {
+        // A BOTH port (storage semantics, never produced by the wrench) is not in the cycle: next from
+        // it enters at the first supported (channel, INPUT).
+        MachineBlockState m = machine(true, PortChannel.GAS);
+        int face = 4;
+        Port both = Port.of(face, PortChannel.POWER, PortDirection.BOTH);
+
+        Port next = WrenchCycles.nextPort(m, face, both);
+        // First capability in declaration order for {GAS, POWER} is GAS.
+        assertEquals(PortChannel.GAS, next.channel());
+        assertEquals(PortDirection.INPUT, next.direction());
+
+        // A port on a channel the machine no longer supports is likewise unknown -> first entry.
+        Port stale = Port.of(face, PortChannel.ITEM, PortDirection.OUTPUT);
+        Port reset = WrenchCycles.nextPort(m, face, stale);
+        assertEquals(PortChannel.GAS, reset.channel());
+        assertEquals(PortDirection.INPUT, reset.direction());
+    }
+
+    @Test
+    void machineWithNoBuffersAlwaysClosed() {
+        MachineBlockState m = machine(false);
+        int face = 1;
+
+        Port a = WrenchCycles.nextPort(m, face, null);
+        assertEquals(face, a.faceIndex());
+        assertEquals(PortDirection.CLOSED, a.direction());
+
+        // Cycling a closed port stays closed (the only entry).
+        Port b = WrenchCycles.nextPort(m, face, a);
+        assertEquals(PortDirection.CLOSED, b.direction());
+    }
+
+    @Test
+    void machinePortCarriesThePassthroughFaceIndex() {
+        MachineBlockState m = machine(true);
+        Port p = WrenchCycles.nextPort(m, 5, null);
+        assertEquals(5, p.faceIndex());
+    }
+}
