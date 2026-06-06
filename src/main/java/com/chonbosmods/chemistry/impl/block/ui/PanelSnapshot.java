@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Pure, testable render model for the machine/pipe panel: a title plus one {@link Row} per label
@@ -132,13 +133,13 @@ public final class PanelSnapshot {
      * (the 1-arg back-compat path) leaves the row hidden.
      */
     @Nonnull
-    public static PanelSnapshot forNetwork(@Nonnull Network network, PipeNode pipe) {
+    public static PanelSnapshot forNetwork(@Nonnull Network network, @Nullable PipeNode pipe) {
         Map<String, String> texts = new LinkedHashMap<>();
         texts.put(ENERGY, "Network: " + gaugeText(network.stored(), network.capacity()));
         texts.put(FLUID, "Pipes: " + network.memberKeys().size()
             + " • Throughput: " + network.throughput() + "/tick");
         if (pipe != null) {
-            texts.put(GAS, facesText(pipe));
+            texts.put(GAS, facesText(pipe)); // semantic reuse: pipes carry no gas buffer, the slot is free
         }
         return new PanelSnapshot(channelDisplayName(network.channel()) + " Pipe Network", texts, true);
     }

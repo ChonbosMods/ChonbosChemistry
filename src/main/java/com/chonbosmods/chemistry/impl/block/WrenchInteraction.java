@@ -182,7 +182,7 @@ public final class WrenchInteraction extends SimpleBlockInteraction {
             manager.invalidate(x, y, z);
             manager.invalidate(nx, ny, nz);
         }
-        sendMessage(commandBuffer, context, "Pipe face " + FaceNames.name(faceIndex) + ": " + next.name());
+        sendMessage(commandBuffer, context, "Pipe face " + FaceNames.name(faceIndex) + ": " + next.jsonValue());
     }
 
     /** True when the block across the face carries a machine or tank block-state (a network endpoint). */
