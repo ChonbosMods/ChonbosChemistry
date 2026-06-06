@@ -164,7 +164,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         }
 
         MachineLookup lookup = new WorldMachineLookup(world, store, machineType, tankType);
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, grid, lookup);
         long delivered = NetworkTransfer.distribute(net, endpoints);
 
         // H6 FIX 1: persist the post-distribute buffer back onto the member pipe shares so an

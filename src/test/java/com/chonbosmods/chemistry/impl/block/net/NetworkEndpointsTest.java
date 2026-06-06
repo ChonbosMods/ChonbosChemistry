@@ -3,6 +3,7 @@ package com.chonbosmods.chemistry.impl.block.net;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.chonbosmods.chemistry.api.energy.EnergyHandler;
+import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.api.io.PortDirection;
 import com.chonbosmods.chemistry.impl.block.EnergyBuffer;
@@ -82,8 +83,22 @@ class NetworkEndpointsTest {
         }
     }
 
-    private static PortConfig portConfig(PortChannel channel, PortDirection direction) {
-        return PortConfig.of(List.of(Port.of(0, channel, direction)));
+    /**
+     * A single POWER pipe at (x,y,z) whose face {@code face} carries flow state {@code state} (all other
+     * faces NORMAL). Lets the flow-filter tests drive the per-face PUSH/PULL/NONE matrix. The same node
+     * instance is returned on every lookup so the network's seed pipe and the collected member pipe share
+     * state.
+     */
+    private static PipeGridView powerPipeWithFace(int x, int y, int z, int face, FlowState state) {
+        long key = NetworkManager.packKey(x, y, z);
+        PipeNode node = PipeNode.of(PortChannel.POWER, 1);
+        node.setFlowState(face, state);
+        return (px, py, pz) -> NetworkManager.packKey(px, py, pz) == key ? node : null;
+    }
+
+    /** A single port on the given face: the port that faces back at a pipe under face-precise matching. */
+    private static PortConfig portConfig(int face, PortChannel channel, PortDirection direction) {
+        return PortConfig.of(List.of(Port.of(face, channel, direction)));
     }
 
     @Test
@@ -92,15 +107,16 @@ class NetworkEndpointsTest {
         Network net = manager.getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));
 
         FakeLookup lookup = new FakeLookup();
-        // OUTPUT-power machine at +X -> provider; INPUT-power machine at -X -> acceptor.
+        // OUTPUT-power machine at +X (faces pipe on its -X face = 1) -> provider;
+        // INPUT-power machine at -X (faces pipe on its +X face = 0) -> acceptor.
         lookup.put(6, 5, 5, new FakePorts(
-            portConfig(PortChannel.POWER, PortDirection.OUTPUT),
+            portConfig(1, PortChannel.POWER, PortDirection.OUTPUT),
             EnergyBuffer.withCapacity(1000L), Map.of()));
         lookup.put(4, 5, 5, new FakePorts(
-            portConfig(PortChannel.POWER, PortDirection.INPUT),
+            portConfig(0, PortChannel.POWER, PortDirection.INPUT),
             EnergyBuffer.withCapacity(1000L), Map.of()));
 
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, singlePowerPipeAt(5, 5, 5), lookup);
         assertEquals(1, endpoints.pureProviders().size());
         assertEquals(1, endpoints.pureAcceptors().size());
         assertEquals(0, endpoints.bufferProviders().size());
@@ -115,10 +131,10 @@ class NetworkEndpointsTest {
         FakeLookup lookup = new FakeLookup();
         // A FLUID machine adjacent to a POWER network: wrong channel, ignored.
         lookup.put(6, 5, 5, new FakePorts(
-            portConfig(PortChannel.FLUID, PortDirection.OUTPUT),
+            portConfig(1, PortChannel.FLUID, PortDirection.OUTPUT),
             null, Map.of(PortChannel.FLUID, ResourceBuffer.withCapacity(1000))));
 
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, singlePowerPipeAt(5, 5, 5), lookup);
         assertEquals(0, endpoints.pureProviders().size());
         assertEquals(0, endpoints.pureAcceptors().size());
     }
@@ -131,9 +147,9 @@ class NetworkEndpointsTest {
         FakeLookup lookup = new FakeLookup();
         // Has a POWER OUTPUT port but no energy handler -> no adapter, skipped.
         lookup.put(6, 5, 5, new FakePorts(
-            portConfig(PortChannel.POWER, PortDirection.OUTPUT), null, Map.of()));
+            portConfig(1, PortChannel.POWER, PortDirection.OUTPUT), null, Map.of()));
 
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, singlePowerPipeAt(5, 5, 5), lookup);
         assertEquals(0, endpoints.pureProviders().size());
         assertEquals(0, endpoints.pureAcceptors().size());
     }
@@ -146,14 +162,16 @@ class NetworkEndpointsTest {
         FakeLookup lookup = new FakeLookup();
         ResourceBuffer source = ResourceBuffer.withCapacity(1000);
         source.insert("oxygen", 200, false);
+        // OUTPUT tank at +Y (faces pipe on -Y = 3); INPUT tank at -Y (faces pipe on +Y = 2).
         lookup.put(5, 6, 5, new FakePorts(
-            portConfig(PortChannel.FLUID, PortDirection.OUTPUT),
+            portConfig(3, PortChannel.FLUID, PortDirection.OUTPUT),
             null, Map.of(PortChannel.FLUID, source)));
         lookup.put(5, 4, 5, new FakePorts(
-            portConfig(PortChannel.FLUID, PortDirection.INPUT),
+            portConfig(2, PortChannel.FLUID, PortDirection.INPUT),
             null, Map.of(PortChannel.FLUID, ResourceBuffer.withCapacity(1000))));
 
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        NetworkEndpoints.Endpoints endpoints =
+            NetworkEndpoints.collect(net, singleFluidPipeAt(5, 5, 5), lookup);
         assertEquals(1, endpoints.pureProviders().size());
         assertEquals(1, endpoints.pureAcceptors().size());
         assertEquals("oxygen", endpoints.pureProviders().get(0).resourceId());
@@ -177,30 +195,33 @@ class NetworkEndpointsTest {
         Network net = manager.getOrBuildNetwork(5, 5, 5, grid);
 
         FakeLookup lookup = new FakeLookup();
+        // The machine faces pipe (5,6,5) on its -X face (1) and pipe (6,5,5) on its -Y face (3): give it
+        // an OUTPUT port on BOTH so it qualifies whichever member pipe the dedup encounters first.
         lookup.put(6, 6, 5, new FakePorts(
-            portConfig(PortChannel.POWER, PortDirection.OUTPUT),
+            PortConfig.of(List.of(
+                Port.of(1, PortChannel.POWER, PortDirection.OUTPUT),
+                Port.of(3, PortChannel.POWER, PortDirection.OUTPUT))),
             EnergyBuffer.withCapacity(1000L), Map.of()));
 
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, grid, lookup);
         assertEquals(1, endpoints.pureProviders().size());
         assertEquals(0, endpoints.pureAcceptors().size());
     }
 
     @Test
     void collect_storageWithBothPorts_classifiedAsBufferProviderAndBufferAcceptor() {
-        // A storage battery: a single neighbour that has BOTH a POWER OUTPUT and a POWER INPUT port.
-        // It must contribute ONE entry to bufferProviders AND ONE to bufferAcceptors (never to the
-        // pure lists), so the priority logic can treat it as storage rather than a source/sink.
+        // A storage battery: a single neighbour whose facing port is BOTH (two-way). Across a NORMAL
+        // pipe face it must contribute ONE entry to bufferProviders AND ONE to bufferAcceptors (never to
+        // the pure lists), so the priority logic can treat it as storage rather than a source/sink.
         NetworkManager manager = new NetworkManager();
         Network net = manager.getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));
 
         FakeLookup lookup = new FakeLookup();
-        PortConfig both = PortConfig.of(List.of(
-            Port.of(0, PortChannel.POWER, PortDirection.OUTPUT),
-            Port.of(1, PortChannel.POWER, PortDirection.INPUT)));
+        // Faces the pipe on its -X face (1).
+        PortConfig both = portConfig(1, PortChannel.POWER, PortDirection.BOTH);
         lookup.put(6, 5, 5, new FakePorts(both, EnergyBuffer.withCapacity(1000L), Map.of()));
 
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, singlePowerPipeAt(5, 5, 5), lookup);
         assertEquals(0, endpoints.pureProviders().size());
         assertEquals(0, endpoints.pureAcceptors().size());
         assertEquals(1, endpoints.bufferProviders().size());
@@ -215,14 +236,12 @@ class NetworkEndpointsTest {
         Network net = manager.getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));
 
         FakeLookup lookup = new FakeLookup();
-        PortConfig both = PortConfig.of(List.of(
-            Port.of(0, PortChannel.POWER, PortDirection.OUTPUT),
-            Port.of(1, PortChannel.POWER, PortDirection.INPUT)));
+        PortConfig both = portConfig(1, PortChannel.POWER, PortDirection.BOTH);
         EnergyBuffer battery = EnergyBuffer.withCapacity(1000L);
         battery.receiveEnergy(250L, false);
         lookup.put(6, 5, 5, new FakePorts(both, battery, Map.of()));
 
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, singlePowerPipeAt(5, 5, 5), lookup);
         assertEquals(1, endpoints.storages().size());
         StorageEndpoint storage = endpoints.storages().get(0);
         assertEquals(250L, storage.stored(), "gauges must read the live buffer");
@@ -231,10 +250,11 @@ class NetworkEndpointsTest {
         // Pure endpoints never appear in storages().
         FakeLookup pureOnly = new FakeLookup();
         pureOnly.put(6, 5, 5, new FakePorts(
-            portConfig(PortChannel.POWER, PortDirection.OUTPUT),
+            portConfig(1, PortChannel.POWER, PortDirection.OUTPUT),
             EnergyBuffer.withCapacity(1000L), Map.of()));
         Network net2 = new NetworkManager().getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));
-        assertEquals(0, NetworkEndpoints.collect(net2, pureOnly).storages().size());
+        assertEquals(0,
+            NetworkEndpoints.collect(net2, singlePowerPipeAt(5, 5, 5), pureOnly).storages().size());
     }
 
     @Test
@@ -245,25 +265,126 @@ class NetworkEndpointsTest {
 
         FakeLookup lookup = new FakeLookup();
         lookup.put(6, 5, 5, new FakePorts(
-            portConfig(PortChannel.POWER, PortDirection.OUTPUT),
+            portConfig(1, PortChannel.POWER, PortDirection.OUTPUT),
             EnergyBuffer.withCapacity(1000L), Map.of()));
-        PortConfig both = PortConfig.of(List.of(
-            Port.of(0, PortChannel.POWER, PortDirection.OUTPUT),
-            Port.of(1, PortChannel.POWER, PortDirection.INPUT)));
+        // Storage at -X faces the pipe on its +X face (0).
+        PortConfig both = portConfig(0, PortChannel.POWER, PortDirection.BOTH);
         lookup.put(4, 5, 5, new FakePorts(both, EnergyBuffer.withCapacity(1000L), Map.of()));
 
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, singlePowerPipeAt(5, 5, 5), lookup);
         assertEquals(1, endpoints.pureProviders().size());
         assertEquals(0, endpoints.pureAcceptors().size());
         assertEquals(1, endpoints.bufferProviders().size());
         assertEquals(1, endpoints.bufferAcceptors().size());
     }
 
+    // --- Face-precise flow-state filtering (2026-06-05 pipe flow-states design Task 6) ---
+
+    @Test
+    void portOnWrongFaceDoesNotQualify() {
+        // Pipe (5,5,5), machine (6,5,5): the pipe reaches it via face 0 (+X), so the machine's facing
+        // port must sit on face 1 (-X). An OUTPUT port on face 0 faces AWAY -> not collected.
+        PipeGridView grid = singlePowerPipeAt(5, 5, 5);
+        NetworkManager manager = new NetworkManager();
+        Network net = manager.getOrBuildNetwork(5, 5, 5, grid);
+
+        FakeLookup wrongFace = new FakeLookup();
+        wrongFace.put(6, 5, 5, new FakePorts(
+            portConfig(0, PortChannel.POWER, PortDirection.OUTPUT),
+            EnergyBuffer.withCapacity(1000L), Map.of()));
+        NetworkEndpoints.Endpoints away = NetworkEndpoints.collect(net, grid, wrongFace);
+        assertEquals(0, away.pureProviders().size());
+        assertEquals(0, away.pureAcceptors().size());
+
+        // Same machine with the port on the facing face (1) -> collected as a pure provider.
+        FakeLookup rightFace = new FakeLookup();
+        rightFace.put(6, 5, 5, new FakePorts(
+            portConfig(1, PortChannel.POWER, PortDirection.OUTPUT),
+            EnergyBuffer.withCapacity(1000L), Map.of()));
+        Network net2 = new NetworkManager().getOrBuildNetwork(5, 5, 5, grid);
+        NetworkEndpoints.Endpoints facing = NetworkEndpoints.collect(net2, grid, rightFace);
+        assertEquals(1, facing.pureProviders().size());
+        assertEquals(0, facing.pureAcceptors().size());
+    }
+
+    @Test
+    void noneFaceHidesMachine() {
+        // Pipe face 0 = NONE: a machine with a valid facing port is invisible to the network.
+        PipeGridView grid = powerPipeWithFace(5, 5, 5, 0, FlowState.NONE);
+        NetworkManager manager = new NetworkManager();
+        Network net = manager.getOrBuildNetwork(5, 5, 5, grid);
+
+        FakeLookup lookup = new FakeLookup();
+        lookup.put(6, 5, 5, new FakePorts(
+            portConfig(1, PortChannel.POWER, PortDirection.OUTPUT),
+            EnergyBuffer.withCapacity(1000L), Map.of()));
+
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, grid, lookup);
+        assertEquals(0, endpoints.pureProviders().size());
+        assertEquals(0, endpoints.pureAcceptors().size());
+        assertEquals(0, endpoints.bufferProviders().size());
+        assertEquals(0, endpoints.bufferAcceptors().size());
+        assertEquals(0, endpoints.storages().size());
+    }
+
+    @Test
+    void pushFaceKeepsAcceptorHalfOnly() {
+        // Machine has a BOTH facing port (a storage). Pipe face 0 = PUSH: the network only pushes INTO
+        // the machine, so it joins as a buffer ACCEPTOR half only (no provider, NOT a paired storage).
+        PipeGridView pushGrid = powerPipeWithFace(5, 5, 5, 0, FlowState.PUSH);
+        NetworkManager manager = new NetworkManager();
+        Network pushNet = manager.getOrBuildNetwork(5, 5, 5, pushGrid);
+        FakeLookup lookup = new FakeLookup();
+        lookup.put(6, 5, 5, new FakePorts(
+            portConfig(1, PortChannel.POWER, PortDirection.BOTH),
+            EnergyBuffer.withCapacity(1000L), Map.of()));
+
+        NetworkEndpoints.Endpoints push = NetworkEndpoints.collect(pushNet, pushGrid, lookup);
+        assertEquals(0, push.pureProviders().size());
+        assertEquals(0, push.pureAcceptors().size());
+        assertEquals(0, push.bufferProviders().size());
+        assertEquals(1, push.bufferAcceptors().size());
+        assertEquals(0, push.storages().size());
+
+        // PULL: provider half only.
+        PipeGridView pullGrid = powerPipeWithFace(5, 5, 5, 0, FlowState.PULL);
+        Network pullNet = new NetworkManager().getOrBuildNetwork(5, 5, 5, pullGrid);
+        NetworkEndpoints.Endpoints pull = NetworkEndpoints.collect(pullNet, pullGrid, lookup);
+        assertEquals(1, pull.bufferProviders().size());
+        assertEquals(0, pull.bufferAcceptors().size());
+        assertEquals(0, pull.storages().size());
+    }
+
+    @Test
+    void storagePairsOnlyWithNormalTwoWayAccess() {
+        // BOTH facing port + NORMAL pipe face -> full StorageEndpoint (storages + both buffer lists).
+        FakeLookup lookup = new FakeLookup();
+        lookup.put(6, 5, 5, new FakePorts(
+            portConfig(1, PortChannel.POWER, PortDirection.BOTH),
+            EnergyBuffer.withCapacity(1000L), Map.of()));
+
+        PipeGridView normalGrid = powerPipeWithFace(5, 5, 5, 0, FlowState.NORMAL);
+        Network normalNet = new NetworkManager().getOrBuildNetwork(5, 5, 5, normalGrid);
+        NetworkEndpoints.Endpoints normal = NetworkEndpoints.collect(normalNet, normalGrid, lookup);
+        assertEquals(1, normal.storages().size());
+        assertEquals(1, normal.bufferProviders().size());
+        assertEquals(1, normal.bufferAcceptors().size());
+
+        // BOTH + PULL -> bufferProviders only, NO StorageEndpoint (balancing needs two-way access).
+        PipeGridView pullGrid = powerPipeWithFace(5, 5, 5, 0, FlowState.PULL);
+        Network pullNet = new NetworkManager().getOrBuildNetwork(5, 5, 5, pullGrid);
+        NetworkEndpoints.Endpoints pull = NetworkEndpoints.collect(pullNet, pullGrid, lookup);
+        assertEquals(0, pull.storages().size());
+        assertEquals(1, pull.bufferProviders().size());
+        assertEquals(0, pull.bufferAcceptors().size());
+    }
+
     @Test
     void collect_emptyNeighbours_yieldsEmptyLists() {
         NetworkManager manager = new NetworkManager();
         Network net = manager.getOrBuildNetwork(5, 5, 5, singlePowerPipeAt(5, 5, 5));
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, new FakeLookup());
+        NetworkEndpoints.Endpoints endpoints =
+            NetworkEndpoints.collect(net, singlePowerPipeAt(5, 5, 5), new FakeLookup());
         assertEquals(0, endpoints.pureProviders().size());
         assertEquals(0, endpoints.pureAcceptors().size());
         assertEquals(0, endpoints.bufferProviders().size());
@@ -281,11 +402,11 @@ class NetworkEndpointsTest {
 
         FakeLookup lookup = new FakeLookup();
         lookup.put(6, 5, 5, new FakePorts(
-            portConfig(PortChannel.POWER, PortDirection.OUTPUT), source, Map.of()));
+            portConfig(1, PortChannel.POWER, PortDirection.OUTPUT), source, Map.of()));
         lookup.put(4, 5, 5, new FakePorts(
-            portConfig(PortChannel.POWER, PortDirection.INPUT), sink, Map.of()));
+            portConfig(0, PortChannel.POWER, PortDirection.INPUT), sink, Map.of()));
 
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, lookup);
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, singlePowerPipeAt(5, 5, 5), lookup);
         long moved = NetworkTransfer.distribute(net, endpoints);
 
         // Single tier-1 pipe network: the per-tick throughput cap bounds EACH phase, so one pass pulls

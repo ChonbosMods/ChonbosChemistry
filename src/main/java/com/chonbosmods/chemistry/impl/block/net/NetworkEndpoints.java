@@ -1,8 +1,10 @@
 package com.chonbosmods.chemistry.impl.block.net;
 
 import com.chonbosmods.chemistry.api.energy.EnergyHandler;
+import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.api.io.PortDirection;
+import com.chonbosmods.chemistry.impl.block.Port;
 import com.chonbosmods.chemistry.impl.block.PortConfig;
 import com.chonbosmods.chemistry.impl.block.ResourceBuffer;
 import com.chonbosmods.chemistry.impl.block.net.MachineLookup.MachinePorts;
@@ -16,22 +18,37 @@ import java.util.Set;
  * 6 face-neighbours and adapting any port-bearing machine/tank found there (via {@link MachineLookup})
  * to the network's channel.
  *
- * <p>Endpoints are classified by their port set (H6 FIX 2):
- * <ul>
- *   <li>OUTPUT-only neighbour → a PURE {@link Provider} (a source: it feeds the network);
- *   <li>INPUT-only neighbour → a PURE {@link Acceptor} (a sink: it drains the network);
- *   <li>neighbour with BOTH an OUTPUT and an INPUT port (e.g. a storage battery) → a BUFFER endpoint:
- *       it contributes ONE entry to the buffer-provider list AND one to the buffer-acceptor list.
- * </ul>
- * This split lets {@link NetworkTransfer} prioritise real sources/sinks over storage and so avoids the
+ * <p>Collection is FACE-PRECISE (2026-06-05 pipe flow-states design §1, Task 6): a neighbour qualifies
+ * only through the single port on the face that points BACK at the pipe, and the pipe face's own
+ * {@link FlowState} then filters what role that port may play. The port says what the machine OFFERS;
+ * the pipe face says what the network ACCEPTS through it.
+ *
+ * <p>The filter matrix (facing-port direction × pipe-face flow state):
+ * <table>
+ *   <caption>OFFER (port) × ACCEPT (pipe face)</caption>
+ *   <tr><th></th><th>NORMAL</th><th>PUSH</th><th>PULL</th><th>NONE</th></tr>
+ *   <tr><td>OUTPUT</td><td>pure provider</td><td>skip</td><td>pure provider</td><td>skip</td></tr>
+ *   <tr><td>INPUT</td><td>pure acceptor</td><td>pure acceptor</td><td>skip</td><td>skip</td></tr>
+ *   <tr><td>BOTH</td><td>StorageEndpoint
+ *       (storages + both buffer lists)</td><td>buffer acceptor only</td>
+ *       <td>buffer provider only</td><td>skip</td></tr>
+ * </table>
+ * Rationale: NONE hides the neighbour entirely. PUSH means the network only feeds the machine, so only
+ * its acceptor half is reachable; PULL only its provider half. A storage block pairs into a balancing
+ * {@link StorageEndpoint} ONLY across a NORMAL (two-way) face: a one-way PUSH/PULL face joins it as a
+ * single buffer half, never as a paired gauge (balancing needs to both fill AND drain it).
+ *
+ * <p>Pure sources/sinks vs storage (H6 FIX 2): splitting the BOTH/storage halves into separate buffer
+ * lists lets {@link NetworkTransfer} prioritise real sources/sinks over storage and so avoids the
  * self-churn where a storage block re-supplies its own energy each tick and starves the actual source.
  * POWER endpoints adapt through their {@link EnergyHandler}; FLUID/GAS endpoints through their
  * {@link ResourceBuffer} for that channel. ITEM is not handled here (no buffer adapter for items yet).
  *
- * <p>Face-precise geometry is deferred: like the existing transport code, ANY matching-channel
- * OUTPUT/INPUT port qualifies a neighbour, regardless of which face it sits on. Requiring the port to
- * face back at the pipe is a later refinement (consistent with {@code MachineTickSystem}'s OFFSETS
- * caveat).
+ * <p>KNOWN SIMPLIFICATION: the per-network neighbour dedup keeps only the FIRST member pipe's face
+ * contribution for a neighbour bordering several member pipes. A machine touching one network through
+ * two faces with DIFFERENT flow states therefore takes the first-encountered face's role; the other
+ * face is ignored. Acceptable while machines are large multiblocks (one network rarely wraps two faces
+ * of the same machine); flagged for a future per-face revision.
  */
 public final class NetworkEndpoints {
 
@@ -58,13 +75,15 @@ public final class NetworkEndpoints {
 
     /**
      * Walks every member pipe's face-neighbours and collects endpoints matching {@code net}'s channel,
-     * classifying each by its port set (see {@link Endpoints}).
+     * classifying each by the FACING port × pipe-face flow state per the matrix in the class javadoc.
      *
      * @param net    the network whose channel/members drive the search.
+     * @param grid   the pipe grid: resolves each member pipe's {@link PipeNode} to read its per-face
+     *               {@link FlowState}. A member with no node in the grid is treated as all-NORMAL.
      * @param lookup live (or fake) block access for resolving a neighbour's ports.
      * @return the classified endpoints. Never null; any list may be empty.
      */
-    public static Endpoints collect(Network net, MachineLookup lookup) {
+    public static Endpoints collect(Network net, PipeGridView grid, MachineLookup lookup) {
         PortChannel channel = net.channel();
         List<Provider> pureProviders = new ArrayList<>();
         List<Acceptor> pureAcceptors = new ArrayList<>();
@@ -73,17 +92,25 @@ public final class NetworkEndpoints {
         List<StorageEndpoint> storages = new ArrayList<>();
         // A neighbour block bordering two member pipes of THIS network would otherwise be wrapped twice
         // (a double share in the fair-split). Dedup by neighbour block position: once a position has
-        // contributed, skip it on subsequent member-pipe hits.
+        // contributed, skip it on subsequent member-pipe hits. NOTE the known simplification in the
+        // class javadoc: a multi-face machine takes the FIRST-encountered face's flow-state role.
         Set<Long> visitedNeighbours = new HashSet<>();
 
         for (long memberKey : net.memberKeys()) {
             int px = NetworkManager.unpackX(memberKey);
             int py = NetworkManager.unpackY(memberKey);
             int pz = NetworkManager.unpackZ(memberKey);
-            for (int[] off : OFFSETS) {
+            PipeNode member = grid.pipeAt(px, py, pz);
+            for (int faceIdx = 0; faceIdx < OFFSETS.length; faceIdx++) {
+                int[] off = OFFSETS[faceIdx];
                 int nx = px + off[0], ny = py + off[1], nz = pz + off[2];
                 if (!visitedNeighbours.add(NetworkManager.packKey(nx, ny, nz))) {
                     continue; // this neighbour position already contributed for this network
+                }
+                // The pipe's face toward this neighbour: NONE hides it entirely.
+                FlowState face = member == null ? FlowState.NORMAL : member.flowState(faceIdx);
+                if (face == FlowState.NONE) {
+                    continue;
                 }
                 MachinePorts neighbour = lookup.at(nx, ny, nz);
                 if (neighbour == null) {
@@ -93,32 +120,78 @@ public final class NetworkEndpoints {
                 if (ports == null) {
                     continue;
                 }
-                // Face-precise matching deferred: any matching-channel port on the neighbour qualifies.
-                boolean hasOutput = !ports.portsFor(channel, PortDirection.OUTPUT).isEmpty();
-                boolean hasInput = !ports.portsFor(channel, PortDirection.INPUT).isEmpty();
-                if (hasOutput && hasInput) {
-                    // Storage endpoint: contributes the PAIRED gauge view (for the balancing phase)
-                    // whose provider/acceptor halves also feed the two buffer lists.
-                    StorageEndpoint storage = storageFor(channel, neighbour);
-                    if (storage != null) {
-                        storages.add(storage);
-                        bufferProviders.add(storage.provider());
-                        bufferAcceptors.add(storage.acceptor());
-                    }
-                } else if (hasOutput) {
+                // Face-precise: only the port on the neighbour face that points BACK at the pipe
+                // (opposite of this pipe's face) qualifies.
+                Port facing = ports.portAt(PipeConnectivity.opposite(faceIdx), channel);
+                if (facing == null) {
+                    continue;
+                }
+                classify(channel, facing.direction(), face, neighbour,
+                    pureProviders, pureAcceptors, bufferProviders, bufferAcceptors, storages);
+            }
+        }
+        return new Endpoints(pureProviders, pureAcceptors, bufferProviders, bufferAcceptors, storages);
+    }
+
+    /**
+     * Applies the OFFER (facing-port {@code direction}) × ACCEPT (pipe {@code face}) matrix for one
+     * qualified neighbour, appending the resulting endpoint(s) to the relevant list(s). See the class
+     * javadoc for the full matrix and rationale. CLOSED ports and unreachable combinations contribute
+     * nothing.
+     */
+    private static void classify(
+            PortChannel channel, PortDirection direction, FlowState face, MachinePorts neighbour,
+            List<Provider> pureProviders, List<Acceptor> pureAcceptors,
+            List<Provider> bufferProviders, List<Acceptor> bufferAcceptors,
+            List<StorageEndpoint> storages) {
+        switch (direction) {
+            case OUTPUT -> {
+                // Port offers out; the network accepts a provider on NORMAL or PULL. PUSH wants to feed
+                // the machine but the port only offers: no overlap.
+                if (face == FlowState.NORMAL || face == FlowState.PULL) {
                     Provider provider = providerFor(channel, neighbour);
                     if (provider != null) {
                         pureProviders.add(provider);
                     }
-                } else if (hasInput) {
+                }
+            }
+            case INPUT -> {
+                // Port accepts in; the network offers an acceptor on NORMAL or PUSH. PULL wants to drain
+                // the machine but the port only accepts: no overlap.
+                if (face == FlowState.NORMAL || face == FlowState.PUSH) {
                     Acceptor acceptor = acceptorFor(channel, neighbour);
                     if (acceptor != null) {
                         pureAcceptors.add(acceptor);
                     }
                 }
             }
+            case BOTH -> {
+                if (face == FlowState.NORMAL) {
+                    // Two-way access: a paired StorageEndpoint whose halves also feed the buffer lists.
+                    StorageEndpoint storage = storageFor(channel, neighbour);
+                    if (storage != null) {
+                        storages.add(storage);
+                        bufferProviders.add(storage.provider());
+                        bufferAcceptors.add(storage.acceptor());
+                    }
+                } else if (face == FlowState.PUSH) {
+                    // One-way IN: buffer acceptor half only, never paired (balancing needs two-way).
+                    Acceptor acceptor = acceptorFor(channel, neighbour);
+                    if (acceptor != null) {
+                        bufferAcceptors.add(acceptor);
+                    }
+                } else if (face == FlowState.PULL) {
+                    // One-way OUT: buffer provider half only, never paired.
+                    Provider provider = providerFor(channel, neighbour);
+                    if (provider != null) {
+                        bufferProviders.add(provider);
+                    }
+                }
+            }
+            default -> {
+                // CLOSED (or any future direction): contributes nothing.
+            }
         }
-        return new Endpoints(pureProviders, pureAcceptors, bufferProviders, bufferAcceptors, storages);
     }
 
     private static StorageEndpoint storageFor(PortChannel channel, MachinePorts endpoint) {
