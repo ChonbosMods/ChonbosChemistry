@@ -8,8 +8,9 @@ package com.chonbosmods.chemistry.impl.texture;
  * <p>For the potion-derived "solid" jar (32x64 texture) the {@code Liquid} node maps to
  * {@code x:15..29, y:0..20}, i.e. {@code new LiquidMask(15, 0, 14, 20)}.
  */
-public record LiquidMask(int x, int y, int width, int height) {
+public record LiquidMask(int x, int y, int width, int height) implements TexelMask {
 
+    @Override
     public boolean contains(int px, int py) {
         return px >= x && px < x + width && py >= y && py < y + height;
     }

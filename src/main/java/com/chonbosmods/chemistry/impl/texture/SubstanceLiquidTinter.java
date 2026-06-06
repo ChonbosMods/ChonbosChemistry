@@ -16,7 +16,7 @@ public final class SubstanceLiquidTinter {
 
     private SubstanceLiquidTinter() {}
 
-    public static BufferedImage tint(BufferedImage master, LiquidMask mask, Color color) {
+    public static BufferedImage tint(BufferedImage master, TexelMask mask, Color color) {
         int w = master.getWidth();
         int h = master.getHeight();
         BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);

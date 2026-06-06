@@ -13,7 +13,7 @@ public final class GlowBoost {
 
     private GlowBoost() {}
 
-    public static BufferedImage apply(BufferedImage src, LiquidMask mask, GlowTier tier) {
+    public static BufferedImage apply(BufferedImage src, TexelMask mask, GlowTier tier) {
         int w = src.getWidth();
         int h = src.getHeight();
         BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);

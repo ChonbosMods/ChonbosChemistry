@@ -58,6 +58,9 @@ assets/
 ### Python ###
 scripts/__pycache__/
 
+# Generated per-liquid fluid-pipe core textures (produced by generateFluidPipeTextures)
+src/main/resources/Common/Blocks/ChonbosMods/Pipes/Substances/
+
 # Generated solid-substance asset pack (produced by generateSolidSubstanceAssets)
 src/main/resources/Common/Items/Chemistry/Substance_Textures/
 src/main/resources/Common/Icons/ItemsGenerated/Chem_Solid_*.png

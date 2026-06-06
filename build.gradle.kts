@@ -46,3 +46,18 @@ tasks.register<JavaExec>("generateSolidSubstanceAssets") {
         project.file("assets-src/icon_liquid_mask.png").absolutePath,
     )
 }
+
+// Bake substance colors into the FluidPipe core islands (per-liquid pipe textures). Multiplies the
+// white core ramp of fluidpipe_on.png by each LIQUID substance color; the steel shell stays neutral.
+// Outputs the per-substance swap textures into the Pipes asset tree. Run before devServer/build:
+//   ./gradlew generateFluidPipeTextures
+tasks.register<JavaExec>("generateFluidPipeTextures") {
+    group = "chemistry"
+    description = "Bake substance colors into the FluidPipe core islands -> per-liquid pipe textures."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.chonbosmods.chemistry.impl.assetgen.FluidPipeTextureGenerator")
+    args(
+        project.file("src/main/resources/Common/Blocks/ChonbosMods/Pipes/fluidpipe_on.png").absolutePath,
+        project.file("src/main/resources/Common/Blocks/ChonbosMods/Pipes/Substances").absolutePath,
+    )
+}
