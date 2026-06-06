@@ -235,12 +235,16 @@ public final class NetworkManager {
      * rebuilds it fresh. Safe no-op if that position is not currently cached.
      */
     public void invalidate(int x, int y, int z) {
-        Long anchor = anchorByPipe.get(packKey(x, y, z));
+        dropByAnchor(anchorByPipe.get(packKey(x, y, z)));
+    }
+
+    /** Drops one cached network by anchor: the anchor entry + every member's mapping. Null-safe no-op. */
+    private void dropByAnchor(Long anchor) {
         if (anchor == null) {
             return;
         }
         networksByAnchor.remove(anchor);
-        // Remove all members pointing at this anchor.
+        // Remove all members pointing at this anchor (single scan).
         anchorByPipe.values().removeIf(a -> a.equals(anchor));
     }
 
@@ -366,13 +370,13 @@ public final class NetworkManager {
      * cached members.
      */
     public void invalidateMembers(Network net) {
+        // All members of one network share a single anchor: resolve it from any member, drop once.
         for (long key : net.memberKeys()) {
             Long anchor = anchorByPipe.get(key);
-            if (anchor == null) {
-                continue;
+            if (anchor != null) {
+                dropByAnchor(anchor);
+                return;
             }
-            networksByAnchor.remove(anchor);
-            anchorByPipe.values().removeIf(a -> a.equals(anchor));
         }
     }
 
