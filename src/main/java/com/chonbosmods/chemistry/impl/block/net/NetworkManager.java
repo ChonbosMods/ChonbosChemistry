@@ -143,7 +143,9 @@ public final class NetworkManager {
             memberKeys.add(packKey(px, py, pz));
             memberNodes.add(node);
 
-            for (int[] off : OFFSETS) {
+            // The OFFSETS index IS the face index from this node toward the neighbour (+X,-X,...).
+            for (int faceIdx = 0; faceIdx < OFFSETS.length; faceIdx++) {
+                int[] off = OFFSETS[faceIdx];
                 int nx = px + off[0], ny = py + off[1], nz = pz + off[2];
                 if (nx < MIN_COORD || nx > MAX_COORD
                         || ny < MIN_COORD || ny > MAX_COORD
@@ -155,8 +157,11 @@ public final class NetworkManager {
                     continue;
                 }
                 PipeNode neighbour = grid.pipeAt(nx, ny, nz);
-                if (neighbour == null || neighbour.channel() != channel) {
-                    continue; // no pipe, or a channel boundary
+                // Single gate (PipeConnectivity.connects): channel + flow states + substance compat.
+                // Replaces the bare same-channel check so NONE faces sever runs and different-substance
+                // lines never merge (the gas bug). The channel check now lives inside connects().
+                if (!PipeConnectivity.connects(node, faceIdx, neighbour)) {
+                    continue; // no pipe, channel boundary, NONE face, or incompatible substance
                 }
                 frontier.add(new int[] {nx, ny, nz});
             }
