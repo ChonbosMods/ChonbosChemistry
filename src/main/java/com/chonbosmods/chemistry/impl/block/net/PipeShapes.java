@@ -1,5 +1,7 @@
 package com.chonbosmods.chemistry.impl.block.net;
 
+import com.chonbosmods.chemistry.api.io.FlowState;
+
 /**
  * Pure, table-driven mapping from a pipe's connected-faces bitmask to its <em>effective-topology</em>
  * interaction-state key plus the Y-rotation that orients that shape.
@@ -234,5 +236,63 @@ public final class PipeShapes {
             return energized ? ON : DEFAULT;
         }
         return energized ? PipePowerStates.poweredOf(shape.stateKey()) : shape.stateKey();
+    }
+
+    /**
+     * The push/pull <em>indicator</em> state key for an end-stub pipe whose single effective arm points at
+     * a machine and whose face flow state is {@link FlowState#PUSH PUSH} or {@link FlowState#PULL PULL}
+     * (Task 12, design §3). When applicable this returns the directional indicator twin of the plain end
+     * shape ({@code End_Push}/{@code End_Pull}, {@code Vertical_End_Up_Push}/{@code _Pull},
+     * {@code Vertical_End_Down_Push}/{@code _Pull}, each with its {@code _On} energized twin); otherwise it
+     * returns {@code null} so the caller falls back to {@link #stateFor}.
+     *
+     * <h2>When an indicator applies</h2>
+     * The indicator is an end-stub overlay, so it applies ONLY when:
+     * <ul>
+     *   <li>{@code effectiveMask} is a single-arm END mask: exactly one of the low 6 bits set
+     *       ({@code Integer.bitCount(effectiveMask) == 1}); AND</li>
+     *   <li>{@code faceState} (the flow state of that single arm's face) is {@code PUSH} or {@code PULL}.</li>
+     * </ul>
+     * For any other mask (zero, multi-arm, or out of range) or any other face state ({@code NORMAL},
+     * {@code NONE}, or {@code null}) this returns {@code null}: those pipes show their plain shape via
+     * {@link #stateFor}. The single arm's face index is {@code Integer.numberOfTrailingZeros(mask)} and the
+     * base end shape (and the rotation the engine welds it with, preserved by the state swap) comes from
+     * {@link #resolve}: +X/-X/+Z/-Z resolve to {@code End} at the appropriate rotation, +Y to
+     * {@code Vertical_End_Up} and -Y to {@code Vertical_End_Down} (both rotation 0).
+     *
+     * <h2>Key construction</h2>
+     * The indicator key is the base end shape key + {@code _Push}/{@code _Pull} (+ {@code _On} when
+     * {@code energized}), e.g. {@code End_Pull}, {@code Vertical_End_Up_Push_On}. The energized twin is
+     * exactly {@link PipePowerStates#poweredOf(String)} of the unenergized indicator key, keeping it in
+     * lockstep with the H8 flip path. Orientation is NOT part of the key (see this class's
+     * {@code Orientation} section); a single-arm mask's rotation is {@link #resolve}{@code .rotationIndex()}.
+     *
+     * @param effectiveMask the pipe's effective connectivity bitmask (OFFSETS order); the indicator only
+     *                      fires for a single-bit (end-stub) mask.
+     * @param faceState     the {@link FlowState} of the single arm's face (the caller reads
+     *                      {@code pipe.flowState(Integer.numberOfTrailingZeros(effectiveMask))}); may be
+     *                      {@code null}.
+     * @param energized     whether the network is energized (selects the {@code _On} twin).
+     * @return the indicator state key, or {@code null} when no indicator applies (caller uses
+     *         {@link #stateFor}).
+     */
+    public static String indicatorStateFor(int effectiveMask, FlowState faceState, boolean energized) {
+        // Cheap eligibility gate: exactly one arm (a single-bit END mask) AND a PUSH/PULL face.
+        if (effectiveMask < 1 || effectiveMask > 63 || Integer.bitCount(effectiveMask) != 1) {
+            return null;
+        }
+        String suffix;
+        if (faceState == FlowState.PUSH) {
+            suffix = "_Push";
+        } else if (faceState == FlowState.PULL) {
+            suffix = "_Pull";
+        } else {
+            return null; // NORMAL, NONE, or null: no indicator.
+        }
+        // The single arm resolves to one of the three end shapes (End / Vertical_End_Up /
+        // Vertical_End_Down); its rotation is carried by the resolved Shape and preserved by the swap.
+        String base = resolve(effectiveMask).stateKey();
+        String key = base + suffix;
+        return energized ? PipePowerStates.poweredOf(key) : key;
     }
 }

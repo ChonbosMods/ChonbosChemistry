@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import com.chonbosmods.chemistry.api.io.FlowState;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -191,5 +194,166 @@ class PipeShapesTest {
                 () -> PipeShapes.resolve(-1));
         org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
                 () -> PipeShapes.resolve(64));
+    }
+
+    // =====================================================================================
+    // indicatorStateFor: end-stub push/pull direction arrows (Task 12)
+    // =====================================================================================
+
+    // --- the 6 single-arm directions x PUSH/PULL, unenergized ---
+
+    @Test
+    void indicator_plusZ_push() {
+        // +Z single arm -> End shape (rotation 0); PUSH face -> End_Push.
+        assertEquals("End_Push", PipeShapes.indicatorStateFor(PZ, FlowState.PUSH, false));
+    }
+
+    @Test
+    void indicator_plusZ_pull() {
+        assertEquals("End_Pull", PipeShapes.indicatorStateFor(PZ, FlowState.PULL, false));
+    }
+
+    @Test
+    void indicator_plusX_push() {
+        // +X is still the End shape (just a different rotation): the key is direction-only, not rotated.
+        assertEquals("End_Push", PipeShapes.indicatorStateFor(PX, FlowState.PUSH, false));
+    }
+
+    @Test
+    void indicator_minusX_pull() {
+        assertEquals("End_Pull", PipeShapes.indicatorStateFor(NX, FlowState.PULL, false));
+    }
+
+    @Test
+    void indicator_minusZ_push() {
+        assertEquals("End_Push", PipeShapes.indicatorStateFor(NZ, FlowState.PUSH, false));
+    }
+
+    @Test
+    void indicator_plusY_push() {
+        assertEquals("Vertical_End_Up_Push", PipeShapes.indicatorStateFor(PY, FlowState.PUSH, false));
+    }
+
+    @Test
+    void indicator_plusY_pull() {
+        assertEquals("Vertical_End_Up_Pull", PipeShapes.indicatorStateFor(PY, FlowState.PULL, false));
+    }
+
+    @Test
+    void indicator_minusY_push() {
+        assertEquals("Vertical_End_Down_Push", PipeShapes.indicatorStateFor(NY, FlowState.PUSH, false));
+    }
+
+    @Test
+    void indicator_minusY_pull() {
+        assertEquals("Vertical_End_Down_Pull", PipeShapes.indicatorStateFor(NY, FlowState.PULL, false));
+    }
+
+    // --- energized appends the _On twin (mirrors PipePowerStates.poweredOf) ---
+
+    @Test
+    void indicator_energizedIsOnTwin() {
+        assertEquals("End_Push_On", PipeShapes.indicatorStateFor(PZ, FlowState.PUSH, true));
+        assertEquals("End_Pull_On", PipeShapes.indicatorStateFor(PX, FlowState.PULL, true));
+        assertEquals("Vertical_End_Up_Push_On",
+                PipeShapes.indicatorStateFor(PY, FlowState.PUSH, true));
+        assertEquals("Vertical_End_Down_Pull_On",
+                PipeShapes.indicatorStateFor(NY, FlowState.PULL, true));
+    }
+
+    @Test
+    void indicator_energizedIsExactlyPoweredOfUnenergized() {
+        int[] singleArms = {PX, NX, PY, NY, PZ, NZ};
+        for (int arm : singleArms) {
+            for (FlowState fs : new FlowState[] {FlowState.PUSH, FlowState.PULL}) {
+                String off = PipeShapes.indicatorStateFor(arm, fs, false);
+                String on = PipeShapes.indicatorStateFor(arm, fs, true);
+                assertEquals(PipePowerStates.poweredOf(off), on,
+                        "arm " + arm + " " + fs + ": energized indicator is not the powered twin");
+                assertEquals(off, PipePowerStates.unpoweredOf(on),
+                        "arm " + arm + " " + fs + ": unpoweredOf(on) does not return the off indicator");
+            }
+        }
+    }
+
+    // --- null cases: NORMAL / NONE / null face on a valid single arm ---
+
+    @Test
+    void indicator_normalFace_isNull() {
+        assertNull(PipeShapes.indicatorStateFor(PZ, FlowState.NORMAL, false));
+        assertNull(PipeShapes.indicatorStateFor(PY, FlowState.NORMAL, true));
+    }
+
+    @Test
+    void indicator_noneFace_isNull() {
+        assertNull(PipeShapes.indicatorStateFor(PZ, FlowState.NONE, false));
+        assertNull(PipeShapes.indicatorStateFor(NY, FlowState.NONE, true));
+    }
+
+    @Test
+    void indicator_nullFace_isNull() {
+        assertNull(PipeShapes.indicatorStateFor(PX, null, false));
+    }
+
+    // --- null cases: zero mask and multi-arm masks (not an end-stub) ---
+
+    @Test
+    void indicator_zeroMask_isNull() {
+        assertNull(PipeShapes.indicatorStateFor(0, FlowState.PUSH, false));
+        assertNull(PipeShapes.indicatorStateFor(0, FlowState.PULL, true));
+    }
+
+    @Test
+    void indicator_multiArmMasks_isNull() {
+        // Straight (two arms), elbow (two), tee (three), cross (four), six (all): none are end stubs.
+        assertNull(PipeShapes.indicatorStateFor(PZ | NZ, FlowState.PUSH, false));
+        assertNull(PipeShapes.indicatorStateFor(PX | PZ, FlowState.PULL, false));
+        assertNull(PipeShapes.indicatorStateFor(PX | NX | PZ, FlowState.PUSH, true));
+        assertNull(PipeShapes.indicatorStateFor(PX | NX | PZ | NZ, FlowState.PULL, false));
+        assertNull(PipeShapes.indicatorStateFor(0b111111, FlowState.PUSH, true));
+    }
+
+    @Test
+    void indicator_outOfRangeMask_isNull() {
+        // Defensive: a bit above the low 6 (or negative) is not a valid single-arm end and never throws.
+        assertNull(PipeShapes.indicatorStateFor(64, FlowState.PUSH, false));
+        assertNull(PipeShapes.indicatorStateFor(-1, FlowState.PULL, false));
+    }
+
+    // --- the indicator's base end shape matches stateFor's plain end (direction aside) ---
+
+    @Test
+    void indicator_baseMatchesPlainEndShape() {
+        int[] singleArms = {PX, NX, PY, NY, PZ, NZ};
+        for (int arm : singleArms) {
+            String plain = PipeShapes.stateFor(arm, false); // e.g. "End", "Vertical_End_Up"
+            String push = PipeShapes.indicatorStateFor(arm, FlowState.PUSH, false);
+            String pull = PipeShapes.indicatorStateFor(arm, FlowState.PULL, false);
+            assertEquals(plain + "_Push", push, "arm " + arm + ": push indicator base mismatch");
+            assertEquals(plain + "_Pull", pull, "arm " + arm + ": pull indicator base mismatch");
+        }
+    }
+
+    // --- every state key indicatorStateFor can emit must exist in the cable JSON Definitions ---
+    // (path validity is covered by the build resources; this asserts the key set is exactly the 12)
+
+    @Test
+    void indicator_emitsOnlyTheTwelveKnownKeys() {
+        java.util.Set<String> emitted = new java.util.TreeSet<>();
+        int[] singleArms = {PX, NX, PY, NY, PZ, NZ};
+        for (int arm : singleArms) {
+            for (FlowState fs : new FlowState[] {FlowState.PUSH, FlowState.PULL}) {
+                emitted.add(PipeShapes.indicatorStateFor(arm, fs, false));
+                emitted.add(PipeShapes.indicatorStateFor(arm, fs, true));
+            }
+        }
+        java.util.Set<String> expected = new java.util.TreeSet<>(java.util.Arrays.asList(
+                "End_Push", "End_Pull",
+                "Vertical_End_Up_Push", "Vertical_End_Up_Pull",
+                "Vertical_End_Down_Push", "Vertical_End_Down_Pull",
+                "End_Push_On", "End_Pull_On",
+                "Vertical_End_Up_Push_On", "Vertical_End_Up_Pull_On",
+                "Vertical_End_Down_Push_On", "Vertical_End_Down_Pull_On"));
+        assertEquals(expected, emitted);
     }
 }

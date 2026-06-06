@@ -122,6 +122,24 @@
         "Vertical_3horiz_Ud": {
           "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_3horiz_ud.blockymodel"
         },
+        "End_Push": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end.blockymodel"
+        },
+        "End_Pull": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end.blockymodel"
+        },
+        "Vertical_End_Up_Push": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up.blockymodel"
+        },
+        "Vertical_End_Up_Pull": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up.blockymodel"
+        },
+        "Vertical_End_Down_Push": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down.blockymodel"
+        },
+        "Vertical_End_Down_Pull": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down.blockymodel"
+        },
         "On": {
           "CustomModelTexture": [
             {
@@ -363,6 +381,60 @@
               "Texture": "Blocks/ChonbosMods/Pipes/cable_pipe_on.png"
             }
           ]
+        },
+        "End_Push_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/cable_pipe_on.png"
+            }
+          ]
+        },
+        "End_Pull_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/cable_pipe_on.png"
+            }
+          ]
+        },
+        "Vertical_End_Up_Push_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/cable_pipe_on.png"
+            }
+          ]
+        },
+        "Vertical_End_Up_Pull_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/cable_pipe_on.png"
+            }
+          ]
+        },
+        "Vertical_End_Down_Push_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/cable_pipe_on.png"
+            }
+          ]
+        },
+        "Vertical_End_Down_Pull_On": {
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down.blockymodel",
+          "CustomModelTexture": [
+            {
+              "Weight": 1,
+              "Texture": "Blocks/ChonbosMods/Pipes/cable_pipe_on.png"
+            }
+          ]
         }
       }
     },
@@ -423,7 +495,19 @@
         "tripod_down_on": "*CC_PowerCable_State_Definitions_Tripod_Down_On",
         "five_down_on": "*CC_PowerCable_State_Definitions_Five_Down_On",
         "vertical_branch_on": "*CC_PowerCable_State_Definitions_Vertical_Branch_On",
-        "vertical_3horiz_ud_on": "*CC_PowerCable_State_Definitions_Vertical_3horiz_Ud_On"
+        "vertical_3horiz_ud_on": "*CC_PowerCable_State_Definitions_Vertical_3horiz_Ud_On",
+        "end_push": "*CC_PowerCable_State_Definitions_End_Push",
+        "end_push_on": "*CC_PowerCable_State_Definitions_End_Push_On",
+        "end_pull": "*CC_PowerCable_State_Definitions_End_Pull",
+        "end_pull_on": "*CC_PowerCable_State_Definitions_End_Pull_On",
+        "vertical_end_up_push": "*CC_PowerCable_State_Definitions_Vertical_End_Up_Push",
+        "vertical_end_up_push_on": "*CC_PowerCable_State_Definitions_Vertical_End_Up_Push_On",
+        "vertical_end_up_pull": "*CC_PowerCable_State_Definitions_Vertical_End_Up_Pull",
+        "vertical_end_up_pull_on": "*CC_PowerCable_State_Definitions_Vertical_End_Up_Pull_On",
+        "vertical_end_down_push": "*CC_PowerCable_State_Definitions_Vertical_End_Down_Push",
+        "vertical_end_down_push_on": "*CC_PowerCable_State_Definitions_Vertical_End_Down_Push_On",
+        "vertical_end_down_pull": "*CC_PowerCable_State_Definitions_Vertical_End_Down_Pull",
+        "vertical_end_down_pull_on": "*CC_PowerCable_State_Definitions_Vertical_End_Down_Pull_On"
       }
     },
     "BlockEntity": {

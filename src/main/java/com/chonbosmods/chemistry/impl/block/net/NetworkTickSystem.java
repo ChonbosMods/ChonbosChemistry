@@ -1,5 +1,6 @@
 package com.chonbosmods.chemistry.impl.block.net;
 
+import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -295,9 +296,20 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
 
                 int effective = PipeVisualStates.effectiveMask(member, mx, my, mz, grid, lookup);
                 int physical = PipeVisualStates.physicalMask(member, mx, my, mz, grid, lookup);
-                if (effective == physical) {
-                    // Undisturbed: the engine pattern + H8 flip already did the right thing. Leave it,
-                    // and forget any stale rotation warning (topology may have changed back).
+
+                // Task 12: end-stub push/pull indicator. Cheap check (single-bit mask + the single arm's
+                // flow state). When the effective topology is a lone arm pointing at a machine whose face
+                // is PUSH/PULL, the indicator shape carries a direction arrow and must be shown EVEN when
+                // effective==physical (an undisturbed straight-to-machine end is a valid indicator case):
+                // so indicator-eligible pipes must NOT take the undisturbed short-circuit below.
+                FlowState faceState = effective == 0
+                        ? null
+                        : member.flowState(Integer.numberOfTrailingZeros(effective));
+                String indicator = PipeShapes.indicatorStateFor(effective, faceState, energized);
+
+                if (indicator == null && effective == physical) {
+                    // Undisturbed and no indicator: the engine pattern + H8 flip already did the right
+                    // thing. Leave it, and forget any stale rotation warning (topology may have changed).
                     warnedRotationMismatch.remove(key);
                     continue;
                 }
@@ -311,7 +323,8 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                     continue; // not our block anymore (race with a break); skip
                 }
 
-                String desired = PipeShapes.stateFor(effective, energized);
+                // Prefer the indicator state when applicable; else the plain effective-topology shape.
+                String desired = indicator != null ? indicator : PipeShapes.stateFor(effective, energized);
                 String current = bt.getStateForBlock(bt);
                 String normalizedCurrent = (current == null || current.isEmpty()) ? "default" : current;
                 if (desired.equals(normalizedCurrent)) {

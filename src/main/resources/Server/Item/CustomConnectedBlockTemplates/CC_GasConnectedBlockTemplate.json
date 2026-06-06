@@ -3494,6 +3494,282 @@
         ]
       },
       "PatternsToMatchAnyOf": []
+    },
+    "end_push": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "end_push_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "end_pull": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "end_pull_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_up_push": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_up_push_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_up_pull": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_up_pull_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_down_push": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_down_push_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_down_pull": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    },
+    "vertical_end_down_pull_on": {
+      "FaceTags": {
+        "North": [
+          "CC_GasFace"
+        ],
+        "South": [
+          "CC_GasFace"
+        ],
+        "East": [
+          "CC_GasFace"
+        ],
+        "West": [
+          "CC_GasFace"
+        ],
+        "Up": [
+          "CC_GasFace"
+        ],
+        "Down": [
+          "CC_GasFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
     }
   }
 }
