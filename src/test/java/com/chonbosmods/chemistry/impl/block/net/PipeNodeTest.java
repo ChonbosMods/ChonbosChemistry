@@ -94,6 +94,27 @@ class PipeNodeTest {
     }
 
     @Test
+    void malformedFlowStatesArrayDecodesDefensively() {
+        // Hand-build a doc with a SHORT FlowStates array (2 entries): missing faces fall back to
+        // NORMAL and decode never throws (hot ECS data: the clamp logic must hold under bad input).
+        PipeNode source = PipeNode.of(PortChannel.GAS, 1);
+        source.setFlowState(0, FlowState.PUSH); // force the key to be present
+        BsonDocument doc = PipeNode.CODEC.encode(source, EmptyExtraInfo.EMPTY).asDocument();
+        org.bson.BsonArray shortArray = new org.bson.BsonArray();
+        shortArray.add(new org.bson.BsonString("none"));
+        shortArray.add(new org.bson.BsonString("pull"));
+        doc.put("FlowStates", shortArray);
+
+        PipeNode decoded = PipeNode.CODEC.decode(doc, EmptyExtraInfo.EMPTY);
+
+        assertEquals(FlowState.NONE, decoded.flowState(0));
+        assertEquals(FlowState.PULL, decoded.flowState(1));
+        for (int i = 2; i < 6; i++) {
+            assertEquals(FlowState.NORMAL, decoded.flowState(i), "missing face " + i + " -> NORMAL");
+        }
+    }
+
+    @Test
     void flowStatesRoundTripThroughCodec() {
         PipeNode node = PipeNode.of(PortChannel.FLUID, 1);
         node.setFlowState(2, FlowState.PUSH);
