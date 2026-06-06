@@ -93,7 +93,7 @@ class PipeConnectivityTest {
     }
 
     @Test
-    void oppositePairsParedDirections() {
+    void oppositePairsPairedDirections() {
         assertEquals(1, PipeConnectivity.opposite(0));
         assertEquals(0, PipeConnectivity.opposite(1));
         assertEquals(3, PipeConnectivity.opposite(2));
