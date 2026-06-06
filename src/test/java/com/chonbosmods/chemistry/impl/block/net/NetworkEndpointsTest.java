@@ -209,6 +209,55 @@ class NetworkEndpointsTest {
     }
 
     @Test
+    void noneFaceDoesNotClaimTheNeighbourDedupSlot() {
+        // Regression: order-dependent NONE-face dedup must not hide a machine reachable via another
+        // member pipe. ONE network, two member pipes BOTH bordering one machine: pipe (5,6,5) reaches it
+        // via a NONE face; pipe (6,5,5) via a NORMAL face. The machine has OUTPUT ports on BOTH touching
+        // faces, so it qualifies as a pure provider through the NORMAL side regardless of which member
+        // the dedup visits first. If a NONE face wrongly CLAIMS the per-neighbour dedup slot (add-before-
+        // NONE-check), the NORMAL-side member is skipped and the machine vanishes.
+        //
+        // An L of three connected POWER pipes: (5,5,5)-(6,5,5)-(5,6,5). The machine sits at (6,6,5),
+        // face-adjacent to (6,5,5) [on its +Y face 2] and to (5,6,5) [on its +X face 0]. The collect
+        // pass walks net.memberKeys(); BFS enqueues neighbours in OFFSETS order (+X before +Y), so the
+        // +X member (6,5,5) is registered first and is hit FIRST during collection. Make THAT first
+        // member the NONE-face one: on the broken code it claims (6,6,5)'s dedup slot then continues,
+        // and the later NORMAL-face member (5,6,5) is denied -> machine vanishes.
+        NetworkManager manager = new NetworkManager();
+        PipeNode none = PipeNode.of(PortChannel.POWER, 1); // (6,5,5): +Y face (2) toward machine = NONE
+        none.setFlowState(2, FlowState.NONE);
+        PipeNode normal = PipeNode.of(PortChannel.POWER, 1); // (5,6,5): +X face (0) toward machine NORMAL
+        PipeNode seed = PipeNode.of(PortChannel.POWER, 1); // (5,5,5): plain corner of the L
+        PipeGridView grid = (px, py, pz) -> {
+            long k = NetworkManager.packKey(px, py, pz);
+            if (k == NetworkManager.packKey(5, 5, 5)) {
+                return seed;
+            }
+            if (k == NetworkManager.packKey(6, 5, 5)) {
+                return none;
+            }
+            if (k == NetworkManager.packKey(5, 6, 5)) {
+                return normal;
+            }
+            return null;
+        };
+        Network net = manager.getOrBuildNetwork(5, 5, 5, grid);
+
+        FakeLookup lookup = new FakeLookup();
+        // Machine faces (6,5,5) on its -Y face (3) and (5,6,5) on its -X face (1): OUTPUT on BOTH.
+        lookup.put(6, 6, 5, new FakePorts(
+            PortConfig.of(List.of(
+                Port.of(3, PortChannel.POWER, PortDirection.OUTPUT),
+                Port.of(1, PortChannel.POWER, PortDirection.OUTPUT))),
+            EnergyBuffer.withCapacity(1000L), Map.of()));
+
+        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, grid, lookup);
+        // Reachable via the NORMAL face: collected exactly once. (The NONE face is dedup-neutral.)
+        assertEquals(1, endpoints.pureProviders().size());
+        assertEquals(0, endpoints.pureAcceptors().size());
+    }
+
+    @Test
     void collect_storageWithBothPorts_classifiedAsBufferProviderAndBufferAcceptor() {
         // A storage battery: a single neighbour whose facing port is BOTH (two-way). Across a NORMAL
         // pipe face it must contribute ONE entry to bufferProviders AND ONE to bufferAcceptors (never to

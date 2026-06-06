@@ -48,7 +48,10 @@ import java.util.Set;
  * contribution for a neighbour bordering several member pipes. A machine touching one network through
  * two faces with DIFFERENT flow states therefore takes the first-encountered face's role; the other
  * face is ignored. Acceptable while machines are large multiblocks (one network rarely wraps two faces
- * of the same machine); flagged for a future per-face revision.
+ * of the same machine); flagged for a future per-face revision. NONE faces are dedup-NEUTRAL: a NONE
+ * face hides its neighbour and never claims the dedup slot, so the first-face-wins race applies only
+ * among NON-NONE faces (a machine reachable via a sibling member's non-NONE face stays visible even if
+ * an earlier-visited member borders it through a NONE face).
  */
 public final class NetworkEndpoints {
 
@@ -92,8 +95,10 @@ public final class NetworkEndpoints {
         List<StorageEndpoint> storages = new ArrayList<>();
         // A neighbour block bordering two member pipes of THIS network would otherwise be wrapped twice
         // (a double share in the fair-split). Dedup by neighbour block position: once a position has
-        // contributed, skip it on subsequent member-pipe hits. NOTE the known simplification in the
-        // class javadoc: a multi-face machine takes the FIRST-encountered face's flow-state role.
+        // contributed, skip it on subsequent member-pipe hits. NONE faces are dedup-NEUTRAL: a NONE face
+        // hides its neighbour entirely, so it must NOT claim the slot (else it would mask the machine
+        // from a sibling member's reachable face). NOTE the known simplification in the class javadoc:
+        // among NON-NONE faces a multi-face machine takes the FIRST-encountered face's flow-state role.
         Set<Long> visitedNeighbours = new HashSet<>();
 
         for (long memberKey : net.memberKeys()) {
@@ -104,13 +109,15 @@ public final class NetworkEndpoints {
             for (int faceIdx = 0; faceIdx < OFFSETS.length; faceIdx++) {
                 int[] off = OFFSETS[faceIdx];
                 int nx = px + off[0], ny = py + off[1], nz = pz + off[2];
-                if (!visitedNeighbours.add(NetworkManager.packKey(nx, ny, nz))) {
-                    continue; // this neighbour position already contributed for this network
-                }
-                // The pipe's face toward this neighbour: NONE hides it entirely.
+                // The pipe's face toward this neighbour: NONE hides it entirely. Check BEFORE the dedup
+                // claim so a NONE face stays dedup-neutral: it neither contributes nor blocks a sibling
+                // member's reachable (non-NONE) face onto the same neighbour.
                 FlowState face = member == null ? FlowState.NORMAL : member.flowState(faceIdx);
                 if (face == FlowState.NONE) {
                     continue;
+                }
+                if (!visitedNeighbours.add(NetworkManager.packKey(nx, ny, nz))) {
+                    continue; // this neighbour position already contributed for this network
                 }
                 MachinePorts neighbour = lookup.at(nx, ny, nz);
                 if (neighbour == null) {
