@@ -1,5 +1,6 @@
 package com.chonbosmods.chemistry.api.io;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.hypixel.hytale.codec.EmptyExtraInfo;
@@ -9,11 +10,11 @@ import org.junit.jupiter.api.Test;
 class FlowStateTest {
 
     @Test
-    void hasFourValues() {
-        assertEquals(4, FlowState.values().length);
-        // Named values exist.
-        FlowState[] expected = {FlowState.NORMAL, FlowState.PUSH, FlowState.PULL, FlowState.NONE};
-        assertEquals(4, expected.length);
+    void hasExactlyTheFourValuesInWrenchCycleOrder() {
+        // Declaration order IS the wrench cycle order (NORMAL -> PUSH -> PULL -> NONE): pin it.
+        assertArrayEquals(
+            new FlowState[] {FlowState.NORMAL, FlowState.PUSH, FlowState.PULL, FlowState.NONE},
+            FlowState.values());
     }
 
     @Test
