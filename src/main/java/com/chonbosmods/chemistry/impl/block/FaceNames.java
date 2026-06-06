@@ -3,7 +3,7 @@ package com.chonbosmods.chemistry.impl.block;
 /**
  * Human-readable names for the 6 cube faces in the canonical {@code NetworkManager.OFFSETS} order
  * {@code +X,-X,+Y,-Y,+Z,-Z} (indices 0..5). Used by the {@code CC_Wrench} interaction to label chat
- * feedback ("Pipe face East: PUSH"); Task 13's flow-state HUD reuses it.
+ * feedback ("Pipe face East: push"); Task 13's flow-state HUD reuses it.
  *
  * <h2>Index → name mapping (matches the engine's {@code BlockFace} axis convention)</h2>
  * The names mirror Hytale's {@code BlockFace} → world-axis mapping, confirmed against HyProTech's
