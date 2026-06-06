@@ -2,6 +2,7 @@ package com.chonbosmods.chemistry.impl.block.net;
 
 import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
+import com.chonbosmods.chemistry.api.io.PortDirection;
 import com.chonbosmods.chemistry.impl.block.Port;
 import com.chonbosmods.chemistry.impl.block.PortConfig;
 import com.chonbosmods.chemistry.impl.block.net.MachineLookup.MachinePorts;
@@ -170,7 +171,10 @@ public final class PipeVisualStates {
             return false;
         }
         Port facing = ports.portAt(PipeConnectivity.opposite(face), channel);
-        return facing != null;
+        // Match NetworkEndpoints' classify gate EXACTLY: a CLOSED facing port contributes nothing to
+        // endpoint collection (the wrench models "closed" as a persisted CLOSED port, not a removed
+        // one), so the transport layer does not join this face and the arm must not render connected.
+        return facing != null && facing.direction() != PortDirection.CLOSED;
     }
 
     /**

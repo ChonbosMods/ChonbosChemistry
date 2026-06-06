@@ -209,6 +209,22 @@ class PipeVisualStatesTest {
     }
 
     @Test
+    void closedFacingPort_effectiveDrops_physicalKeeps() {
+        // A machine face wrenched to CLOSED keeps its (persisted) port but contributes nothing to
+        // endpoint collection: the EFFECTIVE mask must drop the arm exactly like NetworkEndpoints'
+        // classify gate does, while the engine still physically stubs to the channel-bearing machine.
+        PipeNode self = PipeNode.of(PortChannel.POWER, 1);
+        FakeGrid grid = new FakeGrid().put(0, 0, 0, self);
+        FakeLookup lookup = new FakeLookup().put(1, 0, 0, new FakePorts(
+            powerPort(FACE_NX, PortDirection.CLOSED), EnergyBuffer.withCapacity(1000L), Map.of()));
+
+        assertEquals(0, PipeVisualStates.effectiveMask(self, 0, 0, 0, grid, lookup),
+            "a CLOSED facing port is not a transport endpoint: no effective arm");
+        assertEquals(BIT_PX, PipeVisualStates.physicalMask(self, 0, 0, 0, grid, lookup),
+            "engine still stubs physically to the channel-bearing machine");
+    }
+
+    @Test
     void wrongChannelMachine_inNeitherMask() {
         // A FLUID machine beside a POWER pipe: not this network's channel, so neither mask counts it.
         PipeNode self = PipeNode.of(PortChannel.POWER, 1);
