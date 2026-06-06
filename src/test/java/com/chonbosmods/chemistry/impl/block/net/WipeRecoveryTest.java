@@ -2,6 +2,7 @@ package com.chonbosmods.chemistry.impl.block.net;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import java.util.HashMap;
 import java.util.List;
@@ -102,6 +103,130 @@ class WipeRecoveryTest {
         snaps.restorePending(grid, 3);
 
         assertEquals(25, pipe.bufferShare());
+    }
+
+    // --- PipeNodeSnapshots flow-state recovery (Task 5b) ---
+
+    /** A 6-element all-NORMAL flow-state array with the given faces overridden. */
+    private static FlowState[] faces(Map<Integer, FlowState> overrides) {
+        FlowState[] f = new FlowState[6];
+        java.util.Arrays.fill(f, FlowState.NORMAL);
+        overrides.forEach((i, s) -> f[i] = s);
+        return f;
+    }
+
+    @Test
+    void restoresWipedPipeFlowStatesEvenWithZeroShare() {
+        // A wrenched-but-empty pipe: face 0 NONE, share 0, resourceId null. The wipe gave it a fresh
+        // all-NORMAL clone (share 0, id null): exactly the wipe signature, so the face config restores.
+        PipeNode pipe = fluid(1); // wiped: all-NORMAL, share 0, id null
+        FakePipeGrid grid = new FakePipeGrid().put(5, 60, 5, pipe);
+        PipeNodeSnapshots snaps = new PipeNodeSnapshots();
+        snaps.put(NetworkManager.packKey(5, 60, 5), 0, null, faces(Map.of(0, FlowState.NONE)), 10);
+
+        List<Long> restored = snaps.restorePending(grid, 11);
+
+        assertEquals(List.of(NetworkManager.packKey(5, 60, 5)), restored,
+            "a wrenched empty pipe matching the wipe signature must be restored and reported");
+        assertEquals(FlowState.NONE, pipe.flowState(0));
+        assertEquals(FlowState.NORMAL, pipe.flowState(1));
+        assertTrue(snaps.isEmpty(), "applied snapshot must be drained");
+    }
+
+    @Test
+    void restoresFlowStatesAlongsideShareAndResource() {
+        PipeNode pipe = fluid(1); // wiped: all-NORMAL, share 0, id null
+        FakePipeGrid grid = new FakePipeGrid().put(6, 60, 6, pipe);
+        PipeNodeSnapshots snaps = new PipeNodeSnapshots();
+        snaps.put(NetworkManager.packKey(6, 60, 6), 120, "element:bromine",
+            faces(Map.of(2, FlowState.PUSH, 3, FlowState.PULL)), 10);
+
+        snaps.restorePending(grid, 11);
+
+        assertEquals(120, pipe.bufferShare());
+        assertEquals("element:bromine", pipe.resourceId());
+        assertEquals(FlowState.PUSH, pipe.flowState(2));
+        assertEquals(FlowState.PULL, pipe.flowState(3));
+    }
+
+    @Test
+    void allNormalSnapshotIsNeverStored() {
+        // A snapshot whose faces are all NORMAL (and share 0) carries nothing: it must be ignored at put
+        // time so it can never later stomp a re-wrenched pipe.
+        PipeNodeSnapshots snaps = new PipeNodeSnapshots();
+        snaps.put(NetworkManager.packKey(7, 60, 7), 0, null, faces(Map.of()), 10);
+        assertTrue(snaps.isEmpty(), "an all-NORMAL, empty-share snapshot carries nothing");
+    }
+
+    @Test
+    void restoreNeverStompsAFaceTheTargetWasReWrenchedTo() {
+        // Snapshot says face 0 NONE. After the wipe, the target matches the wipe SHARE signature (share
+        // 0, id null) but was legitimately re-wrenched to face 0 PUSH. The restore must leave PUSH: only
+        // faces still at the wiped NORMAL default get the snapshot's value.
+        PipeNode pipe = fluid(1);
+        pipe.setFlowState(0, FlowState.PUSH); // re-wrenched after the wipe
+        FakePipeGrid grid = new FakePipeGrid().put(7, 60, 7, pipe);
+        PipeNodeSnapshots snaps = new PipeNodeSnapshots();
+        snaps.put(NetworkManager.packKey(7, 60, 7), 0, null,
+            faces(Map.of(0, FlowState.NONE, 3, FlowState.PULL)), 10);
+
+        snaps.restorePending(grid, 11);
+
+        assertEquals(FlowState.PUSH, pipe.flowState(0),
+            "a re-wrenched non-NORMAL face must never be stomped by a stale snapshot");
+        assertEquals(FlowState.PULL, pipe.flowState(3),
+            "a face still at the wiped NORMAL default is restored from the snapshot");
+    }
+
+    @Test
+    void flowStatesNotRestoredWhenShareSignatureMovedOn() {
+        // The pipe's share state moved on (share 7): not the wipe signature, so neither share nor face
+        // config is restored (the pipe is live and authoritative).
+        PipeNode pipe = fluid(1);
+        pipe.setBufferShare(7);
+        pipe.setResourceId("compound:ethanol");
+        FakePipeGrid grid = new FakePipeGrid().put(8, 60, 8, pipe);
+        PipeNodeSnapshots snaps = new PipeNodeSnapshots();
+        snaps.put(NetworkManager.packKey(8, 60, 8), 0, null, faces(Map.of(0, FlowState.NONE)), 10);
+
+        List<Long> restored = snaps.restorePending(grid, 11);
+
+        assertTrue(restored.isEmpty());
+        assertEquals(FlowState.NORMAL, pipe.flowState(0),
+            "a pipe past the wipe signature must keep its live faces");
+    }
+
+    // --- PipeSnapshotScan worthiness widening (Task 5b) ---
+
+    @Test
+    void wrenchedEmptyPipeIsSnapshotWorthy() {
+        // share 0 + id null, but face 0 NONE: previously skipped (nothing to save); now worth saving.
+        PipeNode pipe = fluid(1);
+        pipe.setFlowState(0, FlowState.NONE);
+        PipeNodeSnapshots snaps = new PipeNodeSnapshots();
+        snaps.put(NetworkManager.packKey(9, 60, 9), pipe.bufferShare(), pipe.resourceId(),
+            snapshotFaces(pipe), 5);
+        assertEquals(1, snaps.pendingCount(),
+            "a wrenched empty pipe (any non-NORMAL face) must be snapshot-worthy");
+    }
+
+    @Test
+    void emptyAllNormalPipeIsNotSnapshotWorthy() {
+        // share 0, id null, all faces NORMAL: nothing to save, must still be ignored.
+        PipeNode pipe = fluid(1);
+        PipeNodeSnapshots snaps = new PipeNodeSnapshots();
+        snaps.put(NetworkManager.packKey(10, 60, 10), pipe.bufferShare(), pipe.resourceId(),
+            snapshotFaces(pipe), 5);
+        assertTrue(snaps.isEmpty(), "an empty all-NORMAL pipe carries nothing worth restoring");
+    }
+
+    /** Reads a pipe's 6 faces into a fresh array, mirroring what PipeSnapshotScan captures. */
+    private static FlowState[] snapshotFaces(PipeNode pipe) {
+        FlowState[] f = new FlowState[6];
+        for (int i = 0; i < 6; i++) {
+            f[i] = pipe.flowState(i);
+        }
+        return f;
     }
 
     // --- NetworkManager two-pass rebuild pooling ---

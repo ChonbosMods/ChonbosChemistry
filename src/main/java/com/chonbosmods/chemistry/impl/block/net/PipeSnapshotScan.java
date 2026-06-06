@@ -1,5 +1,6 @@
 package com.chonbosmods.chemistry.impl.block.net;
 
+import com.chonbosmods.chemistry.api.io.FlowState;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -24,10 +25,18 @@ public final class PipeSnapshotScan {
     /** Manhattan reach of the engine's depth-3 connected-block neighbor update. */
     static final int RADIUS = 3;
 
+    /** Number of cube faces a pipe carries flow state for, indexed in {@code NetworkManager.OFFSETS} order. */
+    private static final int FACE_COUNT = 6;
+
     private PipeSnapshotScan() {
     }
 
-    /** Snapshots all share-carrying pipes within {@link #RADIUS} (Manhattan) of {@code (x,y,z)}. */
+    /**
+     * Snapshots every restore-worthy pipe within {@link #RADIUS} (Manhattan) of {@code (x,y,z)}: a pipe
+     * carrying a positive share OR any non-NORMAL face (a wrench-only pipe). The face config is captured
+     * alongside the share so the wipe cannot factory-reset a wrenched pipe (Task 5b);
+     * {@link PipeNodeSnapshots#put} applies the final worthiness test.
+     */
     public static void snapshotAround(
             @Nonnull World world,
             @Nonnull ComponentType<ChunkStore, PipeNode> pipeType,
@@ -47,9 +56,10 @@ public final class PipeSnapshotScan {
                     int pz = z + dz;
                     try {
                         PipeNode pipe = BlockModule.getComponent(pipeType, world, px, py, pz);
-                        if (pipe != null && pipe.bufferShare() > 0) {
+                        if (pipe != null && (pipe.bufferShare() > 0 || hasNonNormalFace(pipe))) {
                             snapshots.put(
-                                NetworkManager.packKey(px, py, pz), pipe.bufferShare(), pipe.resourceId(), tick);
+                                NetworkManager.packKey(px, py, pz), pipe.bufferShare(), pipe.resourceId(),
+                                captureFaces(pipe), tick);
                         }
                     } catch (Throwable ignored) {
                         // One unreadable position must never break the event handler.
@@ -57,5 +67,24 @@ public final class PipeSnapshotScan {
                 }
             }
         }
+    }
+
+    /** True when any of the pipe's 6 faces is non-NORMAL (a wrenched pipe worth snapshotting). */
+    private static boolean hasNonNormalFace(PipeNode pipe) {
+        for (int face = 0; face < FACE_COUNT; face++) {
+            if (pipe.flowState(face) != FlowState.NORMAL) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Reads the pipe's 6 per-face flow states into a fresh array, in {@code OFFSETS} order. */
+    private static FlowState[] captureFaces(PipeNode pipe) {
+        FlowState[] faces = new FlowState[FACE_COUNT];
+        for (int face = 0; face < FACE_COUNT; face++) {
+            faces[face] = pipe.flowState(face);
+        }
+        return faces;
     }
 }

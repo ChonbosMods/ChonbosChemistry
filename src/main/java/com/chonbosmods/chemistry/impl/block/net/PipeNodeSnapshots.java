@@ -1,5 +1,6 @@
 package com.chonbosmods.chemistry.impl.block.net;
 
+import com.chonbosmods.chemistry.api.io.FlowState;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,6 +38,16 @@ import java.util.Map;
  * discarded instead. Because events and tick systems share the world thread and the restore runs
  * before the first rebuild of the pass, a wiped pipe cannot be re-split between wipe and restore.
  *
+ * <h2>Flow states (Task 5b: wrench config survives the wipe)</h2>
+ * The wipe also resets a re-resolved pipe's 6 per-face {@link FlowState flow states} to all-NORMAL
+ * (a fresh template clone), so a wrenched pipe near any place/break would silently factory-reset its
+ * face config. Snapshots therefore carry the 6 faces too, and a wrench-only pipe (face config set but
+ * {@code share == 0} / {@code resourceId == null}) is now snapshot-worthy even though it holds no
+ * resource. Flow states restore on the SAME wipe signature as shares, with two extra guards so a stale
+ * snapshot never stomps a re-wrenched pipe: an all-NORMAL snapshot carries nothing and is skipped
+ * entirely, and a target face already non-NORMAL (a legitimate post-wipe re-wrench) is left untouched:
+ * only faces still at their wiped NORMAL default are overwritten.
+ *
  * <p>A snapshot whose position has no live pipe (chunk unloaded, or the pipe itself was removed) is
  * retried each pass until {@link #EXPIRY_TICKS} elapses, then dropped.
  *
@@ -47,21 +58,59 @@ public final class PipeNodeSnapshots {
     /** How long (world ticks) an unapplied snapshot survives before being dropped. */
     static final long EXPIRY_TICKS = 200;
 
-    private record Snapshot(long share, String resourceId, long tick) {
+    /** Number of cube faces a pipe carries flow state for, indexed in {@code NetworkManager.OFFSETS} order. */
+    private static final int FACE_COUNT = 6;
+
+    /** {@code flowStates} may be null (no face config captured) or a 6-element array of (non-null) faces. */
+    private record Snapshot(long share, String resourceId, FlowState[] flowStates, long tick) {
     }
 
     /** packed position key -> pending snapshot (see {@link NetworkManager#packKey}). */
     private final Map<Long, Snapshot> pending = new HashMap<>();
 
     /**
-     * Records a pre-wipe snapshot for the pipe at {@code posKey}. Zero/negative shares carry nothing
-     * worth restoring and are ignored. A newer snapshot for the same position replaces the older one.
+     * Records a pre-wipe snapshot for the pipe at {@code posKey} that carries no flow-state config.
+     * Convenience overload of {@link #put(long, long, String, FlowState[], long)} with null faces.
      */
     public void put(long posKey, long share, String resourceId, long tick) {
-        if (share <= 0) {
-            return;
+        put(posKey, share, resourceId, null, tick);
+    }
+
+    /**
+     * Records a pre-wipe snapshot for the pipe at {@code posKey}. A snapshot is worth keeping when it
+     * carries a positive share OR any non-NORMAL face (a wrench-only pipe with no resource): otherwise
+     * there is nothing the wipe could destroy and the call is ignored. A newer snapshot for the same
+     * position replaces the older one.
+     *
+     * @param flowStates the pipe's 6 per-face flow states, or null when no face config was captured;
+     *     a non-null array is defensively copied.
+     */
+    public void put(long posKey, long share, String resourceId, FlowState[] flowStates, long tick) {
+        FlowState[] faces = normalizeFaces(flowStates);
+        if (share <= 0 && faces == null) {
+            return; // empty share and all-NORMAL (or absent) faces: nothing worth restoring.
         }
-        pending.put(posKey, new Snapshot(share, resourceId, tick));
+        pending.put(posKey, new Snapshot(share, resourceId, faces, tick));
+    }
+
+    /**
+     * Returns a 6-element defensive copy of {@code flowStates} when at least one face is non-NORMAL, or
+     * null when the input is null, too short, or entirely NORMAL (an all-NORMAL config carries nothing).
+     */
+    private static FlowState[] normalizeFaces(FlowState[] flowStates) {
+        if (flowStates == null) {
+            return null;
+        }
+        FlowState[] faces = new FlowState[FACE_COUNT];
+        boolean anyNonNormal = false;
+        for (int i = 0; i < FACE_COUNT; i++) {
+            FlowState s = i < flowStates.length && flowStates[i] != null ? flowStates[i] : FlowState.NORMAL;
+            faces[i] = s;
+            if (s != FlowState.NORMAL) {
+                anyNonNormal = true;
+            }
+        }
+        return anyNonNormal ? faces : null;
     }
 
     /** Fast-path check so the per-tick caller can skip work when nothing is pending. */
@@ -100,8 +149,20 @@ public final class PipeNodeSnapshots {
                 continue; // chunk unloaded or pipe gone: retry until expiry
             }
             if (pipe.bufferShare() == 0 && pipe.resourceId() == null) {
+                // Wipe signature: re-apply the persisted share/resource...
                 pipe.setBufferShare(snap.share());
                 pipe.setResourceId(snap.resourceId());
+                // ...and the per-face flow config, but never stomp a face the pipe was already
+                // re-wrenched to (non-NORMAL): only faces still at their wiped NORMAL default are
+                // overwritten. A null (all-NORMAL) snapshot carries nothing and is skipped.
+                FlowState[] faces = snap.flowStates();
+                if (faces != null) {
+                    for (int face = 0; face < FACE_COUNT; face++) {
+                        if (pipe.flowState(face) == FlowState.NORMAL) {
+                            pipe.setFlowState(face, faces[face]);
+                        }
+                    }
+                }
                 restored.add(key);
             }
             it.remove(); // applied, or the pipe's state legitimately moved on: snapshot is spent
