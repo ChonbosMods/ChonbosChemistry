@@ -57,18 +57,12 @@
           "Resources": [],
           "Ports": {
             "Ports": [
-              { "Face": 0, "Channel": "power", "Direction": "input" },
-              { "Face": 1, "Channel": "power", "Direction": "input" },
-              { "Face": 2, "Channel": "power", "Direction": "input" },
-              { "Face": 3, "Channel": "power", "Direction": "input" },
-              { "Face": 4, "Channel": "power", "Direction": "input" },
-              { "Face": 5, "Channel": "power", "Direction": "input" },
-              { "Face": 0, "Channel": "power", "Direction": "output" },
-              { "Face": 1, "Channel": "power", "Direction": "output" },
-              { "Face": 2, "Channel": "power", "Direction": "output" },
-              { "Face": 3, "Channel": "power", "Direction": "output" },
-              { "Face": 4, "Channel": "power", "Direction": "output" },
-              { "Face": 5, "Channel": "power", "Direction": "output" }
+              { "Face": 0, "Channel": "power", "Direction": "both" },
+              { "Face": 1, "Channel": "power", "Direction": "both" },
+              { "Face": 2, "Channel": "power", "Direction": "both" },
+              { "Face": 3, "Channel": "power", "Direction": "both" },
+              { "Face": 4, "Channel": "power", "Direction": "both" },
+              { "Face": 5, "Channel": "power", "Direction": "both" }
             ]
           },
           "Work": {

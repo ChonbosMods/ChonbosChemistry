@@ -41,6 +41,21 @@ public final class PortConfig {
         return matches;
     }
 
+    /**
+     * The single port on {@code faceIndex} carrying {@code channel}, or {@code null} if none. Under
+     * one-port-per-face (design 2026-06-05 §1) a face carries at most one port per channel; this is the
+     * face-precise lookup the endpoint collector uses to find the port that faces back at a pipe. If
+     * several ports somehow match (legacy data), the first is returned.
+     */
+    public Port portAt(int faceIndex, PortChannel channel) {
+        for (Port p : ports) {
+            if (p.faceIndex() == faceIndex && p.channel() == channel) {
+                return p;
+            }
+        }
+        return null;
+    }
+
     public List<Port> ports() {
         return ports;
     }

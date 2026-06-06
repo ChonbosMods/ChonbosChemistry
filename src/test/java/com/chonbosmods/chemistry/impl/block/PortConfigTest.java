@@ -68,6 +68,33 @@ class PortConfigTest {
     }
 
     @Test
+    void portCodecAcceptsBothDirection() throws Exception {
+        Port p = decode(Port.CODEC, "{\"Face\":3,\"Channel\":\"power\",\"Direction\":\"both\"}");
+        assertEquals(3, p.faceIndex());
+        assertEquals(PortChannel.POWER, p.channel());
+        assertEquals(PortDirection.BOTH, p.direction());
+    }
+
+    @Test
+    void portAtReturnsTheFacingChannelPort() {
+        PortConfig cfg = PortConfig.of(List.of(
+            Port.of(0, PortChannel.POWER, PortDirection.BOTH),
+            Port.of(1, PortChannel.POWER, PortDirection.OUTPUT),
+            Port.of(1, PortChannel.FLUID, PortDirection.INPUT)));
+        // Face 0 / POWER -> the BOTH port.
+        Port f0 = cfg.portAt(0, PortChannel.POWER);
+        assertEquals(PortDirection.BOTH, f0.direction());
+        // Face 1 / FLUID -> the FLUID input (channel-filtered, ignores the POWER port on the same face).
+        Port f1 = cfg.portAt(1, PortChannel.FLUID);
+        assertEquals(PortChannel.FLUID, f1.channel());
+        assertEquals(PortDirection.INPUT, f1.direction());
+        // No port on face 2.
+        assertEquals(null, cfg.portAt(2, PortChannel.POWER));
+        // Face 0 has no FLUID port.
+        assertEquals(null, cfg.portAt(0, PortChannel.FLUID));
+    }
+
+    @Test
     void portConfigCodecRoundTripsViaEncode() {
         PortConfig cfg = PortConfig.of(List.of(
             Port.of(0, PortChannel.GAS, PortDirection.INPUT),
