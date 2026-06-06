@@ -1,11 +1,14 @@
 package com.chonbosmods.chemistry.impl.block.ui;
 
 import com.chonbosmods.chemistry.api.energy.EnergyHandler;
+import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
+import com.chonbosmods.chemistry.impl.block.FaceNames;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.ResourceBuffer;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.chonbosmods.chemistry.impl.block.net.Network;
+import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,6 +37,9 @@ public final class PanelSnapshot {
     private static final List<String> SELECTORS = List.of(ENERGY, FLUID, GAS, ITEM, EMPTY);
 
     private static final String NO_BUFFERS = "This block has no buffers to display.";
+
+    /** Number of cube faces a pipe carries flow state for, in {@code OFFSETS} order. */
+    private static final int FACE_COUNT = 6;
 
     private final String title;
     private final List<Row> rows;
@@ -115,11 +121,45 @@ public final class PanelSnapshot {
 
     @Nonnull
     public static PanelSnapshot forNetwork(@Nonnull Network network) {
+        return forNetwork(network, null);
+    }
+
+    /**
+     * Network readout for a specific clicked {@code pipe}: same stats as the 1-arg overload, plus a
+     * per-face flow-state row on {@code #GasLabel}. The row lists only the non-NORMAL faces (in
+     * face-index order, {@code "<Name> <state>"} entries joined by {@code " · "}), or reads
+     * {@code "Faces: all normal"} when every face is {@link FlowState#NORMAL}. A null {@code pipe}
+     * (the 1-arg back-compat path) leaves the row hidden.
+     */
+    @Nonnull
+    public static PanelSnapshot forNetwork(@Nonnull Network network, PipeNode pipe) {
         Map<String, String> texts = new LinkedHashMap<>();
         texts.put(ENERGY, "Network: " + gaugeText(network.stored(), network.capacity()));
         texts.put(FLUID, "Pipes: " + network.memberKeys().size()
             + " • Throughput: " + network.throughput() + "/tick");
+        if (pipe != null) {
+            texts.put(GAS, facesText(pipe));
+        }
         return new PanelSnapshot(channelDisplayName(network.channel()) + " Pipe Network", texts, true);
+    }
+
+    /** "Faces: " + the non-NORMAL faces (name + lowercase state) in index order, or "Faces: all normal". */
+    @Nonnull
+    private static String facesText(@Nonnull PipeNode pipe) {
+        StringBuilder sb = new StringBuilder("Faces: ");
+        boolean any = false;
+        for (int face = 0; face < FACE_COUNT; face++) {
+            FlowState state = pipe.flowState(face);
+            if (state == FlowState.NORMAL) {
+                continue;
+            }
+            if (any) {
+                sb.append(" · ");
+            }
+            sb.append(FaceNames.name(face)).append(' ').append(state.jsonValue());
+            any = true;
+        }
+        return any ? sb.toString() : "Faces: all normal";
     }
 
     /** Empty-state snapshot: just the title and a message row. */

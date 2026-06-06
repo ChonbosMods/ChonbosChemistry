@@ -147,7 +147,7 @@ public final class MachinePanelPage extends CustomUIPage implements PanelRefresh
 
         PipeNode pipe = blockStore.getComponent(this.blockRef, mod.pipeComponentType());
         if (pipe != null) {
-            return this.computePipeSnapshot(blockStore, mod);
+            return this.computePipeSnapshot(blockStore, mod, pipe);
         }
 
         return PanelSnapshot.empty("Machine", "This is not a chemistry block.");
@@ -155,11 +155,13 @@ public final class MachinePanelPage extends CustomUIPage implements PanelRefresh
 
     /**
      * Render model for a pipe block: resolve its network (WorldThread-safe, see class javadoc) and
-     * show the network's aggregate buffer + member count + bottleneck throughput. Null-safe at every
-     * step; any failure falls back to the non-live "Network unavailable." empty state.
+     * show the network's aggregate buffer + member count + bottleneck throughput, plus the clicked
+     * {@code pipe}'s per-face flow states. Null-safe at every step; any failure falls back to the
+     * non-live "Network unavailable." empty state.
      */
     @Nonnull
-    private PanelSnapshot computePipeSnapshot(@Nonnull Store<ChunkStore> blockStore, @Nonnull ChonbosChemistry mod) {
+    private PanelSnapshot computePipeSnapshot(
+            @Nonnull Store<ChunkStore> blockStore, @Nonnull ChonbosChemistry mod, @Nonnull PipeNode pipe) {
         // Decode the clicked block's world (x,y,z) via BlockStateInfo + BlockChunk (same technique as
         // NetworkTickSystem), but reading the components off this.blockRef rather than an ArchetypeChunk.
         BlockModule.BlockStateInfo info = blockStore.getComponent(this.blockRef, this.blockInfoType);
@@ -192,7 +194,7 @@ public final class MachinePanelPage extends CustomUIPage implements PanelRefresh
         if (net == null) {
             return PanelSnapshot.empty("Pipe", "Network unavailable.");
         }
-        return PanelSnapshot.forNetwork(net);
+        return PanelSnapshot.forNetwork(net, pipe);
     }
 
     /** The viewed block's world, off the block ref's external ChunkStore. Null on any failure. */

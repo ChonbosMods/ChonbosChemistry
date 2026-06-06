@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.api.io.PortDirection;
 import com.chonbosmods.chemistry.impl.block.EnergyBuffer;
@@ -15,6 +16,7 @@ import com.chonbosmods.chemistry.impl.block.ResourceBuffer;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.chonbosmods.chemistry.impl.block.WorkState;
 import com.chonbosmods.chemistry.impl.block.net.Network;
+import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +121,47 @@ class PanelSnapshotTest {
         assertEquals("Pipes: 2 • Throughput: 5/tick", statsRow.text());
         assertFalse(row(snapshot, "#GasLabel").visible());
         assertFalse(row(snapshot, "#EmptyLabel").visible());
+    }
+
+    /** The 1-arg forNetwork (no pipe) leaves the #GasLabel faces row hidden: back-compat path. */
+    @Test
+    void networkSnapshotWithoutPipeOmitsFacesRow() {
+        Network net = new Network(PortChannel.POWER);
+        net.addMember(1L, 500, 5);
+
+        PanelSnapshot snapshot = PanelSnapshot.forNetwork(net);
+
+        assertFalse(row(snapshot, "#GasLabel").visible());
+    }
+
+    /** With a pipe, the #GasLabel row lists only the non-NORMAL faces in face-index order. */
+    @Test
+    void networkSnapshotShowsNonNormalFaces() {
+        Network net = new Network(PortChannel.POWER);
+        net.addMember(1L, 500, 5);
+        PipeNode pipe = PipeNode.of(PortChannel.POWER, 1);
+        pipe.setFlowState(0, FlowState.PUSH);
+        pipe.setFlowState(5, FlowState.NONE);
+
+        PanelSnapshot snapshot = PanelSnapshot.forNetwork(net, pipe);
+
+        PanelSnapshot.Row facesRow = row(snapshot, "#GasLabel");
+        assertTrue(facesRow.visible());
+        assertEquals("Faces: East push · North none", facesRow.text());
+    }
+
+    /** An all-NORMAL pipe still shows the faces row, reading "Faces: all normal". */
+    @Test
+    void networkSnapshotAllNormalFaces() {
+        Network net = new Network(PortChannel.POWER);
+        net.addMember(1L, 500, 5);
+        PipeNode pipe = PipeNode.of(PortChannel.POWER, 1);
+
+        PanelSnapshot snapshot = PanelSnapshot.forNetwork(net, pipe);
+
+        PanelSnapshot.Row facesRow = row(snapshot, "#GasLabel");
+        assertTrue(facesRow.visible());
+        assertEquals("Faces: all normal", facesRow.text());
     }
 
     @Test
