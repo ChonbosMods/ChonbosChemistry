@@ -26,6 +26,13 @@ The transport-network rework plan (`docs/plans/2026-06-03-transport-network-rewo
 - **Restart persistence:** spot-checked headlessly (codec round-trip into a fresh `NetworkManager`, fluid type-lock recovery) and in-game (server restart).
 - Plus (parallel session): **CC_FluidPipe live end-to-end** (bromine/ethanol sources, type-lock, H8/H8b wipe-recovery) and the **substance color/glow pass**.
 
+**2026-06-05 (later) — per-face flow states + I/O wrench (in-game verification pending):**
+- **Per-face `FlowState` (`NORMAL`/`PUSH`/`PULL`/`NONE`)** on every pipe face (§13.9), persisted as an optional `PipeNode` codec key (absent = all-`NORMAL`, no migration). **The gas bug is fixed:** different-substance same-channel lines no longer merge (auto-NONE rule, dynamic, drain-remerge via lock-clear). `docs/plans/2026-06-05-pipe-flow-states-design.md`.
+- **`CC_Wrench` I/O config tool:** cycles pipe faces `NORMAL→PUSH→PULL→NONE` and machine faces through `(channel × input/output) → closed` (§5.4/§13.9).
+- **Face-precise endpoint collection:** `NetworkEndpoints.collect` now qualifies the machine by the port ON the touching face and applies that pipe face's flow-state filter — this **completes** the deferred "real block-face-index alignment" item (face indexing locked to the `OFFSETS` convention `+X,−X,+Y,−Y,+Z,−Z` everywhere).
+- **`PortDirection.BOTH`** added as the storage-block (two-way) direction; **wrench config survives a state wipe** (flow states persist in `PipeNode`'s codec; machine port config via `BlockHolder`).
+- **In-game verification: PENDING.**
+
 **Built and working (energy/POWER channel, end-to-end):**
 - **Energy standard (§7):** `api.energy.EnergyHandler` + `impl.block.EnergyBuffer`: `long` amounts, external (`maxReceive`/`maxExtract`-capped) vs internal transfer paths, ratio helpers, optional-codec rate fields (shared `OptionalLongCodec` incl. the raw-JSON path).
 - **Network core (§13.2/§13.7, `impl.block.net`):** `PipeNode` component (channel/tier/persisted `bufferShare`); `NetworkManager` cached BFS discovery (packed-key, anchor-id, invalidate on pipe place/break: chunk-unload eviction DEFERRED because the 0.5.3 engine dispatches `ChunkUnloadEvent` from parallel workers and any `EntityEventSystem` handler kills the WorldThread); `NetworkTickSystem` per-tick distribution: per-phase throughput budget (tier 0 = 500 cap / 5 per-tick per segment, `[TUNE]`), max-min fair-split with ROTATING remainder (equal consumers stay within ±1 cumulatively), **source/storage priority** (pure providers always; battery providers only under real demand; pure acceptors before battery acceptors: no self-churn), **buffer-share persistence** (pool shares on build, write back each tick: network energy survives invalidation/rebuild and block removal).
@@ -37,7 +44,7 @@ The transport-network rework plan (`docs/plans/2026-06-03-transport-network-rewo
 1. **§3 + §9 machines & recipes: THE NEXT MILESTONE.** The `MachineTickSystem` work pass is still a stub; everything it needs (power, transport, buffers, run-dry rules, GUI scaffold, ON/OFF state mechanism per §16-style `State.Definitions` + `setBlockInteractionState`) now exists. Chemistry trio first (Synthesizer/Decomposer/Converter, recipes auto-derived from the dataset).
 2. **GAS pipes: DONE (2026-06-05, in-game verified).** `CC_GasPipe` + hydrogen/CO₂ test rig, pure asset clone of the fluid pattern (`docs/plans/2026-06-05-gas-channel-assets-design.md`); final gas art replaces the placeholder `GasTube_*`/`gastube_*` files in place. **ITEM pipes (§13.4) and NEUTRON pipes (§13.5):** own later plans.
 3. **§11 heat, §14 redstone, §15 electrified benches:** designed, not started.
-4. Small deferred items: pipe tooltip icon (Blockbench render staged at `~/Development/Hytale/models/staging/pipe-icon/`; NOTE pipe models use per-axis `stretch` which the Blockbench viewport ignores: bake stretch before screenshotting), chunk-unload eviction via a WorldThread-safe hook, real block-face-index alignment, network split/merge optimization (vs drop-and-rebuild), all `[TUNE]` numbers. *(Done 2026-06-05: live-refresh GUI, battery↔battery balancing, tank/resource carry via `BlockHolder`, restart persistence spot-check.)*
+4. Small deferred items: pipe tooltip icon (Blockbench render staged at `~/Development/Hytale/models/staging/pipe-icon/`; NOTE pipe models use per-axis `stretch` which the Blockbench viewport ignores: bake stretch before screenshotting), chunk-unload eviction via a WorldThread-safe hook, ~~real block-face-index alignment~~ (DONE 2026-06-05, see flow-states entry above), network split/merge optimization (vs drop-and-rebuild), all `[TUNE]` numbers. *(Done 2026-06-05: live-refresh GUI, battery↔battery balancing, tank/resource carry via `BlockHolder`, restart persistence spot-check.)*
 
 ### Revision: transport architecture (supersedes the adjacency model)
 
@@ -135,6 +142,7 @@ All five are **pipes carrying their own channel** with the same network machiner
 - **No pressurized-gas simulation.** A gas is mechanically identical to a fluid — a number up to a capacity. "Pressurized" is flavor only.
 - **Three tiers** (e.g., Basic / Advanced / Elite). **Tier affects storage capacity only** — no other differences. **Tanks are not stackable** in any tier. Higher tiers gated behind the mod's own refined materials, looping chemistry back into infrastructure.
 - **Tanks relocate with contents preserved.** Picking up and moving a full tank *is* the manual transport method — there is no separate portable-container item (see Section 5.6).
+- **Tank faces ship as storage (`PortDirection.BOTH`)** on all sides (set in JSON); wrench/GUI port config for tanks is a **later refinement** (the wrench currently cycles machine faces only). Until then a tank both provides to and accepts from any connected pipe network of its channel.
 
 ### 5.3 The five pipe types
 Energy cable, fluid pipe, gas pipe, item pipe, neutron pipe. They are the **only** way resources move between blocks (adjacency auto-flow is removed). All five share the same network machinery, fully specified in **§13**:
@@ -145,11 +153,11 @@ Energy cable, fluid pipe, gas pipe, item pipe, neutron pipe. They are the **only
 - Pipes are **required** for transport, but remain cheap, early infrastructure: the cost is routing/planning, not gating.
 
 ### 5.4 Configurable ports
-Machines are large enough that **a single side can carry two or more ports**, so configuration is per-**port**, not per-face: each port on a machine's surface is individually assigned a **channel** (item / fluid / gas / power / neutron) and a **direction** (input / output / closed). Tanks, being simpler, configure per face (input / output / closed). A port connects when a **pipe of its channel** sits on that face: the port becomes a provider (output) or acceptor (input) on that pipe's network (§13). Two machines that sit flush against each other do **not** exchange — a pipe of the right channel must bridge them. **Decided: a pipe is always required; there is no direct port-to-port (zero-length-network) transfer.** One code path, no special case — building transport is always a deliberate routing step.
+Machines are **≥4×4 multiblocks**, so faces are plentiful: configuration is **one port per face** (the earlier "multi-port sides" model is superseded — see the 2026-06-05 flow-states design doc). Each face carries exactly one port, assigned a **channel** (item / fluid / gas / power / neutron) and a **`PortDirection`** (input / output / both / closed). `BOTH` is the storage-block direction (two-way access). A port connects when a **pipe of its channel** sits on that face: the port becomes a provider (output) or acceptor (input) on that pipe's network (§13). Two machines that sit flush against each other do **not** exchange — a pipe of the right channel must bridge them. **Decided: a pipe is always required; there is no direct port-to-port (zero-length-network) transfer.** One code path, no special case — building transport is always a deliberate routing step.
 
-Ports ship with **sensible defaults most players never touch**, and can be reconfigured two ways (Mekanism does both, and Hytale workbench GUIs make the in-menu version cheap): with a **wrench** on the block face, and/or via the **machine GUI**. Defaults-with-optional-config keeps the HCI cost near zero for casual players while leaving full control available.
+Ports ship with **sensible defaults most players never touch**, and can be reconfigured two ways (Mekanism does both, and Hytale workbench GUIs make the in-menu version cheap): with the **CC_Wrench** on the block face (it cycles the face's port through the machine's capability pairs `(channel × input/output) → closed`), and/or via the **machine GUI** (later). Defaults-with-optional-config keeps the HCI cost near zero for casual players while leaving full control available.
 
-> Note: because sides are multi-port and freely assignable, **face scarcity is a non-issue** — this is what let us drop hand-held canisters and any in-GUI injection slot entirely (see Section 5.6).
+> Note: because machines are large multiblocks with abundant faces, **face scarcity is a non-issue** — this is what let us drop hand-held canisters and any in-GUI injection slot entirely (see Section 5.6).
 
 ### 5.5 Machine internal buffers
 Every machine holds small per-channel internal buffers (a few operations' worth), shown as gauges in the GUI; connected pipe networks top these up between cycles. Their job is to **decouple production rate from consumption rate** (a machine that consumes a steady trickle can be fed by a source that delivers in bursts), and to define run-dry behavior (Section 8). They are **not** there to mask transport latency: under the shared-network-buffer model (§13.2) intra-network transfer is effectively instantaneous, so there is no per-hop crawl to hide.
@@ -352,6 +360,21 @@ Result is **max-min fairness**: every acceptor gets an equal share or as much as
 
 ### 13.8 What this means for machine buffers
 Machine internal buffers (§5.5) exist to **decouple production cadence from consumption cadence**, not to hide transport latency (there is none intra-network). A furnace drawing a steady trickle from a reactor that pulses output every N ticks rides its buffer across the gaps.
+
+### 13.9 Per-face flow states
+Every **pipe face** carries a **`FlowState`**: `NORMAL` / `PUSH` / `PULL` / `NONE` (persisted as an optional codec key on `PipeNode`: absent = all-`NORMAL`, so placed pipes decode unchanged). This is the Mekanism-style per-side connection control, brought in to fix a gas-testing bug where two adjacent pipes carrying *different* substances welded into one network. Detail lives in `docs/plans/2026-06-05-pipe-flow-states-design.md`; the load-bearing rules:
+
+- **Filter semantics (port = OFFER, pipe face = ACCEPT).** A machine/tank port says what it *offers* (its `PortDirection`); the touching pipe face says what the network *accepts* through it. The matrix:
+  - **`NORMAL`** — honor the port's own direction (`OUTPUT` → provider, `INPUT` → acceptor, `BOTH` → both).
+  - **`PUSH`** — acceptor-half only (the network pushes *into* the block: a `PUSH`-reached tank joins as acceptor only).
+  - **`PULL`** — provider-half only (the network pulls *out*: a `PULL`-reached tank joins as provider only).
+  - **`NONE`** — invisible (no connection through this face).
+
+  Storage pairs into a balancing `StorageEndpoint` only with full two-way access; a `PULL`-reached tank is a provider only, `PUSH`-reached an acceptor only.
+- **Auto-NONE rule (substance mismatch).** Two adjacent same-channel pipes whose persisted `resourceId`s are both non-null and **different** do not connect: `NORMAL` dynamically resolves to no-connection. This is **not stored** — it is re-evaluated on every topology event, so it is **dynamic**: draining one line clears its lock, and the next event lets the two lines **remerge** (the tick write-back detects a lock clearing `resourceId` non-null → null and invalidates the boundary). Pipe↔pipe faces only meaningfully cycle `NORMAL ↔ NONE`; push/pull data on a pipe-pipe face is treated as `NORMAL`.
+- **Wrench is the config tool.** `CC_Wrench` cycles a pipe face `NORMAL → PUSH → PULL → NONE` (sneak reverses, where the engine exposes it); on a machine face it cycles the single port through the machine's capability pairs `(channel × input/output) → closed` (§5.4). Wrench writes are topology events: they invalidate the affected network (with the H8 snapshot guard) and recompute visuals.
+- **Visuals are programmatic.** The engine's pattern system **cannot see flow state**, so any pipe with a suppressed or special arm gets **programmatic shape states** (the proven H8 `setBlockInteractionState` path); all-`NORMAL`, unmismatched pipes keep riding the pattern system for free. A suppressed arm (`NONE`/mismatch) renders the **lesser topology** shape (tee → straight, straight → end: all 26 shapes already exist), and `PUSH`/`PULL` endpoints get dedicated **end-stub indicator** art (`_end_push` / `_end_pull` + `_on` twins per pipe family).
+- **Pipes drop plain.** Breaking a pipe carries **no flow-state config** (matches Mekanism); machines/tanks carry their port config via `BlockHolder` automatically, but pipes do not.
 
 ---
 
