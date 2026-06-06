@@ -40,7 +40,10 @@ package com.chonbosmods.chemistry.impl.block.net;
  * permutation ({@code yaw90: (x,y,z)->(z,y,-x)}, {@code yaw180: ->(-x,y,-z)}, {@code yaw270: ->(-z,y,x)})
  * to expand every shape's base mask into the world masks it covers, recording {@code (shape, yaw)} for
  * each. Iterating shapes in template order and rotations in {@code computeEnabled} order with
- * first-match-wins exactly mirrors the engine's resolution order. The result: all 64 masks are covered,
+ * first-match-wins exactly mirrors the engine's resolution order. TIE-BREAK that matters for exactly
+ * two masks ({@code 0b110110} and {@code 0b111010}): within a single shape, all four pure cardinal
+ * rotations are tried BEFORE any mirror variant, so a mask reachable both by a yaw-2 rotation and by a
+ * MirrorX of yaw-0 records rotation index 2 (pure rotation wins). The result: all 64 masks are covered,
  * with zero cross-shape conflicts (the only duplicate hits are a shape matching itself at a symmetric
  * rotation, where the lower yaw index wins). The {@code rotationIndex} we store is the yaw ordinal,
  * which equals {@code RotationTuple.index()} for a pure cardinal rotation
