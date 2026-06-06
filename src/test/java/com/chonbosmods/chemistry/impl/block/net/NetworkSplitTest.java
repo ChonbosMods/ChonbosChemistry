@@ -1,7 +1,9 @@
 package com.chonbosmods.chemistry.impl.block.net;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
@@ -122,6 +124,82 @@ class NetworkSplitTest {
 
         // Symmetric: B resolves to the same single network (it is not dropped/isolated).
         assertEquals(mgr.anchorOf(0, 0, 0), mgr.anchorOf(1, 0, 0), "B belongs to the same network");
+    }
+
+    @Test
+    void drainedLineRemergesAfterLockClears() {
+        // Two adjacent FLUID runs locked to DIFFERENT substances => separate networks (Task 4): left pair
+        // bromine, right pair ethanol. Drain the right (ethanol) network to 0; its write-back must report
+        // lockCleared=true (a member came in carrying a non-null resourceId AND the network is now
+        // null-locked), and invalidating that network's members lets the next build merge BOTH runs into
+        // ONE network locked to the surviving (bromine) substance.
+        FakePipeGrid grid = new FakePipeGrid()
+            .put(0, 0, 0, lockedFluid("element:bromine", 3))
+            .put(1, 0, 0, lockedFluid("element:bromine", 3))
+            .put(2, 0, 0, lockedFluid("compound:ethanol", 5))
+            .put(3, 0, 0, lockedFluid("compound:ethanol", 5));
+        NetworkManager mgr = new NetworkManager();
+
+        Network bromine = mgr.getOrBuildNetwork(0, 0, 0, grid);
+        Network ethanol = mgr.getOrBuildNetwork(3, 0, 0, grid);
+        assertEquals(2, ethanol.memberKeys().size(), "ethanol starts as its own 2-pipe run");
+        assertEquals("compound:ethanol", ethanol.lockedResourceId());
+        assertNotEquals(mgr.anchorOf(0, 0, 0), mgr.anchorOf(3, 0, 0), "two SEPARATE networks to begin");
+        assertEquals(2, mgr.cachedNetworkCount(), "both runs cached as distinct networks");
+
+        // Writing back the still-locked bromine network must NOT report a lock-clear (it stays locked).
+        assertFalse(NetworkManager.writeBackShares(bromine, grid),
+            "a network that stays locked does not report lock-clear");
+
+        // Drain the ethanol network to empty: Network.extract clears the FLUID lock at exactly 0.
+        ethanol.extract(ethanol.stored(), false);
+        assertEquals(0, ethanol.stored(), "ethanol network drained empty");
+
+        // The write-back now sees members that came IN carrying a resourceId but a network locked to null.
+        boolean lockCleared = NetworkManager.writeBackShares(ethanol, grid);
+        assertTrue(lockCleared, "draining a previously-locked FLUID network reports lock-clear");
+
+        // The tick system reacts by invalidating the drained network's members.
+        mgr.invalidateMembers(ethanol);
+        assertEquals(1, mgr.cachedNetworkCount(),
+            "the drained network was dropped from the cache (only bromine remains)");
+
+        // Next build from EITHER side now spans both runs: the drained line carries no lock, so the
+        // different-substance boundary is gone and the lines merge into ONE bromine network.
+        Network merged = mgr.getOrBuildNetwork(3, 0, 0, grid);
+        assertEquals(4, merged.memberKeys().size(), "drained line re-merges with the surviving line");
+        assertEquals("element:bromine", merged.lockedResourceId(), "merged lock is the surviving substance");
+        assertEquals(mgr.anchorOf(0, 0, 0), mgr.anchorOf(3, 0, 0), "now ONE merged network");
+    }
+
+    @Test
+    void writeBackNeverReportsLockClearForPowerNetwork() {
+        // POWER never locks: members carry null resourceId and the network's lock is always null, so the
+        // lock-clear condition (a member came in non-null AND now null) can never fire => never invalidate.
+        PipeNode a = PipeNode.of(PortChannel.POWER, 0);
+        a.setBufferShare(10);
+        FakePipeGrid grid = new FakePipeGrid()
+            .put(0, 0, 0, a)
+            .put(1, 0, 0, PipeNode.of(PortChannel.POWER, 0));
+        NetworkManager mgr = new NetworkManager();
+
+        Network net = mgr.getOrBuildNetwork(0, 0, 0, grid);
+        assertFalse(NetworkManager.writeBackShares(net, grid),
+            "POWER network never reports lock-clear (no previous lock)");
+    }
+
+    @Test
+    void writeBackNeverReportsLockClearForEmptySinceForeverFluid() {
+        // A FLUID line that was never locked (null ids, 0 shares) must NOT report lock-clear: the
+        // condition requires a PREVIOUS lock, so an empty-since-forever network never invalidates per tick.
+        FakePipeGrid grid = new FakePipeGrid()
+            .put(0, 0, 0, fluid())
+            .put(1, 0, 0, fluid());
+        NetworkManager mgr = new NetworkManager();
+
+        Network net = mgr.getOrBuildNetwork(0, 0, 0, grid);
+        assertFalse(NetworkManager.writeBackShares(net, grid),
+            "an empty-since-forever FLUID network never reports lock-clear");
     }
 
     @Test

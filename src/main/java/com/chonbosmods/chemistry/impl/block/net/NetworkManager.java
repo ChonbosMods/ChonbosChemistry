@@ -309,22 +309,70 @@ public final class NetworkManager {
      * locked resource id; null for POWER/empty) back onto the pipe's {@link PipeNode}. Shared by the
      * per-tick write-back ({@code NetworkTickSystem}) and its headless regression test so both exercise
      * identical logic. A missing pipe at a member position is skipped defensively.
+     *
+     * <h2>Lock-clear detection (Task 5)</h2>
+     * Returns {@code true} when this write-back observes the network's FLUID/GAS type-lock CLEARING:
+     * defined as <em>at least one member pipe carried a non-null persisted {@code resourceId} COMING IN
+     * (i.e. it was locked as of the last write-back) AND the network's current
+     * {@link Network#lockedResourceId()} is now null</em>. That is exactly the drain-to-empty transition
+     * (a distribute pass emptied the network, and {@link Network#extract} cleared the lock at 0): the
+     * member still records the old resource, but the network no longer does. The previous-incoming check
+     * is read PER MEMBER before this method overwrites that pipe's resourceId with the network's value.
+     *
+     * <p>This requires a PREVIOUS lock, so it can never false-positive for:
+     * <ul>
+     *   <li>POWER networks (members' resourceId is always null, network lock always null); or
+     *   <li>a FLUID/GAS network that has been empty/unlocked since forever (no member ever carried a
+     *       resourceId, so the incoming-non-null clause is never satisfied) - it will NOT invalidate
+     *       itself every tick.
+     * </ul>
+     * The {@code NetworkTickSystem} uses the returned flag to invalidate the drained network's members
+     * (see {@link #invalidateMembers}) so the next topology evaluation re-merges it with an adjacent run
+     * the cleared substance boundary no longer separates.
+     *
+     * @return {@code true} iff this write-back cleared a previously-held type-lock (drain-remerge signal).
      */
-    public static void writeBackShares(Network net, PipeGridView grid) {
+    public static boolean writeBackShares(Network net, PipeGridView grid) {
         // Snapshot the member keys into a fixed-order array: splitEvenly assigns the remainder by ascending
         // ARRAY index, but memberKeys() is HashSet-ordered, so which specific pipes get the +1 remainder
         // unit is non-deterministic across membership changes. Only the TOTAL written back is guaranteed.
         Long[] keys = net.memberKeys().toArray(new Long[0]);
         long[] shares = splitEvenly(net.stored(), keys.length);
         String resourceId = net.lockedResourceId();
+        boolean anyIncomingLock = false;
         for (int i = 0; i < keys.length; i++) {
             long key = keys[i];
             PipeNode pipe = grid.pipeAt(unpackX(key), unpackY(key), unpackZ(key));
             if (pipe == null) {
                 continue; // pipe gone from the live grid: skip
             }
+            // Read the incoming (last-write-back) resourceId BEFORE overwriting it below.
+            if (pipe.resourceId() != null) {
+                anyIncomingLock = true;
+            }
             pipe.setBufferShare(shares[i]);
             pipe.setResourceId(resourceId);
+        }
+        // Lock-clear: a member came in locked AND the network is now unlocked (null).
+        return anyIncomingLock && resourceId == null;
+    }
+
+    /**
+     * Drops every member position of {@code net} from the cache so the next {@link #getOrBuildNetwork}
+     * from any of them rebuilds fresh: the drain-remerge hook ({@code NetworkTickSystem} calls this when
+     * {@link #writeBackShares} reports a lock-clear). Removing the anchor entry plus every
+     * {@code pipeKey -> anchor} mapping for this network's members mirrors {@link #invalidate} but is
+     * driven directly by the live member set rather than a world lookup. Safe no-op for a network with no
+     * cached members.
+     */
+    public void invalidateMembers(Network net) {
+        for (long key : net.memberKeys()) {
+            Long anchor = anchorByPipe.get(key);
+            if (anchor == null) {
+                continue;
+            }
+            networksByAnchor.remove(anchor);
+            anchorByPipe.values().removeIf(a -> a.equals(anchor));
         }
     }
 

@@ -169,7 +169,12 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
 
         // H6 FIX 1: persist the post-distribute buffer back onto the member pipe shares so an
         // invalidation/rebuild (place/break between ticks) re-pools it losslessly.
-        NetworkManager.writeBackShares(net, grid);
+        // Task 5: if this write-back CLEARED the network's type-lock (a FLUID/GAS line drained empty),
+        // invalidate its members so the next access re-merges it with an adjacent run the now-gone
+        // substance boundary used to separate (the drain case has no place/break event to trigger this).
+        if (NetworkManager.writeBackShares(net, grid)) {
+            manager.invalidateMembers(net);
+        }
 
         // Visual ON/OFF: a network is "energized" if it currently holds energy OR moved any this tick.
         // The OR on delivered is critical: in steady flow the buffer is pulled and fully delivered
