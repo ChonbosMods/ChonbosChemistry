@@ -302,9 +302,19 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                 // is PUSH/PULL, the indicator shape carries a direction arrow and must be shown EVEN when
                 // effective==physical (an undisturbed straight-to-machine end is a valid indicator case):
                 // so indicator-eligible pipes must NOT take the undisturbed short-circuit below.
-                FlowState faceState = effective == 0
-                        ? null
-                        : member.flowState(Integer.numberOfTrailingZeros(effective));
+                // The indicator is a pipe->MACHINE concept: a stale persisted PUSH/PULL on a face whose
+                // neighbour is (now) another PIPE must not draw an arrow (pipe-pipe push/pull is treated
+                // as NORMAL everywhere else). Guard: the single arm must not point at a pipe.
+                FlowState faceState = null;
+                if (Integer.bitCount(effective) == 1) {
+                    int armFace = Integer.numberOfTrailingZeros(effective);
+                    int ax = mx + NetworkManager.OFFSETS[armFace][0];
+                    int ay = my + NetworkManager.OFFSETS[armFace][1];
+                    int az = mz + NetworkManager.OFFSETS[armFace][2];
+                    if (grid.pipeAt(ax, ay, az) == null) {
+                        faceState = member.flowState(armFace);
+                    }
+                }
                 String indicator = PipeShapes.indicatorStateFor(effective, faceState, energized);
 
                 if (indicator == null && effective == physical) {

@@ -48,7 +48,9 @@ public final class NetworkManager {
      * {@code MachineTickSystem.OFFSETS}. Diagonals are intentionally absent: only face neighbours
      * connect.
      */
-    private static final int[][] OFFSETS = {
+    // Package-visible: the canonical face-offset table for the net layer (NetworkTickSystem's
+    // indicator guard reads it; PipeVisualStates/NetworkEndpoints keep documented mirrors).
+    static final int[][] OFFSETS = {
         {1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}
     };
 
