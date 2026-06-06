@@ -102,6 +102,29 @@ class NetworkSplitTest {
     }
 
     @Test
+    void ringWithOneSeveredEdgeKeepsAllMembers() {
+        // 2x2 POWER ring: A(0,0,0) B(1,0,0) C(1,0,1) D(0,0,1). Sever ONLY A's +X face (index 0)
+        // toward B. B stays reachable via A-D-C-B, so the network must still have all 4 members.
+        // Regression: a visited-before-gate BFS marks B visited when the severed A->B edge is
+        // checked, then can never enqueue B via the valid alternate path: it drops to 3 members.
+        PipeNode a = PipeNode.of(PortChannel.POWER, 0);
+        a.setFlowState(0, FlowState.NONE); // A's +X face (toward B) severed
+        FakePipeGrid grid = new FakePipeGrid()
+            .put(0, 0, 0, a)
+            .put(1, 0, 0, PipeNode.of(PortChannel.POWER, 0)) // B
+            .put(1, 0, 1, PipeNode.of(PortChannel.POWER, 0)) // C
+            .put(0, 0, 1, PipeNode.of(PortChannel.POWER, 0)); // D
+        NetworkManager mgr = new NetworkManager();
+
+        Network net = mgr.getOrBuildNetwork(0, 0, 0, grid);
+        assertEquals(4, net.memberKeys().size(),
+            "B is loop-reachable via A-D-C-B even though A's +X edge is severed");
+
+        // Symmetric: B resolves to the same single network (it is not dropped/isolated).
+        assertEquals(mgr.anchorOf(0, 0, 0), mgr.anchorOf(1, 0, 0), "B belongs to the same network");
+    }
+
+    @Test
     void oppositeFaceNoneAlsoSplits() {
         // NONE on the RECEIVING side: the right pipe's -X face (index 1, toward (1,0,0)). Same split.
         PipeNode right = fluid();

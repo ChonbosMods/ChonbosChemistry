@@ -23,10 +23,12 @@ import java.util.Set;
  *
  * <h2>Discovery</h2>
  * {@link #getOrBuildNetwork} BFS-floods from a starting pipe over the 6 face-neighbors
- * ({@link #OFFSETS}, mirroring {@code MachineTickSystem}'s convention), following ONLY pipes of the
- * SAME {@link com.chonbosmods.chemistry.api.io.PortChannel channel}: a different-channel neighbour is a
- * boundary and is not part of this network. Each discovered segment is added to a fresh
- * {@link Network} with its tier's capacity/throughput from {@link PipeTiers}.
+ * ({@link #OFFSETS}, mirroring {@code MachineTickSystem}'s convention), crossing a face only when
+ * {@link PipeConnectivity#connects} accepts it: same
+ * {@link com.chonbosmods.chemistry.api.io.PortChannel channel} AND neither facing flow state
+ * {@link com.chonbosmods.chemistry.api.io.FlowState#NONE NONE} AND substances compatible. Any rejected
+ * edge (different channel, a NONE face, or a substance mismatch) is a network boundary. Each discovered
+ * segment is added to a fresh {@link Network} with its tier's capacity/throughput from {@link PipeTiers}.
  *
  * <h2>Caching &amp; anchor</h2>
  * A network's deterministic id is its <em>anchor</em>: the lexicographically-smallest packed member
@@ -106,7 +108,7 @@ public final class NetworkManager {
 
     /**
      * Returns the {@link Network} the pipe at {@code (x,y,z)} belongs to, building (and caching) it via
-     * same-channel BFS on first request.
+     * PipeConnectivity-gated BFS on first request.
      *
      * @return the network, or null if there is no pipe at {@code (x,y,z)}.
      */
@@ -153,8 +155,8 @@ public final class NetworkManager {
                     continue; // outside packable range; treat as world edge
                 }
                 long nKey = packKey(nx, ny, nz);
-                if (!visited.add(nKey)) {
-                    continue;
+                if (visited.contains(nKey)) {
+                    continue; // already reached via an accepted edge (or is the start)
                 }
                 PipeNode neighbour = grid.pipeAt(nx, ny, nz);
                 // Single gate (PipeConnectivity.connects): channel + flow states + substance compat.
@@ -163,6 +165,11 @@ public final class NetworkManager {
                 if (!PipeConnectivity.connects(node, faceIdx, neighbour)) {
                     continue; // no pipe, channel boundary, NONE face, or incompatible substance
                 }
+                // Mark visited only on an ACCEPTED edge: a neighbour rejected here (e.g. a severed
+                // face) must stay un-visited so it can still be reached via a valid alternate path in
+                // a loop. The same neighbour may thus be CHECKED once per adjacent member: that is
+                // correct and cheap (dedup still short-circuits once it is enqueued).
+                visited.add(nKey);
                 frontier.add(new int[] {nx, ny, nz});
             }
         }
