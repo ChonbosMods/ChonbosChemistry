@@ -2,7 +2,6 @@ package com.chonbosmods.chemistry.impl.block.net;
 
 import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
-import com.chonbosmods.chemistry.api.io.PortDirection;
 import com.chonbosmods.chemistry.impl.block.Port;
 import com.chonbosmods.chemistry.impl.block.PortConfig;
 import com.chonbosmods.chemistry.impl.block.net.MachineLookup.MachinePorts;
@@ -21,9 +20,11 @@ import com.chonbosmods.chemistry.impl.block.net.MachineLookup.MachinePorts;
  *         <li>a same-channel pipe neighbour that {@link PipeConnectivity#connects} accepts (channel +
  *             both flow states non-NONE + substance compatible), OR</li>
  *         <li>a machine/tank neighbour that endpoint-collection would qualify through this face: the
- *             pipe face's own {@link FlowState} is not {@link FlowState#NONE NONE} AND the neighbour
- *             carries a facing port of the network's channel on the face pointing back at the pipe
- *             (the same {@code portAt(opposite(face), channel)} gate {@link NetworkEndpoints} uses).</li>
+ *             pipe face's own {@link FlowState} is not {@link FlowState#NONE NONE} AND the neighbour's
+ *             facing port ({@code portAt(opposite(face), channel)}) OVERLAPS the face's flow state per
+ *             {@link NetworkEndpoints}' full classify matrix (OUTPUT joins under NORMAL/PULL, INPUT
+ *             under NORMAL/PUSH, BOTH under any non-NONE, CLOSED never): see
+ *             {@code machineEndpointJoins}.</li>
  *       </ul></li>
  *   <li>{@link #physicalMask}: bit set iff the engine's pattern matcher would stub an arm to this face,
  *       ignoring flow states and substance compatibility:
@@ -98,12 +99,13 @@ public final class PipeVisualStates {
                 continue; // a pipe occupies the cell: it is not also a machine endpoint
             }
 
-            // (b) machine/tank endpoint, gated exactly like NetworkEndpoints.collect:
-            // the pipe face must be non-NONE AND the neighbour must carry a facing port of the channel.
+            // (b) machine/tank endpoint, gated exactly like NetworkEndpoints.collect: the pipe face
+            // must be non-NONE AND the neighbour's facing port must OVERLAP the face's flow state
+            // (the full classify matrix, not just port-exists: see machineEndpointJoins).
             if (pipe.flowState(face) == FlowState.NONE) {
                 continue;
             }
-            if (machineHasFacingPort(lookup, nx, ny, nz, face, channel)) {
+            if (machineEndpointJoins(lookup, nx, ny, nz, face, channel, pipe.flowState(face))) {
                 mask |= (1 << face);
             }
         }
@@ -152,13 +154,21 @@ public final class PipeVisualStates {
     }
 
     /**
-     * Whether a machine/tank at {@code (nx,ny,nz)} carries a facing port of {@code channel} on the face
-     * pointing back at the pipe (i.e. {@code portAt(opposite(face), channel) != null}). This is the
-     * exact facing-port gate {@link NetworkEndpoints#collect} applies, lifted into the shared pure layer
-     * so the two never drift. Used by {@link #effectiveMask}.
+     * Whether the transport layer would actually JOIN the machine/tank at {@code (nx,ny,nz)} through
+     * this face: the neighbour carries a facing port of {@code channel}
+     * ({@code portAt(opposite(face), channel)}) AND that port's direction OVERLAPS the pipe face's flow
+     * state, replicating {@link NetworkEndpoints}' classify matrix in full:
+     * <ul>
+     *   <li>OUTPUT port: joins under NORMAL or PULL (PUSH has no overlap: the port only offers).</li>
+     *   <li>INPUT port: joins under NORMAL or PUSH (PULL has no overlap).</li>
+     *   <li>BOTH port: joins under any non-NONE flow state.</li>
+     *   <li>CLOSED port: never joins (the wrench persists "closed" as a CLOSED port, not a removed one).</li>
+     * </ul>
+     * Lifted gate-for-gate from {@code NetworkEndpoints.classify} so the visual twin cannot drift from
+     * the transport truth. Used by {@link #effectiveMask}.
      */
-    private static boolean machineHasFacingPort(
-            MachineLookup lookup, int nx, int ny, int nz, int face, PortChannel channel) {
+    private static boolean machineEndpointJoins(
+            MachineLookup lookup, int nx, int ny, int nz, int face, PortChannel channel, FlowState flow) {
         if (lookup == null) {
             return false;
         }
@@ -171,10 +181,16 @@ public final class PipeVisualStates {
             return false;
         }
         Port facing = ports.portAt(PipeConnectivity.opposite(face), channel);
-        // Match NetworkEndpoints' classify gate EXACTLY: a CLOSED facing port contributes nothing to
-        // endpoint collection (the wrench models "closed" as a persisted CLOSED port, not a removed
-        // one), so the transport layer does not join this face and the arm must not render connected.
-        return facing != null && facing.direction() != PortDirection.CLOSED;
+        if (facing == null) {
+            return false;
+        }
+        // The direction x flow-state overlap, gate-for-gate with NetworkEndpoints.classify.
+        return switch (facing.direction()) {
+            case OUTPUT -> flow == FlowState.NORMAL || flow == FlowState.PULL;
+            case INPUT -> flow == FlowState.NORMAL || flow == FlowState.PUSH;
+            case BOTH -> true; // flow is already non-NONE (caller gates NONE)
+            default -> false;  // CLOSED: never a transport endpoint
+        };
     }
 
     /**

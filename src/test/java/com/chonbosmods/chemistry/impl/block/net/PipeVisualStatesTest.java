@@ -225,6 +225,43 @@ class PipeVisualStatesTest {
     }
 
     @Test
+    void pushAtOutputOnlyPort_noOverlap_effectiveDrops() {
+        // Pipe face PUSH at a generator (OUTPUT-only port): the port only offers, the pipe only pushes:
+        // classify yields nothing, so the transport layer does not join and the arm must drop. PULL at
+        // the same port overlaps (provider) and keeps the arm.
+        PipeNode self = PipeNode.of(PortChannel.POWER, 1);
+        self.setFlowState(0, FlowState.PUSH);
+        FakeGrid grid = new FakeGrid().put(0, 0, 0, self);
+        FakeLookup lookup = new FakeLookup().put(1, 0, 0, new FakePorts(
+            powerPort(FACE_NX, PortDirection.OUTPUT), EnergyBuffer.withCapacity(1000L), Map.of()));
+
+        assertEquals(0, PipeVisualStates.effectiveMask(self, 0, 0, 0, grid, lookup),
+            "PUSH x OUTPUT has no overlap: no effective arm");
+        assertEquals(BIT_PX, PipeVisualStates.physicalMask(self, 0, 0, 0, grid, lookup));
+
+        self.setFlowState(0, FlowState.PULL);
+        assertEquals(BIT_PX, PipeVisualStates.effectiveMask(self, 0, 0, 0, grid, lookup),
+            "PULL x OUTPUT overlaps (provider): arm stays");
+    }
+
+    @Test
+    void pullAtInputOnlyPort_noOverlap_effectiveDrops() {
+        // Mirror case: pipe face PULL at a sink (INPUT-only port): no overlap, arm drops; PUSH keeps it.
+        PipeNode self = PipeNode.of(PortChannel.POWER, 1);
+        self.setFlowState(0, FlowState.PULL);
+        FakeGrid grid = new FakeGrid().put(0, 0, 0, self);
+        FakeLookup lookup = new FakeLookup().put(1, 0, 0, new FakePorts(
+            powerPort(FACE_NX, PortDirection.INPUT), EnergyBuffer.withCapacity(1000L), Map.of()));
+
+        assertEquals(0, PipeVisualStates.effectiveMask(self, 0, 0, 0, grid, lookup),
+            "PULL x INPUT has no overlap: no effective arm");
+
+        self.setFlowState(0, FlowState.PUSH);
+        assertEquals(BIT_PX, PipeVisualStates.effectiveMask(self, 0, 0, 0, grid, lookup),
+            "PUSH x INPUT overlaps (acceptor): arm stays");
+    }
+
+    @Test
     void wrongChannelMachine_inNeitherMask() {
         // A FLUID machine beside a POWER pipe: not this network's channel, so neither mask counts it.
         PipeNode self = PipeNode.of(PortChannel.POWER, 1);
