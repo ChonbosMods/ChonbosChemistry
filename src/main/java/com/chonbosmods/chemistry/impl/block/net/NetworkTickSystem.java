@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
 /**
@@ -54,6 +55,18 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType;
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType;
     private final NetworkService networkService;
+
+    /** Logger for the rate-limited rotation-mismatch warning (Task 11 fallback). */
+    private static final Logger LOGGER = Logger.getLogger(NetworkTickSystem.class.getName());
+
+    /**
+     * Positions already warned about a suppressed-arm rotation mismatch (Task 11 fallback ladder rung
+     * (b)): a programmatic state swap cannot set rotation (see {@link PipeShapes}), so when the effective
+     * shape needs a different rotation than the block currently has, we still apply the state (right arm
+     * count beats wrong substance weld) but log ONCE per position to avoid per-tick log spam. Packed
+     * block keys ({@link NetworkManager#packKey}).
+     */
+    private final Set<Long> warnedRotationMismatch = new HashSet<>();
 
     /** Per-world last-seen world tick, to detect when to reset that world's processed-anchor set. */
     private final Map<World, Long> lastTickByWorld = new IdentityHashMap<>();
@@ -181,6 +194,14 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         // within one tick, ending at stored()==0, yet the cables must still read as ON.
         boolean energized = net.stored() > 0 || delivered > 0;
         applyPoweredVisual(world, net, energized);
+
+        // Task 11: programmatic suppressed-arm visuals. For each member pipe whose EFFECTIVE
+        // connectivity (what the network joins) differs from its PHYSICAL connectivity (what the engine's
+        // pattern matcher welds), override the interaction state so the rendered arm count matches the
+        // suppressed topology (a NONE face, a substance mismatch, or a flow-hidden machine). Undisturbed
+        // pipes (masks equal) are left to the engine + the H8 powered flip above. Throttled by reading
+        // the placed state first and only swapping on a real change (same discipline as the powered flip).
+        applySuppressedArmVisuals(world, net, grid, lookup, energized);
     }
 
     /**
@@ -225,5 +246,107 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                 // A single member's visual swap must never crash the tick.
             }
         }
+    }
+
+    /**
+     * Task 11: applies programmatic suppressed-arm visuals to every member pipe of {@code net}. For each
+     * member it computes the pure {@link PipeVisualStates#effectiveMask effective} and
+     * {@link PipeVisualStates#physicalMask physical} connectivity masks and, when they DIFFER (a
+     * suppressed arm: a NONE face, a substance-mismatched pipe, or a flow-hidden machine), swaps the
+     * cable's interaction state to {@link PipeShapes#stateFor}{@code (effectiveMask, energized)} so the
+     * rendered arm count matches the suppressed topology. When the masks are EQUAL the pipe is
+     * undisturbed and is left entirely to the engine pattern system plus the H8 powered flip
+     * ({@link #applyPoweredVisual}, already run): this method does nothing for it.
+     *
+     * <h2>Throttle</h2>
+     * Like the powered flip, this reads the placed interaction-state name first and issues
+     * {@code setBlockInteractionState} ONLY when the desired programmatic state actually differs from the
+     * current one, so the steady-state path costs a mask comparison + a state read and no block mutation.
+     *
+     * <h2>Rotation-mismatch fallback (PipeShapes orientation finding)</h2>
+     * A programmatic state swap CANNOT set the block's rotation (it preserves
+     * {@code getRotationIndex(x,y,z)}; see {@link PipeShapes}). If the effective shape's required
+     * rotation ({@link PipeShapes#resolve}) differs from the block's CURRENT rotation index, the swapped
+     * state renders at the wrong orientation. Per the Task 10 fallback ladder we accept the visual-only
+     * compromise (rung (b)): a wrong rotation with the RIGHT arm count beats a welded arm to a
+     * different-substance / flow-severed neighbour, so we STILL apply the state, but log ONCE per
+     * position (deduped via {@link #warnedRotationMismatch}) so it is visible without spamming the tick.
+     * Revisit if it looks bad in-game (Task 15).
+     *
+     * <p>Fully guarded: a missing chunk/block/state for any member is skipped and never throws on the
+     * world thread.
+     */
+    private void applySuppressedArmVisuals(
+            @Nonnull World world,
+            @Nonnull Network net,
+            @Nonnull PipeGridView grid,
+            @Nonnull MachineLookup lookup,
+            boolean energized) {
+        for (long key : net.memberKeys()) {
+            try {
+                int mx = NetworkManager.unpackX(key);
+                int my = NetworkManager.unpackY(key);
+                int mz = NetworkManager.unpackZ(key);
+
+                PipeNode member = grid.pipeAt(mx, my, mz);
+                if (member == null) {
+                    continue; // pipe gone from the live grid (race with a break); skip
+                }
+
+                int effective = PipeVisualStates.effectiveMask(member, mx, my, mz, grid, lookup);
+                int physical = PipeVisualStates.physicalMask(member, mx, my, mz, grid, lookup);
+                if (effective == physical) {
+                    // Undisturbed: the engine pattern + H8 flip already did the right thing. Leave it,
+                    // and forget any stale rotation warning (topology may have changed back).
+                    warnedRotationMismatch.remove(key);
+                    continue;
+                }
+
+                BlockAccessor accessor = world.getChunkIfLoaded(ChunkUtil.indexChunkFromBlock(mx, mz));
+                if (accessor == null) {
+                    continue; // chunk not loaded; will re-resolve when it next ticks
+                }
+                BlockType bt = accessor.getBlockType(mx, my, mz);
+                if (bt == null || bt == BlockType.EMPTY) {
+                    continue; // not our block anymore (race with a break); skip
+                }
+
+                String desired = PipeShapes.stateFor(effective, energized);
+                String current = bt.getStateForBlock(bt);
+                String normalizedCurrent = (current == null || current.isEmpty()) ? "default" : current;
+                if (desired.equals(normalizedCurrent)) {
+                    continue; // already showing the suppressed shape; no swap needed
+                }
+
+                // Rotation-mismatch fallback (rung (b)): apply the state regardless, but warn once.
+                // getRotationIndex is what setBlockInteractionState itself reads + preserves (PipeShapes'
+                // orientation finding, design §16.4); both rotation accessors carry the SDK's
+                // marked-for-removal tag, so we pin this one and suppress narrowly.
+                int requiredRotation = PipeShapes.resolve(effective).rotationIndex();
+                int currentRotation = currentRotationIndex(accessor, mx, my, mz);
+                if (requiredRotation != currentRotation && warnedRotationMismatch.add(key)) {
+                    LOGGER.warning(
+                        "Suppressed-arm pipe at (" + mx + "," + my + "," + mz + "): effective shape '"
+                        + desired + "' wants rotation " + requiredRotation + " but block is at "
+                        + currentRotation + "; applying state anyway (wrong orientation, right arm count). "
+                        + "Task 10 fallback rung (b): revisit if it looks bad in-game.");
+                }
+
+                accessor.setBlockInteractionState(mx, my, mz, bt, desired, false);
+            } catch (Throwable ignored) {
+                // A single member's suppressed-arm swap must never crash the tick.
+            }
+        }
+    }
+
+    /**
+     * The block's current rotation index at {@code (x,y,z)}: this is exactly the index
+     * {@code setBlockInteractionState} reads and preserves on a state swap (PipeShapes' orientation
+     * finding). {@code getRotationIndex} carries the SDK's removal tag (as does its {@code getRotation}
+     * twin), so the suppression is isolated to this one-line accessor rather than the whole visual pass.
+     */
+    @SuppressWarnings("removal")
+    private static int currentRotationIndex(@Nonnull BlockAccessor accessor, int x, int y, int z) {
+        return accessor.getRotationIndex(x, y, z);
     }
 }
