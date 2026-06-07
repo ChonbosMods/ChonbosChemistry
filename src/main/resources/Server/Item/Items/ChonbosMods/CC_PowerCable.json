@@ -123,22 +123,22 @@
           "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_3horiz_ud.blockymodel"
         },
         "End_Push": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end.blockymodel"
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end_push.blockymodel"
         },
         "End_Pull": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end.blockymodel"
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end_pull.blockymodel"
         },
         "Vertical_End_Up_Push": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up.blockymodel"
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up_push.blockymodel"
         },
         "Vertical_End_Up_Pull": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up.blockymodel"
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up_pull.blockymodel"
         },
         "Vertical_End_Down_Push": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down.blockymodel"
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down_push.blockymodel"
         },
         "Vertical_End_Down_Pull": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down.blockymodel"
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down_pull.blockymodel"
         },
         "On": {
           "CustomModelTexture": [
@@ -383,7 +383,7 @@
           ]
         },
         "End_Push_On": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end.blockymodel",
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end_push.blockymodel",
           "CustomModelTexture": [
             {
               "Weight": 1,
@@ -392,7 +392,7 @@
           ]
         },
         "End_Pull_On": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end.blockymodel",
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_end_pull.blockymodel",
           "CustomModelTexture": [
             {
               "Weight": 1,
@@ -401,7 +401,7 @@
           ]
         },
         "Vertical_End_Up_Push_On": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up.blockymodel",
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up_push.blockymodel",
           "CustomModelTexture": [
             {
               "Weight": 1,
@@ -410,7 +410,7 @@
           ]
         },
         "Vertical_End_Up_Pull_On": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up.blockymodel",
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_up_pull.blockymodel",
           "CustomModelTexture": [
             {
               "Weight": 1,
@@ -419,7 +419,7 @@
           ]
         },
         "Vertical_End_Down_Push_On": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down.blockymodel",
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down_push.blockymodel",
           "CustomModelTexture": [
             {
               "Weight": 1,
@@ -428,7 +428,7 @@
           ]
         },
         "Vertical_End_Down_Pull_On": {
-          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down.blockymodel",
+          "CustomModel": "Blocks/ChonbosMods/Pipes/Pipe_vertical_end_down_pull.blockymodel",
           "CustomModelTexture": [
             {
               "Weight": 1,
