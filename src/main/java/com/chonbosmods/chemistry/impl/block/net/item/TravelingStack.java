@@ -96,6 +96,10 @@ public final class TravelingStack {
      * A stack about to enter the network at the head of {@code path} ({@code segmentIndex} 0,
      * {@code progressTicks} 0). {@code metadata} may be null; a non-null document is deep-copied so the
      * stack owns its own metadata. {@code path} is copied defensively (never null: a null becomes empty).
+     *
+     * <p>PERSISTENCE INVARIANT: a stack with {@code count <= 0} or an EMPTY path is dropped by the
+     * defensive decode ({@code PipeNode.DEFENSIVE_IN_TRANSIT_CODEC}): always build the route before a
+     * stack can ever be saved (extraction does this up front).
      */
     public static TravelingStack of(String id, int count, BsonDocument metadata, long[] path,
                                     long originKey, long destKey) {
