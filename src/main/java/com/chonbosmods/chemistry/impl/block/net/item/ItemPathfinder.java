@@ -72,7 +72,9 @@ public final class ItemPathfinder {
      *     {@code path}).
      * @param path the member-pipe keys from the entry pipe to the destination's via pipe, INCLUSIVE of
      *     both ends, in travel order. For a container adjacent to the entry pipe this is a single
-     *     element ({@code [entry]}). Never null, never empty.
+     *     element ({@code [entry]}). Never null, never empty. The array is owned by the candidate:
+     *     callers must treat it as read-only (copy before mutating, e.g. into a TravelingStack, whose
+     *     factory already copies defensively).
      */
     public record Candidate(Destination destination, long[] path) {
     }
