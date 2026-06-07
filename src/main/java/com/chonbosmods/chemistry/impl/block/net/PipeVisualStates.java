@@ -134,19 +134,11 @@ public final class PipeVisualStates {
         }
         PortChannel channel = pipe.channel();
         int mask = 0;
-        // Connection cap (2026-06-07 design Decision 1): this pipe joins at most 3 non-pipe endpoints
-        // (machines/containers), lowest face index winning. The cap applies to the EFFECTIVE mask (the
-        // transport truth) only: the engine's pattern matcher does NOT cap, so physicalMask stays
-        // uncapped and a capped machine arm diverges (effective < physical) into the suppressed-arm swap,
-        // rendering the capped topology. Containers never count physically anyway. Same per-pipe budget
-        // used by NetworkEndpoints/ItemEndpoints so the visual twin agrees. See EndpointConnectionCap.
-        EndpointConnectionCap cap = new EndpointConnectionCap();
         for (int face = 0; face < OFFSETS.length; face++) {
             int[] off = OFFSETS[face];
             int nx = x + off[0], ny = y + off[1], nz = z + off[2];
 
-            // (a) same-channel pipe neighbour, gated exactly like the network BFS. Pipe-pipe edges are NOT
-            // capped (the cap counts only NON-pipe endpoints): never claim budget here.
+            // (a) same-channel pipe neighbour, gated exactly like the network BFS.
             PipeNode neighbourPipe = grid == null ? null : grid.pipeAt(nx, ny, nz);
             if (neighbourPipe != null) {
                 if (PipeConnectivity.connects(pipe, face, neighbourPipe)) {
@@ -156,8 +148,7 @@ public final class PipeVisualStates {
             }
 
             // The pipe's own face must be non-NONE for either a machine OR a container to join (a NONE
-            // face hides whatever is beyond it, exactly as NetworkEndpoints/ItemEndpoints both gate). A
-            // NONE face consumes NO cap budget (CONNECTIONS, not adjacency).
+            // face hides whatever is beyond it, exactly as NetworkEndpoints/ItemEndpoints both gate).
             if (pipe.flowState(face) == FlowState.NONE) {
                 continue;
             }
@@ -166,11 +157,7 @@ public final class PipeVisualStates {
             // must be non-NONE AND the neighbour's facing port must OVERLAP the face's flow state
             // (the full classify matrix, not just port-exists: see machineEndpointJoins).
             if (machineEndpointJoins(lookup, nx, ny, nz, face, channel, pipe.flowState(face))) {
-                // A real connection: claim a cap slot. Beyond the budget the arm is dropped from EFFECTIVE
-                // (it stays in physical -> the documented divergence renders the capped topology).
-                if (cap.tryClaim()) {
-                    mask |= (1 << face);
-                }
+                mask |= (1 << face);
                 continue; // a qualified machine endpoint: do not also probe a container at the same cell
             }
 
@@ -184,10 +171,7 @@ public final class PipeVisualStates {
             // no machine-vs-container precedence rule yet: when ITEM machines land, define it THERE first
             // and mirror it here, or the visual twin will silently invent policy.
             if (containerEndpointJoins(channel, containers, nx, ny, nz)) {
-                // A container is a connection: it claims a cap slot too (ItemEndpoints caps containers).
-                if (cap.tryClaim()) {
-                    mask |= (1 << face);
-                }
+                mask |= (1 << face);
             }
         }
         return mask;

@@ -486,40 +486,4 @@ class PipeVisualStatesTest {
             PipeShapes.stateFor(eff, false), PipeShapes.stateFor(phys, false),
             "the effective (larger, straight) shape differs from the physical (end) shape");
     }
-
-    // --- connection cap on the visual masks (2026-06-07 design Decision 1) ---
-
-    private static final int FACE_PY = 2; // +Y, bit 2
-    private static final int FACE_NY = 3; // -Y, bit 3
-    private static final int BIT_PY = 1 << FACE_PY;
-    private static final int BIT_NY = 1 << FACE_NY;
-
-    @Test
-    void cap_fourMachines_effectiveDropsFourthArm_physicalKeepsAll() {
-        // A power pipe with OUTPUT machines on faces 0,1,2,3. The transport cap (3) drops the 4th arm
-        // (face 3, lowest-face-wins) from the EFFECTIVE mask, but the engine welds every channel-bearing
-        // machine, so the PHYSICAL mask keeps all four. effective < physical: the suppressed-arm swap
-        // fires and renders the capped (3-arm) topology -- documented divergence.
-        PipeNode self = PipeNode.of(PortChannel.POWER, 1);
-        FakeGrid grid = new FakeGrid().put(0, 0, 0, self);
-        FakeLookup lookup = new FakeLookup()
-            .put(1, 0, 0, new FakePorts(powerPort(FACE_NX, PortDirection.OUTPUT),
-                EnergyBuffer.withCapacity(1000L), Map.of())) // face 0
-            .put(-1, 0, 0, new FakePorts(powerPort(FACE_PX, PortDirection.OUTPUT),
-                EnergyBuffer.withCapacity(1000L), Map.of())) // face 1
-            .put(0, 1, 0, new FakePorts(powerPort(FACE_NY, PortDirection.OUTPUT),
-                EnergyBuffer.withCapacity(1000L), Map.of())) // face 2
-            .put(0, -1, 0, new FakePorts(powerPort(FACE_PY, PortDirection.OUTPUT),
-                EnergyBuffer.withCapacity(1000L), Map.of())); // face 3 -- the 4th
-
-        int eff = PipeVisualStates.effectiveMask(self, 0, 0, 0, grid, lookup);
-        int phys = PipeVisualStates.physicalMask(self, 0, 0, 0, grid, lookup);
-
-        assertEquals(BIT_PX | BIT_NX | BIT_PY, eff,
-            "effective: the cap keeps faces 0,1,2 and drops the 4th (face 3)");
-        assertEquals(BIT_PX | BIT_NX | BIT_PY | BIT_NY, phys,
-            "physical: the engine welds all four channel-bearing machines (uncapped)");
-        assertNotEquals(eff, phys,
-            "effective < physical at the capped face: suppressed-arm swap renders the capped topology");
-    }
 }
