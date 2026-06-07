@@ -110,8 +110,25 @@ BLOCK_CENTRE_Y = 16               # model-space Y of the block centre
 YAW_FOR_FACE = {4: 0, 0: 1, 5: 2, 1: 3}
 
 # textureLayout side-face cycle under one yaw90 step (verified vs authored Stub_E).
-# back->left->front->right->back; top/bottom unchanged.
+# back->left->front->right->back. The four faces around the +Y axis cycle and their
+# offset/mirror/angle ride verbatim with the face (proven: all side-face angle deltas
+# are 0 across authored Stub_E/S/W).
 FACE_CYCLE = {"back": "left", "left": "front", "front": "right", "right": "back"}
+
+# Cap (top/bottom) source under yaw k, taken from the ORIGINAL (pre-yaw) layout. The
+# side 4-cycle above does NOT carry the caps: the authored stub UV wraps the pipe as a
+# strip, so a stub yawed onto its side shows a side-band texel on BOTH caps (k=1,3) and
+# swaps top<->bottom at k=2. This is NOT per-step composable (k=1/3 collapse both caps
+# onto one face, destroying the distinction needed for the next step), so it must be a
+# direct k-indexed map off the original faces. Derived + byte-verified against authored
+# cross Stub_E/S/W (all six faces, offset+mirror+angle; every angle delta is 0).
+#   k=0 identity   k=1 caps<-left   k=2 top<->bottom swap   k=3 caps<-right
+CAP_SOURCE = {
+    0: {"top": "top", "bottom": "bottom"},
+    1: {"top": "left", "bottom": "left"},
+    2: {"top": "bottom", "bottom": "top"},
+    3: {"top": "right", "bottom": "right"},
+}
 
 # The 26 non-node topology shapes in template order, with the PascalCase state key.
 # (template key -> state key); used for emission ordering. The base arm masks come
@@ -226,13 +243,22 @@ def yaw_size(size, k):
 
 
 def yaw_texture_layout(tl, k):
-    """Cycle the four side faces back->left->front->right per yaw90 step; top and
-    bottom are unchanged. Offsets/mirror/angle ride along with the face."""
+    """Yaw the per-face textureLayout by k * 90 deg about +Y, reproducing the authored
+    stub/collar convention completely (offset + mirror + angle on all 6 faces).
+
+    Side faces (back/front/left/right) cycle back->left->front->right per step and
+    carry their offset/mirror/angle verbatim. The top/bottom caps do NOT ride that
+    cycle: they are remapped directly off the ORIGINAL layout via CAP_SOURCE (a
+    sideways stub shows a side-band texel on both caps at k=1/3, and swaps the caps at
+    k=2). Proven byte-exact vs authored cross Stub_E/S/W on every face."""
+    k %= 4
     out = copy.deepcopy(tl)
-    for _ in range(k % 4):
+    for _ in range(k):  # advance the four side faces around the +Y axis
         prev = copy.deepcopy(out)
         for src, dst in FACE_CYCLE.items():
             out[dst] = prev[src]
+    for cap, src in CAP_SOURCE[k].items():  # caps come straight off the original layout
+        out[cap] = copy.deepcopy(tl[src])
     return out
 
 

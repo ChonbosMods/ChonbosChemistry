@@ -4,7 +4,10 @@ enumeration (counts per arity), and the yaw rotation math.
 The full generation + round-trip proof live in the script's --self-test (they
 need the real model corpus); these tests pin the pure combinatorics + geometry
 that PipeShapes must reproduce independently."""
+import copy
+import json
 import unittest
+from pathlib import Path
 
 from gen_pipe_tips import (
     mask_to_arms,
@@ -14,9 +17,15 @@ from gen_pipe_tips import (
     yaw_position,
     yaw_size,
     yaw_texture_layout,
+    yaw_node,
     YAW_FOR_FACE,
     mask_for_shape,
 )
+
+# Authored topology corpus (the rotated-UV ground truth). Present in the repo; the
+# proof test below skips cleanly if it has been relocated.
+CORPUS = (Path(__file__).resolve().parent.parent
+          / "src/main/resources/Common/Blocks/ChonbosMods/Pipes")
 
 
 class MaskArmsTest(unittest.TestCase):
@@ -129,15 +138,84 @@ class YawMathTest(unittest.TestCase):
         self.assertEqual(out["front"]["offset"]["x"], tl["left"]["offset"]["x"])
         self.assertEqual(out["right"]["offset"]["x"], tl["front"]["offset"]["x"])
         self.assertEqual(out["back"]["offset"]["x"], tl["right"]["offset"]["x"])
-        # top/bottom unchanged
-        self.assertEqual(out["top"], tl["top"])
-        self.assertEqual(out["bottom"], tl["bottom"])
+
+    def test_yaw_texture_layout_caps_remap_off_original(self):
+        # The caps do NOT ride the side cycle: k=1/3 take a side-band texel onto both
+        # caps; k=2 swaps top<->bottom. Sourced off the ORIGINAL layout (not the
+        # already-cycled one). Pins the cap-face bug fix.
+        tl = {f: {"offset": {"x": i, "y": 0}, "mirror": {"x": False, "y": False},
+                  "angle": 0}
+              for i, f in enumerate(["back", "front", "left", "right", "top", "bottom"])}
+        k1 = yaw_texture_layout(tl, 1)
+        self.assertEqual(k1["top"], tl["left"])
+        self.assertEqual(k1["bottom"], tl["left"])
+        k2 = yaw_texture_layout(tl, 2)
+        self.assertEqual(k2["top"], tl["bottom"])
+        self.assertEqual(k2["bottom"], tl["top"])
+        k3 = yaw_texture_layout(tl, 3)
+        self.assertEqual(k3["top"], tl["right"])
+        self.assertEqual(k3["bottom"], tl["right"])
+
+    def test_yaw_texture_layout_k0_identity(self):
+        tl = {f: {"offset": {"x": i, "y": i}, "mirror": {"x": True, "y": False},
+                  "angle": 90}
+              for i, f in enumerate(["back", "front", "left", "right", "top", "bottom"])}
+        self.assertEqual(yaw_texture_layout(tl, 0), tl)
 
     def test_yaw_texture_layout_four_steps_identity(self):
         tl = {f: {"offset": {"x": i, "y": i}, "mirror": {"x": False, "y": True},
                   "angle": 90}
               for i, f in enumerate(["back", "front", "left", "right", "top", "bottom"])}
         self.assertEqual(yaw_texture_layout(tl, 4), tl)
+
+
+class RotatedUVProofTest(unittest.TestCase):
+    """The proof that was missing: a yaw of the authored +Z stub must BYTE-MATCH the
+    artist-authored Stub_E / Stub_S / Stub_W (all six textureLayout faces, plus
+    position + size). This is what catches the cap-face / angle / mirror bug class
+    that the +Z round-trip (yaw 0) cannot see."""
+
+    @classmethod
+    def setUpClass(cls):
+        cross = CORPUS / "ItemPipe_cross.blockymodel"
+        if not cross.exists():
+            raise unittest.SkipTest(f"authored corpus not found at {CORPUS}")
+        cls.model = json.loads(cross.read_text())
+        cls.stubs = {n["name"]: n for n in cls.model["nodes"]
+                     if n["name"].startswith("Stub_")}
+
+    def _assert_yaw_matches(self, target_name, k):
+        src = self.stubs["Stub_N"]
+        got = yaw_node(src, k)
+        want = self.stubs[target_name]
+        # Ignore id + name (the generator canonicalises those); geometry +
+        # textureLayout (offset, mirror, angle on every face) must byte-match.
+        def norm(n):
+            c = copy.deepcopy(n)
+            c.pop("id", None)
+            c.pop("name", None)
+            return c
+        self.assertEqual(norm(got), norm(want),
+                         f"yaw{k}(Stub_N) != authored {target_name}")
+
+    def test_yaw1_matches_authored_stub_e(self):
+        self._assert_yaw_matches("Stub_E", 1)
+
+    def test_yaw2_matches_authored_stub_s(self):
+        self._assert_yaw_matches("Stub_S", 2)
+
+    def test_yaw3_matches_authored_stub_w(self):
+        self._assert_yaw_matches("Stub_W", 3)
+
+    def test_every_face_textureLayout_matches(self):
+        # Explicit per-face assertion so a regression names the offending face.
+        faces = ["back", "front", "left", "right", "top", "bottom"]
+        for target, k in (("Stub_E", 1), ("Stub_S", 2), ("Stub_W", 3)):
+            got = yaw_node(self.stubs["Stub_N"], k)["shape"]["textureLayout"]
+            want = self.stubs[target]["shape"]["textureLayout"]
+            for f in faces:
+                self.assertEqual(got[f], want[f],
+                                 f"{target} face '{f}' mismatch under yaw{k}")
 
 
 if __name__ == "__main__":

@@ -192,12 +192,12 @@
             "angle": 0
           },
           "top": {
-            "offset": {"x": 16, "y": 32},
+            "offset": {"x": 8, "y": 24},
             "mirror": {"x": false, "y": false},
             "angle": 0
           },
           "bottom": {
-            "offset": {"x": 16, "y": 28},
+            "offset": {"x": 8, "y": 24},
             "mirror": {"x": false, "y": false},
             "angle": 0
           }
@@ -296,14 +296,14 @@
             "angle": 0
           },
           "top": {
-            "offset": {"x": 0, "y": 50},
+            "offset": {"x": 0, "y": 52},
             "mirror": {"x": false, "y": false},
-            "angle": 0
+            "angle": 270
           },
           "bottom": {
-            "offset": {"x": 0, "y": 50},
+            "offset": {"x": 0, "y": 52},
             "mirror": {"x": false, "y": false},
-            "angle": 0
+            "angle": 270
           }
         },
         "unwrapMode": "custom",

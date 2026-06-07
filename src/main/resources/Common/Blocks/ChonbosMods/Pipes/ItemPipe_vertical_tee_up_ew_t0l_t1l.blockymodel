@@ -244,14 +244,14 @@
             "angle": 0
           },
           "top": {
-            "offset": {"x": 10, "y": 50},
+            "offset": {"x": 10, "y": 52},
             "mirror": {"x": false, "y": false},
-            "angle": 0
+            "angle": 270
           },
           "bottom": {
-            "offset": {"x": 10, "y": 50},
+            "offset": {"x": 10, "y": 52},
             "mirror": {"x": false, "y": false},
-            "angle": 0
+            "angle": 270
           }
         },
         "unwrapMode": "custom",
@@ -296,14 +296,14 @@
             "angle": 0
           },
           "top": {
-            "offset": {"x": 10, "y": 50},
+            "offset": {"x": 10, "y": 52},
             "mirror": {"x": false, "y": false},
-            "angle": 0
+            "angle": 270
           },
           "bottom": {
-            "offset": {"x": 10, "y": 50},
+            "offset": {"x": 10, "y": 52},
             "mirror": {"x": false, "y": false},
-            "angle": 0
+            "angle": 270
           }
         },
         "unwrapMode": "custom",
