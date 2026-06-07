@@ -49,8 +49,10 @@ import java.util.List;
  * <h2>Defensive</h2>
  * A malformed stack (empty path, or {@code segmentIndex} outside the path: shouldn't exist per the
  * persistence invariant, but never throw) resolves to {@link Decision#POP_OUT} so the glue can drop it
- * rather than crash the tick. {@code popOutPipeKey} is then the clamped current segment (or 0 for an
- * empty path).
+ * rather than crash the tick. {@code popOutPipeKey} is then the clamped current segment, or {@code 0L}
+ * for an empty path: {@code 0L} is NOT a valid packed position (packKey biases coordinates), so the
+ * glue (Task 7) must treat a zero key as "no drop location": drop at the pipe that OWNS the stack's
+ * inTransit entry instead of unpacking the key.
  *
  * <p>Pure JDK + net-layer types only: no engine imports.
  */
