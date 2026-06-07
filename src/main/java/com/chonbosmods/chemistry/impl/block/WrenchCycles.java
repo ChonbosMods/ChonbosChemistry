@@ -93,7 +93,7 @@ public final class WrenchCycles {
      * @param target what the face points at (a {@link Target#MACHINE} endpoint, or a {@link Target#PIPE})
      * @param otherDirectedFaces the number of PUSH/PULL faces on this pipe EXCLUDING the clicked face.
      *     The caller (the interaction glue) counts directed faces and subtracts the clicked face so the
-     *     face's own current state never counts against itself: a PULL face can always stay/leave directed.
+     *     face's own current state never counts against itself. NOTE the budget-spent exception: with 2+ OTHER directed faces, a clicked directed face collapses out of push/pull (the ring has no directed entries) and cannot re-enter until budget frees: the wrench drives over-budget legacy data toward compliance.
      * @return the next flow state. Toward PIPE the budget is irrelevant (push/pull are never offered).
      *     Toward MACHINE with fewer than {@link #MAX_DIRECTED_FACES} other directed faces: the full
      *     {@code NORMAL -> PUSH -> PULL -> NONE} ring. Toward MACHINE with the budget spent

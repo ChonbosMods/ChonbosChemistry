@@ -173,7 +173,7 @@ public final class WrenchInteraction extends SimpleBlockInteraction {
 
         // The directed-face budget (design 2026-06-07 decision 2): count PUSH/PULL faces EXCLUDING the
         // clicked face so the face's own current state never counts against itself (a directed face can
-        // always stay/leave directed; legacy 3+-directed saves still cycle each face freely).
+        // own state never counts against itself; over-budget legacy faces collapse toward compliance).
         int otherDirectedFaces = countDirectedFaces(pipe, faceIndex);
 
         FlowState current = pipe.flowState(faceIndex);
