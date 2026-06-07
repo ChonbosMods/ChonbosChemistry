@@ -88,6 +88,23 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
      */
     private final Map<World, Set<Long>> processedAnchorsByWorld = new IdentityHashMap<>();
 
+    /**
+     * Packed block keys ({@link NetworkManager#packKey}) of pipes this system has PROGRAMMATICALLY
+     * overridden via {@link #applySuppressedArmVisuals} (a divergence/tip composite written through the
+     * rotation-setting {@code setBlock(...,198)} path). Tracked so that when such a pipe later becomes
+     * undisturbed again ({@code !anyTip && effective == physical}) we actively RESET it to the plain
+     * engine shape instead of leaving the stale override on screen: the engine never re-resolves a pipe
+     * on a container/flow-state change (only place/break runs ConnectedBlocksUtil), so without this the
+     * override persists until an unrelated edit elsewhere wipes it.
+     *
+     * <p>Lifecycle: a key is ADDED when this method applies a programmatic state, and REMOVED when the
+     * undisturbed branch resets that pipe back to plain. A pipe whose chunk/grid entry has vanished (a
+     * break) is simply never revisited here, so its key may linger in the set indefinitely: an acceptable
+     * small leak, identical in kind to the old {@code warnedRotationMismatch} set, not worth a second
+     * bookkeeping pass to scrub (the break path already invalidates the network).
+     */
+    private final Set<Long> overriddenPositions = new HashSet<>();
+
     public NetworkTickSystem(
             @Nonnull ComponentType<ChunkStore, PipeNode> pipeType,
             @Nonnull ComponentType<ChunkStore, MachineBlockState> machineType,
@@ -413,9 +430,18 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                 }
 
                 if (!anyTip && effective == physical) {
-                    // Undisturbed and no tip: the engine pattern + H8 flip already did the right thing.
-                    // Leave it entirely to the engine (this is the cheap steady-state fast path: no chunk
-                    // fetch, no state read).
+                    // Undisturbed and no tip. Two sub-cases (see shouldResetOverride):
+                    if (!overriddenPositions.contains(key)) {
+                        // Never programmatically touched: the engine pattern + H8 flip own this pipe's
+                        // visual. Cheap steady-state fast path: no chunk fetch, no state read.
+                        continue;
+                    }
+                    // We previously overrode this pipe (added a container/tip arm) and it has now returned
+                    // to the plain engine topology: the engine will NOT re-resolve it on its own (a
+                    // container/flow change runs no neighbour pass), so the stale override would linger.
+                    // Actively reset it to the plain effective shape via the SAME entity-preserving,
+                    // neighbour-non-wiping setBlock(...,198) path, gated by the read-before-write throttle.
+                    resetOverriddenToPlain(world, key, mx, my, mz, effective, energized);
                     continue;
                 }
 
@@ -476,10 +502,95 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                 // reshapes/wipes neighbour pipes.
                 int id = BlockType.getAssetMap().getIndex(newState.getId());
                 accessor.setBlock(mx, my, mz, id, newState, wantRot, 0, 198);
+                // Record that this pipe now carries a programmatic override, so when it later becomes
+                // undisturbed again the branch above resets it to plain (the engine won't re-resolve it).
+                overriddenPositions.add(key);
             } catch (Throwable ignored) {
                 // A single member's suppressed-arm swap must never crash the tick.
             }
         }
+    }
+
+    /**
+     * Resets a previously-overridden pipe back to its PLAIN effective-topology shape, then drops it from
+     * {@link #overriddenPositions}. Called only from the undisturbed branch of
+     * {@link #applySuppressedArmVisuals} for a position that {@link #shouldResetOverride} flagged
+     * (undisturbed + no tip + currently overridden).
+     *
+     * <h2>Why this is needed</h2>
+     * Once we programmatically override a pipe (e.g. add a chest/container arm), the engine no longer owns
+     * its visual: a later container/flow-state change that drops the arm does NOT trigger the engine's
+     * neighbour re-resolution (only place/break runs ConnectedBlocksUtil), so the overridden shape would
+     * stay on screen until an unrelated edit elsewhere wipes it. This actively writes the plain shape the
+     * tick the divergence disappears.
+     *
+     * <h2>Energized composition (no powered flicker)</h2>
+     * The plain desired key is {@link PipeShapes#stateFor}{@code (effective, energized)}, which already
+     * bakes the {@code _On} twin via {@link PipePowerStates#poweredOf} when {@code energized} (identical to
+     * what {@link #applyPoweredVisual} and the tip path produce). {@code applyPoweredVisual} runs BEFORE
+     * this method each tick and only flips the texture twin; this reset, running last, writes the
+     * energized-correct plain key outright, so a powered cable resets straight to its {@code _On} shape with
+     * no off-frame. Next tick {@code applyPoweredVisual} sees the already-correct twin and no-ops.
+     *
+     * <h2>Throttle</h2>
+     * Mirrors the apply path: reads the placed state name + rotation and writes only when the plain shape
+     * name or the wanted rotation differs, so a pipe already at the plain shape just drops from the set
+     * with no block mutation. The rotation is SET to {@code PipeShapes.resolve(effective).rotationIndex()}
+     * via the same entity-preserving {@code setBlock(...,198)} primitive (no neighbour wipe).
+     *
+     * <p>Fully guarded: a missing chunk/block/state is skipped; the position still drops from the set so a
+     * vanished pipe never lingers via this path.
+     */
+    private void resetOverriddenToPlain(
+            @Nonnull World world, long key, int mx, int my, int mz, int effective, boolean energized) {
+        try {
+            BlockAccessor accessor = world.getChunkIfLoaded(ChunkUtil.indexChunkFromBlock(mx, mz));
+            if (accessor == null) {
+                return; // chunk not loaded; leave the key set, retry when it next ticks
+            }
+            BlockType bt = accessor.getBlockType(mx, my, mz);
+            if (bt == null || bt == BlockType.EMPTY) {
+                overriddenPositions.remove(key); // not our block anymore (broken); stop tracking it
+                return;
+            }
+
+            int wantRot = PipeShapes.resolve(effective).rotationIndex();
+            int currentRotation = currentRotationIndex(accessor, mx, my, mz);
+            String desired = PipeShapes.stateFor(effective, energized);
+            String current = bt.getStateForBlock(bt);
+            String normalizedCurrent = (current == null || current.isEmpty()) ? "default" : current;
+
+            if (shouldResetOverride(desired, normalizedCurrent, wantRot, currentRotation)) {
+                BlockType newState = bt.getBlockForState(desired);
+                if (newState != null) {
+                    int id = BlockType.getAssetMap().getIndex(newState.getId());
+                    accessor.setBlock(mx, my, mz, id, newState, wantRot, 0, 198);
+                }
+                // "default" is the base block: getBlockForState may legitimately return the base BlockType
+                // here, which the setBlock above applies; either way the override no longer holds.
+            }
+            // Whether we wrote or the throttle skipped (already plain), the override is resolved: stop
+            // tracking so the cheap fast path owns this pipe again next tick.
+            overriddenPositions.remove(key);
+        } catch (Throwable ignored) {
+            // A single member's reset must never crash the tick.
+        }
+    }
+
+    /**
+     * Pure decision: should a previously-overridden pipe issue a plain-shape write this tick? True only
+     * when the placed shape name differs from the desired plain key OR the placed rotation differs from the
+     * wanted rotation: identical throttle discipline to the apply path, factored out for unit testing.
+     *
+     * @param desiredStateName the plain {@link PipeShapes#stateFor} key the pipe should return to
+     * @param currentStateName the pipe's current placed interaction-state name (normalized; never null/"")
+     * @param wantRotation the rotation the plain shape wants ({@code resolve(effective).rotationIndex()})
+     * @param currentRotation the pipe's current placed rotation index
+     * @return {@code true} if a block write is needed; {@code false} if already at the plain shape+rotation
+     */
+    static boolean shouldResetOverride(
+            String desiredStateName, String currentStateName, int wantRotation, int currentRotation) {
+        return !desiredStateName.equals(currentStateName) || wantRotation != currentRotation;
     }
 
     /**
