@@ -213,4 +213,94 @@ class ItemEndpointsTest {
         assertEquals(0, endpoints.destinations().size());
         assertEquals(0, endpoints.sources().size());
     }
+
+    // --- connection cap: a pipe joins at most 3 non-pipe endpoints (2026-06-07 design Decision 1) ---
+
+    /** A single ITEM pipe at (x,y,z) with all 6 faces NORMAL. */
+    private static PipeGridView itemPipeAllNormal(int x, int y, int z) {
+        long key = NetworkManager.packKey(x, y, z);
+        PipeNode node = PipeNode.of(PortChannel.ITEM, 1);
+        return (px, py, pz) -> NetworkManager.packKey(px, py, pz) == key ? node : null;
+    }
+
+    @Test
+    void cap_fourContainersAroundOnePipe_onlyThreeLowestFacesCollected() {
+        // One pipe (5,5,5), containers on faces 0(+X),1(-X),2(+Y),3(-Y). The cap is 3: face-index order
+        // wins, so faces 0,1,2 collect and face 3 (-Y) is skipped ENTIRELY.
+        PipeGridView grid = itemPipeAllNormal(5, 5, 5);
+        Network net = itemNetworkAt(5, 5, 5, grid);
+        FakeContainerLookup containers = new FakeContainerLookup();
+        containers.put(6, 5, 5); // face 0 +X
+        containers.put(4, 5, 5); // face 1 -X
+        containers.put(5, 6, 5); // face 2 +Y
+        containers.put(5, 4, 5); // face 3 -Y (the 4th: must be dropped)
+
+        Endpoints endpoints = ItemEndpoints.collect(net, grid, containers);
+        assertEquals(3, endpoints.destinations().size(), "cap drops the 4th endpoint");
+        Set<Integer> faces = new HashSet<>();
+        for (ItemEndpoints.Destination d : endpoints.destinations()) {
+            faces.add(d.viaFace());
+        }
+        assertTrue(faces.contains(0) && faces.contains(1) && faces.contains(2),
+            "the three lowest faces win the slots");
+        assertTrue(!faces.contains(3), "face 3 (-Y) is the 4th and must be skipped");
+    }
+
+    @Test
+    void cap_noneFaceDoesNotConsumeBudget_lowerCountThatShifts() {
+        // Faces 0,1,2,3 have containers but face 1 (-X) is NONE: NONE does NOT count against the cap, so
+        // the qualifying faces are 0,2,3 (three of them) and ALL collect. The NONE face shifts which 3 win.
+        long key = NetworkManager.packKey(5, 5, 5);
+        PipeNode node = PipeNode.of(PortChannel.ITEM, 1);
+        node.setFlowState(1, FlowState.NONE); // -X hidden, consumes no budget
+        PipeGridView grid = (px, py, pz) -> NetworkManager.packKey(px, py, pz) == key ? node : null;
+        Network net = itemNetworkAt(5, 5, 5, grid);
+        FakeContainerLookup containers = new FakeContainerLookup();
+        containers.put(6, 5, 5); // face 0 +X  -> collects
+        containers.put(4, 5, 5); // face 1 -X  -> NONE, skipped, no budget
+        containers.put(5, 6, 5); // face 2 +Y  -> collects
+        containers.put(5, 4, 5); // face 3 -Y  -> collects (would be dropped if NONE counted)
+
+        Endpoints endpoints = ItemEndpoints.collect(net, grid, containers);
+        assertEquals(3, endpoints.destinations().size());
+        Set<Integer> faces = new HashSet<>();
+        for (ItemEndpoints.Destination d : endpoints.destinations()) {
+            faces.add(d.viaFace());
+        }
+        assertTrue(faces.contains(0) && faces.contains(2) && faces.contains(3),
+            "NONE face -X consumes no budget; faces 0,2,3 all win");
+        assertTrue(!faces.contains(1), "the NONE face never collects");
+    }
+
+    @Test
+    void cap_isPerPipeNotPerNetwork_twoPipesThreeEach() {
+        // Two connected ITEM pipes (5,5,5)-(6,5,5) joined at the +X/-X faces. Each borders 3 OTHER
+        // containers. Per-pipe budget: 3 each = 6 total, none dropped.
+        PipeNode a = PipeNode.of(PortChannel.ITEM, 1); // (5,5,5)
+        PipeNode b = PipeNode.of(PortChannel.ITEM, 1); // (6,5,5)
+        PipeGridView grid = (px, py, pz) -> {
+            long k = NetworkManager.packKey(px, py, pz);
+            if (k == NetworkManager.packKey(5, 5, 5)) {
+                return a;
+            }
+            if (k == NetworkManager.packKey(6, 5, 5)) {
+                return b;
+            }
+            return null;
+        };
+        Network net = itemNetworkAt(5, 5, 5, grid);
+        FakeContainerLookup containers = new FakeContainerLookup();
+        // pipe a (5,5,5): containers on -X, +Y, -Y (3)
+        containers.put(4, 5, 5);
+        containers.put(5, 6, 5);
+        containers.put(5, 4, 5);
+        // pipe b (6,5,5): containers on +X, +Y, -Y (3)
+        containers.put(7, 5, 5);
+        containers.put(6, 6, 5);
+        containers.put(6, 4, 5);
+
+        Endpoints endpoints = ItemEndpoints.collect(net, grid, containers);
+        assertEquals(6, endpoints.destinations().size(),
+            "per-pipe cap: two pipes x 3 each = 6, nothing dropped");
+    }
 }

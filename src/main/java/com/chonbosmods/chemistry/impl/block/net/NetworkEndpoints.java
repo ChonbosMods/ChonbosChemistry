@@ -106,6 +106,12 @@ public final class NetworkEndpoints {
             int py = NetworkManager.unpackY(memberKey);
             int pz = NetworkManager.unpackZ(memberKey);
             PipeNode member = grid.pipeAt(px, py, pz);
+            // Connection cap (2026-06-07 design Decision 1): this MEMBER pipe joins at most 3 machine/tank
+            // neighbours. Fresh per member pipe (per-pipe, not per-network). A storage neighbour counts as
+            // ONE connection even though it contributes provider+acceptor halves. NONE faces / empty cells
+            // / non-overlapping ports consume NO budget (CONNECTIONS, not adjacency). See
+            // EndpointConnectionCap.
+            EndpointConnectionCap cap = new EndpointConnectionCap();
             for (int faceIdx = 0; faceIdx < OFFSETS.length; faceIdx++) {
                 int[] off = OFFSETS[faceIdx];
                 int nx = px + off[0], ny = py + off[1], nz = pz + off[2];
@@ -116,8 +122,11 @@ public final class NetworkEndpoints {
                 if (face == FlowState.NONE) {
                     continue;
                 }
-                if (!visitedNeighbours.add(NetworkManager.packKey(nx, ny, nz))) {
-                    continue; // this neighbour position already contributed for this network
+                long neighbourKey = NetworkManager.packKey(nx, ny, nz);
+                // Dedup CHECK (not yet claim): a neighbour already collected via another member pipe is
+                // skipped here and must NOT consume this pipe's budget.
+                if (visitedNeighbours.contains(neighbourKey)) {
+                    continue;
                 }
                 MachinePorts neighbour = lookup.at(nx, ny, nz);
                 if (neighbour == null) {
@@ -133,6 +142,17 @@ public final class NetworkEndpoints {
                 if (facing == null) {
                     continue;
                 }
+                // A facing port that does not OVERLAP the pipe face (CLOSED, or PUSH-at-OUTPUT, etc.) is
+                // not a real connection: it consumes no budget and claims no dedup slot. Probe first.
+                if (!overlaps(facing.direction(), face)) {
+                    continue;
+                }
+                // Cap CHECK before the dedup CLAIM: a capped-out endpoint is skipped ENTIRELY (not
+                // collected, not dedup-claimed), leaving it free for a sibling member pipe.
+                if (!cap.tryClaim()) {
+                    continue;
+                }
+                visitedNeighbours.add(neighbourKey);
                 classify(channel, facing.direction(), face, neighbour,
                     pureProviders, pureAcceptors, bufferProviders, bufferAcceptors, storages);
             }
@@ -199,6 +219,28 @@ public final class NetworkEndpoints {
                 // CLOSED (or any future direction): contributes nothing.
             }
         }
+    }
+
+    /**
+     * Whether a facing port of the given {@code direction} OVERLAPS a pipe face's {@code flow} state, i.e.
+     * whether {@link #classify} would produce at least one endpoint for the pair. Gate-for-gate with the
+     * classify matrix:
+     * <ul>
+     *   <li>OUTPUT: overlaps NORMAL or PULL.</li>
+     *   <li>INPUT: overlaps NORMAL or PUSH.</li>
+     *   <li>BOTH: overlaps any non-NONE flow (callers gate NONE before reaching here).</li>
+     *   <li>CLOSED: never overlaps.</li>
+     * </ul>
+     * Single source of truth for "is this machine face a real connection", reused by {@code collect}'s
+     * connection-cap gate and by {@link PipeVisualStates#effectiveMask} so the visual twin cannot drift.
+     */
+    static boolean overlaps(PortDirection direction, FlowState flow) {
+        return switch (direction) {
+            case OUTPUT -> flow == FlowState.NORMAL || flow == FlowState.PULL;
+            case INPUT -> flow == FlowState.NORMAL || flow == FlowState.PUSH;
+            case BOTH -> flow != FlowState.NONE;
+            default -> false; // CLOSED (or any future direction): never a transport endpoint
+        };
     }
 
     private static StorageEndpoint storageFor(PortChannel channel, MachinePorts endpoint) {

@@ -2,6 +2,7 @@ package com.chonbosmods.chemistry.impl.block.net.item;
 
 import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
+import com.chonbosmods.chemistry.impl.block.net.EndpointConnectionCap;
 import com.chonbosmods.chemistry.impl.block.net.Network;
 import com.chonbosmods.chemistry.impl.block.net.NetworkManager;
 import com.chonbosmods.chemistry.impl.block.net.PipeGridView;
@@ -109,6 +110,10 @@ public final class ItemEndpoints {
             int py = NetworkManager.unpackY(memberKey);
             int pz = NetworkManager.unpackZ(memberKey);
             PipeNode member = grid.pipeAt(px, py, pz);
+            // Connection cap (2026-06-07 design Decision 1): this MEMBER pipe joins at most 3 containers.
+            // Fresh per member pipe (per-pipe, not per-network): two pipes can each reach 3. Counts
+            // CONNECTIONS only: a NONE face / empty cell never consumes budget. See EndpointConnectionCap.
+            EndpointConnectionCap cap = new EndpointConnectionCap();
             for (int faceIdx = 0; faceIdx < OFFSETS.length; faceIdx++) {
                 int[] off = OFFSETS[faceIdx];
                 int nx = px + off[0], ny = py + off[1], nz = pz + off[2];
@@ -123,13 +128,22 @@ public final class ItemEndpoints {
                 if (grid.pipeAt(nx, ny, nz) != null) {
                     continue;
                 }
-                if (!visitedContainers.add(NetworkManager.packKey(nx, ny, nz))) {
-                    continue; // this container position already contributed for this network
-                }
+                long containerKey = NetworkManager.packKey(nx, ny, nz);
+                // Qualify FIRST (container present?) so an empty cell costs no dedup slot and no budget.
                 if (containers.at(nx, ny, nz) == null) {
                     continue;
                 }
-                long containerKey = NetworkManager.packKey(nx, ny, nz);
+                // Dedup CHECK (not yet claim): a container already collected via another member pipe is
+                // skipped here and must NOT consume this pipe's budget.
+                if (visitedContainers.contains(containerKey)) {
+                    continue;
+                }
+                // Cap CHECK before the dedup CLAIM: a capped-out endpoint is skipped ENTIRELY (not
+                // collected, not dedup-claimed: per the plan), leaving it free for a sibling member pipe.
+                if (!cap.tryClaim()) {
+                    continue;
+                }
+                visitedContainers.add(containerKey);
                 // Face state alone decides the role (containers have no ports): NORMAL/PUSH deliver,
                 // PULL extracts. NONE was already skipped above.
                 if (face == FlowState.PULL) {
