@@ -5,6 +5,7 @@ import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.impl.block.Port;
 import com.chonbosmods.chemistry.impl.block.PortConfig;
 import com.chonbosmods.chemistry.impl.block.net.MachineLookup.MachinePorts;
+import com.chonbosmods.chemistry.impl.block.net.item.ContainerLookup;
 
 /**
  * Pure computation of a pipe's two 6-bit connectivity masks (Task 11, 2026-06-05 pipe flow-states
@@ -24,15 +25,35 @@ import com.chonbosmods.chemistry.impl.block.net.MachineLookup.MachinePorts;
  *             facing port ({@code portAt(opposite(face), channel)}) OVERLAPS the face's flow state per
  *             {@link NetworkEndpoints}' full classify matrix (OUTPUT joins under NORMAL/PULL, INPUT
  *             under NORMAL/PUSH, BOTH under any non-NONE, CLOSED never): see
- *             {@code machineEndpointJoins}.</li>
+ *             {@code machineEndpointJoins}, OR</li>
+ *         <li>(ITEM channel ONLY) a storage CONTAINER neighbour (vanilla chest/etc.) the
+ *             {@link ContainerLookup} resolves, gated by the pipe face's {@link FlowState} ALONE: any
+ *             non-NONE face ({@code NORMAL}/{@code PUSH}/{@code PULL}) with a container present joins.
+ *             This mirrors {@code ItemEndpoints}' qualification EXACTLY (NORMAL/PUSH deliver, PULL
+ *             extracts: all three render an arm). NOTE the asymmetry vs machines: a container has NO
+ *             ports, so there is no OFFER&times;ACCEPT overlap to apply: a PULL face at a container IS
+ *             connected for visuals (the arm renders) where a PULL face at an OUTPUT-only machine port
+ *             is NOT. See {@code containerEndpointJoins}. Containers are ignored on non-ITEM channels (a
+ *             chest beside a power cable is irrelevant) and whenever {@code containers} is null.</li>
  *       </ul></li>
  *   <li>{@link #physicalMask}: bit set iff the engine's pattern matcher would stub an arm to this face,
  *       ignoring flow states and substance compatibility:
  *       <ul>
  *         <li>any same-channel pipe neighbour (regardless of NONE faces or substance lock), OR</li>
  *         <li>a machine/tank neighbour that ADVERTISES the channel as a connectable face tag.</li>
- *       </ul></li>
+ *       </ul>
+ *       The physical mask is deliberately tag-based and NEVER counts a container, EVEN on the ITEM
+ *       channel. This is the crux of the "chest stubbing" design (2026-06-06 item-channel design
+ *       &sect;"Chest stubbing"): vanilla chests advertise NO {@code CC_ItemFace} tag, so the engine's
+ *       connected-block pattern matcher NEVER welds an arm toward them. A container therefore sets the
+ *       bit in EFFECTIVE but NOT in PHYSICAL, yielding {@code effective > physical}: the SAME
+ *       programmatic state swap that suppression uses then runs in reverse, ADDING the arm the engine
+ *       refused to draw so the pipe visibly reaches into the chest.</li>
  * </ul>
+ *
+ * <p>(The plan doc's Task 9 line says the physical mask should count "container present at all": that
+ * is a plan-doc error: it would make {@code effective == physical} for a chest and the arm would never
+ * be added. The design doc above is authoritative: containers count in EFFECTIVE only.)
  *
  * <h2>Machine physical-mask approximation (flag for in-game validation)</h2>
  * The engine stubs a connected-block arm to a neighbour based on the {@code FaceTags} advertised by the
@@ -48,8 +69,11 @@ import com.chonbosmods.chemistry.impl.block.net.MachineLookup.MachinePorts;
  * <h2>Why the comparison matters</h2>
  * When {@code effectiveMask == physicalMask} the pipe is "undisturbed": the engine's pattern system
  * already drew the right arms and the H8 powered flip retextures them in place. The driver must then do
- * NOTHING beyond H8. Only a divergence (a suppressed arm: a NONE face, a substance-mismatched pipe, or
- * a machine the flow state hides) warrants a programmatic state swap. See
+ * NOTHING beyond H8. Only a divergence warrants a programmatic state swap, in EITHER direction:
+ * {@code effective < physical} DROPS a suppressed arm (a NONE face, a substance-mismatched pipe, or a
+ * machine the flow state hides), while {@code effective > physical} ADDS one the engine refused to draw
+ * (an ITEM pipe reaching into a tag-less vanilla chest: the "chest stubbing" case above). Either way the
+ * swap retargets the cable to {@code stateFor(effectiveMask, ...)}, the shape reality demands. See
  * {@code NetworkTickSystem#applySuppressedArmVisual} for the thin application half (which also handles
  * the rotation-mismatch fallback documented on {@link PipeShapes}).
  *
@@ -81,6 +105,30 @@ public final class PipeVisualStates {
      * @return the 6-bit effective mask (bit i set means face i is joined), in OFFSETS order.
      */
     public static int effectiveMask(PipeNode pipe, int x, int y, int z, PipeGridView grid, MachineLookup lookup) {
+        return effectiveMask(pipe, x, y, z, grid, lookup, null);
+    }
+
+    /**
+     * The EFFECTIVE connectivity bitmask, container-aware. Identical to
+     * {@link #effectiveMask(PipeNode, int, int, int, PipeGridView, MachineLookup)} except that, for an
+     * ITEM-channel pipe, a face that has NO same-channel pipe and NO machine/tank endpoint additionally
+     * counts a storage CONTAINER neighbour resolved by {@code containers}, gated by the pipe face's
+     * {@link FlowState} alone (any non-NONE face: see the class javadoc and {@code containerEndpointJoins}).
+     * Containers are ignored entirely on non-ITEM channels and when {@code containers} is null.
+     *
+     * <p>The 5-arg overload delegates here with {@code containers = null}: null = "no container
+     * awareness", so every pre-Task-9 caller and test keeps its exact behaviour untouched. An overload
+     * (rather than a single nullable param on the old method) is the cleaner seam: callers that genuinely
+     * have no container source (non-ITEM networks, all the pure machine/pipe tests) read more honestly
+     * calling the short form than threading an explicit {@code null}, and the old signature stays a
+     * stable, documented contract.
+     *
+     * @param containers resolves a storage-container neighbour for ITEM pipes; null = no container
+     *                   awareness (non-ITEM networks pass null at zero cost). See {@link ContainerLookup}.
+     */
+    public static int effectiveMask(
+            PipeNode pipe, int x, int y, int z, PipeGridView grid, MachineLookup lookup,
+            ContainerLookup containers) {
         if (pipe == null) {
             return 0;
         }
@@ -96,16 +144,28 @@ public final class PipeVisualStates {
                 if (PipeConnectivity.connects(pipe, face, neighbourPipe)) {
                     mask |= (1 << face);
                 }
-                continue; // a pipe occupies the cell: it is not also a machine endpoint
+                continue; // a pipe occupies the cell: it is not also a machine/container endpoint
+            }
+
+            // The pipe's own face must be non-NONE for either a machine OR a container to join (a NONE
+            // face hides whatever is beyond it, exactly as NetworkEndpoints/ItemEndpoints both gate).
+            if (pipe.flowState(face) == FlowState.NONE) {
+                continue;
             }
 
             // (b) machine/tank endpoint, gated exactly like NetworkEndpoints.collect: the pipe face
             // must be non-NONE AND the neighbour's facing port must OVERLAP the face's flow state
             // (the full classify matrix, not just port-exists: see machineEndpointJoins).
-            if (pipe.flowState(face) == FlowState.NONE) {
-                continue;
-            }
             if (machineEndpointJoins(lookup, nx, ny, nz, face, channel, pipe.flowState(face))) {
+                mask |= (1 << face);
+                continue; // a qualified machine endpoint: do not also probe a container at the same cell
+            }
+
+            // (c) ITEM-channel storage container, gated by the face flow state ALONE (containers have no
+            // ports: NORMAL/PUSH/PULL all join: any non-NONE face with a container present = connected,
+            // mirroring ItemEndpoints). Containers count in EFFECTIVE only (the engine never welds toward
+            // them: see physicalMask): so effective > physical here ADDS the chest arm.
+            if (containerEndpointJoins(channel, containers, nx, ny, nz)) {
                 mask |= (1 << face);
             }
         }
@@ -126,6 +186,24 @@ public final class PipeVisualStates {
      * @return the 6-bit physical mask, in OFFSETS order.
      */
     public static int physicalMask(PipeNode pipe, int x, int y, int z, PipeGridView grid, MachineLookup lookup) {
+        return physicalMask(pipe, x, y, z, grid, lookup, null);
+    }
+
+    /**
+     * The PHYSICAL connectivity bitmask, container-aware in SIGNATURE only. The {@code containers}
+     * parameter is accepted so the driver can thread one lookup to both masks symmetrically, but it is
+     * INTENTIONALLY IGNORED here: the physical mask models what the ENGINE's connected-block pattern
+     * matcher welds, and vanilla containers advertise no {@code CC_ItemFace} tag, so the engine NEVER
+     * welds an arm toward a chest. Counting a container here would make {@code effective == physical} for
+     * a chest neighbour and the arm-add swap would never fire. See the class javadoc's "Chest stubbing"
+     * note (and the flagged plan-doc error). The 5-arg overload delegates here with {@code null}.
+     *
+     * @param containers accepted for caller symmetry but IGNORED (containers are never physically welded);
+     *                   may be null.
+     */
+    public static int physicalMask(
+            PipeNode pipe, int x, int y, int z, PipeGridView grid, MachineLookup lookup,
+            @SuppressWarnings("unused") ContainerLookup containers) {
         if (pipe == null) {
             return 0;
         }
@@ -191,6 +269,25 @@ public final class PipeVisualStates {
             case BOTH -> true; // flow is already non-NONE (caller gates NONE)
             default -> false;  // CLOSED: never a transport endpoint
         };
+    }
+
+    /**
+     * Whether the ITEM transport layer would JOIN a storage container at {@code (nx,ny,nz)} through this
+     * face, for the {@link #effectiveMask}. Mirrors {@code ItemEndpoints.collect}'s container
+     * qualification EXACTLY: ITEM channel only, a container present at the cell, and (the caller has
+     * already gated the pipe face to non-NONE) any non-NONE face joins regardless of its
+     * NORMAL/PUSH/PULL value, because a container has NO ports and so no OFFER&times;ACCEPT overlap to
+     * apply: a PULL face at a container IS connected for visuals (the arm renders). Returns false on a
+     * non-ITEM channel or a null {@code containers} seam (no container awareness): a chest beside a power
+     * cable is irrelevant. Used by {@link #effectiveMask} only: the {@link #physicalMask} never counts a
+     * container (the engine welds no arm toward a tag-less chest: see that method).
+     */
+    private static boolean containerEndpointJoins(
+            PortChannel channel, ContainerLookup containers, int nx, int ny, int nz) {
+        if (channel != PortChannel.ITEM || containers == null) {
+            return false;
+        }
+        return containers.at(nx, ny, nz) != null;
     }
 
     /**

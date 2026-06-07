@@ -197,10 +197,16 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         // passes below still run for them (flow-state arms + future container arms), with energized=false:
         // item pipes ship no _On states (design "NO _On state for item pipes"), and the visual passes
         // no-op on any missing block state anyway, so a false energized is correct and defensive.
+        // ITEM-only container lookup, shared by both the item transfer pass and the container-aware
+        // visual masks below. Null for every non-ITEM network: those masks take no container awareness
+        // (a chest beside a power/fluid/gas cable is irrelevant) at zero cost, and constructing the
+        // world adapter is pointless work for them.
+        WorldContainerLookup containers = null;
+
         boolean energized;
         if (net.channel() == PortChannel.ITEM) {
-            ItemEndpoints.Endpoints itemEndpoints =
-                ItemEndpoints.collect(net, grid, new WorldContainerLookup(world, store));
+            containers = new WorldContainerLookup(world, store);
+            ItemEndpoints.Endpoints itemEndpoints = ItemEndpoints.collect(net, grid, containers);
             itemTransfer.tickNetwork(net, world, store, grid, itemEndpoints);
             energized = false; // ITEM has no _On twin; Task 9 owns the full item visual integration
         } else {
@@ -229,7 +235,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         // suppressed topology (a NONE face, a substance mismatch, or a flow-hidden machine). Undisturbed
         // pipes (masks equal) are left to the engine + the H8 powered flip above. Throttled by reading
         // the placed state first and only swapping on a real change (same discipline as the powered flip).
-        applySuppressedArmVisuals(world, net, grid, lookup, energized);
+        applySuppressedArmVisuals(world, net, grid, lookup, containers, energized);
     }
 
     /**
@@ -279,12 +285,33 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     /**
      * Task 11: applies programmatic suppressed-arm visuals to every member pipe of {@code net}. For each
      * member it computes the pure {@link PipeVisualStates#effectiveMask effective} and
-     * {@link PipeVisualStates#physicalMask physical} connectivity masks and, when they DIFFER (a
-     * suppressed arm: a NONE face, a substance-mismatched pipe, or a flow-hidden machine), swaps the
+     * {@link PipeVisualStates#physicalMask physical} connectivity masks and, when they DIFFER, swaps the
      * cable's interaction state to {@link PipeShapes#stateFor}{@code (effectiveMask, energized)} so the
-     * rendered arm count matches the suppressed topology. When the masks are EQUAL the pipe is
-     * undisturbed and is left entirely to the engine pattern system plus the H8 powered flip
-     * ({@link #applyPoweredVisual}, already run): this method does nothing for it.
+     * rendered arm count matches reality. The divergence runs in EITHER direction:
+     * {@code effective < physical} DROPS a suppressed arm (a NONE face, a substance-mismatched pipe, or a
+     * flow-hidden machine), and (Task 9, ITEM networks only) {@code effective > physical} ADDS an arm the
+     * engine refused to weld: a vanilla chest carries no {@code CC_ItemFace} tag, so the engine stubs
+     * nothing toward it, but the network delivers into it: the swap adds the chest arm. When the masks
+     * are EQUAL the pipe is undisturbed and is left entirely to the engine pattern system plus the H8
+     * powered flip ({@link #applyPoweredVisual}, already run): this method does nothing for it.
+     *
+     * <h2>Container awareness (Task 9)</h2>
+     * {@code containers} is the ITEM network's {@link WorldContainerLookup} (the same one the item
+     * transfer pass used this tick), or {@code null} for a non-ITEM network. It is threaded straight into
+     * both mask calls: {@link PipeVisualStates#effectiveMask} counts a container neighbour only on the
+     * ITEM channel with a non-null lookup, and {@link PipeVisualStates#physicalMask} ignores it entirely.
+     * For non-ITEM networks the null lookup means zero container awareness, identical to the pre-Task-9
+     * behaviour. {@code energized} is always {@code false} for ITEM networks (item pipes ship no
+     * {@code _On} states): the caller's channel branch sets it, so the indicator/plain states resolve to
+     * the unenergized node here.
+     *
+     * <h2>Indicator (Task 12) reaches containers too</h2>
+     * The single-arm push/pull indicator already works for a container end: the indicator guard only
+     * requires that the lone arm NOT point at a PIPE (a container is not a pipe), so a single-arm ITEM
+     * pipe whose face is PUSH/PULL toward a chest reads its face flow state and
+     * {@link PipeShapes#indicatorStateFor} renders the directional {@code end_push}/{@code end_pull}
+     * shape. The container only needs to make the face count in the effective mask (it does, above) for
+     * the single-bit indicator path to engage.
      *
      * <h2>Throttle</h2>
      * Like the powered flip, this reads the placed interaction-state name first and issues
@@ -309,6 +336,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
             @Nonnull Network net,
             @Nonnull PipeGridView grid,
             @Nonnull MachineLookup lookup,
+            WorldContainerLookup containers,
             boolean energized) {
         for (long key : net.memberKeys()) {
             try {
@@ -321,8 +349,11 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                     continue; // pipe gone from the live grid (race with a break); skip
                 }
 
-                int effective = PipeVisualStates.effectiveMask(member, mx, my, mz, grid, lookup);
-                int physical = PipeVisualStates.physicalMask(member, mx, my, mz, grid, lookup);
+                // Container-aware masks for ITEM networks (containers != null): the effective mask
+                // counts a chest the engine never welds toward, so effective > physical ADDS the arm.
+                // Non-ITEM networks pass containers=null (no container awareness, identical to pre-Task-9).
+                int effective = PipeVisualStates.effectiveMask(member, mx, my, mz, grid, lookup, containers);
+                int physical = PipeVisualStates.physicalMask(member, mx, my, mz, grid, lookup, containers);
 
                 // Task 12: end-stub push/pull indicator. Cheap check (single-bit mask + the single arm's
                 // flow state). When the effective topology is a lone arm pointing at a machine whose face
