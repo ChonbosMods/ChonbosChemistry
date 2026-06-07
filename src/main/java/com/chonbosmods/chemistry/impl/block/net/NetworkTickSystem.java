@@ -350,6 +350,11 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
             @Nonnull MachineLookup lookup,
             WorldContainerLookup containers,
             boolean energized) {
+        // DIAGNOSTIC (2026-06-07 tip-rotation confirmation, remove after root-cause): rate-limit the
+        // per-pipe rotation log to ~1 line/s so one in-game run confirms whether the chosen composite
+        // shape WANTS a rotation the block does not currently have (the suspected tip/collar-misorient
+        // root cause). Gated to the same pull boundary the item diagnostic uses.
+        final boolean diagTick = world.getTick() % 20 == 0;
         for (long key : net.memberKeys()) {
             try {
                 int mx = NetworkManager.unpackX(key);
@@ -422,6 +427,20 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                 String normalizedCurrent = (current == null || current.isEmpty()) ? "default" : current;
                 if (desired.equals(normalizedCurrent)) {
                     continue; // already showing the suppressed shape; no swap needed
+                }
+
+                // DIAGNOSTIC (2026-06-07 tip-rotation confirmation, remove after root-cause): this pipe
+                // is getting a NON-PLAIN programmatic state (divergence and/or tip). Log the masks, the
+                // chosen key, the rotation the resolved shape WANTS, and the block's CURRENT rotation.
+                // A consistent wantRot != curRot here confirms the rotation-mismatch root cause: a state
+                // swap preserves the block's frozen rotation, so a composite tip/container shape renders
+                // at the wrong orientation. Rate-limited (diagTick) to ~1 line/s to avoid tick spam.
+                if (diagTick) {
+                    LOGGER.info("[CC-tiprot] (" + mx + "," + my + "," + mz + ") eff="
+                        + Integer.toBinaryString(effective) + " phys="
+                        + Integer.toBinaryString(physical) + " key=" + desired
+                        + " wantRot=" + PipeShapes.resolve(effective).rotationIndex()
+                        + " curRot=" + currentRotation);
                 }
 
                 // Rotation-mismatch fallback (rung (b)): apply the state regardless, but warn once.
