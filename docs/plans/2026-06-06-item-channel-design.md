@@ -49,3 +49,49 @@ Pull interval ~20 ticks; per-pull cap ~16 items; travel ~5 ticks/segment; max in
 ## Testing
 
 Pure: pathfinder (shortest, filter-gated, NONE-respect, nearest order, mid-path re-route), endpoints qualification, re-route ladder, TravelingStack codec + absent default, extraction eligibility, mask container-awareness (both divergence directions). Engine glue (real containers, ground drops, wrench-on-chest) verifies in-game together with the flow-states checklist.
+
+## Spike findings (Task 7)
+
+*Decompiled from Server 0.5.3 (`/tmp/bh-spike`, CFR + javap) on 2026-06-06. The §16.6 container claims came from HyProTech's source, which targets an OLDER engine: they are STALE for 0.5.3 and are superseded below.*
+
+### Container access path: REFACTORED since HyProTech
+
+HyProTech's `MachineItemAccess` reaches containers through `meta/state/ItemContainerState` + `ItemContainerBlockState` + `BlockStateModule`. **None of those classes exist in 0.5.3.** The container state moved to a plain `ChunkStore` block-entity COMPONENT, exactly the shape our `PipeNode`/`MachineBlockState` already use:
+
+- `com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock` `implements Component<ChunkStore>`.
+  - `public static ComponentType<ChunkStore, ItemContainerBlock> getComponentType()` (also `BlockModule.get().getItemContainerBlockComponentType()`).
+  - `@Nonnull SimpleItemContainer getItemContainer()` — **lazily allocates** `new SimpleItemContainer(capacity)` on first call, so it is never null once the component is present.
+  - `short getCapacity()`, `String getDroplist()`.
+- Resolution seam (same as `WorldPipeGridView`/`WorldMachineLookup`): `Ref<ChunkStore> ref = BlockModule.getBlockEntity(world, x, y, z)` then `store.getComponent(ref, ItemContainerBlock.getComponentType())`. A null ref / null component == "no container here". This is how we detect "this block has a container" from a world position: **component presence**, no block-state interface needed.
+
+### `ItemContainer` (engine 0.5.3) — the real insert/extract/read surface
+
+`com.hypixel.hytale.server.core.inventory.container.ItemContainer` (super of `SimpleItemContainer`). Verified methods:
+
+- **Read:** `short getCapacity()`; `ItemStack getItemStack(short slot)`.
+- **Insert (whole-container, first-available, auto-stacks):** `ItemStackTransaction addItemStack(ItemStack stack, boolean allOrNothing, boolean fullStacks, boolean filter)`. Returns a transaction with `getQuery()` (requested) and `getRemainder()` (what did not fit) ⇒ **accepted = query.qty − remainder.qty**. There is **NO simulate/dry-run flag** on `addItemStack`.
+- **Insert dry-run (boolean only):** `boolean canAddItemStack(ItemStack, boolean fullStacks, boolean filter)` returns whether the WHOLE stack would fit; it does NOT report a partial count. The engine's partial-count test helpers (`InternalContainerUtilItemStack.testAddToEmptySlots/testAddToExistingItemStacks`) are `protected` ⇒ **not callable from our package.**
+- **Extract a slot:** `ItemStackSlotTransaction removeItemStackFromSlot(short slot, int quantityToRemove, boolean allOrNothing, boolean filter)`. `getOutput()` is the removed stack **with its metadata**. We pass `allOrNothing=false` (take what's there up to the cap) and `filter=false` (pipe extraction is gated by OUR filter layer, not the container's slot filters).
+- Per-slot insert also exists (`canAddItemStackToSlot(slot, stack, allOrNothing, filter)` / `addItemStackToSlot(slot, stack, allOrNothing, filter)`) but the whole-container `addItemStack` is the right grain for "deliver into a chest".
+
+### `ItemStack` (engine 0.5.3) accessors/ctors — confirmed
+
+`new ItemStack(String id, int qty, BsonDocument metadata)`, `new ItemStack(id, qty)`, `new ItemStack(id)`; `String getItemId()`, `int getQuantity()`, `BsonDocument getMetadata()`, `boolean isEmpty()` + static `ItemStack.isEmpty(stack)`, `ItemStack withMetadata(BsonDocument)`, `Item getItem()`; static `boolean isSameItemType(a, b)`. `Item.getMaxStack()` gives the per-item stack ceiling.
+
+### Honest-simulate decision for `WorldContainerLookup`
+
+Because `addItemStack` has no dry-run that yields a partial count, **simulate insert is computed by a read-only slot scan** using only public accessors (`getCapacity`, `getItemStack(slot)`, `isSameItemType`, `Item.getMaxStack`): sum the room in same-type non-full slots plus empty-slot capacity, capped at the requested amount. The **commit** path uses `addItemStack(...,false,false,false)` and reads `accepted = query − remainder`, so any divergence between the scan estimate and the real engine fit is reconciled at commit time — and the pure layer already trusts the actual returned amount (T2 staleness contract). Simulate never mutates.
+
+### Vanilla chest verification ✓ ("any vanilla container")
+
+Vanilla chests declare the SAME component in their BlockType JSON, e.g. `Server/Item/Items/Container/Furniture_Kweebec_Chest_Large.json` and `Server/Item/Items/Furniture/Ancient/Furniture_Ancient_Chest_Small.json`:
+
+```json
+"BlockEntity": { "Components": { "ItemContainerBlock": { "Capacity": 36 } } }
+```
+
+So a placed vanilla chest resolves through the exact `BlockModule.getBlockEntity` → `getComponent(ItemContainerBlock.getComponentType())` → `getItemContainer()` path above. The "any block entity with an engine `ItemContainer`" requirement is met by component presence; no per-block allow-list is needed.
+
+### Persistence
+
+The chest's contents persist via the engine's own `ItemContainerBlock` codec (not ours). We never persist container contents; our only new persisted state is the `TravelingStack`s on `PipeNode.InTransit` (already landed). After mutating a chest (insert/extract commit) we mark the chest's chunk needing-save via the existing `BlockComponentChunk.markNeedsSaving()` pattern (`WrenchInteraction.markNeedsSaving`), and likewise mark pipe chunks after any `inTransit` mutation.
