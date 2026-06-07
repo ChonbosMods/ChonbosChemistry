@@ -62,6 +62,9 @@ class ItemExtractionTest {
         private int capacity;       // how many can still be inserted (destination)
         private int promiseCap = Integer.MAX_VALUE; // clamps firstExtractable's reported count
         private int raceTo = -1;    // if >=0, the contents actually present at commit time
+        private org.bson.BsonDocument sourceMetadata; // metadata firstExtractable reports (source slot)
+        org.bson.BsonDocument lastInsertSimulateMetadata; // metadata the LAST simulate insert received
+        boolean insertSimulateCalled;
 
         FakeContainer(String itemId, int contents, int capacity) {
             this.itemId = itemId;
@@ -79,8 +82,17 @@ class ItemExtractionTest {
             return this;
         }
 
+        FakeContainer sourceMetadata(org.bson.BsonDocument v) {
+            this.sourceMetadata = v;
+            return this;
+        }
+
         @Override
-        public int insert(ItemKey key, int amount, boolean simulate) {
+        public int insert(ItemKey key, org.bson.BsonDocument metadata, int amount, boolean simulate) {
+            if (simulate) {
+                lastInsertSimulateMetadata = metadata;
+                insertSimulateCalled = true;
+            }
             int fit = Math.min(amount, capacity);
             if (!simulate) {
                 capacity -= fit;
@@ -89,7 +101,7 @@ class ItemExtractionTest {
         }
 
         @Override
-        public ItemKey firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
+        public Peek firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
             if (contents <= 0) {
                 return null;
             }
@@ -97,7 +109,7 @@ class ItemExtractionTest {
             if (!filter.admits(candidate, pipeKey, viaFace)) {
                 return null;
             }
-            return candidate;
+            return new Peek(candidate, sourceMetadata);
         }
 
         @Override
@@ -108,7 +120,7 @@ class ItemExtractionTest {
             if (!simulate) {
                 contents = available - pulled;
             }
-            return new Extracted(pulled, null);
+            return new Extracted(pulled, sourceMetadata);
         }
     }
 
@@ -244,12 +256,12 @@ class ItemExtractionTest {
         // A container that would throw if touched: proves saturation short-circuits before any probe.
         ContainerView tripwire = new ContainerView() {
             @Override
-            public int insert(ItemKey key, int amount, boolean simulate) {
+            public int insert(ItemKey key, org.bson.BsonDocument metadata, int amount, boolean simulate) {
                 throw new AssertionError("container consulted under saturation");
             }
 
             @Override
-            public ItemKey firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
+            public Peek firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
                 throw new AssertionError("container consulted under saturation");
             }
 
@@ -403,5 +415,37 @@ class ItemExtractionTest {
 
         assertNull(tryExtract(src, net, grid, containers, endpoints, 0),
             "a raced commit of 0 yields no stack (never a count<=0 TravelingStack)");
+    }
+
+    // ---- 10. metadata threads source -> confirmation simulate AND onto the TravelingStack ----------
+
+    @Test
+    void confirmationSimulate_receivesSourceStackMetadata_andStackCarriesIt() {
+        // CRITICAL review fix: the destination-confirmation simulate must see the REAL metadata of the
+        // stack about to travel (engine isStackableWith compares metadata), and the launched
+        // TravelingStack must carry that metadata so delivery round-trips byte-for-byte.
+        FakeGrid grid = new FakeGrid()
+            .put(0, 0, 0, itemPipe())
+            .put(1, 0, 0, itemPipe());
+        Network net = networkAt(0, 0, 0, grid);
+        Source src = source(-1, 0, 0, 0, 0, 0, 1);
+        Destination destination = dest(2, 0, 0, 1, 0, 0, 0);
+        Endpoints endpoints = new Endpoints(List.of(destination), List.of(src));
+        org.bson.BsonDocument meta = new org.bson.BsonDocument("Damage", new org.bson.BsonInt32(7));
+        FakeContainer srcC = new FakeContainer(COBBLE, 64, 0).sourceMetadata(meta);
+        FakeContainer destC = new FakeContainer(COBBLE, 0, 64);
+        FakeContainerLookup containers = new FakeContainerLookup()
+            .put(-1, 0, 0, srcC)
+            .put(2, 0, 0, destC);
+
+        TravelingStack s = tryExtract(src, net, grid, containers, endpoints, 0);
+
+        assertNotNull(s);
+        // The confirmation simulate ran against the destination with the source stack's REAL metadata.
+        assertTrue(destC.insertSimulateCalled, "destination confirmation simulate must run");
+        assertEquals(meta, destC.lastInsertSimulateMetadata,
+            "confirmation simulate must receive the source stack's metadata, not null");
+        // The launched stack carries the commit's metadata so delivery round-trips byte-for-byte.
+        assertEquals(meta, s.metadata(), "the TravelingStack carries the extracted metadata");
     }
 }

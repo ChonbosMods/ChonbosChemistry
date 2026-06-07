@@ -56,10 +56,18 @@ import java.util.List;
  *
  * <h2>Metadata seam</h2>
  * The pure layer reasons over {@link ItemKey} (id + count) alone; item metadata is knowable only by the
- * world container at the moment of extraction. {@link ContainerView#extract} therefore returns an
- * {@link ContainerView.Extracted} carrying both the committed amount AND the extracted stack's opaque
- * metadata, which this layer threads verbatim into {@link TravelingStack#of} without inspecting it. The
- * in-memory test fake supplies {@code null} metadata; the world impl (Task 7) supplies the real
+ * world container. It surfaces in TWO places, both threaded verbatim without inspection:
+ * <ul>
+ *   <li>The {@link ContainerView.Peek} from {@link ContainerView#firstExtractable} carries the matched
+ *       slot's metadata, used for the destination-CONFIRMATION simulate so it sees the REAL stack about
+ *       to travel (engine {@code isStackableWith} compares metadata: a same-id different-metadata slot is
+ *       not room).
+ *   <li>{@link ContainerView#extract} returns an {@link ContainerView.Extracted} carrying the COMMIT's
+ *       metadata, which this layer threads into {@link TravelingStack#of}.
+ * </ul>
+ * The TravelingStack carries the COMMIT's metadata (Extracted), not the Peek's: if they differ (a slot
+ * raced between peek and commit), the commit's is authoritative because it describes what was actually
+ * pulled. The in-memory test fake supplies {@code null}; the world impl (Task 7) supplies the real
  * document read from the matched slot.
  *
  * <p>Pure JDK + net-layer types only: no engine imports.
@@ -110,13 +118,14 @@ public final class ItemExtraction {
         }
 
         // Rule 3 (cap) + the source viaPipe filter: firstExtractable scans for the first stack the
-        // SOURCE via-pipe filter admits, reported with its count already capped at pullCap. Null means
-        // empty / filter admits nothing.
-        ItemKey extractable = src.firstExtractable(
+        // SOURCE via-pipe filter admits, reported as a Peek with its count already capped at pullCap and
+        // the matched slot's metadata. Null means empty / filter admits nothing.
+        ContainerView.Peek peek = src.firstExtractable(
             filters.forPipe(source.viaPipeKey()), source.viaPipeKey(), source.viaFace(), pullCap);
-        if (extractable == null) {
+        if (peek == null) {
             return null;
         }
+        ItemKey extractable = peek.key();
 
         // Rule 2 — NO EXTRACTION WITHOUT A DESTINATION (Mekanism sorter rule). Find the nearest-first
         // admitting destinations FROM the source via pipe, then take the FIRST one that accepts > 0 in
@@ -136,7 +145,10 @@ public final class ItemExtraction {
             if (destView == null) {
                 continue; // candidate container vanished
             }
-            int accepted = destView.insert(extractable, extractable.count(), true);
+            // Confirm with the REAL metadata of the stack about to travel: the engine stacks into an
+            // occupied destination slot only when isStackableWith (id AND metadata), so a same-id but
+            // different-metadata slot is NOT room (CRITICAL review fix: avoids launch-then-bounce).
+            int accepted = destView.insert(extractable, peek.metadata(), extractable.count(), true);
             if (accepted > 0) {
                 chosen = c;
                 sized = Math.min(extractable.count(), accepted);

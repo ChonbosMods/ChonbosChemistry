@@ -75,7 +75,7 @@ class ItemTransferDriverTest {
         }
 
         @Override
-        public int insert(ItemKey key, int amount, boolean simulate) {
+        public int insert(ItemKey key, org.bson.BsonDocument metadata, int amount, boolean simulate) {
             int fit = Math.min(amount, capacity);
             if (!simulate) {
                 capacity -= fit;
@@ -84,11 +84,11 @@ class ItemTransferDriverTest {
         }
 
         @Override
-        public ItemKey firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
+        public Peek firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
             if (contentId == null || contentCount <= 0) {
                 return null;
             }
-            return new ItemKey(contentId, Math.min(contentCount, cap));
+            return new Peek(new ItemKey(contentId, Math.min(contentCount, cap)), null);
         }
 
         @Override
@@ -211,7 +211,7 @@ class ItemTransferDriverTest {
         driver().tickNetwork(net, grid, containers, endpoints, FilterLookup.NONE, 1, sink, saver);
 
         assertTrue(a.inTransit().isEmpty(), "delivered stack removed from the pipe");
-        assertEquals(57, destC.insert(new ItemKey(COBBLE, 1), 1000, true), "7 actually delivered");
+        assertEquals(57, destC.insert(new ItemKey(COBBLE, 1), null, 1000, true), "7 actually delivered");
         assertTrue(saver.marked.contains(key(0, 0, 0)), "owning pipe marked needing-save");
         assertTrue(sink.drops.isEmpty());
     }

@@ -168,8 +168,10 @@ public final class ItemTransit {
         int count = stack.count();
 
         // Insert probe + commit folded into one: a full accept commits all; a partial commits what fits;
-        // a zero accept (full or container gone) commits nothing.
-        int accepted = dest == null ? 0 : dest.insert(stack.key(), count, false);
+        // a zero accept (full or container gone) commits nothing. The stack's metadata is attached so the
+        // delivered engine stack round-trips byte-for-byte (CRITICAL review fix) and participates in
+        // stackability (engine isStackableWith).
+        int accepted = dest == null ? 0 : dest.insert(stack.key(), stack.metadata(), count, false);
 
         if (accepted >= count) {
             // Full delivery (covers a returning stack arriving at its origin: dest == origin, treated
@@ -227,7 +229,7 @@ public final class ItemTransit {
                 continue; // never re-pick the rejecting container; the origin is rung 2's job
             }
             ContainerView view = containerAt(containers, containerKey);
-            if (view == null || view.insert(stack.key(), stack.count(), true) <= 0) {
+            if (view == null || view.insert(stack.key(), stack.metadata(), stack.count(), true) <= 0) {
                 continue; // gone or no room: not a viable re-route target
             }
             retarget(stack, c, containerKey);
@@ -243,7 +245,7 @@ public final class ItemTransit {
                 continue;
             }
             ContainerView view = containerAt(containers, containerKey);
-            if (view == null || view.insert(stack.key(), stack.count(), true) <= 0) {
+            if (view == null || view.insert(stack.key(), stack.metadata(), stack.count(), true) <= 0) {
                 break; // origin reachable but gone/full: fall through to pop out
             }
             retarget(stack, c, containerKey);

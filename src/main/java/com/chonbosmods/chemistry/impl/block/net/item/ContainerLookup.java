@@ -75,27 +75,60 @@ public interface ContainerLookup {
         }
 
         /**
+         * The first stack a container offers for extraction: its routing identity (id + capped count)
+         * AND the matched slot's OPAQUE metadata. Returned by {@link #firstExtractable}.
+         *
+         * <p>WHY metadata rides along here (CRITICAL review fix, 2026-06-06): a PULL extraction confirms
+         * its destination with a {@code simulate=true} {@link #insert} BEFORE committing the pull. The
+         * engine stacks into an occupied destination slot only when the stacks are
+         * {@code isStackableWith} (id AND durability AND metadata equal), so the confirmation simulate
+         * MUST carry the REAL metadata of the stack about to travel: a same-id-but-different-metadata
+         * destination slot is NOT room. Reporting only the {@link ItemKey} (id + count) would let the
+         * simulate over-promise. The metadata is read here, at the same scan that finds the stack, so
+         * the confirmation probe sees exactly what would be inserted on arrival.
+         *
+         * @param key      the first admitted stack (id + count up to the cap), never null when this Peek
+         *                 is non-null
+         * @param metadata that stack's opaque metadata, or {@code null} when it has none (the in-memory
+         *                 test fake and metadata-free items both pass {@code null}); carried verbatim and
+         *                 never inspected by the routing layer
+         */
+        record Peek(ItemKey key, BsonDocument metadata) {
+        }
+
+        /**
          * Insert up to {@code amount} of {@code key}'s item type into this container.
          *
+         * <p>The {@code metadata} participates in stackability EXACTLY as the engine's
+         * {@code isStackableWith} (id AND durability AND metadata equal): a {@code simulate=true} probe
+         * counts an occupied same-id slot as room ONLY when that slot's metadata matches {@code metadata}
+         * (both null, or the documents equal); empty slots always count. On commit
+         * ({@code simulate=false}) the accepted items are attached to a stack carrying {@code metadata}
+         * (cloned), so a damaged/enchanted/BlockHolder item delivered through a pipe round-trips
+         * byte-for-byte. Pass {@code null} when the item has no metadata.
+         *
          * @param key      the item type to insert (its {@code count} is ignored; {@code amount} rules)
+         * @param metadata the opaque metadata to attach on commit and match for stackability; nullable
          * @param amount   the maximum number of items to insert
          * @param simulate when true, compute the acceptance without mutating (the destination probe)
          * @return the number of items accepted (0..amount); 0 means the container is full or rejects it
          */
-        int insert(ItemKey key, int amount, boolean simulate);
+        int insert(ItemKey key, BsonDocument metadata, int amount, boolean simulate);
 
         /**
-         * The first stack this container offers for extraction that {@code filter} admits, reported as
-         * an {@link ItemKey} whose {@code count} is the available amount capped at {@code cap}.
+         * The first stack this container offers for extraction that {@code filter} admits, reported as a
+         * {@link Peek} whose {@code key.count} is the available amount capped at {@code cap} and whose
+         * {@code metadata} is the matched slot's opaque metadata (for the destination-confirmation
+         * simulate, see {@link Peek}).
          *
          * @param filter   the gate the candidate stack must pass; consulted per design at extraction
          * @param pipeKey  the packed key of the PULL pipe whose filter this is (for the filter call)
          * @param viaFace  the face index (0..5) the pipe presents toward this container (for the filter)
          * @param cap      the per-pull item cap; the returned {@code count} never exceeds it
-         * @return the first admitted stack (id + count up to {@code cap}), or {@code null} if the
-         *         container is empty or the filter admits nothing in it
+         * @return the first admitted stack as a {@link Peek} (id + count up to {@code cap} + metadata),
+         *         or {@code null} if the container is empty or the filter admits nothing in it
          */
-        ItemKey firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap);
+        Peek firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap);
 
         /**
          * Extract up to {@code amount} of {@code key}'s item type from this container.

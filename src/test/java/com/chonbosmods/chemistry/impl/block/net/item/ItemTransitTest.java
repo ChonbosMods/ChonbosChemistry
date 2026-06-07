@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
@@ -53,22 +54,27 @@ class ItemTransitTest {
     /** A container with a fixed remaining capacity (per item, type-agnostic for these tests). */
     private static final class FakeContainer implements ContainerView {
         private int capacity;
+        /** The metadata the LAST commit (simulate=false) insert received; recorded for the metadata test. */
+        org.bson.BsonDocument lastCommittedMetadata;
+        boolean committed;
 
         FakeContainer(int capacity) {
             this.capacity = capacity;
         }
 
         @Override
-        public int insert(ItemKey key, int amount, boolean simulate) {
+        public int insert(ItemKey key, org.bson.BsonDocument metadata, int amount, boolean simulate) {
             int fit = Math.min(amount, capacity);
             if (!simulate) {
                 capacity -= fit;
+                lastCommittedMetadata = metadata;
+                committed = true;
             }
             return fit;
         }
 
         @Override
-        public ItemKey firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
+        public Peek firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
             return null;
         }
 
@@ -166,7 +172,31 @@ class ItemTransitTest {
         assertEquals(Decision.DELIVERED, r.decision());
         assertEquals(7, r.deliveredCount());
         // The container actually received 7 (commit, not simulate): remaining capacity is 57.
-        assertEquals(57, destC.insert(new ItemKey(COBBLE, 1), 1000, true));
+        assertEquals(57, destC.insert(new ItemKey(COBBLE, 1), null, 1000, true));
+    }
+
+    // ---- 2b. delivery carries the stack's metadata to the container --------------------------
+
+    @Test
+    void delivery_carriesStackMetadataToTheContainerOnCommit() {
+        // CRITICAL review fix: a damaged/enchanted/BlockHolder item delivered through a pipe must arrive
+        // WITH its metadata. The fake records the metadata it received on the commit insert.
+        FakeGrid grid = new FakeGrid().put(0, 0, 0, itemPipe());
+        Network net = networkAt(0, 0, 0, grid);
+        Endpoints endpoints = new Endpoints(List.of(dest(1, 0, 0, 0, 0, 0, 0)), List.of());
+        FakeContainer destC = new FakeContainer(64);
+        FakeContainerLookup containers = new FakeContainerLookup().put(1, 0, 0, destC);
+
+        org.bson.BsonDocument meta = new org.bson.BsonDocument("Damage", new org.bson.BsonInt32(42));
+        long[] path = {key(0, 0, 0)};
+        TravelingStack s = TravelingStack.of(COBBLE, 5, meta, path, key(99, 0, 0), key(1, 0, 0));
+        s.setProgressTicks(SPEED - 1);
+
+        StepResult r = step(s, net, grid, containers, endpoints);
+        assertEquals(Decision.DELIVERED, r.decision());
+        assertTrue(destC.committed, "the delivery committed an insert");
+        assertEquals(meta, destC.lastCommittedMetadata,
+            "delivery must carry the stack's metadata to the container, not strip it");
     }
 
     // ---- 3. partial delivery -> re-route remainder -------------------------------------------
@@ -205,7 +235,7 @@ class ItemTransitTest {
         assertEquals(0, s.segmentIndex());
         assertEquals(0, s.progressTicks());
         // The near container actually got 3 committed (remaining 0).
-        assertEquals(0, destC.insert(new ItemKey(COBBLE, 1), 1000, true));
+        assertEquals(0, destC.insert(new ItemKey(COBBLE, 1), null, 1000, true));
     }
 
     // ---- 4. zero-accept + alternate -> REROUTED ----------------------------------------------
@@ -293,7 +323,7 @@ class ItemTransitTest {
         StepResult r = step(s, net, grid, containers, endpoints);
         assertEquals(Decision.DELIVERED, r.decision());
         assertEquals(6, r.deliveredCount());
-        assertEquals(58, originC.insert(new ItemKey(COBBLE, 1), 1000, true));
+        assertEquals(58, originC.insert(new ItemKey(COBBLE, 1), null, 1000, true));
     }
 
     // ---- 7. origin gone/full -> POP_OUT ------------------------------------------------------

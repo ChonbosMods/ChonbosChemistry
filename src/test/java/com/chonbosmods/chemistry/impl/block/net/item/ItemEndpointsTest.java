@@ -27,12 +27,12 @@ class ItemEndpointsTest {
     /** A no-op container view: ItemEndpoints qualifies on presence only, never calls into the view. */
     private static final ContainerView STUB_VIEW = new ContainerView() {
         @Override
-        public int insert(ItemKey key, int amount, boolean simulate) {
+        public int insert(ItemKey key, org.bson.BsonDocument metadata, int amount, boolean simulate) {
             return 0;
         }
 
         @Override
-        public ItemKey firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
+        public Peek firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
             return null;
         }
 
