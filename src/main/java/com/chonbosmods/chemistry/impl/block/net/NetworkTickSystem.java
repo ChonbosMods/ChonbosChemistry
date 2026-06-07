@@ -73,6 +73,13 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     private static final Logger LOGGER = Logger.getLogger(NetworkTickSystem.class.getName());
 
     /**
+     * TEMPORARY diagnostics master switch (the [CC-item] stall log + the [CC-tiprot] rotation log).
+     * OFF by default so the server stays quiet; flip to true (or set the {@code cc.debug.tick} system
+     * property) for a single confirmation run. Both diagnostics are removed once their bugs are fixed.
+     */
+    private static final boolean DEBUG_TICK_LOGS = Boolean.getBoolean("cc.debug.tick");
+
+    /**
      * Positions already warned about a suppressed-arm rotation mismatch (Task 11 fallback ladder rung
      * (b)): a programmatic state swap cannot set rotation (see {@link PipeShapes}), so when the effective
      * shape needs a different rotation than the block currently has, we still apply the state (right arm
@@ -210,7 +217,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
             // DIAGNOSTIC (2026-06-06 stall report, remove after root-cause): once per pull interval,
             // log what the glue sees so one in-game run pinpoints the failing phase (endpoint
             // detection vs extraction vs movement). Rate-limited to the pull boundary: ~1 line/s.
-            boolean diagTick = now % 20 == 0;
+            boolean diagTick = DEBUG_TICK_LOGS && now % 20 == 0;
             int beforeTransit = diagTick ? countInTransitDiag(net, grid) : 0;
             itemTransfer.tickNetwork(net, world, containers, grid, itemEndpoints);
             if (diagTick) {
@@ -354,7 +361,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         // per-pipe rotation log to ~1 line/s so one in-game run confirms whether the chosen composite
         // shape WANTS a rotation the block does not currently have (the suspected tip/collar-misorient
         // root cause). Gated to the same pull boundary the item diagnostic uses.
-        final boolean diagTick = world.getTick() % 20 == 0;
+        final boolean diagTick = DEBUG_TICK_LOGS && world.getTick() % 20 == 0;
         for (long key : net.memberKeys()) {
             try {
                 int mx = NetworkManager.unpackX(key);
