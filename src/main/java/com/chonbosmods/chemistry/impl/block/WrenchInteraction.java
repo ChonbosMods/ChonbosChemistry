@@ -21,6 +21,7 @@ import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.movement.MovementStatesComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
+import com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.client.SimpleBlockInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -185,7 +186,16 @@ public final class WrenchInteraction extends SimpleBlockInteraction {
         sendMessage(commandBuffer, context, "Pipe face " + FaceNames.name(faceIndex) + ": " + next.jsonValue());
     }
 
-    /** True when the block across the face carries a machine or tank block-state (a network endpoint). */
+    /**
+     * True when the block across the face is a network endpoint the pipe-face cycle should treat as a
+     * MACHINE-style target (the full 4-state NORMAL→PUSH→PULL→NONE ring rather than the pipe-to-pipe
+     * 2-state ring). That is: a chemistry machine, a tank, or any block carrying an engine
+     * {@link ItemContainerBlock} component (a vanilla chest, the item-channel's passive endpoint). The
+     * container check is component PRESENCE only (the spike's detection, design §"Spike findings (Task 7)":
+     * {@code BlockModule.getBlockEntity} + {@code store.getComponent(ref, ItemContainerBlock.getComponentType())}):
+     * a container advertises no ports, so PUSH/PULL on the pipe face is exactly how the player aims the
+     * arm into/out of it.
+     */
     private boolean neighbourIsEndpoint(
             World world, int x, int y, int z,
             @Nullable ComponentType<ChunkStore, MachineBlockState> machineType,
@@ -201,7 +211,12 @@ public final class WrenchInteraction extends SimpleBlockInteraction {
         if (machineType != null && store.getComponent(ref, machineType) != null) {
             return true;
         }
-        return tankType != null && store.getComponent(ref, tankType) != null;
+        if (tankType != null && store.getComponent(ref, tankType) != null) {
+            return true;
+        }
+        // A vanilla container (chest, etc.) is a passive ITEM endpoint: component presence == "has a
+        // container", so its pipe face gets the full machine-style 4-cycle to aim the arm.
+        return store.getComponent(ref, ItemContainerBlock.getComponentType()) != null;
     }
 
     // --- machine face: cycle port capability ---

@@ -164,6 +164,84 @@ class PanelSnapshotTest {
         assertEquals("Faces: all normal", facesRow.text());
     }
 
+    /**
+     * An ITEM network with stats renders the discrete-transport rows (no shared buffer): row 1 is the
+     * in-transit/pipe count, row 2 the destinations/sources count. The faces row coexists.
+     */
+    @Test
+    void itemNetworkSnapshotShowsTransitAndEndpointRows() {
+        Network net = new Network(PortChannel.ITEM);
+        net.addMember(1L, 0, 0);
+        net.addMember(2L, 0, 0);
+        PipeNode pipe = PipeNode.of(PortChannel.ITEM, 1);
+        pipe.setFlowState(0, FlowState.PULL);
+
+        PanelSnapshot snapshot = PanelSnapshot.forNetwork(
+            net, pipe, new PanelSnapshot.ItemNetworkStats(3, 2, 1));
+
+        assertEquals("Items Pipe Network", snapshot.title());
+        assertCoversAllRows(snapshot);
+        PanelSnapshot.Row transitRow = row(snapshot, "#EnergyLabel");
+        assertTrue(transitRow.visible());
+        assertEquals("In transit: 3 stacks • Pipes: 2", transitRow.text());
+        PanelSnapshot.Row endpointRow = row(snapshot, "#FluidLabel");
+        assertTrue(endpointRow.visible());
+        assertEquals("Destinations: 2 • Sources: 1", endpointRow.text());
+        // Faces row still works alongside the item-specific rows.
+        PanelSnapshot.Row facesRow = row(snapshot, "#GasLabel");
+        assertTrue(facesRow.visible());
+        assertEquals("Faces: East pull", facesRow.text());
+    }
+
+    /** Defensive: an ITEM network with null stats falls back to the fungible-gauge rendering. */
+    @Test
+    void itemNetworkSnapshotWithNullStatsFallsBackToGauge() {
+        Network net = new Network(PortChannel.ITEM);
+        net.addMember(1L, 500, 5);
+
+        PanelSnapshot snapshot = PanelSnapshot.forNetwork(net, null, null);
+
+        PanelSnapshot.Row gaugeRow = row(snapshot, "#EnergyLabel");
+        assertTrue(gaugeRow.visible());
+        assertEquals("Network: 0 / 500 (0%)", gaugeRow.text());
+        PanelSnapshot.Row statsRow = row(snapshot, "#FluidLabel");
+        assertTrue(statsRow.visible());
+        assertEquals("Pipes: 1 • Throughput: 5/tick", statsRow.text());
+    }
+
+    /** Defensive channel gate: stats on a NON-ITEM network are ignored; the fungible gauge stays. */
+    @Test
+    void nonItemNetworkIgnoresItemStats() {
+        Network net = new Network(PortChannel.POWER);
+        net.addMember(1L, 500, 5);
+        net.addMember(2L, 500, 5);
+        net.insert(null, 250, false);
+
+        PanelSnapshot snapshot = PanelSnapshot.forNetwork(
+            net, null, new PanelSnapshot.ItemNetworkStats(9, 9, 9));
+
+        PanelSnapshot.Row gaugeRow = row(snapshot, "#EnergyLabel");
+        assertTrue(gaugeRow.visible());
+        assertEquals("Network: 250 / 1000 (25%)", gaugeRow.text());
+        PanelSnapshot.Row statsRow = row(snapshot, "#FluidLabel");
+        assertEquals("Pipes: 2 • Throughput: 5/tick", statsRow.text());
+    }
+
+    /** Singular/plural polish: "1 stack" vs "N stacks" on the in-transit row. */
+    @Test
+    void itemNetworkSnapshotInTransitSingularVsPlural() {
+        Network net = new Network(PortChannel.ITEM);
+        net.addMember(1L, 0, 0);
+
+        PanelSnapshot one = PanelSnapshot.forNetwork(
+            net, null, new PanelSnapshot.ItemNetworkStats(1, 0, 0));
+        assertEquals("In transit: 1 stack • Pipes: 1", row(one, "#EnergyLabel").text());
+
+        PanelSnapshot zero = PanelSnapshot.forNetwork(
+            net, null, new PanelSnapshot.ItemNetworkStats(0, 0, 0));
+        assertEquals("In transit: 0 stacks • Pipes: 1", row(zero, "#EnergyLabel").text());
+    }
+
     @Test
     void emptySnapshotCarriesTitleAndMessage() {
         PanelSnapshot snapshot = PanelSnapshot.empty("Pipe", "Network unavailable.");

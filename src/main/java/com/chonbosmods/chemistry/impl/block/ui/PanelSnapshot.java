@@ -30,6 +30,16 @@ public final class PanelSnapshot {
     /** One label row: selector, explicit visibility, and the text (null when hidden). */
     public record Row(@Nonnull String selector, boolean visible, String text) {}
 
+    /**
+     * Aggregate counts for an ITEM network's discrete-transport readout, computed by the page and passed
+     * IN to keep this render model pure (the network itself has no shared item buffer to read).
+     *
+     * @param inTransit   total {@code TravelingStack}s currently moving over the network's member pipes
+     * @param destinations number of container endpoints the network can deliver into (NORMAL/PUSH faces)
+     * @param sources      number of container endpoints the network auto-extracts from (PULL faces)
+     */
+    public record ItemNetworkStats(int inTransit, int destinations, int sources) {}
+
     private static final String ENERGY = "#EnergyLabel";
     private static final String FLUID = "#FluidLabel";
     private static final String GAS = "#GasLabel";
@@ -122,22 +132,46 @@ public final class PanelSnapshot {
 
     @Nonnull
     public static PanelSnapshot forNetwork(@Nonnull Network network) {
-        return forNetwork(network, null);
+        return forNetwork(network, null, null);
+    }
+
+    @Nonnull
+    public static PanelSnapshot forNetwork(@Nonnull Network network, @Nullable PipeNode pipe) {
+        return forNetwork(network, pipe, null);
     }
 
     /**
-     * Network readout for a specific clicked {@code pipe}: same stats as the 1-arg overload, plus a
-     * per-face flow-state row on {@code #GasLabel}. The row lists only the non-NORMAL faces (in
-     * face-index order, {@code "<Name> <state>"} entries joined by {@code " · "}), or reads
-     * {@code "Faces: all normal"} when every face is {@link FlowState#NORMAL}. A null {@code pipe}
-     * (the 1-arg back-compat path) leaves the row hidden.
+     * Network readout for a specific clicked {@code pipe}, plus a per-face flow-state row on
+     * {@code #GasLabel}. The faces row lists only the non-NORMAL faces (in face-index order,
+     * {@code "<Name> <state>"} entries joined by {@code " · "}), or reads {@code "Faces: all normal"}
+     * when every face is {@link FlowState#NORMAL}. A null {@code pipe} leaves the faces row hidden.
+     *
+     * <p>ROW 1 / ROW 2 are channel-dependent. ITEM networks have no shared buffer, so when this is an
+     * {@link PortChannel#ITEM} network AND {@code itemStats} is non-null the rows read the discrete
+     * transport summary: row 1 ({@code #EnergyLabel}) {@code "In transit: N stack(s) • Pipes: M"}, row 2
+     * ({@code #FluidLabel}) {@code "Destinations: D • Sources: S"}. For every other case (POWER/FLUID/GAS,
+     * or a null {@code itemStats} on an ITEM network as a defensive fallback) the rows render the fungible
+     * shared-buffer gauge + throughput as before. {@code itemStats} is IGNORED on non-ITEM networks
+     * (channel-gated defence).
+     *
+     * @param itemStats discrete-transport counts the page computed for an ITEM network, or {@code null}
+     *     to render the fungible gauge (the default / fallback).
      */
     @Nonnull
-    public static PanelSnapshot forNetwork(@Nonnull Network network, @Nullable PipeNode pipe) {
+    public static PanelSnapshot forNetwork(
+            @Nonnull Network network, @Nullable PipeNode pipe, @Nullable ItemNetworkStats itemStats) {
         Map<String, String> texts = new LinkedHashMap<>();
-        texts.put(ENERGY, "Network: " + gaugeText(network.stored(), network.capacity()));
-        texts.put(FLUID, "Pipes: " + network.memberKeys().size()
-            + " • Throughput: " + network.throughput() + "/tick");
+        if (network.channel() == PortChannel.ITEM && itemStats != null) {
+            int n = itemStats.inTransit();
+            texts.put(ENERGY, "In transit: " + n + (n == 1 ? " stack" : " stacks")
+                + " • Pipes: " + network.memberKeys().size());
+            texts.put(FLUID, "Destinations: " + itemStats.destinations()
+                + " • Sources: " + itemStats.sources());
+        } else {
+            texts.put(ENERGY, "Network: " + gaugeText(network.stored(), network.capacity()));
+            texts.put(FLUID, "Pipes: " + network.memberKeys().size()
+                + " • Throughput: " + network.throughput() + "/tick");
+        }
         if (pipe != null) {
             texts.put(GAS, facesText(pipe)); // semantic reuse: pipes carry no gas buffer, the slot is free
         }
