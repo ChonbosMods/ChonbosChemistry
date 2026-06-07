@@ -323,6 +323,29 @@ class WipeRecoveryTest {
         assertTrue(pipe.inTransit().isEmpty(), "no double-application: the delivered stack stays gone");
     }
 
+    @Test
+    void allThreePayloadClassesRestoreTogether() {
+        // A single snapshot carrying a SHARE + a non-NORMAL FACE + an IN-TRANSIT stack (the three
+        // payload classes: H6 shares, Task 5b faces, Task 11 stacks) must restore all three in one
+        // pass onto a wiped clone. The restore blocks are independent in code; this pins that none
+        // of them short-circuits the others.
+        PipeNode pipe = item(1); // wiped clone: share 0, id null, all-NORMAL, empty inTransit
+        FakePipeGrid grid = new FakePipeGrid().put(5, 60, 5, pipe);
+        PipeNodeSnapshots snaps = new PipeNodeSnapshots();
+        FlowState[] faces = new FlowState[6];
+        faces[0] = FlowState.NONE;
+        snaps.put(NetworkManager.packKey(5, 60, 5), 25, null, faces,
+            List.of(stack("item:gold_ingot", 4)), 10);
+
+        List<Long> restored = snaps.restorePending(grid, 11);
+
+        assertEquals(1, restored.size(), "the mixed-payload snapshot restores in one pass");
+        assertEquals(25, pipe.bufferShare(), "share payload restored");
+        assertEquals(FlowState.NONE, pipe.flowState(0), "face payload restored");
+        assertEquals(1, pipe.inTransit().size(), "in-transit payload restored");
+        assertEquals("item:gold_ingot", pipe.inTransit().get(0).id());
+    }
+
     // --- PipeSnapshotScan worthiness widening (Task 5b) ---
 
     @Test
