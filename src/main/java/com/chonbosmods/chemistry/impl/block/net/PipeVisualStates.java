@@ -165,6 +165,11 @@ public final class PipeVisualStates {
             // ports: NORMAL/PUSH/PULL all join: any non-NONE face with a container present = connected,
             // mirroring ItemEndpoints). Containers count in EFFECTIVE only (the engine never welds toward
             // them: see physicalMask): so effective > physical here ADDS the chest arm.
+            // PRECEDENCE NOTE (machines milestone): a cell with BOTH a machine component AND a container
+            // falls through to here whenever the machine's port gate FAILS (CLOSED port, non-overlapping
+            // flow state): the container then still adds the arm. The transport layer (ItemEndpoints) has
+            // no machine-vs-container precedence rule yet: when ITEM machines land, define it THERE first
+            // and mirror it here, or the visual twin will silently invent policy.
             if (containerEndpointJoins(channel, containers, nx, ny, nz)) {
                 mask |= (1 << face);
             }
