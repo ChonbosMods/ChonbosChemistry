@@ -6,14 +6,14 @@
 
 1. **Connection cap: a pipe block joins at most 3 non-pipe endpoints** (containers/machines). A 4th adjacent endpoint does not connect (deterministic selection: lowest face index wins; wrench/panel reflect reality). Applies to ALL channels (one rule everywhere).
 2. **Config budget: a pipe block carries at most 2 PUSH/PULL faces, any shape.** The wrench cycle skips push/pull on a face when the budget is spent elsewhere (with a chat message naming the rule); NORMAL→NONE still cycles.
-3. **Every legal configuration renders truthfully.** Tip models exist for every (shape × ≤2 tipped arms × push/pull) combination: **~620 generated states per family** (on-twins double power/fluid/gas; item has no on-state). Nothing configurable is ever invisible.
+3. **Every legal configuration renders truthfully.** Tip models exist for every (shape × ≤2 tipped arms × push/pull) combination: **~604 generated states per family** (on-twins double power/fluid/gas; item has no on-state). Nothing configurable is ever invisible.
 4. **All models are GENERATED**, zero hand-authored: tip geometry is extracted from the existing `F_end_push`/`F_end_pull` (horizontal) and `F_vertical_end_up/down_push/pull` (vertical) models by diffing against their plain counterparts, then transposed onto every arm of every topology shape.
 5. **Smoke test gates the rollout**: generate ONE family (ITEM: smallest, no twins), verify in-game asset load, then generate the rest. Fallback knob if load chokes: restrict 5/6-arm shapes to 1 or 0 tips (saves ~180/~220 states) without touching the gameplay rules.
 6. NORMAL faces remain free: unlimited NORMAL-face endpoints render as plain arms (no new states). PULL is the only position-locked config; multi-pull beyond the budget routes through separate segments (the Mekanism idiom).
 
 ## State count math (per family)
 
-Per shape with k arms: `2k` one-tip + `2k(k-1)` two-tip variants. Across the 26 shapes (3×k1, 5×k2, 7×k3, 7×k4, 3×k5, 1×k6): 6+40+126+224+150+72 = **618**.
+Per shape with k arms: `2k` one-tip + `2k(k-1)` two-tip variants. Across the 26 shapes (authoritative template masks: 3×k1, 5×k2, 8×k3, 6×k4, 3×k5, 1×k6): 6+40+144+192+150+72 = **604** (the earlier 618 estimate mis-bucketed one 3-arm shape as 4-arm; the generator self-test pins the real count).
 
 ## Naming scheme
 
