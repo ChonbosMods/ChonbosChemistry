@@ -97,3 +97,82 @@ So a placed vanilla chest resolves through the exact `BlockModule.getBlockEntity
 ### Persistence
 
 The chest's contents persist via the engine's own `ItemContainerBlock` codec (not ours). We never persist container contents; our only new persisted state is the `TravelingStack`s on `PipeNode.InTransit` (already landed). After mutating a chest (insert/extract commit) we mark the chest's chunk needing-save via the existing `BlockComponentChunk.markNeedsSaving()` pattern (`WrenchInteraction.markNeedsSaving`), and likewise mark pipe chunks after any `inTransit` mutation.
+
+## Spike findings (overlay tip entities)
+
+*Decompile spike 2026-06-07 (Server-0.5.3). Goal: can a tiny static model entity act as a per-face "push/pull tip" overlay on pipe blocks, since block states only allow one CustomModel per state? Every claim below is cited to a decompiled class + method.*
+
+**VERDICT: VIABLE-WITH-CAVEATS.** A static prop entity renders an arbitrary blockymodel at sub-block coords with full rotation + scale, is click-through when spawned without a hitbox, and can be made non-persistent with one built-in marker. The one non-trivial caveat: the model must be a **registered `ModelAsset`** (a standalone tip `.blockymodel` registered through our asset pack), not a raw path handed to the entity at spawn time. The single best precedent is the engine's own deployable entity, which is functionally identical to what we want.
+
+### 1. Minimal static-prop archetype (the exact recipe)
+
+The engine's `DeployablesUtils.spawnDeployable` (com.hypixel.hytale.builtin.deployables.DeployablesUtils) is a near-exact template: it builds a `Holder<EntityStore>` via `EntityStore.REGISTRY.newHolder()`, adds model + transform + networking + a non-serialized marker, and commits with `commandBuffer.addEntity(holder, AddReason.SPAWN)`.
+
+To **exist + render + be networked** an entity needs only:
+- `TransformComponent` (com.hypixel...entity.component.TransformComponent) — `Position` (Vector3d) + `Rotation` (Rotation3f). See §3.
+- `ModelComponent` (...entity.component.ModelComponent) — wraps a `Model`; `EntityTrackerSystems$EntityModel.queueUpdatesFor` sends `ModelUpdate(model.toPacket(), scale)` to every viewer.
+- `NetworkId` (...entity.tracker.NetworkId) — `new NetworkId(store.getExternalData().takeNextNetworkId())`. Required for any per-entity client packet.
+- `BoundingBox` (...entity.component.BoundingBox) — server-side spatial AABB; `new BoundingBox(model.getBoundingBox())`. **Not** networked on its own (no tracker system sends it; only `HitboxCollisionSystems$EntityTrackerUpdate` sends hittability — see §4).
+- `Visible` tracker component — `holder.ensureComponent(EntityModule.get().getVisibleComponentType())`. Every networked tracker system queries `Query.and(visibleComponentType, ...)`, so without it nothing is sent.
+- `PropComponent` (...entity.component.PropComponent) — marks the entity a static prop. `EntityTrackerSystems$EntityModel.queueUpdatesFor` additionally sends a `PropUpdate` when `isProp`. `ModelSystems$AssignNetworkIdToProps` + `EnsurePropsPrefabCopyable` are the only prop-specific systems and only add NetworkId/PrefabCopyable (both harmless).
+
+`ItemComponent.generateItemDrops` builds the drop archetype via `ItemSystems$EnsureRequiredComponents.onEntityAdd`: ItemComponent + NetworkId + **ItemPhysicsComponent** + BoundingBox + ModelComponent (+ DynamicLight). A drop is almost our prop. We **OMIT**: `ItemComponent`, `ItemPhysicsComponent` (gravity/physics), `PickupItemComponent`/pickup collision, and any `DespawnComponent` (unless we want auto-expiry). What remains is exactly the deployable recipe minus its gameplay components (EntityStatMap, DeployableComponent, Invulnerable, AudioComponent, HeadRotation are all optional for a pure visual).
+
+### 2. Model source — registered ModelAsset, not arbitrary path
+
+`Model` (...asset.type.model.config.Model) `toPacket()` writes BOTH `packet.assetId` and `packet.path`, and defaults `texture` to `path.replace(".blockymodel",".png")` — so the wire format *can* carry a raw path. BUT the only public constructors of a usable `Model` go through `Model.createScaledModel(ModelAsset, scale, ...)` / `Model.createStaticScaledModel(ModelAsset, scale)`, which require a `ModelAsset` to source the bounding box, eye height, particles, etc. `Model.ModelReference.toModel()` resolves `ModelAsset.getAssetMap().getAsset(modelAssetId)` by id. The `.blockymodel` path itself lives on the `ModelAsset` (`ModelAsset.model` field, codec key `"Model"`; `"Texture"` key for the png).
+
+**Therefore:** author a standalone tip `.blockymodel` (e.g. `ItemPipe_end_push` tip extracted to its own model) and register it as a `ModelAsset` through our asset pack (GenerateAssetsEvent / ModelAsset asset store — see hytale-assets skill). Then spawn with `Model.createStaticScaledModel(tipModelAsset, scale)`. `createStaticScaledModel` sets `staticModel=true` (`Static` codec flag on `ModelReference`), which the `toReference()` path also infers when `animationSetMap == null` — i.e. an animation-less tip is treated as static automatically.
+
+### 3. Scale / rotation / anchor
+
+- **Scale:** `Model` carries a `scale` float; `Model.createScaledModel(asset, scale, ...)` scales bounding box, eye height, camera, physics uniformly. Pass scale at spawn.
+- **Rotation:** `TransformComponent.rotation` is `Rotation3f` = full yaw/pitch/roll (`teleportRotation` sets all three). More than enough to orient a tip toward any of the 6 faces.
+- **Anchor:** position is `Vector3d` (double), so sub-block placement at a face center (block + 0.5 + faceNormal*0.5) is trivial. Convention: props render **centered on position** (deployables set `TransformComponent.setPosition(spawnPos)` directly with no feet offset, unlike player models which use eyeHeight/feet). So place the tip at the exact face-tip world point.
+
+### 4. Click-through (the kill-or-keep question) — PASSES
+
+Hittability and interactability are **both opt-in components**, sent by dedicated tracker systems; absence = the client never registers the entity as a target:
+- **Hitbox / attack target:** `HitboxCollision` (...entity.hitboxcollision.HitboxCollision) is a separate component. `HitboxCollisionSystems$EntityTrackerUpdate.queueUpdatesFor` sends `HitboxCollisionUpdate` only for entities that *have* it. `DeployablesUtils.spawnDeployable` adds it **conditionally** (`if (config.getHitboxCollisionConfigIndex() != -1)`) — a deployable with no hitbox config is hitbox-less. A prop without `HitboxCollision` is not raycast-hittable for attack/damage.
+- **Interaction (press-F):** `Interactable` (...entity.component.Interactable) is opt-in; `EntityInteractableSystems$EntityTrackerUpdate` sends `InteractableUpdate` only for entities that have it. No `Interactable` = no interact prompt, no `UseEntityInteraction` target.
+- This mirrors how nametag/hologram-style UI is attached (`UIComponentList` via `EntityUIModule`) without making the carrier hittable.
+
+So: spawn the tip with **neither `HitboxCollision` nor `Interactable`** and it is fully click-through — clicks/attacks pass to the pipe block behind it. (Caveat to verify in-game: client-side soft selection/highlight outline behavior on a model with a server `BoundingBox` but no networked hitbox — server targeting is provably safe; the visual hover outline is the only unknown and is the single reason this is VIABLE-*WITH-CAVEATS* rather than unconditionally VIABLE.)
+
+### 5. Persistence — solved with a built-in marker
+
+`PersistentModel` (...entity.component.PersistentModel) HAS a codec and IS saved; `ModelSystems$SetRenderedModel` rebuilds the `ModelComponent` from it on `AddReason.LOAD`. **Do not add `PersistentModel`** if we want a transient tip.
+
+The built-in no-save flag is `NonSerialized`: `ComponentRegistry` registers `nonSerializedComponentType = registerComponent(NonSerialized.class, NonSerialized::get)`, exposed as `EntityStore.REGISTRY.getNonSerializedComponentType()`. `DeployablesUtils` adds exactly this: `holder.ensureComponent(EntityStore.REGISTRY.getNonSerializedComponentType())`. Adding it makes our tip exist only in memory — no disk save, no reload, no dedupe problem. This is the recommended path: spawn tips fresh during our visual pass each session.
+
+(Fallback if we ever want persistent tips: register our own EntityStore marker component carrying the owning pipe `BlockPos` and dedupe on load. `getEntityStoreRegistry().registerComponent(...)` works for us exactly as our existing ChunkStore registrations do — `ChonbosChemistry.java` already registers `MachineBlockState`/`TankBlockState`/`PipeNode` on the chunk registry, and registers systems on `getEntityStoreRegistry()`. Not needed if we use `NonSerialized`.)
+
+### 6. Despawn / remove
+
+From any tick system: `commandBuffer.removeEntity(ref, RemoveReason.REMOVE)` (or `tryRemoveEntity` for a safe no-throw variant). Confirmed in `DespawnSystem.tick`: `commandBuffer.removeEntity(entityRef, RemoveReason.REMOVE)`. `CommandBuffer.addEntity(holder, AddReason.SPAWN)` returns the `Ref` we hold to remove later. Optional auto-expiry: add `DespawnComponent(despawnAt)` and the engine's `DespawnSystem` removes it for us.
+
+### Probe command (`/cc-tipspike`) — exact spawn recipe
+
+```java
+// Prereq: a tip ModelAsset must be registered (asset pack). For the probe, any small
+// registered ModelAsset id works to prove the mechanism (e.g. reuse an existing item/prop model id).
+ModelAsset tip = ModelAsset.getAssetMap().getAsset("<tipModelAssetId>");
+Model model = Model.createStaticScaledModel(tip, /*scale*/ 0.5f);
+
+Holder<EntityStore> h = EntityStore.REGISTRY.newHolder();
+h.addComponent(TransformComponent.getComponentType(),
+        new TransformComponent(faceTipWorldPos /*Vector3d*/, faceRotation /*Rotation3f*/));
+h.addComponent(ModelComponent.getComponentType(), new ModelComponent(model));
+h.addComponent(PropComponent.getComponentType(), PropComponent.get());
+h.addComponent(BoundingBox.getComponentType(), new BoundingBox(model.getBoundingBox()));
+h.addComponent(NetworkId.getComponentType(),
+        new NetworkId(store.getExternalData().takeNextNetworkId()));
+h.ensureComponent(EntityModule.get().getVisibleComponentType());
+h.ensureComponent(EntityStore.REGISTRY.getNonSerializedComponentType()); // transient: no disk save
+// DELIBERATELY OMITTED: HitboxCollision, Interactable, ItemComponent, ItemPhysicsComponent,
+//                       PersistentModel, PickupItemComponent  -> click-through, non-persistent, no physics.
+Ref<EntityStore> ref = commandBuffer.addEntity(h, AddReason.SPAWN);
+// Later (cleanup / face toggled off): commandBuffer.removeEntity(ref, RemoveReason.REMOVE);
+```
+
+Probe goals to confirm the one open caveat: (a) tip renders at the face tip with correct orientation/scale; (b) attacking/pressing-F through the tip hits the pipe block, not the tip; (c) tip is gone after relog (proves `NonSerialized`).
