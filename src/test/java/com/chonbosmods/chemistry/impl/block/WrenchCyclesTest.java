@@ -55,6 +55,98 @@ class WrenchCyclesTest {
         assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.PULL, WrenchCycles.Target.PIPE));
     }
 
+    // --- Pipe face toward a MACHINE under the 2 push/pull faces budget ---
+
+    @Test
+    void budgetConstantIsTwo() {
+        assertEquals(2, WrenchCycles.MAX_DIRECTED_FACES);
+    }
+
+    @Test
+    void zeroOtherDirectedFacesLeavesFullRing() {
+        // 0 other directed faces: full NORMAL -> PUSH -> PULL -> NONE -> wrap, same as the 2-arg form.
+        assertEquals(FlowState.PUSH, WrenchCycles.next(FlowState.NORMAL, WrenchCycles.Target.MACHINE, 0));
+        assertEquals(FlowState.PULL, WrenchCycles.next(FlowState.PUSH, WrenchCycles.Target.MACHINE, 0));
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.PULL, WrenchCycles.Target.MACHINE, 0));
+        assertEquals(FlowState.NORMAL, WrenchCycles.next(FlowState.NONE, WrenchCycles.Target.MACHINE, 0));
+    }
+
+    @Test
+    void oneOtherDirectedFaceLeavesFullRing() {
+        // 1 other directed face: budget not yet spent, push/pull still reachable.
+        assertEquals(FlowState.PUSH, WrenchCycles.next(FlowState.NORMAL, WrenchCycles.Target.MACHINE, 1));
+        assertEquals(FlowState.PULL, WrenchCycles.next(FlowState.PUSH, WrenchCycles.Target.MACHINE, 1));
+    }
+
+    @Test
+    void budgetSpentMachineForwardCycleEqualsPipeRing() {
+        // 2 other directed faces: budget spent. The MACHINE cycle degrades to the PIPE ring
+        // (NORMAL -> NONE -> wrap): push/pull simply drop out.
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.NORMAL, WrenchCycles.Target.MACHINE, 2));
+        assertEquals(FlowState.NORMAL, WrenchCycles.next(FlowState.NONE, WrenchCycles.Target.MACHINE, 2));
+        // It matches the PIPE-target ring exactly.
+        assertEquals(WrenchCycles.next(FlowState.NORMAL, WrenchCycles.Target.PIPE),
+            WrenchCycles.next(FlowState.NORMAL, WrenchCycles.Target.MACHINE, 2));
+        assertEquals(WrenchCycles.next(FlowState.NONE, WrenchCycles.Target.PIPE),
+            WrenchCycles.next(FlowState.NONE, WrenchCycles.Target.MACHINE, 2));
+    }
+
+    @Test
+    void budgetSpentMachineReverseCycleEqualsPipeRing() {
+        // Reverse mirrors forward within the same budget condition: NONE <-> NORMAL only.
+        assertEquals(FlowState.NONE, WrenchCycles.previous(FlowState.NORMAL, WrenchCycles.Target.MACHINE, 2));
+        assertEquals(FlowState.NORMAL, WrenchCycles.previous(FlowState.NONE, WrenchCycles.Target.MACHINE, 2));
+        assertEquals(WrenchCycles.previous(FlowState.NORMAL, WrenchCycles.Target.PIPE),
+            WrenchCycles.previous(FlowState.NORMAL, WrenchCycles.Target.MACHINE, 2));
+        assertEquals(WrenchCycles.previous(FlowState.NONE, WrenchCycles.Target.PIPE),
+            WrenchCycles.previous(FlowState.NONE, WrenchCycles.Target.MACHINE, 2));
+    }
+
+    @Test
+    void budgetCountExcludesSelfSoADirectedFaceStillCyclesThroughPushPull() {
+        // The cycled face's own current PUSH/PULL state does NOT count against itself: the caller passes
+        // otherDirectedFaces = (directed faces EXCLUDING this one). A PULL face with exactly 1 OTHER
+        // directed face is at the budget total of 2, but its own slot is free, so it still walks the full
+        // ring: PULL -> NONE -> NORMAL -> PUSH -> PULL.
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.PULL, WrenchCycles.Target.MACHINE, 1));
+        assertEquals(FlowState.NORMAL, WrenchCycles.next(FlowState.NONE, WrenchCycles.Target.MACHINE, 1));
+        assertEquals(FlowState.PUSH, WrenchCycles.next(FlowState.NORMAL, WrenchCycles.Target.MACHINE, 1));
+        assertEquals(FlowState.PULL, WrenchCycles.next(FlowState.PUSH, WrenchCycles.Target.MACHINE, 1));
+    }
+
+    @Test
+    void budgetSpentNormalToNoneStillAvailable() {
+        // Even with the budget spent elsewhere, a NORMAL face can still go to NONE (close the face).
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.NORMAL, WrenchCycles.Target.MACHINE, 2));
+    }
+
+    @Test
+    void budgetSpentInverseProperty() {
+        // next and previous remain exact inverses within the budget-spent condition (the 2-state ring).
+        for (FlowState s : new FlowState[] {FlowState.NORMAL, FlowState.NONE}) {
+            FlowState fwd = WrenchCycles.next(s, WrenchCycles.Target.MACHINE, 2);
+            assertEquals(s, WrenchCycles.previous(fwd, WrenchCycles.Target.MACHINE, 2));
+            FlowState back = WrenchCycles.previous(s, WrenchCycles.Target.MACHINE, 2);
+            assertEquals(s, WrenchCycles.next(back, WrenchCycles.Target.MACHINE, 2));
+        }
+    }
+
+    @Test
+    void budgetSpentStalePushOnPipeStillCollapsesToNone() {
+        // A budget-spent MACHINE face holding a stale PUSH/PULL (e.g. legacy data) still advances into the
+        // 2-state ring: treated as NORMAL's neighbour, it lands on NONE.
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.PUSH, WrenchCycles.Target.MACHINE, 2));
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.PULL, WrenchCycles.Target.MACHINE, 2));
+    }
+
+    @Test
+    void budgetIgnoredForPipeTarget() {
+        // Toward a PIPE the budget is irrelevant (push/pull are never offered there anyway): the count
+        // overload must behave identically to the 2-arg form regardless of otherDirectedFaces.
+        assertEquals(FlowState.NONE, WrenchCycles.next(FlowState.NORMAL, WrenchCycles.Target.PIPE, 2));
+        assertEquals(FlowState.NORMAL, WrenchCycles.next(FlowState.NONE, WrenchCycles.Target.PIPE, 5));
+    }
+
     // --- Machine capability cycle ---
 
     private static MachineBlockState machine(boolean power, PortChannel... resourceChannels) {

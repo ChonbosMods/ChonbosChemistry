@@ -171,8 +171,15 @@ public final class WrenchInteraction extends SimpleBlockInteraction {
             neighbourIsEndpoint(world, nx, ny, nz, machineType, tankType) ? WrenchCycles.Target.MACHINE
                 : WrenchCycles.Target.PIPE;
 
+        // The directed-face budget (design 2026-06-07 decision 2): count PUSH/PULL faces EXCLUDING the
+        // clicked face so the face's own current state never counts against itself (a directed face can
+        // always stay/leave directed; legacy 3+-directed saves still cycle each face freely).
+        int otherDirectedFaces = countDirectedFaces(pipe, faceIndex);
+
         FlowState current = pipe.flowState(faceIndex);
-        FlowState next = sneaking ? WrenchCycles.previous(current, target) : WrenchCycles.next(current, target);
+        FlowState next = sneaking
+            ? WrenchCycles.previous(current, target, otherDirectedFaces)
+            : WrenchCycles.next(current, target, otherDirectedFaces);
         pipe.setFlowState(faceIndex, next);
         markNeedsSaving(world, x, y, z);
 
@@ -184,6 +191,33 @@ public final class WrenchInteraction extends SimpleBlockInteraction {
             manager.invalidate(nx, ny, nz);
         }
         sendMessage(commandBuffer, context, "Pipe face " + FaceNames.name(faceIndex) + ": " + next.jsonValue());
+        // The budget note fires exactly when the player WOULD have entered push/pull toward a machine but
+        // the budget was spent elsewhere, so the cycle skipped them (degraded to NORMAL<->NONE). It rides
+        // alongside the normal feedback above, once per click.
+        if (target == WrenchCycles.Target.MACHINE && otherDirectedFaces >= WrenchCycles.MAX_DIRECTED_FACES) {
+            sendMessage(commandBuffer, context,
+                "Pipe direction budget: " + WrenchCycles.MAX_DIRECTED_FACES
+                    + " faces max (this pipe already has " + WrenchCycles.MAX_DIRECTED_FACES + ")");
+        }
+    }
+
+    /**
+     * Counts this pipe's PUSH/PULL (directed) faces, EXCLUDING {@code excludeFace}. The exclusion is what
+     * keeps the clicked face's own current state from counting against itself, giving the design's
+     * "its own state doesn't count" and "legacy 3+-directed faces still cycle" guarantees for free.
+     */
+    private int countDirectedFaces(PipeNode pipe, int excludeFace) {
+        int count = 0;
+        for (int f = 0; f < OFFSETS.length; f++) {
+            if (f == excludeFace) {
+                continue;
+            }
+            FlowState s = pipe.flowState(f);
+            if (s == FlowState.PUSH || s == FlowState.PULL) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**

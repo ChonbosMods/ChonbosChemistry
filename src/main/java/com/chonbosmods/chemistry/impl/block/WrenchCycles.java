@@ -53,6 +53,15 @@ public final class WrenchCycles {
     private WrenchCycles() {
     }
 
+    /**
+     * Maximum number of PUSH/PULL (directed) faces a single pipe block may carry, any shape (design
+     * 2026-06-07 decision 2). When this many directed faces already exist on OTHER faces, the pipe-face
+     * cycle toward a {@link Target#MACHINE} skips PUSH/PULL: it degrades to the two-state PIPE ring
+     * ({@code NORMAL <-> NONE}) so the player cannot add a third. The generator + {@code PipeShapes}
+     * reference this same concept (a named constant beats a magic 2).
+     */
+    public static final int MAX_DIRECTED_FACES = 2;
+
     /** What a pipe face points at, resolved by the interaction glue before calling the cycle. */
     public enum Target {
         /** The face points at a network endpoint (a machine / storage block). */
@@ -61,14 +70,59 @@ public final class WrenchCycles {
         PIPE
     }
 
-    /** Forward flow cycle for a pipe face. Toward MACHINE: 4 states; toward PIPE: NORMAL<->NONE. */
+    /**
+     * Forward flow cycle for a pipe face with no budget pressure. Toward MACHINE: 4 states; toward PIPE:
+     * NORMAL&lt;-&gt;NONE. Equivalent to {@link #next(FlowState, Target, int)} with {@code otherDirectedFaces = 0}.
+     */
     public static FlowState next(FlowState current, Target target) {
-        return step(current, target, +1);
+        return next(current, target, 0);
     }
 
-    /** Reverse flow cycle for a pipe face (sneak). Exact inverse of {@link #next}. */
+    /**
+     * Reverse flow cycle for a pipe face (sneak) with no budget pressure. Exact inverse of
+     * {@link #next(FlowState, Target)}.
+     */
     public static FlowState previous(FlowState current, Target target) {
-        return step(current, target, -1);
+        return previous(current, target, 0);
+    }
+
+    /**
+     * Forward flow cycle for a pipe face under the directed-face budget (design 2026-06-07 decision 2).
+     *
+     * @param current the clicked face's current flow state
+     * @param target what the face points at (a {@link Target#MACHINE} endpoint, or a {@link Target#PIPE})
+     * @param otherDirectedFaces the number of PUSH/PULL faces on this pipe EXCLUDING the clicked face.
+     *     The caller (the interaction glue) counts directed faces and subtracts the clicked face so the
+     *     face's own current state never counts against itself: a PULL face can always stay/leave directed.
+     * @return the next flow state. Toward PIPE the budget is irrelevant (push/pull are never offered).
+     *     Toward MACHINE with fewer than {@link #MAX_DIRECTED_FACES} other directed faces: the full
+     *     {@code NORMAL -> PUSH -> PULL -> NONE} ring. Toward MACHINE with the budget spent
+     *     ({@code otherDirectedFaces >= MAX_DIRECTED_FACES}): the ring degrades to the PIPE ring
+     *     ({@code NORMAL <-> NONE}), so push/pull drop out and a third directed face cannot be added.
+     */
+    public static FlowState next(FlowState current, Target target, int otherDirectedFaces) {
+        return step(current, effectiveTarget(target, otherDirectedFaces), +1);
+    }
+
+    /**
+     * Reverse flow cycle for a pipe face (sneak) under the directed-face budget. Exact inverse of
+     * {@link #next(FlowState, Target, int)} WITHIN the same budget condition (the two stay inverses for a
+     * fixed {@code otherDirectedFaces}).
+     */
+    public static FlowState previous(FlowState current, Target target, int otherDirectedFaces) {
+        return step(current, effectiveTarget(target, otherDirectedFaces), -1);
+    }
+
+    /**
+     * Resolves the target the ring is built from: a MACHINE face whose pipe has already spent the
+     * directed-face budget elsewhere degrades to a PIPE-style two-state ring (push/pull skipped). A PIPE
+     * target is unaffected (it never offers push/pull regardless of the count).
+     */
+    private static Target effectiveTarget(Target target, int otherDirectedFaces) {
+        if (target == Target.MACHINE && otherDirectedFaces >= MAX_DIRECTED_FACES) {
+            return Target.PIPE;
+        }
+        return target;
     }
 
     private static final FlowState[] MACHINE_RING =
