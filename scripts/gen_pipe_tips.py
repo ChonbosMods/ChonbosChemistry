@@ -93,6 +93,7 @@ import copy
 import hashlib
 import itertools
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -368,14 +369,38 @@ def load_json(path):
     return json.loads(Path(path).read_text())
 
 
+#: Leaf-object keys the corpus inlines onto one line ({"x": 0, "y": 16, "z": 0} style),
+#: derived by inspecting the authored models: vectors/quaternions only.
+_INLINE_LEAF_KEYS = ("mirror", "offset", "orientation", "position", "size", "stretch")
+
+_INLINE_RE = re.compile(
+    r'"(?:' + "|".join(_INLINE_LEAF_KEYS) + r')": \{[^{}]*?\}',
+    re.DOTALL,
+)
+
+
+def _inline_leaves(text):
+    """Collapse corpus leaf objects (vectors/quaternions) onto one line, matching the
+    hand-authored formatting so generated models diff cleanly against the corpus."""
+    def collapse(match):
+        inner = " ".join(part.strip() for part in match.group(0).splitlines())
+        return inner.replace("{ ", "{").replace(", }", "}").replace(" }", "}")
+    return _INLINE_RE.sub(collapse, text)
+
+
+def model_text(model):
+    """The corpus-formatted serialization: 2-space indent, inlined vector leaves,
+    NO trailing newline (the authored files end at the closing brace). Deterministic."""
+    return _inline_leaves(json.dumps(model, indent=2, sort_keys=False))
+
+
 def dump_model(model, path):
-    """Write a blockymodel with the corpus formatting (2-space indent, trailing
-    newline, ensure_ascii). Deterministic."""
-    Path(path).write_text(json.dumps(model, indent=2) + "\n")
+    """Write a blockymodel in the corpus formatting (see model_text). Deterministic."""
+    Path(path).write_text(model_text(model))
 
 
 def model_path_text(model):
-    return json.dumps(model, indent=2, sort_keys=False) + "\n"
+    return model_text(model)
 
 
 def family_tips(models_dir, family):
