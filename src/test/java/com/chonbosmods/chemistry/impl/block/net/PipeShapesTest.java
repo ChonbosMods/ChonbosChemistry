@@ -197,163 +197,216 @@ class PipeShapesTest {
     }
 
     // =====================================================================================
-    // indicatorStateFor: end-stub push/pull direction arrows (Task 12)
+    // tippedStateFor: per-face push/pull tip state selection, any shape (Task 4)
     // =====================================================================================
+    //
+    // Key contract (must match scripts/gen_pipe_tips.py state_key()):
+    //   <ShapePascal>_T<modelFace><p|l>[_T<modelFace><p|l>]  (faces ASCENDING, p/l LOWERCASE)
+    // Inputs are WORLD-space; tippedStateFor un-rotates tipped faces to model space via the
+    // block's rotationIndex before building the key (the generated models are rotation-0).
 
-    // --- the 6 single-arm directions x PUSH/PULL, unenergized ---
+    /** Build a 6-entry faceStates array (OFFSETS order) that is all-NORMAL except the given faces. */
+    private static FlowState[] faces(java.util.Map<Integer, FlowState> overrides) {
+        FlowState[] fs = new FlowState[6];
+        java.util.Arrays.fill(fs, FlowState.NORMAL);
+        overrides.forEach((f, s) -> fs[f] = s);
+        return fs;
+    }
+
+    private static FlowState[] allNormal() {
+        return faces(java.util.Map.of());
+    }
+
+    // --- zero tipped faces -> the plain stateFor result ---
 
     @Test
-    void indicator_plusZ_push() {
-        // +Z single arm -> End shape (rotation 0); PUSH face -> End_Push.
-        assertEquals("End_Push", PipeShapes.indicatorStateFor(PZ, FlowState.PUSH, false));
+    void tipped_noTippedFaces_isPlainStateFor() {
+        // Tee (3 arms) all-NORMAL: no tip -> plain "Tee".
+        int mask = PX | NX | PZ; // tee r3 in the table
+        assertEquals(PipeShapes.stateFor(mask, false),
+                PipeShapes.tippedStateFor(mask, allNormal(), mask, false, 0));
     }
 
     @Test
-    void indicator_plusZ_pull() {
-        assertEquals("End_Pull", PipeShapes.indicatorStateFor(PZ, FlowState.PULL, false));
+    void tipped_pushFaceNotAnEndpointArm_isPlainStateFor() {
+        // A PUSH on +X but endpointArmMask excludes +X (it points at a pipe): no tip.
+        int mask = PX | NX | PZ;
+        FlowState[] fs = faces(java.util.Map.of(0, FlowState.PUSH));
+        assertEquals(PipeShapes.stateFor(mask, false),
+                PipeShapes.tippedStateFor(mask, fs, NX | PZ, false, 0)); // +X not in endpoint mask
     }
 
     @Test
-    void indicator_plusX_push() {
-        // +X is still the End shape (just a different rotation): the key is direction-only, not rotated.
-        assertEquals("End_Push", PipeShapes.indicatorStateFor(PX, FlowState.PUSH, false));
+    void tipped_pushFaceNotAnEffectiveArm_isIgnored() {
+        // PUSH on +Y but +Y is not in the effective mask: not an arm, ignored.
+        int mask = PX | NX | PZ; // no +Y
+        FlowState[] fs = faces(java.util.Map.of(2, FlowState.PUSH));
+        // endpointArmMask claims +Y too, but effective mask gates it out.
+        assertEquals(PipeShapes.stateFor(mask, false),
+                PipeShapes.tippedStateFor(mask, fs, mask | PY, false, 0));
+    }
+
+    // --- one tipped face (rotation 0) ---
+
+    @Test
+    void tipped_singleEnd_plusZ_push_isEnd_T4p() {
+        // +Z single arm = End shape; PUSH endpoint arm at world face 4 -> model face 4 (rot 0).
+        int mask = PZ;
+        FlowState[] fs = faces(java.util.Map.of(4, FlowState.PUSH));
+        assertEquals("End_T4p", PipeShapes.tippedStateFor(mask, fs, PZ, false, 0));
     }
 
     @Test
-    void indicator_minusX_pull() {
-        assertEquals("End_Pull", PipeShapes.indicatorStateFor(NX, FlowState.PULL, false));
+    void tipped_singleEnd_plusZ_pull_isEnd_T4l() {
+        int mask = PZ;
+        FlowState[] fs = faces(java.util.Map.of(4, FlowState.PULL));
+        assertEquals("End_T4l", PipeShapes.tippedStateFor(mask, fs, PZ, false, 0));
     }
 
     @Test
-    void indicator_minusZ_push() {
-        assertEquals("End_Push", PipeShapes.indicatorStateFor(NZ, FlowState.PUSH, false));
+    void tipped_singleEnd_verticalUp_push_isVerticalEndUp_T2p() {
+        // +Y single arm = Vertical_End_Up; PUSH at world face 2 -> model face 2 (yaw-invariant).
+        int mask = PY;
+        FlowState[] fs = faces(java.util.Map.of(2, FlowState.PUSH));
+        assertEquals("Vertical_End_Up_T2p", PipeShapes.tippedStateFor(mask, fs, PY, false, 0));
     }
 
     @Test
-    void indicator_plusY_push() {
-        assertEquals("Vertical_End_Up_Push", PipeShapes.indicatorStateFor(PY, FlowState.PUSH, false));
+    void tipped_singleEnd_verticalDown_pull_isVerticalEndDown_T3l() {
+        int mask = NY;
+        FlowState[] fs = faces(java.util.Map.of(3, FlowState.PULL));
+        assertEquals("Vertical_End_Down_T3l", PipeShapes.tippedStateFor(mask, fs, NY, false, 0));
+    }
+
+    // --- two tipped faces (the design's flagship sample) ---
+
+    @Test
+    void tipped_tee_T0p_T4l() {
+        // Tee covering +X|-X|+Z (mask 0b010011 -> "Tee" r3 in the table), PUSH on +X (face 0),
+        // PULL on +Z (face 4). Faces ascending in the key: T0p then T4l.
+        int mask = PX | NX | PZ;
+        FlowState[] fs = faces(java.util.Map.of(0, FlowState.PUSH, 4, FlowState.PULL));
+        assertEquals("Tee_T0p_T4l", PipeShapes.tippedStateFor(mask, fs, mask, false, 0));
     }
 
     @Test
-    void indicator_plusY_pull() {
-        assertEquals("Vertical_End_Up_Pull", PipeShapes.indicatorStateFor(PY, FlowState.PULL, false));
+    void tipped_twoFaces_sortedAscendingRegardlessOfDeclarationOrder() {
+        // PULL on +Z (4) and PUSH on -X (1): ascending order is T1l then T4p.
+        int mask = PX | NX | PZ;
+        FlowState[] fs = faces(java.util.Map.of(4, FlowState.PUSH, 1, FlowState.PULL));
+        assertEquals("Tee_T1l_T4p", PipeShapes.tippedStateFor(mask, fs, mask, false, 0));
     }
 
     @Test
-    void indicator_minusY_push() {
-        assertEquals("Vertical_End_Down_Push", PipeShapes.indicatorStateFor(NY, FlowState.PUSH, false));
+    void tipped_cross_twoVerticalInvariantFaces() {
+        // Cross is horizontal only; use a Six shape so +Y/-Y are arms. Tip +Y push, -Y pull.
+        int mask = 0b111111; // Six
+        FlowState[] fs = faces(java.util.Map.of(2, FlowState.PUSH, 3, FlowState.PULL));
+        assertEquals("Six_T2p_T3l", PipeShapes.tippedStateFor(mask, fs, mask, false, 0));
+    }
+
+    // --- legacy 3+ tipped faces: keep the 2 LOWEST (defensive; wrench can't produce this) ---
+
+    @Test
+    void tipped_threeFaces_keepsTwoLowest() {
+        // Six shape, tips on +X(0) push, -X(1) pull, +Y(2) push. Lowest two faces: 0 and 1.
+        int mask = 0b111111;
+        FlowState[] fs = faces(java.util.Map.of(0, FlowState.PUSH, 1, FlowState.PULL, 2, FlowState.PUSH));
+        assertEquals("Six_T0p_T1l", PipeShapes.tippedStateFor(mask, fs, mask, false, 0));
+    }
+
+    // --- energized appends _On (mirrors PipePowerStates.poweredOf) ---
+
+    @Test
+    void tipped_energizedAppendsOn() {
+        int mask = PX | NX | PZ;
+        FlowState[] fs = faces(java.util.Map.of(0, FlowState.PUSH, 4, FlowState.PULL));
+        assertEquals("Tee_T0p_T4l_On", PipeShapes.tippedStateFor(mask, fs, mask, true, 0));
     }
 
     @Test
-    void indicator_minusY_pull() {
-        assertEquals("Vertical_End_Down_Pull", PipeShapes.indicatorStateFor(NY, FlowState.PULL, false));
-    }
-
-    // --- energized appends the _On twin (mirrors PipePowerStates.poweredOf) ---
-
-    @Test
-    void indicator_energizedIsOnTwin() {
-        assertEquals("End_Push_On", PipeShapes.indicatorStateFor(PZ, FlowState.PUSH, true));
-        assertEquals("End_Pull_On", PipeShapes.indicatorStateFor(PX, FlowState.PULL, true));
-        assertEquals("Vertical_End_Up_Push_On",
-                PipeShapes.indicatorStateFor(PY, FlowState.PUSH, true));
-        assertEquals("Vertical_End_Down_Pull_On",
-                PipeShapes.indicatorStateFor(NY, FlowState.PULL, true));
+    void tipped_energizedIsExactlyPoweredOfUnenergized() {
+        int mask = PZ;
+        FlowState[] fs = faces(java.util.Map.of(4, FlowState.PUSH));
+        String off = PipeShapes.tippedStateFor(mask, fs, PZ, false, 0);
+        String on = PipeShapes.tippedStateFor(mask, fs, PZ, true, 0);
+        assertEquals(PipePowerStates.poweredOf(off), on);
+        assertEquals(off, PipePowerStates.unpoweredOf(on));
     }
 
     @Test
-    void indicator_energizedIsExactlyPoweredOfUnenergized() {
-        int[] singleArms = {PX, NX, PY, NY, PZ, NZ};
-        for (int arm : singleArms) {
-            for (FlowState fs : new FlowState[] {FlowState.PUSH, FlowState.PULL}) {
-                String off = PipeShapes.indicatorStateFor(arm, fs, false);
-                String on = PipeShapes.indicatorStateFor(arm, fs, true);
-                assertEquals(PipePowerStates.poweredOf(off), on,
-                        "arm " + arm + " " + fs + ": energized indicator is not the powered twin");
-                assertEquals(off, PipePowerStates.unpoweredOf(on),
-                        "arm " + arm + " " + fs + ": unpoweredOf(on) does not return the off indicator");
+    void tipped_noTip_energized_isPlainEnergizedStateFor() {
+        int mask = PX | NX | PZ;
+        assertEquals(PipeShapes.stateFor(mask, true),
+                PipeShapes.tippedStateFor(mask, allNormal(), mask, true, 0));
+    }
+
+    // --- NORMAL / NONE faces never produce a tip ---
+
+    @Test
+    void tipped_normalAndNoneFaces_noTip() {
+        int mask = PX | NX | PZ;
+        FlowState[] fs = faces(java.util.Map.of(0, FlowState.NORMAL, 4, FlowState.NONE));
+        assertEquals(PipeShapes.stateFor(mask, false),
+                PipeShapes.tippedStateFor(mask, fs, mask, false, 0));
+    }
+
+    // --- rotation mapping: world tipped face un-rotates to model face in the key ---
+
+    @Test
+    void tipped_rotationMapsWorldFaceToModelFace() {
+        // A +X(0) end at the table's rotation. End for +X resolves to rotationIndex 1.
+        // World face 0 under rot1 maps to model face 4 (the rot-0 base End's arm is +Z=4).
+        // So a PUSH on world +X with rotationIndex 1 must key as End_T4p (model space).
+        int mask = PX;
+        FlowState[] fs = faces(java.util.Map.of(0, FlowState.PUSH));
+        int rot = PipeShapes.resolve(mask).rotationIndex(); // == 1
+        assertEquals(1, rot);
+        assertEquals("End_T4p", PipeShapes.tippedStateFor(mask, fs, PX, false, rot));
+    }
+
+    @Test
+    void tipped_rotationRoundTripExhaustive() {
+        // For every rotation (0..3) and every world face (0..5), un-rotating then re-rotating is
+        // identity, and the model-face index that lands in the key is the documented inverse-yaw of
+        // the world face. This pins the mapping used internally by tippedStateFor.
+        // world->model per rotationIndex (derived from the generator's (x,y,z)->(z,y,-x) yaw):
+        int[][] worldToModel = {
+            {0, 1, 2, 3, 4, 5}, // rot0 identity
+            {4, 5, 2, 3, 1, 0}, // rot1
+            {1, 0, 2, 3, 5, 4}, // rot2
+            {5, 4, 2, 3, 0, 1}, // rot3
+        };
+        for (int rot = 0; rot < 4; rot++) {
+            for (int wf = 0; wf < 6; wf++) {
+                int modelFace = PipeShapes.worldFaceToModelFace(wf, rot);
+                assertEquals(worldToModel[rot][wf], modelFace,
+                        "rot " + rot + " world face " + wf + " -> wrong model face");
+                // round-trip: re-rotate the model face back to world.
+                assertEquals(wf, PipeShapes.modelFaceToWorldFace(modelFace, rot),
+                        "rot " + rot + " face " + wf + ": round-trip not identity");
             }
         }
     }
 
-    // --- null cases: NORMAL / NONE / null face on a valid single arm ---
-
     @Test
-    void indicator_normalFace_isNull() {
-        assertNull(PipeShapes.indicatorStateFor(PZ, FlowState.NORMAL, false));
-        assertNull(PipeShapes.indicatorStateFor(PY, FlowState.NORMAL, true));
-    }
-
-    @Test
-    void indicator_noneFace_isNull() {
-        assertNull(PipeShapes.indicatorStateFor(PZ, FlowState.NONE, false));
-        assertNull(PipeShapes.indicatorStateFor(NY, FlowState.NONE, true));
-    }
-
-    @Test
-    void indicator_nullFace_isNull() {
-        assertNull(PipeShapes.indicatorStateFor(PX, null, false));
-    }
-
-    // --- null cases: zero mask and multi-arm masks (not an end-stub) ---
-
-    @Test
-    void indicator_zeroMask_isNull() {
-        assertNull(PipeShapes.indicatorStateFor(0, FlowState.PUSH, false));
-        assertNull(PipeShapes.indicatorStateFor(0, FlowState.PULL, true));
-    }
-
-    @Test
-    void indicator_multiArmMasks_isNull() {
-        // Straight (two arms), elbow (two), tee (three), cross (four), six (all): none are end stubs.
-        assertNull(PipeShapes.indicatorStateFor(PZ | NZ, FlowState.PUSH, false));
-        assertNull(PipeShapes.indicatorStateFor(PX | PZ, FlowState.PULL, false));
-        assertNull(PipeShapes.indicatorStateFor(PX | NX | PZ, FlowState.PUSH, true));
-        assertNull(PipeShapes.indicatorStateFor(PX | NX | PZ | NZ, FlowState.PULL, false));
-        assertNull(PipeShapes.indicatorStateFor(0b111111, FlowState.PUSH, true));
-    }
-
-    @Test
-    void indicator_outOfRangeMask_isNull() {
-        // Defensive: a bit above the low 6 (or negative) is not a valid single-arm end and never throws.
-        assertNull(PipeShapes.indicatorStateFor(64, FlowState.PUSH, false));
-        assertNull(PipeShapes.indicatorStateFor(-1, FlowState.PULL, false));
-    }
-
-    // --- the indicator's base end shape matches stateFor's plain end (direction aside) ---
-
-    @Test
-    void indicator_baseMatchesPlainEndShape() {
-        int[] singleArms = {PX, NX, PY, NY, PZ, NZ};
-        for (int arm : singleArms) {
-            String plain = PipeShapes.stateFor(arm, false); // e.g. "End", "Vertical_End_Up"
-            String push = PipeShapes.indicatorStateFor(arm, FlowState.PUSH, false);
-            String pull = PipeShapes.indicatorStateFor(arm, FlowState.PULL, false);
-            assertEquals(plain + "_Push", push, "arm " + arm + ": push indicator base mismatch");
-            assertEquals(plain + "_Pull", pull, "arm " + arm + ": pull indicator base mismatch");
+    void tipped_verticalFacesYawInvariant() {
+        // +Y(2) and -Y(3) map to themselves under all four rotations.
+        for (int rot = 0; rot < 4; rot++) {
+            assertEquals(2, PipeShapes.worldFaceToModelFace(2, rot), "rot " + rot + " +Y not invariant");
+            assertEquals(3, PipeShapes.worldFaceToModelFace(3, rot), "rot " + rot + " -Y not invariant");
         }
     }
 
-    // --- every state key indicatorStateFor can emit must exist in the cable JSON Definitions ---
-    // (path validity is covered by the build resources; this asserts the key set is exactly the 12)
-
     @Test
-    void indicator_emitsOnlyTheTwelveKnownKeys() {
-        java.util.Set<String> emitted = new java.util.TreeSet<>();
-        int[] singleArms = {PX, NX, PY, NY, PZ, NZ};
-        for (int arm : singleArms) {
-            for (FlowState fs : new FlowState[] {FlowState.PUSH, FlowState.PULL}) {
-                emitted.add(PipeShapes.indicatorStateFor(arm, fs, false));
-                emitted.add(PipeShapes.indicatorStateFor(arm, fs, true));
-            }
-        }
-        java.util.Set<String> expected = new java.util.TreeSet<>(java.util.Arrays.asList(
-                "End_Push", "End_Pull",
-                "Vertical_End_Up_Push", "Vertical_End_Up_Pull",
-                "Vertical_End_Down_Push", "Vertical_End_Down_Pull",
-                "End_Push_On", "End_Pull_On",
-                "Vertical_End_Up_Push_On", "Vertical_End_Up_Pull_On",
-                "Vertical_End_Down_Push_On", "Vertical_End_Down_Pull_On"));
-        assertEquals(expected, emitted);
+    void tipped_twoFacesUnderRotation_keyUsesModelFaces() {
+        // Tee covering +X|-X|+Z resolves to rotation 3 (table: 0b010011 -> Tee r3).
+        // PUSH on world +X(0), PULL on world +Z(4). Under rot3: world 0 -> model 5, world 4 -> model 0.
+        // Ascending model faces: 0(l) then 5(p) -> Tee_T0l_T5p.
+        int mask = PX | NX | PZ;
+        int rot = PipeShapes.resolve(mask).rotationIndex();
+        assertEquals(3, rot);
+        FlowState[] fs = faces(java.util.Map.of(0, FlowState.PUSH, 4, FlowState.PULL));
+        assertEquals("Tee_T0l_T5p", PipeShapes.tippedStateFor(mask, fs, mask, false, rot));
     }
 }

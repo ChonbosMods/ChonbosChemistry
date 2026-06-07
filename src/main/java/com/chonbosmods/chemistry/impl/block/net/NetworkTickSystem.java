@@ -315,16 +315,15 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
      * ITEM channel with a non-null lookup, and {@link PipeVisualStates#physicalMask} ignores it entirely.
      * For non-ITEM networks the null lookup means zero container awareness, identical to the pre-Task-9
      * behaviour. {@code energized} is always {@code false} for ITEM networks (item pipes ship no
-     * {@code _On} states): the caller's channel branch sets it, so the indicator/plain states resolve to
+     * {@code _On} states): the caller's channel branch sets it, so the tipped/plain states resolve to
      * the unenergized node here.
      *
-     * <h2>Indicator (Task 12) reaches containers too</h2>
-     * The single-arm push/pull indicator already works for a container end: the indicator guard only
-     * requires that the lone arm NOT point at a PIPE (a container is not a pipe), so a single-arm ITEM
-     * pipe whose face is PUSH/PULL toward a chest reads its face flow state and
-     * {@link PipeShapes#indicatorStateFor} renders the directional {@code end_push}/{@code end_pull}
-     * shape. The container only needs to make the face count in the effective mask (it does, above) for
-     * the single-bit indicator path to engage.
+     * <h2>Per-face tips (Task 4) reach containers too</h2>
+     * The push/pull tips work for any arm pointing at an endpoint, including a container end: the
+     * endpoint-arm mask requires only that the arm NOT point at a PIPE (a container is not a pipe), so an
+     * ITEM pipe whose face is PUSH/PULL toward a chest contributes that face to {@code endpointArmMask}
+     * and {@link PipeShapes#tippedStateFor} renders the composite tip shape. The container only needs to
+     * make the face count in the effective mask (it does, above) for the tip path to engage.
      *
      * <h2>Throttle</h2>
      * Like the powered flip, this reads the placed interaction-state name first and issues
@@ -368,29 +367,37 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                 int effective = PipeVisualStates.effectiveMask(member, mx, my, mz, grid, lookup, containers);
                 int physical = PipeVisualStates.physicalMask(member, mx, my, mz, grid, lookup, containers);
 
-                // Task 12: end-stub push/pull indicator. Cheap check (single-bit mask + the single arm's
-                // flow state). When the effective topology is a lone arm pointing at a machine whose face
-                // is PUSH/PULL, the indicator shape carries a direction arrow and must be shown EVEN when
-                // effective==physical (an undisturbed straight-to-machine end is a valid indicator case):
-                // so indicator-eligible pipes must NOT take the undisturbed short-circuit below.
-                // The indicator is a pipe->MACHINE concept: a stale persisted PUSH/PULL on a face whose
-                // neighbour is (now) another PIPE must not draw an arrow (pipe-pipe push/pull is treated
-                // as NORMAL everywhere else). Guard: the single arm must not point at a pipe.
-                FlowState faceState = null;
-                if (Integer.bitCount(effective) == 1) {
-                    int armFace = Integer.numberOfTrailingZeros(effective);
+                // Task 4: per-face push/pull tips, any shape (up to MAX_DIRECTED_FACES arms). A face tips
+                // when it is an effective arm AND an endpoint arm (points at a machine/container, NOT
+                // another pipe) AND its flow state is PUSH/PULL. We build the per-face flow-state array
+                // (OFFSETS order) and the endpoint-arm mask, then let PipeShapes select the composite key.
+                // A stale persisted PUSH/PULL on a face whose neighbour is (now) another PIPE must NOT draw
+                // an arrow (pipe-pipe push/pull is treated as NORMAL everywhere else): the endpoint-arm
+                // mask excludes such faces, generalising the old single-arm guard to every arm.
+                FlowState[] faceStates = new FlowState[6];
+                int endpointArmMask = 0;
+                boolean anyTip = false;
+                for (int armFace = 0; armFace < 6; armFace++) {
+                    FlowState fs = member.flowState(armFace);
+                    faceStates[armFace] = fs;
+                    if ((effective & (1 << armFace)) == 0) {
+                        continue; // not an effective arm; can't be an endpoint arm either
+                    }
                     int ax = mx + NetworkManager.OFFSETS[armFace][0];
                     int ay = my + NetworkManager.OFFSETS[armFace][1];
                     int az = mz + NetworkManager.OFFSETS[armFace][2];
                     if (grid.pipeAt(ax, ay, az) == null) {
-                        faceState = member.flowState(armFace);
+                        endpointArmMask |= 1 << armFace; // neighbour is not a pipe: an endpoint arm
+                        if (fs == FlowState.PUSH || fs == FlowState.PULL) {
+                            anyTip = true; // a tipped face exists (cheap pre-check, no rotation needed)
+                        }
                     }
                 }
-                String indicator = PipeShapes.indicatorStateFor(effective, faceState, energized);
 
-                if (indicator == null && effective == physical) {
-                    // Undisturbed and no indicator: the engine pattern + H8 flip already did the right
-                    // thing. Leave it, and forget any stale rotation warning (topology may have changed).
+                if (!anyTip && effective == physical) {
+                    // Undisturbed and no tip: the engine pattern + H8 flip already did the right thing.
+                    // Leave it, and forget any stale rotation warning (topology may have changed).
+                    // (This is the cheap steady-state path: no chunk fetch, no state read.)
                     warnedRotationMismatch.remove(key);
                     continue;
                 }
@@ -404,8 +411,13 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                     continue; // not our block anymore (race with a break); skip
                 }
 
-                // Prefer the indicator state when applicable; else the plain effective-topology shape.
-                String desired = indicator != null ? indicator : PipeShapes.stateFor(effective, energized);
+                // The block's current yaw is needed BOTH to un-rotate world tip faces to model space (the
+                // composite key) AND for the rotation-mismatch fallback below: read it once.
+                int currentRotation = currentRotationIndex(accessor, mx, my, mz);
+
+                // The tipped key falls back to the plain effective-topology shape when no arm tips.
+                String desired = PipeShapes.tippedStateFor(
+                    effective, faceStates, endpointArmMask, energized, currentRotation);
                 String current = bt.getStateForBlock(bt);
                 String normalizedCurrent = (current == null || current.isEmpty()) ? "default" : current;
                 if (desired.equals(normalizedCurrent)) {
@@ -417,7 +429,6 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                 // orientation finding, design §16.4); both rotation accessors carry the SDK's
                 // marked-for-removal tag, so we pin this one and suppress narrowly.
                 int requiredRotation = PipeShapes.resolve(effective).rotationIndex();
-                int currentRotation = currentRotationIndex(accessor, mx, my, mz);
                 if (requiredRotation != currentRotation && warnedRotationMismatch.add(key)) {
                     LOGGER.warning(
                         "Suppressed-arm pipe at (" + mx + "," + my + "," + mz + "): effective shape '"

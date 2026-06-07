@@ -1,6 +1,7 @@
 package com.chonbosmods.chemistry.impl.block.net;
 
 import com.chonbosmods.chemistry.api.io.FlowState;
+import com.chonbosmods.chemistry.impl.block.WrenchCycles;
 
 /**
  * Pure, table-driven mapping from a pipe's connected-faces bitmask to its <em>effective-topology</em>
@@ -239,60 +240,147 @@ public final class PipeShapes {
     }
 
     /**
-     * The push/pull <em>indicator</em> state key for an end-stub pipe whose single effective arm points at
-     * a machine and whose face flow state is {@link FlowState#PUSH PUSH} or {@link FlowState#PULL PULL}
-     * (Task 12, design §3). When applicable this returns the directional indicator twin of the plain end
-     * shape ({@code End_Push}/{@code End_Pull}, {@code Vertical_End_Up_Push}/{@code _Pull},
-     * {@code Vertical_End_Down_Push}/{@code _Pull}, each with its {@code _On} energized twin); otherwise it
-     * returns {@code null} so the caller falls back to {@link #stateFor}.
-     *
-     * <h2>When an indicator applies</h2>
-     * The indicator is an end-stub overlay, so it applies ONLY when:
-     * <ul>
-     *   <li>{@code effectiveMask} is a single-arm END mask: exactly one of the low 6 bits set
-     *       ({@code Integer.bitCount(effectiveMask) == 1}); AND</li>
-     *   <li>{@code faceState} (the flow state of that single arm's face) is {@code PUSH} or {@code PULL}.</li>
-     * </ul>
-     * For any other mask (zero, multi-arm, or out of range) or any other face state ({@code NORMAL},
-     * {@code NONE}, or {@code null}) this returns {@code null}: those pipes show their plain shape via
-     * {@link #stateFor}. The single arm's face index is {@code Integer.numberOfTrailingZeros(mask)} and the
-     * base end shape (and the rotation the engine welds it with, preserved by the state swap) comes from
-     * {@link #resolve}: +X/-X/+Z/-Z resolve to {@code End} at the appropriate rotation, +Y to
-     * {@code Vertical_End_Up} and -Y to {@code Vertical_End_Down} (both rotation 0).
-     *
-     * <h2>Key construction</h2>
-     * The indicator key is the base end shape key + {@code _Push}/{@code _Pull} (+ {@code _On} when
-     * {@code energized}), e.g. {@code End_Pull}, {@code Vertical_End_Up_Push_On}. The energized twin is
-     * exactly {@link PipePowerStates#poweredOf(String)} of the unenergized indicator key, keeping it in
-     * lockstep with the H8 flip path. Orientation is NOT part of the key (see this class's
-     * {@code Orientation} section); a single-arm mask's rotation is {@link #resolve}{@code .rotationIndex()}.
-     *
-     * @param effectiveMask the pipe's effective connectivity bitmask (OFFSETS order); the indicator only
-     *                      fires for a single-bit (end-stub) mask.
-     * @param faceState     the {@link FlowState} of the single arm's face (the caller reads
-     *                      {@code pipe.flowState(Integer.numberOfTrailingZeros(effectiveMask))}); may be
-     *                      {@code null}.
-     * @param energized     whether the network is energized (selects the {@code _On} twin).
-     * @return the indicator state key, or {@code null} when no indicator applies (caller uses
-     *         {@link #stateFor}).
+     * The forward (model&rarr;world) yaw face permutation for ONE 90&deg; step about +Y, derived from the
+     * generator's position yaw {@code (x,y,z)->(z,y,-x)} (see {@code scripts/gen_pipe_tips.py}). Index
+     * {@code i} holds the WORLD face that model face {@code i} lands on after a single +90&deg; rotation:
+     * <pre>  +X(0)->-Z(5), -X(1)->+Z(4), +Y(2)->+Y(2), -Y(3)->-Y(3), +Z(4)->+X(0), -Z(5)->-X(1)</pre>
+     * Applying this {@code rotationIndex} times maps the rotation-0 model face onto the world face the
+     * engine renders it at. (Cross-check: applying it to +Z(4) over yaw 0..3 yields {@code 4,0,5,1},
+     * exactly the generator's {@code YAW_FOR_FACE} contract that yaw1 carries +Z onto +X.)
      */
-    public static String indicatorStateFor(int effectiveMask, FlowState faceState, boolean energized) {
-        // Cheap eligibility gate: exactly one arm (a single-bit END mask) AND a PUSH/PULL face.
-        if (effectiveMask < 1 || effectiveMask > 63 || Integer.bitCount(effectiveMask) != 1) {
-            return null;
+    private static final int[] YAW_FORWARD = {5, 4, 2, 3, 0, 1};
+
+    /** The inverse (world&rarr;model) yaw face permutation for ONE 90&deg; step about +Y. */
+    private static final int[] YAW_INVERSE = invert(YAW_FORWARD);
+
+    private static int[] invert(int[] perm) {
+        int[] inv = new int[perm.length];
+        for (int i = 0; i < perm.length; i++) {
+            inv[perm[i]] = i;
         }
-        String suffix;
-        if (faceState == FlowState.PUSH) {
-            suffix = "_Push";
-        } else if (faceState == FlowState.PULL) {
-            suffix = "_Pull";
-        } else {
-            return null; // NORMAL, NONE, or null: no indicator.
+        return inv;
+    }
+
+    /**
+     * Un-rotates a WORLD face index to the MODEL-space face index for a block at {@code rotationIndex}.
+     * The generated tip models are authored in model space (rotation 0); the engine orients them by yaw =
+     * {@code rotationIndex}. So a world tipped face must be mapped through the INVERSE yaw permutation
+     * {@code rotationIndex} times to name the model face the tip lives on. Vertical faces (+Y/-Y) are
+     * yaw-invariant and map to themselves. Inverse of {@link #modelFaceToWorldFace}.
+     *
+     * @param worldFace world face index (OFFSETS order, 0..5)
+     * @param rotationIndex the block's yaw rotation (0..3); reduced mod 4
+     * @return the model-space face index (0..5)
+     */
+    public static int worldFaceToModelFace(int worldFace, int rotationIndex) {
+        int f = worldFace;
+        for (int i = 0; i < ((rotationIndex % 4) + 4) % 4; i++) {
+            f = YAW_INVERSE[f];
         }
-        // The single arm resolves to one of the three end shapes (End / Vertical_End_Up /
-        // Vertical_End_Down); its rotation is carried by the resolved Shape and preserved by the swap.
-        String base = resolve(effectiveMask).stateKey();
-        String key = base + suffix;
-        return energized ? PipePowerStates.poweredOf(key) : key;
+        return f;
+    }
+
+    /**
+     * Re-rotates a MODEL face index to the WORLD face index the engine renders it at for a block at
+     * {@code rotationIndex} (applies the forward yaw permutation {@code rotationIndex} times). Inverse of
+     * {@link #worldFaceToModelFace}; exposed for round-trip tests.
+     */
+    public static int modelFaceToWorldFace(int modelFace, int rotationIndex) {
+        int f = modelFace;
+        for (int i = 0; i < ((rotationIndex % 4) + 4) % 4; i++) {
+            f = YAW_FORWARD[f];
+        }
+        return f;
+    }
+
+    /**
+     * The per-face <em>tipped</em> interaction-state key for a pipe: the composite key that names the plain
+     * effective-topology shape plus a push/pull tip on each tipped arm (design 2026-06-07, Task 4). This
+     * replaces the old single-arm-only {@code indicatorStateFor}: tips now render on ANY shape, for up to
+     * {@link com.chonbosmods.chemistry.impl.block.WrenchCycles#MAX_DIRECTED_FACES} arms.
+     *
+     * <h2>What a tipped face is</h2>
+     * An arm gets a tip when it is BOTH an effective arm ({@code effectiveMask} bit set) AND an endpoint
+     * arm ({@code endpointArmMask} bit set: it points at a machine/container, not another pipe) AND its
+     * {@link FlowState} is {@code PUSH} or {@code PULL}. {@code NORMAL}/{@code NONE}/{@code null} faces,
+     * faces that are not effective arms, and faces toward another pipe never produce a tip (a stale
+     * pipe&rarr;pipe PUSH/PULL draws no arrow, matching the wrench's treatment everywhere else).
+     *
+     * <h2>Key construction (matches the generator EXACTLY)</h2>
+     * The key is {@code <ShapePascal>} + one {@code _T<modelFace><p|l>} per tipped face, faces ASCENDING,
+     * {@code p}=push / {@code l}=pull LOWERCASE: e.g. {@code Tee_T0p_T4l}. This mirrors
+     * {@code scripts/gen_pipe_tips.py}'s {@code state_key()} byte-for-byte (the generator emits {@code _T}
+     * with a lowercase {@code p}/{@code l}; the design prose's uppercase {@code P|L} is superseded by the
+     * generator, the source of truth). The {@code <ShapePascal>} is {@link #resolve}{@code .stateKey()} for
+     * {@code effectiveMask} (same shape the plain {@link #stateFor} returns). When {@code energized} the
+     * whole key gets the {@code _On} twin via {@link PipePowerStates#poweredOf(String)}, in lockstep with
+     * the H8 flip path.
+     *
+     * <h2>Rotation: world&rarr;model face mapping</h2>
+     * Inputs are WORLD-space ({@code effectiveMask}, {@code faceStates}, {@code endpointArmMask} are all in
+     * OFFSETS world order). The generated models are model-space (rotation 0), so each tipped WORLD face is
+     * un-rotated to its MODEL face via {@link #worldFaceToModelFace}{@code (worldFace, rotationIndex)}
+     * before naming. The faces are then sorted ASCENDING by MODEL index (the generator canonicalises on
+     * the model-space index). {@code rotationIndex} is the block's CURRENT yaw (the driver reads
+     * {@code getRotationIndex}); it equals {@link #resolve}{@code .rotationIndex()} in the steady state, but
+     * the driver's existing rotation-mismatch fallback still applies the state regardless, and the tip
+     * faces ride the same shape rotation.
+     *
+     * <h2>Fallbacks</h2>
+     * <ul>
+     *   <li>Zero tipped faces &rarr; the plain {@link #stateFor}{@code (effectiveMask, energized)} key.</li>
+     *   <li>Legacy 3+ tipped faces (pre-budget saves; the wrench can no longer produce them) &rarr; keep
+     *       the 2 LOWEST tipped faces by MODEL index, ignore the rest (defensive truncation).</li>
+     *   <li>Out-of-range {@code effectiveMask} &rarr; delegates to {@link #stateFor}, which throws.</li>
+     * </ul>
+     *
+     * @param effectiveMask the pipe's effective connectivity bitmask (OFFSETS world order, 0..63)
+     * @param faceStates the pipe's 6 per-face flow states in OFFSETS world order; entries may be
+     *                   {@code null} (treated as no-tip). Must be length &ge; 6.
+     * @param endpointArmMask which effective arms point at ENDPOINTS (machines/containers): a tipped face
+     *                        must be set here AND in {@code effectiveMask}
+     * @param energized whether the network is energized (selects the {@code _On} twin)
+     * @param rotationIndex the block's current yaw rotation (0..3) used to un-rotate world tip faces to
+     *                      model space
+     * @return the composite tipped state key, or the plain {@link #stateFor} key when no tip applies
+     */
+    public static String tippedStateFor(int effectiveMask, FlowState[] faceStates, int endpointArmMask,
+                                        boolean energized, int rotationIndex) {
+        // Collect model-space tipped faces. A face tips iff it is an effective arm AND an endpoint arm AND
+        // its flow state is PUSH/PULL. Sort by MODEL index ascending (the generator's canonicalisation).
+        int tipMask = effectiveMask & endpointArmMask & 0b111111;
+        // (modelFace << 1) | kindBit, kindBit 0=push 1=pull, packed for a simple ascending sort.
+        int[] tips = new int[6];
+        int n = 0;
+        for (int worldFace = 0; worldFace < 6; worldFace++) {
+            if ((tipMask & (1 << worldFace)) == 0) {
+                continue;
+            }
+            FlowState fs = worldFace < faceStates.length ? faceStates[worldFace] : null;
+            int kindBit;
+            if (fs == FlowState.PUSH) {
+                kindBit = 0;
+            } else if (fs == FlowState.PULL) {
+                kindBit = 1;
+            } else {
+                continue; // NORMAL / NONE / null: no tip.
+            }
+            int modelFace = worldFaceToModelFace(worldFace, rotationIndex);
+            tips[n++] = (modelFace << 1) | kindBit;
+        }
+        if (n == 0) {
+            return stateFor(effectiveMask, energized); // no tip: plain shape.
+        }
+        java.util.Arrays.sort(tips, 0, n);
+        // Legacy 3+ tips: defensively keep the 2 LOWEST (model-face) tipped faces.
+        int keep = Math.min(n, WrenchCycles.MAX_DIRECTED_FACES);
+
+        StringBuilder key = new StringBuilder(resolve(effectiveMask).stateKey());
+        for (int i = 0; i < keep; i++) {
+            int modelFace = tips[i] >> 1;
+            char kind = (tips[i] & 1) == 0 ? 'p' : 'l';
+            key.append("_T").append(modelFace).append(kind);
+        }
+        return energized ? PipePowerStates.poweredOf(key.toString()) : key.toString();
     }
 }
