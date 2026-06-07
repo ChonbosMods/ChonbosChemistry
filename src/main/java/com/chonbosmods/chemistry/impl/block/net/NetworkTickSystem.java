@@ -1,8 +1,12 @@
 package com.chonbosmods.chemistry.impl.block.net;
 
 import com.chonbosmods.chemistry.api.io.FlowState;
+import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
+import com.chonbosmods.chemistry.impl.block.net.item.ItemEndpoints;
+import com.chonbosmods.chemistry.impl.block.net.item.ItemTransferSystem;
+import com.chonbosmods.chemistry.impl.block.net.item.WorldContainerLookup;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
@@ -56,6 +60,14 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType;
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType;
     private final NetworkService networkService;
+
+    /**
+     * The ITEM-channel transport glue (Task 7), invoked instead of {@link NetworkTransfer#distribute} for
+     * ITEM networks. Stateless and reused across worlds/networks (it builds its per-tick container lookup
+     * + seams from the world/store passed in). See {@code ItemTransferDriver} for the structure rationale
+     * (a driver-from-this-system, not a second ticking system).
+     */
+    private final ItemTransferSystem itemTransfer = new ItemTransferSystem();
 
     /** Logger for the rate-limited rotation-mismatch warning (Task 11 fallback). */
     private static final Logger LOGGER = Logger.getLogger(NetworkTickSystem.class.getName());
@@ -178,22 +190,37 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         }
 
         MachineLookup lookup = new WorldMachineLookup(world, store, machineType, tankType);
-        NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, grid, lookup);
-        long delivered = NetworkTransfer.distribute(net, endpoints);
 
-        // H6 FIX 1: persist the post-distribute buffer back onto the member pipe shares so an
-        // invalidation/rebuild (place/break between ticks) re-pools it losslessly.
-        // Task 5: if this write-back CLEARED the network's type-lock (a FLUID/GAS line drained empty),
-        // invalidate its members so the next access re-merges it with an adjacent run the now-gone
-        // substance boundary used to separate (the drain case has no place/break event to trigger this).
-        if (NetworkManager.writeBackShares(net, grid)) {
-            manager.invalidateMembers(net);
+        // ITEM networks transport DISCRETE stacks, not a fungible shared buffer: they run the dedicated
+        // item driver (Task 7) instead of NetworkTransfer.distribute, and skip the energy/lock write-back
+        // machinery entirely (an ITEM network has no stored()/type-lock to persist or clear). The visual
+        // passes below still run for them (flow-state arms + future container arms), with energized=false:
+        // item pipes ship no _On states (design "NO _On state for item pipes"), and the visual passes
+        // no-op on any missing block state anyway, so a false energized is correct and defensive.
+        boolean energized;
+        if (net.channel() == PortChannel.ITEM) {
+            ItemEndpoints.Endpoints itemEndpoints =
+                ItemEndpoints.collect(net, grid, new WorldContainerLookup(world, store));
+            itemTransfer.tickNetwork(net, world, store, grid, itemEndpoints);
+            energized = false; // ITEM has no _On twin; Task 9 owns the full item visual integration
+        } else {
+            NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, grid, lookup);
+            long delivered = NetworkTransfer.distribute(net, endpoints);
+
+            // H6 FIX 1: persist the post-distribute buffer back onto the member pipe shares so an
+            // invalidation/rebuild (place/break between ticks) re-pools it losslessly.
+            // Task 5: if this write-back CLEARED the network's type-lock (a FLUID/GAS line drained empty),
+            // invalidate its members so the next access re-merges it with an adjacent run the now-gone
+            // substance boundary used to separate (the drain case has no place/break event to trigger this).
+            if (NetworkManager.writeBackShares(net, grid)) {
+                manager.invalidateMembers(net);
+            }
+
+            // Visual ON/OFF: a network is "energized" if it currently holds energy OR moved any this tick.
+            // The OR on delivered is critical: in steady flow the buffer is pulled and fully delivered
+            // within one tick, ending at stored()==0, yet the cables must still read as ON.
+            energized = net.stored() > 0 || delivered > 0;
         }
-
-        // Visual ON/OFF: a network is "energized" if it currently holds energy OR moved any this tick.
-        // The OR on delivered is critical: in steady flow the buffer is pulled and fully delivered
-        // within one tick, ending at stored()==0, yet the cables must still read as ON.
-        boolean energized = net.stored() > 0 || delivered > 0;
         applyPoweredVisual(world, net, energized);
 
         // Task 11: programmatic suppressed-arm visuals. For each member pipe whose EFFECTIVE
