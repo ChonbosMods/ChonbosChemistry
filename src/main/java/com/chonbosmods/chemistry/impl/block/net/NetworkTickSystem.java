@@ -69,7 +69,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
      */
     private final ItemTransferSystem itemTransfer = new ItemTransferSystem();
 
-    /** Logger for the rate-limited rotation-mismatch warning (Task 11 fallback). */
+    /** Logger for the gated tick diagnostics ([CC-item] stall log + [CC-tiprot] rotation log). */
     private static final Logger LOGGER = Logger.getLogger(NetworkTickSystem.class.getName());
 
     /**
@@ -78,15 +78,6 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
      * property) for a single confirmation run. Both diagnostics are removed once their bugs are fixed.
      */
     private static final boolean DEBUG_TICK_LOGS = Boolean.getBoolean("cc.debug.tick");
-
-    /**
-     * Positions already warned about a suppressed-arm rotation mismatch (Task 11 fallback ladder rung
-     * (b)): a programmatic state swap cannot set rotation (see {@link PipeShapes}), so when the effective
-     * shape needs a different rotation than the block currently has, we still apply the state (right arm
-     * count beats wrong substance weld) but log ONCE per position to avoid per-tick log spam. Packed
-     * block keys ({@link NetworkManager#packKey}).
-     */
-    private final Set<Long> warnedRotationMismatch = new HashSet<>();
 
     /** Per-world last-seen world tick, to detect when to reset that world's processed-anchor set. */
     private final Map<World, Long> lastTickByWorld = new IdentityHashMap<>();
@@ -333,19 +324,34 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
      * make the face count in the effective mask (it does, above) for the tip path to engage.
      *
      * <h2>Throttle</h2>
-     * Like the powered flip, this reads the placed interaction-state name first and issues
-     * {@code setBlockInteractionState} ONLY when the desired programmatic state actually differs from the
-     * current one, so the steady-state path costs a mask comparison + a state read and no block mutation.
+     * Like the powered flip, this reads the placed state first and issues the block swap ONLY when the
+     * desired programmatic state name actually differs from the current one OR the block's current
+     * rotation differs from the rotation the effective shape wants ({@link PipeShapes#resolve}). Now that
+     * rotation is part of the write (see below), the rotation half of the throttle is REQUIRED: without it
+     * a pipe already showing the right state name but at a stale rotation would never be corrected, and a
+     * pipe at the right rotation but read each tick would otherwise re-issue the same write. The
+     * steady-state path costs a mask comparison + a state read + a rotation read and no block mutation.
      *
-     * <h2>Rotation-mismatch fallback (PipeShapes orientation finding)</h2>
-     * A programmatic state swap CANNOT set the block's rotation (it preserves
-     * {@code getRotationIndex(x,y,z)}; see {@link PipeShapes}). If the effective shape's required
-     * rotation ({@link PipeShapes#resolve}) differs from the block's CURRENT rotation index, the swapped
-     * state renders at the wrong orientation. Per the Task 10 fallback ladder we accept the visual-only
-     * compromise (rung (b)): a wrong rotation with the RIGHT arm count beats a welded arm to a
-     * different-substance / flow-severed neighbour, so we STILL apply the state, but log ONCE per
-     * position (deduped via {@link #warnedRotationMismatch}) so it is visible without spamming the tick.
-     * Revisit if it looks bad in-game (Task 15).
+     * <h2>Rotation is SET, not preserved (2026-06-07 fix)</h2>
+     * The engine's {@code setBlockInteractionState} resolves the new shape from the state name but reuses
+     * the block's EXISTING rotation index (see {@link PipeShapes}), so a composite tip/container shape
+     * rendered at the block's frozen rotation: arms pointed the wrong way, lone-stub tips faced the wrong
+     * neighbour, and collar UVs striped on multi-arm shapes. This path instead calls the rotation-setting
+     * {@code WorldChunk.setBlock} primitive directly with {@code rotation =
+     * PipeShapes.resolve(effectiveMask).rotationIndex()} (the rotation the shape WANTS), mirroring what
+     * {@code setBlockInteractionState} does internally for everything else ({@code id} from the asset map,
+     * {@code newState} from {@code getBlockForState}, {@code filler = 0}) but writing the wanted rotation
+     * rather than the frozen one. Settings reuse the engine's {@code 198} (0xC6) verbatim:
+     * <ul>
+     *   <li><b>bit 1 (0x02) SET</b> &rarr; the existing block entity (this PipeNode: flow states,
+     *       in-transit stacks) is PRESERVED, not re-cloned from the template (the H8 wipe). Identical to
+     *       what {@code setBlockInteractionState} already did, so no data-loss regression.</li>
+     *   <li>the remaining bits match {@code setBlockInteractionState}'s side-effect profile (break-particle
+     *       suppression etc.), so the only behavioural delta vs. the old swap is the rotation write.</li>
+     * </ul>
+     * A direct {@code setBlock} does NOT run {@code ConnectedBlocksUtil}, so it never reshapes or wipes the
+     * neighbour pipes (no cascade). The old rotation-mismatch fallback (apply-anyway-and-warn) is obsolete
+     * and removed: we now set the correct rotation outright.
      *
      * <p>Fully guarded: a missing chunk/block/state for any member is skipped and never throws on the
      * world thread.
@@ -408,9 +414,8 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
 
                 if (!anyTip && effective == physical) {
                     // Undisturbed and no tip: the engine pattern + H8 flip already did the right thing.
-                    // Leave it, and forget any stale rotation warning (topology may have changed).
-                    // (This is the cheap steady-state path: no chunk fetch, no state read.)
-                    warnedRotationMismatch.remove(key);
+                    // Leave it entirely to the engine (this is the cheap steady-state fast path: no chunk
+                    // fetch, no state read).
                     continue;
                 }
 
@@ -423,47 +428,54 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                     continue; // not our block anymore (race with a break); skip
                 }
 
-                // The block's current yaw is needed BOTH to un-rotate world tip faces to model space (the
-                // composite key) AND for the rotation-mismatch fallback below: read it once.
+                // The rotation the effective shape WANTS. We SET this (the fix): the composite tip/
+                // container shape is oriented correctly instead of inheriting the block's frozen yaw. The
+                // tip key is built in this same wanted rotation so its model-space tip faces line up with
+                // the orientation we are about to write (NOT the stale current rotation).
+                int wantRot = PipeShapes.resolve(effective).rotationIndex();
                 int currentRotation = currentRotationIndex(accessor, mx, my, mz);
 
                 // The tipped key falls back to the plain effective-topology shape when no arm tips.
                 String desired = PipeShapes.tippedStateFor(
-                    effective, faceStates, endpointArmMask, energized, currentRotation);
+                    effective, faceStates, endpointArmMask, energized, wantRot);
                 String current = bt.getStateForBlock(bt);
                 String normalizedCurrent = (current == null || current.isEmpty()) ? "default" : current;
-                if (desired.equals(normalizedCurrent)) {
-                    continue; // already showing the suppressed shape; no swap needed
+
+                // Throttle: skip when the block ALREADY shows this shape AND is at the wanted rotation.
+                // The rotation half is required now that rotation is part of the write (see javadoc):
+                // without it a stale-rotation block would never be corrected, and a correct block would be
+                // rewritten every tick.
+                if (desired.equals(normalizedCurrent) && currentRotation == wantRot) {
+                    continue;
                 }
 
-                // DIAGNOSTIC (2026-06-07 tip-rotation confirmation, remove after root-cause): this pipe
-                // is getting a NON-PLAIN programmatic state (divergence and/or tip). Log the masks, the
-                // chosen key, the rotation the resolved shape WANTS, and the block's CURRENT rotation.
-                // A consistent wantRot != curRot here confirms the rotation-mismatch root cause: a state
-                // swap preserves the block's frozen rotation, so a composite tip/container shape renders
-                // at the wrong orientation. Rate-limited (diagTick) to ~1 line/s to avoid tick spam.
+                // DIAGNOSTIC (2026-06-07 tip-rotation, gated by cc.debug.tick, kept harmless/off for the
+                // confirmation run): the masks, chosen key, wanted rotation, and the block's CURRENT
+                // rotation. Rate-limited (diagTick) to ~1 line/s.
                 if (diagTick) {
                     LOGGER.info("[CC-tiprot] (" + mx + "," + my + "," + mz + ") eff="
                         + Integer.toBinaryString(effective) + " phys="
                         + Integer.toBinaryString(physical) + " key=" + desired
-                        + " wantRot=" + PipeShapes.resolve(effective).rotationIndex()
-                        + " curRot=" + currentRotation);
+                        + " wantRot=" + wantRot + " curRot=" + currentRotation);
                 }
 
-                // Rotation-mismatch fallback (rung (b)): apply the state regardless, but warn once.
-                // getRotationIndex is what setBlockInteractionState itself reads + preserves (PipeShapes'
-                // orientation finding, design §16.4); both rotation accessors carry the SDK's
-                // marked-for-removal tag, so we pin this one and suppress narrowly.
-                int requiredRotation = PipeShapes.resolve(effective).rotationIndex();
-                if (requiredRotation != currentRotation && warnedRotationMismatch.add(key)) {
-                    LOGGER.warning(
-                        "Suppressed-arm pipe at (" + mx + "," + my + "," + mz + "): effective shape '"
-                        + desired + "' wants rotation " + requiredRotation + " but block is at "
-                        + currentRotation + "; applying state anyway (wrong orientation, right arm count). "
-                        + "Task 10 fallback rung (b): revisit if it looks bad in-game.");
+                // Resolve the new shape BlockType from the desired state name (mirrors what
+                // setBlockInteractionState does internally). Null => the state key is not defined on this
+                // BlockType: skip defensively rather than write garbage.
+                BlockType newState = bt.getBlockForState(desired);
+                if (newState == null) {
+                    continue;
                 }
 
-                accessor.setBlockInteractionState(mx, my, mz, bt, desired, false);
+                // Rotation-setting swap (the fix): write the shape geometry AND the WANTED rotation via the
+                // setBlock primitive, mirroring setBlockInteractionState's internals (id from the asset
+                // map, filler 0, settings 198) but with wantRot in place of the preserved currentRotation.
+                // settings 198 (0xC6): bit 1 (0x02) is SET, so the existing PipeNode entity (flow states,
+                // in-transit stacks) is PRESERVED (no template re-clone = no H8 wipe); the rest matches the
+                // engine's own swap side-effects. A direct setBlock skips ConnectedBlocksUtil, so it never
+                // reshapes/wipes neighbour pipes.
+                int id = BlockType.getAssetMap().getIndex(newState.getId());
+                accessor.setBlock(mx, my, mz, id, newState, wantRot, 0, 198);
             } catch (Throwable ignored) {
                 // A single member's suppressed-arm swap must never crash the tick.
             }
