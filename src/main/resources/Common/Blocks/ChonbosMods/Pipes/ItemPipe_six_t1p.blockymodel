@@ -400,14 +400,14 @@
             "angle": 0
           },
           "top": {
-            "offset": {"x": 0, "y": 52},
+            "offset": {"x": 0, "y": 50},
             "mirror": {"x": false, "y": false},
-            "angle": 270
+            "angle": 0
           },
           "bottom": {
-            "offset": {"x": 0, "y": 52},
+            "offset": {"x": 0, "y": 50},
             "mirror": {"x": false, "y": false},
-            "angle": 270
+            "angle": 0
           }
         },
         "unwrapMode": "custom",
