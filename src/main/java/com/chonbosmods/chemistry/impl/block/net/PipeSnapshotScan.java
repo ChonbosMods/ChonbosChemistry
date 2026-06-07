@@ -33,9 +33,10 @@ public final class PipeSnapshotScan {
 
     /**
      * Snapshots every restore-worthy pipe within {@link #RADIUS} (Manhattan) of {@code (x,y,z)}: a pipe
-     * carrying a positive share OR any non-NORMAL face (a wrench-only pipe). The face config is captured
-     * alongside the share so the wipe cannot factory-reset a wrenched pipe (Task 5b);
-     * {@link PipeNodeSnapshots#put} applies the final worthiness test.
+     * carrying a positive share OR any non-NORMAL face (a wrench-only pipe) OR any in-transit stack (an
+     * item pipe mid-flight). The face config AND the in-flight stacks are captured alongside the share so
+     * the wipe cannot factory-reset a wrenched pipe (Task 5b) or VOID in-flight items (Task 11);
+     * {@link PipeNodeSnapshots#put} applies the final worthiness test (and deep-copies the stacks).
      */
     public static void snapshotAround(
             @Nonnull World world,
@@ -56,10 +57,13 @@ public final class PipeSnapshotScan {
                     int pz = z + dz;
                     try {
                         PipeNode pipe = BlockModule.getComponent(pipeType, world, px, py, pz);
-                        if (pipe != null && (pipe.bufferShare() > 0 || hasNonNormalFace(pipe))) {
+                        if (pipe != null
+                                && (pipe.bufferShare() > 0 || hasNonNormalFace(pipe) || !pipe.inTransit().isEmpty())) {
+                            // inTransit() is a defensive copy; PipeNodeSnapshots.put deep-copies each stack
+                            // again so the snapshot owns frozen instances independent of the live, ticking ones.
                             snapshots.put(
                                 NetworkManager.packKey(px, py, pz), pipe.bufferShare(), pipe.resourceId(),
-                                captureFaces(pipe), tick);
+                                captureFaces(pipe), pipe.inTransit(), tick);
                         }
                     } catch (Throwable ignored) {
                         // One unreadable position must never break the event handler.
