@@ -207,7 +207,20 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         if (net.channel() == PortChannel.ITEM) {
             containers = new WorldContainerLookup(world, store);
             ItemEndpoints.Endpoints itemEndpoints = ItemEndpoints.collect(net, grid, containers);
+            // DIAGNOSTIC (2026-06-06 stall report, remove after root-cause): once per pull interval,
+            // log what the glue sees so one in-game run pinpoints the failing phase (endpoint
+            // detection vs extraction vs movement). Rate-limited to the pull boundary: ~1 line/s.
+            boolean diagTick = now % 20 == 0;
+            int beforeTransit = diagTick ? countInTransitDiag(net, grid) : 0;
             itemTransfer.tickNetwork(net, world, containers, grid, itemEndpoints);
+            if (diagTick) {
+                int afterTransit = countInTransitDiag(net, grid);
+                LOGGER.info("[CC-item] tick=" + now + " anchor=" + anchor
+                    + " members=" + net.memberKeys().size()
+                    + " sources=" + itemEndpoints.sources().size()
+                    + " dests=" + itemEndpoints.destinations().size()
+                    + " inTransit " + beforeTransit + "->" + afterTransit);
+            }
             energized = false; // ITEM has no _On twin; Task 9 owns the full item visual integration
         } else {
             NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, grid, lookup);
@@ -429,5 +442,18 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     @SuppressWarnings("removal")
     private static int currentRotationIndex(@Nonnull BlockAccessor accessor, int x, int y, int z) {
         return accessor.getRotationIndex(x, y, z);
+    }
+
+    /** DIAGNOSTIC helper (2026-06-06 stall report): live in-transit total across member pipes. */
+    private static int countInTransitDiag(Network net, PipeGridView grid) {
+        int total = 0;
+        for (long key : net.memberKeys()) {
+            PipeNode pipe = grid.pipeAt(
+                NetworkManager.unpackX(key), NetworkManager.unpackY(key), NetworkManager.unpackZ(key));
+            if (pipe != null) {
+                total += pipe.inTransit().size();
+            }
+        }
+        return total;
     }
 }
