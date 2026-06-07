@@ -91,17 +91,20 @@ public final class TipSpikeCommand extends AbstractPlayerCommand {
             @Nonnull World world) {
         try {
             String arg = argArg.provided(context) ? argArg.get(context) : null;
+            String trimmed = arg == null ? "" : arg.trim();
 
-            if (arg != null && "clear".equalsIgnoreCase(arg.trim())) {
+            if ("clear".equalsIgnoreCase(trimmed)) {
                 clearProbes(store, playerRef);
                 return;
             }
 
-            String modelId = (arg != null && !arg.trim().isEmpty())
-                    ? arg.trim()
-                    : DEFAULT_MODEL_ASSET_ID;
+            // Click-through iteration (2026-06-07 probe result: the WITH-box variant blocked clicks):
+            // hypothesis: the networked BoundingBox is what the client raycasts. Default is now the
+            // NO-box variant; "box" re-spawns the original for comparison.
+            boolean withBox = "box".equalsIgnoreCase(trimmed);
+            String modelId = (!trimmed.isEmpty() && !withBox) ? trimmed : DEFAULT_MODEL_ASSET_ID;
 
-            spawnProbe(store, ref, playerRef, modelId);
+            spawnProbe(store, ref, playerRef, modelId, withBox);
         } catch (Throwable t) {
             // Never throw out of a command: report + log and move on.
             safeReply(playerRef, "cc-tipspike failed: " + t);
@@ -112,7 +115,8 @@ public final class TipSpikeCommand extends AbstractPlayerCommand {
             @Nonnull Store<EntityStore> store,
             @Nonnull Ref<EntityStore> playerEntityRef,
             @Nonnull PlayerRef playerRef,
-            @Nonnull String modelId) {
+            @Nonnull String modelId,
+            boolean withBox) {
         ModelAsset tip = ModelAsset.getAssetMap().getAsset(modelId);
         if (tip == null) {
             safeReply(playerRef, "cc-tipspike: unknown ModelAsset id '" + modelId
@@ -135,15 +139,20 @@ public final class TipSpikeCommand extends AbstractPlayerCommand {
         // flatten to horizontal and step FORWARD_OFFSET blocks out, lifted to roughly eye height.
         Vector3d forward = playerRot.transform(new Vector3d(0.0, 0.0, -1.0));
         double horizLen = Math.hypot(forward.x, forward.z);
-        double dirX = horizLen > 1.0e-6 ? forward.x / horizLen : 0.0;
-        double dirZ = horizLen > 1.0e-6 ? forward.z / horizLen : -1.0;
+        double rawX = horizLen > 1.0e-6 ? forward.x / horizLen : 0.0;
+        double rawZ = horizLen > 1.0e-6 ? forward.z / horizLen : -1.0;
+        // Empirical correction (2026-06-07 probe: spawned to the RIGHT of the look direction): the
+        // engine's yaw convention put our computed vector 90 degrees clockwise of the true facing.
+        // Rotate it back counter-clockwise. Cosmetic only: real tips anchor at pipe faces.
+        double dirX = rawZ;
+        double dirZ = -rawX;
         Vector3d spawnPos = new Vector3d(
                 playerPos.x + dirX * FORWARD_OFFSET,
                 playerPos.y + EYE_HEIGHT,
                 playerPos.z + dirZ * FORWARD_OFFSET);
 
-        // Face the tip back toward the player (look along the reverse of the step direction).
-        Rotation3f tipRotation = Rotation3f.lookAt(new Vector3d(-dirX, 0.0, -dirZ));
+        // Identity rotation: orientation conventions are not what this probe tests.
+        Rotation3f tipRotation = new Rotation3f();
 
         Model model = Model.createStaticScaledModel(tip, TIP_SCALE);
 
@@ -153,7 +162,10 @@ public final class TipSpikeCommand extends AbstractPlayerCommand {
                 new TransformComponent(spawnPos, tipRotation));
         holder.addComponent(ModelComponent.getComponentType(), new ModelComponent(model));
         holder.addComponent(PropComponent.getComponentType(), PropComponent.get());
-        holder.addComponent(BoundingBox.getComponentType(), new BoundingBox(model.getBoundingBox()));
+        if (withBox) {
+            // The original recipe (click-blocking per the 2026-06-07 probe): kept for A/B comparison.
+            holder.addComponent(BoundingBox.getComponentType(), new BoundingBox(model.getBoundingBox()));
+        }
         holder.addComponent(NetworkId.getComponentType(),
                 new NetworkId(store.getExternalData().takeNextNetworkId()));
         holder.ensureComponent(EntityModule.get().getVisibleComponentType());
@@ -167,9 +179,10 @@ public final class TipSpikeCommand extends AbstractPlayerCommand {
         SPAWNED.add(spawned);
 
         safeReply(playerRef, "cc-tipspike: spawned '" + modelId + "' (scale " + TIP_SCALE
+                + ", " + (withBox ? "WITH BoundingBox" : "NO BoundingBox")
                 + ") at " + fmt(spawnPos) + ". Total probes this session: " + SPAWNED.size() + ".");
-        safeReply(playerRef, "check: renders? right size? click THROUGH it onto the block behind? "
-                + "gone after relog? (/cc-tipspike clear to remove)");
+        safeReply(playerRef, "check: renders at all? click THROUGH it onto the block behind? "
+                + "(/cc-tipspike box = old variant, /cc-tipspike clear = remove)");
     }
 
     private void clearProbes(@Nonnull Store<EntityStore> store, @Nonnull PlayerRef playerRef) {
