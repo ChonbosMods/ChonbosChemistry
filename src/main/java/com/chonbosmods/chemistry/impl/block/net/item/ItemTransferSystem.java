@@ -13,7 +13,6 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -63,17 +62,17 @@ public final class ItemTransferSystem {
      *
      * @param net        the ITEM network (the driver no-ops on non-ITEM, but the caller already filters).
      * @param world      the live world (drop spawning + chunk dirty marking).
-     * @param store      the {@link ChunkStore} store from the tick (container component access).
+     * @param containers the caller's container lookup (the SAME instance the endpoint collection and the
+     *                   container-aware visual masks use: one adapter per ITEM network per tick).
      * @param grid       the per-tick pipe grid view.
      * @param endpoints  the network's collected item endpoints (destinations + PULL sources).
      */
     public void tickNetwork(
             @Nonnull Network net,
             @Nonnull World world,
-            @Nonnull Store<ChunkStore> store,
+            @Nonnull WorldContainerLookup containers,
             @Nonnull PipeGridView grid,
             @Nonnull Endpoints endpoints) {
-        WorldContainerLookup containers = new WorldContainerLookup(world, store);
         ItemTransferDriver.DropSink dropSink = (pipeKey, stack) -> spawnDrop(world, pipeKey, stack);
         ItemTransferDriver.SaveMarker saveMarker = pipeKey -> markNeedsSaving(world, pipeKey);
         driver.tickNetwork(

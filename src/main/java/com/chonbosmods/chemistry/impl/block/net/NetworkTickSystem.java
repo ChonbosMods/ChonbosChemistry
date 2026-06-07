@@ -207,7 +207,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         if (net.channel() == PortChannel.ITEM) {
             containers = new WorldContainerLookup(world, store);
             ItemEndpoints.Endpoints itemEndpoints = ItemEndpoints.collect(net, grid, containers);
-            itemTransfer.tickNetwork(net, world, store, grid, itemEndpoints);
+            itemTransfer.tickNetwork(net, world, containers, grid, itemEndpoints);
             energized = false; // ITEM has no _On twin; Task 9 owns the full item visual integration
         } else {
             NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, grid, lookup);
