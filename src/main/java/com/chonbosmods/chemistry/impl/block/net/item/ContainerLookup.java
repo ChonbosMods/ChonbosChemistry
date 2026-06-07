@@ -1,5 +1,7 @@
 package com.chonbosmods.chemistry.impl.block.net.item;
 
+import org.bson.BsonDocument;
+
 /**
  * The mockable seam between the pure ITEM transport layer and live Hytale container access
  * (2026-06-06 item-channel design §13.4, "Architecture &rarr; Pure"). It answers "is there a storage
@@ -52,6 +54,27 @@ public interface ContainerLookup {
     interface ContainerView {
 
         /**
+         * The result of a {@link #extract} commit (or simulate): how many items came out, and the
+         * extracted stack's OPAQUE engine metadata (durability/enchants/BlockHolder contents/...).
+         *
+         * <p>WHY this exists (design resolution, Task 6 step 5): the pure routing layer reasons over
+         * {@link ItemKey} (id + count) alone and never inspects metadata, but a {@link TravelingStack}
+         * must carry the extracted item's metadata so the engine stack round-trips byte-for-byte when
+         * re-inserted at the destination. The metadata is only knowable by the WORLD container at the
+         * moment of extraction (it reads the matched slot). Folding it into the {@code extract} return
+         * is the cleanest honest seam: it keeps {@code extract} the single point that touches the
+         * container's real contents, avoids a separate stateful {@code lastExtractMetadata()} accessor,
+         * and lets the in-memory test fake supply {@code null} metadata trivially.
+         *
+         * @param amount   the number of items actually pulled (0..requested)
+         * @param metadata the extracted stack's opaque metadata, or {@code null} when it has none
+         *                 (the in-memory test fake and metadata-free items both pass {@code null});
+         *                 carried verbatim and never inspected by the routing layer
+         */
+        record Extracted(int amount, BsonDocument metadata) {
+        }
+
+        /**
          * Insert up to {@code amount} of {@code key}'s item type into this container.
          *
          * @param key      the item type to insert (its {@code count} is ignored; {@code amount} rules)
@@ -80,8 +103,11 @@ public interface ContainerLookup {
          * @param key      the item type to pull (its {@code count} is ignored; {@code amount} rules)
          * @param amount   the maximum number of items to pull
          * @param simulate when true, compute the available amount without mutating
-         * @return the number of items actually pulled (0..amount)
+         * @return an {@link Extracted}: the amount actually pulled (0..amount, possibly less than
+         *         {@code amount} if the contents raced down between probe and commit) plus the
+         *         extracted stack's opaque metadata; never null (a 0-amount extract carries null
+         *         metadata)
          */
-        int extract(ItemKey key, int amount, boolean simulate);
+        Extracted extract(ItemKey key, int amount, boolean simulate);
     }
 }

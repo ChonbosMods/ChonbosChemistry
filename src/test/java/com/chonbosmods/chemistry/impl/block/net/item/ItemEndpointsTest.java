@@ -37,8 +37,8 @@ class ItemEndpointsTest {
         }
 
         @Override
-        public int extract(ItemKey key, int amount, boolean simulate) {
-            return 0;
+        public Extracted extract(ItemKey key, int amount, boolean simulate) {
+            return new Extracted(0, null);
         }
     };
 
