@@ -122,6 +122,16 @@ public final class MachineBlockState implements Component<ChunkStore> {
         return ports;
     }
 
+    /**
+     * Replaces this machine's port configuration. Used by the {@code CC_Wrench} interaction to persist a
+     * cycled face port (the caller rebuilds the {@link PortConfig} with the face's port replaced, never
+     * appended, so a face never carries two ports). A null config resets to empty. The mutation is
+     * persisted by the engine's ECS save path; the wrench marks the block component chunk needing-save.
+     */
+    public void setPorts(PortConfig ports) {
+        this.ports = ports != null ? ports : PortConfig.of(List.of());
+    }
+
     /** @return the energy handler, or null if this node carries no power. */
     public EnergyHandler energy() {
         return energy;

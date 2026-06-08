@@ -50,66 +50,12 @@
           "Channel": "gas",
           "Ports": {
             "Ports": [
-              {
-                "Face": 0,
-                "Channel": "gas",
-                "Direction": "input"
-              },
-              {
-                "Face": 0,
-                "Channel": "gas",
-                "Direction": "output"
-              },
-              {
-                "Face": 1,
-                "Channel": "gas",
-                "Direction": "input"
-              },
-              {
-                "Face": 1,
-                "Channel": "gas",
-                "Direction": "output"
-              },
-              {
-                "Face": 2,
-                "Channel": "gas",
-                "Direction": "input"
-              },
-              {
-                "Face": 2,
-                "Channel": "gas",
-                "Direction": "output"
-              },
-              {
-                "Face": 3,
-                "Channel": "gas",
-                "Direction": "input"
-              },
-              {
-                "Face": 3,
-                "Channel": "gas",
-                "Direction": "output"
-              },
-              {
-                "Face": 4,
-                "Channel": "gas",
-                "Direction": "input"
-              },
-              {
-                "Face": 4,
-                "Channel": "gas",
-                "Direction": "output"
-              },
-              {
-                "Face": 5,
-                "Channel": "gas",
-                "Direction": "input"
-              },
-              {
-                "Face": 5,
-                "Channel": "gas",
-                "Direction": "output"
-              }
+              { "Face": 0, "Channel": "gas", "Direction": "both" },
+              { "Face": 1, "Channel": "gas", "Direction": "both" },
+              { "Face": 2, "Channel": "gas", "Direction": "both" },
+              { "Face": 3, "Channel": "gas", "Direction": "both" },
+              { "Face": 4, "Channel": "gas", "Direction": "both" },
+              { "Face": 5, "Channel": "gas", "Direction": "both" }
             ]
           },
           "Throughput": 1000

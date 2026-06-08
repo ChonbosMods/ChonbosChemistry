@@ -23,10 +23,12 @@ import java.util.Set;
  *
  * <h2>Discovery</h2>
  * {@link #getOrBuildNetwork} BFS-floods from a starting pipe over the 6 face-neighbors
- * ({@link #OFFSETS}, mirroring {@code MachineTickSystem}'s convention), following ONLY pipes of the
- * SAME {@link com.chonbosmods.chemistry.api.io.PortChannel channel}: a different-channel neighbour is a
- * boundary and is not part of this network. Each discovered segment is added to a fresh
- * {@link Network} with its tier's capacity/throughput from {@link PipeTiers}.
+ * ({@link #OFFSETS}, mirroring {@code MachineTickSystem}'s convention), crossing a face only when
+ * {@link PipeConnectivity#connects} accepts it: same
+ * {@link com.chonbosmods.chemistry.api.io.PortChannel channel} AND neither facing flow state
+ * {@link com.chonbosmods.chemistry.api.io.FlowState#NONE NONE} AND substances compatible. Any rejected
+ * edge (different channel, a NONE face, or a substance mismatch) is a network boundary. Each discovered
+ * segment is added to a fresh {@link Network} with its tier's capacity/throughput from {@link PipeTiers}.
  *
  * <h2>Caching &amp; anchor</h2>
  * A network's deterministic id is its <em>anchor</em>: the lexicographically-smallest packed member
@@ -46,7 +48,9 @@ public final class NetworkManager {
      * {@code MachineTickSystem.OFFSETS}. Diagonals are intentionally absent: only face neighbours
      * connect.
      */
-    private static final int[][] OFFSETS = {
+    // Package-visible: the canonical face-offset table for the net layer (NetworkTickSystem's
+    // indicator guard reads it; PipeVisualStates/NetworkEndpoints keep documented mirrors).
+    static final int[][] OFFSETS = {
         {1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}
     };
 
@@ -106,7 +110,7 @@ public final class NetworkManager {
 
     /**
      * Returns the {@link Network} the pipe at {@code (x,y,z)} belongs to, building (and caching) it via
-     * same-channel BFS on first request.
+     * PipeConnectivity-gated BFS on first request.
      *
      * @return the network, or null if there is no pipe at {@code (x,y,z)}.
      */
@@ -143,7 +147,9 @@ public final class NetworkManager {
             memberKeys.add(packKey(px, py, pz));
             memberNodes.add(node);
 
-            for (int[] off : OFFSETS) {
+            // The OFFSETS index IS the face index from this node toward the neighbour (+X,-X,...).
+            for (int faceIdx = 0; faceIdx < OFFSETS.length; faceIdx++) {
+                int[] off = OFFSETS[faceIdx];
                 int nx = px + off[0], ny = py + off[1], nz = pz + off[2];
                 if (nx < MIN_COORD || nx > MAX_COORD
                         || ny < MIN_COORD || ny > MAX_COORD
@@ -151,13 +157,21 @@ public final class NetworkManager {
                     continue; // outside packable range; treat as world edge
                 }
                 long nKey = packKey(nx, ny, nz);
-                if (!visited.add(nKey)) {
-                    continue;
+                if (visited.contains(nKey)) {
+                    continue; // already reached via an accepted edge (or is the start)
                 }
                 PipeNode neighbour = grid.pipeAt(nx, ny, nz);
-                if (neighbour == null || neighbour.channel() != channel) {
-                    continue; // no pipe, or a channel boundary
+                // Single gate (PipeConnectivity.connects): channel + flow states + substance compat.
+                // Replaces the bare same-channel check so NONE faces sever runs and different-substance
+                // lines never merge (the gas bug). The channel check now lives inside connects().
+                if (!PipeConnectivity.connects(node, faceIdx, neighbour)) {
+                    continue; // no pipe, channel boundary, NONE face, or incompatible substance
                 }
+                // Mark visited only on an ACCEPTED edge: a neighbour rejected here (e.g. a severed
+                // face) must stay un-visited so it can still be reached via a valid alternate path in
+                // a loop. The same neighbour may thus be CHECKED once per adjacent member: that is
+                // correct and cheap (dedup still short-circuits once it is enqueued).
+                visited.add(nKey);
                 frontier.add(new int[] {nx, ny, nz});
             }
         }
@@ -223,12 +237,16 @@ public final class NetworkManager {
      * rebuilds it fresh. Safe no-op if that position is not currently cached.
      */
     public void invalidate(int x, int y, int z) {
-        Long anchor = anchorByPipe.get(packKey(x, y, z));
+        dropByAnchor(anchorByPipe.get(packKey(x, y, z)));
+    }
+
+    /** Drops one cached network by anchor: the anchor entry + every member's mapping. Null-safe no-op. */
+    private void dropByAnchor(Long anchor) {
         if (anchor == null) {
             return;
         }
         networksByAnchor.remove(anchor);
-        // Remove all members pointing at this anchor.
+        // Remove all members pointing at this anchor (single scan).
         anchorByPipe.values().removeIf(a -> a.equals(anchor));
     }
 
@@ -297,22 +315,70 @@ public final class NetworkManager {
      * locked resource id; null for POWER/empty) back onto the pipe's {@link PipeNode}. Shared by the
      * per-tick write-back ({@code NetworkTickSystem}) and its headless regression test so both exercise
      * identical logic. A missing pipe at a member position is skipped defensively.
+     *
+     * <h2>Lock-clear detection (Task 5)</h2>
+     * Returns {@code true} when this write-back observes the network's FLUID/GAS type-lock CLEARING:
+     * defined as <em>at least one member pipe carried a non-null persisted {@code resourceId} COMING IN
+     * (i.e. it was locked as of the last write-back) AND the network's current
+     * {@link Network#lockedResourceId()} is now null</em>. That is exactly the drain-to-empty transition
+     * (a distribute pass emptied the network, and {@link Network#extract} cleared the lock at 0): the
+     * member still records the old resource, but the network no longer does. The previous-incoming check
+     * is read PER MEMBER before this method overwrites that pipe's resourceId with the network's value.
+     *
+     * <p>This requires a PREVIOUS lock, so it can never false-positive for:
+     * <ul>
+     *   <li>POWER networks (members' resourceId is always null, network lock always null); or
+     *   <li>a FLUID/GAS network that has been empty/unlocked since forever (no member ever carried a
+     *       resourceId, so the incoming-non-null clause is never satisfied) - it will NOT invalidate
+     *       itself every tick.
+     * </ul>
+     * The {@code NetworkTickSystem} uses the returned flag to invalidate the drained network's members
+     * (see {@link #invalidateMembers}) so the next topology evaluation re-merges it with an adjacent run
+     * the cleared substance boundary no longer separates.
+     *
+     * @return {@code true} iff this write-back cleared a previously-held type-lock (drain-remerge signal).
      */
-    public static void writeBackShares(Network net, PipeGridView grid) {
+    public static boolean writeBackShares(Network net, PipeGridView grid) {
         // Snapshot the member keys into a fixed-order array: splitEvenly assigns the remainder by ascending
         // ARRAY index, but memberKeys() is HashSet-ordered, so which specific pipes get the +1 remainder
         // unit is non-deterministic across membership changes. Only the TOTAL written back is guaranteed.
         Long[] keys = net.memberKeys().toArray(new Long[0]);
         long[] shares = splitEvenly(net.stored(), keys.length);
         String resourceId = net.lockedResourceId();
+        boolean anyIncomingLock = false;
         for (int i = 0; i < keys.length; i++) {
             long key = keys[i];
             PipeNode pipe = grid.pipeAt(unpackX(key), unpackY(key), unpackZ(key));
             if (pipe == null) {
                 continue; // pipe gone from the live grid: skip
             }
+            // Read the incoming (last-write-back) resourceId BEFORE overwriting it below.
+            if (pipe.resourceId() != null) {
+                anyIncomingLock = true;
+            }
             pipe.setBufferShare(shares[i]);
             pipe.setResourceId(resourceId);
+        }
+        // Lock-clear: a member came in locked AND the network is now unlocked (null).
+        return anyIncomingLock && resourceId == null;
+    }
+
+    /**
+     * Drops every member position of {@code net} from the cache so the next {@link #getOrBuildNetwork}
+     * from any of them rebuilds fresh: the drain-remerge hook ({@code NetworkTickSystem} calls this when
+     * {@link #writeBackShares} reports a lock-clear). Removing the anchor entry plus every
+     * {@code pipeKey -> anchor} mapping for this network's members mirrors {@link #invalidate} but is
+     * driven directly by the live member set rather than a world lookup. Safe no-op for a network with no
+     * cached members.
+     */
+    public void invalidateMembers(Network net) {
+        // All members of one network share a single anchor: resolve it from any member, drop once.
+        for (long key : net.memberKeys()) {
+            Long anchor = anchorByPipe.get(key);
+            if (anchor != null) {
+                dropByAnchor(anchor);
+                return;
+            }
         }
     }
 

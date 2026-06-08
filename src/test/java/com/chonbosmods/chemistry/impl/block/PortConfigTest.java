@@ -68,6 +68,33 @@ class PortConfigTest {
     }
 
     @Test
+    void portCodecAcceptsBothDirection() throws Exception {
+        Port p = decode(Port.CODEC, "{\"Face\":3,\"Channel\":\"power\",\"Direction\":\"both\"}");
+        assertEquals(3, p.faceIndex());
+        assertEquals(PortChannel.POWER, p.channel());
+        assertEquals(PortDirection.BOTH, p.direction());
+    }
+
+    @Test
+    void portAtReturnsTheFacingChannelPort() {
+        PortConfig cfg = PortConfig.of(List.of(
+            Port.of(0, PortChannel.POWER, PortDirection.BOTH),
+            Port.of(1, PortChannel.POWER, PortDirection.OUTPUT),
+            Port.of(1, PortChannel.FLUID, PortDirection.INPUT)));
+        // Face 0 / POWER -> the BOTH port.
+        Port f0 = cfg.portAt(0, PortChannel.POWER);
+        assertEquals(PortDirection.BOTH, f0.direction());
+        // Face 1 / FLUID -> the FLUID input (channel-filtered, ignores the POWER port on the same face).
+        Port f1 = cfg.portAt(1, PortChannel.FLUID);
+        assertEquals(PortChannel.FLUID, f1.channel());
+        assertEquals(PortDirection.INPUT, f1.direction());
+        // No port on face 2.
+        assertEquals(null, cfg.portAt(2, PortChannel.POWER));
+        // Face 0 has no FLUID port.
+        assertEquals(null, cfg.portAt(0, PortChannel.FLUID));
+    }
+
+    @Test
     void portConfigCodecRoundTripsViaEncode() {
         PortConfig cfg = PortConfig.of(List.of(
             Port.of(0, PortChannel.GAS, PortDirection.INPUT),
@@ -83,5 +110,43 @@ class PortConfigTest {
         assertEquals(1, b.faceIndex());
         assertEquals(PortChannel.FLUID, b.channel());
         assertEquals(PortDirection.OUTPUT, b.direction());
+    }
+
+    @Test
+    void withFacePortReplacesAnyExistingPortOnThatFaceNeverAppends() {
+        PortConfig cfg = PortConfig.of(List.of(
+            Port.of(0, PortChannel.FLUID, PortDirection.INPUT),
+            Port.of(1, PortChannel.POWER, PortDirection.OUTPUT)));
+        // Re-config face 0 to a different channel/direction: must replace, not add a second port.
+        PortConfig next = cfg.withFacePort(Port.of(0, PortChannel.GAS, PortDirection.OUTPUT));
+        assertEquals(2, next.ports().size());
+        assertEquals(1, next.portsFor(PortChannel.GAS, PortDirection.OUTPUT).size());
+        Port face0 = next.portAt(0, PortChannel.GAS);
+        assertNotNull(face0);
+        assertEquals(PortDirection.OUTPUT, face0.direction());
+        // Face 0 must carry no other port (the old FLUID/INPUT is gone).
+        assertNull(next.portAt(0, PortChannel.FLUID));
+        // The untouched face 1 survives unchanged.
+        Port face1 = next.portAt(1, PortChannel.POWER);
+        assertNotNull(face1);
+        assertEquals(PortDirection.OUTPUT, face1.direction());
+        // Source config is unchanged (immutable rebuild).
+        assertEquals(PortChannel.FLUID, cfg.portAt(0, PortChannel.FLUID).channel());
+    }
+
+    @Test
+    void withFacePortAddsWhenFaceHadNoPort() {
+        PortConfig cfg = PortConfig.of(List.of());
+        PortConfig next = cfg.withFacePort(Port.of(3, PortChannel.ITEM, PortDirection.INPUT));
+        assertEquals(1, next.ports().size());
+        assertNotNull(next.portAt(3, PortChannel.ITEM));
+    }
+
+    @Test
+    void withFacePortNullIsAnUnchangedCopy() {
+        PortConfig cfg = PortConfig.of(List.of(Port.of(2, PortChannel.POWER, PortDirection.INPUT)));
+        PortConfig next = cfg.withFacePort(null);
+        assertEquals(1, next.ports().size());
+        assertNotNull(next.portAt(2, PortChannel.POWER));
     }
 }

@@ -51,3 +51,93 @@
 ## Testing
 
 Headless TDD: FlowState/PipeNode codec round-trips (absent-key default); `connects()` truth table; BFS split/merge incl. drain-remerge; endpoint filtering per face state incl. storage pairing; wrench cycle as a pure function. Engine glue (clicked face, sneak, visuals) verifies in-game.
+
+## Spike findings (Task 8)
+
+Engine spike against Server 0.5.3 (decompiled at `/tmp/bh-spike` with CFR 0.152). Decompile-verified unless noted. Task 9's implementer can build directly from this.
+
+### Path corrections (plan's stated paths were wrong)
+- `InteractionContext` lives at `com/hypixel/hytale/server/core/entity/InteractionContext.class` (NOT `.../modules/interaction/`).
+- `SimpleBlockInteraction` (the abstract base you extend) is at `com/hypixel/hytale/server/core/modules/interaction/interaction/config/client/SimpleBlockInteraction.class`. (There is also an unrelated `com/hypixel/hytale/protocol/SimpleBlockInteraction` packet class: do NOT extend that.)
+- HyProTech is at `/home/keroppi/Development/Hytale/ReferenceJars/HyProTech` (outside this repo). The side tool is `src/main/java/com/example/plugin/interaction/CableSideToolInteraction.java`.
+
+### Clicked face: accessors (CONFIRMED)
+The clicked face is carried on `InteractionSyncData`, obtained from the context:
+- `InteractionContext.getState()` → `@Nonnull InteractionSyncData` (server/working state).
+- `InteractionContext.getClientState()` → `@Nullable InteractionSyncData` (client-reported state).
+- `InteractionContext.getServerState()` → `@Nonnull InteractionSyncData`.
+
+On `com.hypixel.hytale.protocol.InteractionSyncData` (public fields, direct access):
+- `public BlockFace blockFace = BlockFace.None;` — **the primary face accessor.**
+- `public org.joml.Vector3fc raycastNormal;` — fallback hit normal (nullable). Note: joml `Vector3fc`, so use `.x()/.y()/.z()` methods, not `.x` fields.
+- Also present and useful: `public BlockPosition blockPosition;`, `public org.joml.Position raycastHit;`, `public float raycastDistance;`, `public BlockRotation blockRotation;`, `public int placedBlockId;`.
+
+`com.hypixel.hytale.protocol.BlockFace` is an enum: `None(0), Up(1), Down(2), North(3), South(4), East(5), West(6)`, with `getValue()` / `fromValue(int)` / `VALUES[]`.
+
+**Mechanism HyProTech uses (exact):** `resolveSide` reads `context.getState()` first, then falls back to `context.getClientState()`. For each `InteractionSyncData` it tries `state.blockFace` (mapped East/West/Up/Down/South/North → side enum, ignoring `None`), and only if that yields nothing falls back to deriving the side from `state.raycastNormal` by largest-abs-component + sign. No ray math or rotation-index of its own: it just reads the engine-provided `blockFace`. (Caveat: HyProTech's `resolveSideFromNormal` is typed to take `com.hypixel.hytale.protocol.Vector3f` while the field is `org.joml.Vector3fc` — a source/decompile mismatch. Treat `blockFace` as the reliable path and only add a normal fallback if you reconcile the joml type yourself.)
+
+**Critical wiring requirement:** `blockFace` is only populated when the interaction opts into the client's latest target. `SimpleBlockInteraction` exposes a codec field `UseLatestTarget` (boolean). HyProTech's item JSON sets `"UseLatestTarget": true` so the client-reported target+face flow through. Without it, `blockFace` stays `None`. (In simulate path, `simulateTick0` hardcodes `context.getState().blockFace = BlockFace.Up` — so the real face is a server-tick / client-state phenomenon, which is why server-side `interactWithBlock` is where you read it.)
+
+### `SimpleBlockInteraction.interactWithBlock` signature (CONFIRMED, 0.5.3)
+```java
+protected abstract void interactWithBlock(
+    @Nonnull  World world,
+    @Nonnull  CommandBuffer<EntityStore> commandBuffer,
+    @Nonnull  InteractionType type,
+    @Nonnull  InteractionContext context,
+    @Nullable ItemStack itemStack,
+    @Nonnull  org.joml.Vector3i blockPos,   // NOTE: org.joml.Vector3i, not the math.vector one
+    @Nonnull  CooldownHandler cooldownHandler);
+```
+Also abstract (must implement, can be a no-op for server-only tools):
+```java
+protected abstract void simulateInteractWithBlock(
+    @Nonnull InteractionType type, @Nonnull InteractionContext context,
+    @Nullable ItemStack itemStack, @Nonnull World world, @Nonnull org.joml.Vector3i blockPos);
+```
+The base's `tick0` does the distance check (`InteractionValidation.canPlayerInteractWithBlock`), resolves the target block (honoring `UseLatestTarget`), rejects air/blockId 0|1, then calls `interactWithBlock`. `getWaitForDataFrom()` returns `Client`; `needsRemoteSync()` returns `true`. Your subclass needs a `BuilderCodec` chained from `SimpleBlockInteraction.CODEC` (which contributes the `UseLatestTarget` key) and a public no-arg constructor calling `super()` (HyProTech pattern).
+
+### Sneak / crouch: AVAILABLE (not via InteractionContext directly)
+`InteractionContext` has **no** sneak/crouch/movement accessor. BUT a `SimpleBlockInteraction` handler can read it off the player entity:
+- `context.getEntity()` → `Ref<EntityStore>` (the player).
+- `commandBuffer.getComponent(ref, MovementStatesComponent.getComponentType())` → `MovementStatesComponent` (`com/hypixel/hytale/server/core/entity/movement/MovementStatesComponent`).
+- `MovementStatesComponent.getMovementStates()` → `com.hypixel.hytale.protocol.MovementStates`.
+- `MovementStates.crouching` (public boolean) — **this is the sneak/crouch flag.** Also `forcedCrouching` (public boolean) if you want to count forced crouch.
+
+So: **YES, a SimpleBlockInteraction handler can know the player is sneaking** via `MovementStatesComponent → MovementStates.crouching`. Caveat for Task 9: this is the player's crouch state at the server tick the interaction runs, not necessarily latched to the exact click instant; verify in-game that it reflects "sneaking while clicking" reliably. If it proves flaky, the fallback is two items (a forward-cycle wrench and a reverse-cycle wrench) instead of sneak-to-reverse.
+
+### Item JSON + registration shape for a custom interaction (CONFIRMED)
+The wrench is an item. Two pieces:
+
+1. **Plugin registers the interaction class** against the `Interaction.CODEC` codec registry, keyed by a string ID (from `Machinarium.java`):
+```java
+getCodecRegistry(Interaction.CODEC).register(
+    "machinarium_toggle_cable_side",          // string id used as JSON "Type"
+    CableSideToolInteraction.class,
+    CableSideToolInteraction.CODEC);
+```
+(`Interaction.CODEC` = `com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction`.)
+
+2. **Item JSON** (`Server/Item/Items/Machinarium_Cable_Tool.json`) wires an interaction *type* (e.g. `Secondary`) to the registered id via its `Type`:
+```json
+{
+  "Parent": "Tool_Hammer_Crude",
+  "Interactions": {
+    "Primary": "Block_Primary",
+    "Secondary": {
+      "Interactions": [
+        { "Type": "machinarium_toggle_cable_side", "UseLatestTarget": true }
+      ]
+    }
+  }
+}
+```
+Key points: the JSON `"Type"` value is the **string id from the codec registry**, not a class name. `UseLatestTarget: true` is the `SimpleBlockInteraction` codec field (face/target wiring). `InteractionType` enum has `Primary(0)`, `Secondary(1)`, `Use(5)` — for an item-held wrench HyProTech uses `Secondary` (the press-F / use-style action; pick whichever maps to the intended input). This is the item-interaction path, distinct from our existing block-side `"Use": { "Interactions": [{ "Type": "OpenCustomUI", ... }] }` on BlockTypes (e.g. `CC_PowerCable.json`).
+
+### Surprises affecting Task 9's design
+- **`UseLatestTarget: true` is mandatory** to get a real `blockFace`; omit it and every click reports `BlockFace.None`. This is the single biggest gotcha.
+- **`blockPos` is `org.joml.Vector3i`** in the handler signature (HyProTech immediately copies into `com.hypixel.hytale.math.vector.Vector3i` for `ChunkUtil`). Don't assume the math-package type.
+- **Sneak is reachable but indirect** (player component, not context) and tick-timed: plan a fallback (separate forward/reverse items) in case crouch-at-click proves unreliable.
+- **Block component edits + persistence:** HyProTech reads/writes block-attached components via `world.getChunkStore().getChunkComponent(chunkIndex, BlockComponentChunk.getComponentType())`, indexes with `ChunkUtil.indexBlockInColumn(localX, y, localZ)`, mutates, then `blockComponents.markNeedsSaving()`. This is the precedent for persisting per-face flow state on our `PipeNode` block components.
+- **Two separate `SimpleBlockInteraction` classes exist** (protocol packet vs config base): extend the config one (`.../interaction/config/client/SimpleBlockInteraction`).
+- Nothing was undiscoverable by decompile; the only soft spot is the runtime reliability of crouch-at-click, which is an in-game verification item for Task 9, not a decompile gap.

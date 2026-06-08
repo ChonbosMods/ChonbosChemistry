@@ -1,0 +1,21 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CC_Wrench.name",
+    "Description": "server.items.CC_Wrench.description"
+  },
+  "Parent": "Tool_Hammer_Crude",
+  "Categories": [
+    "Items.Tools"
+  ],
+  "Interactions": {
+    "Primary": "Block_Primary",
+    "Secondary": {
+      "Interactions": [
+        {
+          "Type": "cc_wrench",
+          "UseLatestTarget": true
+        }
+      ]
+    }
+  }
+}

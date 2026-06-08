@@ -81,6 +81,17 @@
 
 **Step 5:** commit `feat(net): drained fluid/gas networks re-merge: lock-clear during write-back invalidates members`.
 
+### Task 5b (ADDED during execution): flow states survive the engine's connected-block wipe
+
+**Why (found during Task 2):** the engine's connected-block neighbour pass replaces re-resolved pipes' block entities with fresh template clones (the H8 wipe). `PipeSnapshotScan`/`PipeNodeSnapshots` snapshot+restore only `bufferShare`/`resourceId`: a fresh clone has all-NORMAL `flowStates`, so ANY place/break near a wrenched pipe would silently factory-reset its face config.
+
+**Files:**
+- Modify: `src/main/java/com/chonbosmods/chemistry/impl/block/net/PipeNodeSnapshots.java` (snapshot records gain the 6 flow states; restore re-applies them)
+- Modify: `src/main/java/com/chonbosmods/chemistry/impl/block/net/PipeSnapshotScan.java` (capture flow states; widen the snapshot-worthiness test: a pipe with any non-NORMAL face is snapshot-worthy even with share==0/resourceId==null)
+- Test: extend `src/test/java/com/chonbosmods/chemistry/impl/block/net/WipeRecoveryTest.java`
+
+**Steps (TDD):** failing test first: snapshot a pipe with face 0 NONE + share 0; simulate the wipe (fresh all-NORMAL node, share 0, resourceId null); restore; assert face 0 NONE again AND that a never-wrenched wiped pipe behaves exactly as before (no regression in the 8 existing WipeRecovery cases). CAREFUL with the restore signature: the wipe signature for SHARES stays `share==0 && resourceId==null`; flow-state restore applies on the same signature but only overwrites faces when the snapshot carries a non-all-NORMAL config (never stomp a legitimately re-wrenched pipe with a stale all-NORMAL snapshot). Commit: `fix(net): wrenched pipe flow states survive the connected-block wipe`.
+
 ### Task 6: face-precise endpoint collection + flow filter
 
 **Files:**

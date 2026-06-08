@@ -1,12 +1,15 @@
 package com.chonbosmods.chemistry.impl.block.ui;
 
 import com.chonbosmods.chemistry.ChonbosChemistry;
+import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.chonbosmods.chemistry.impl.block.net.Network;
 import com.chonbosmods.chemistry.impl.block.net.NetworkManager;
 import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import com.chonbosmods.chemistry.impl.block.net.WorldPipeGridView;
+import com.chonbosmods.chemistry.impl.block.net.item.ItemEndpoints;
+import com.chonbosmods.chemistry.impl.block.net.item.WorldContainerLookup;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -147,7 +150,7 @@ public final class MachinePanelPage extends CustomUIPage implements PanelRefresh
 
         PipeNode pipe = blockStore.getComponent(this.blockRef, mod.pipeComponentType());
         if (pipe != null) {
-            return this.computePipeSnapshot(blockStore, mod);
+            return this.computePipeSnapshot(blockStore, mod, pipe);
         }
 
         return PanelSnapshot.empty("Machine", "This is not a chemistry block.");
@@ -155,11 +158,13 @@ public final class MachinePanelPage extends CustomUIPage implements PanelRefresh
 
     /**
      * Render model for a pipe block: resolve its network (WorldThread-safe, see class javadoc) and
-     * show the network's aggregate buffer + member count + bottleneck throughput. Null-safe at every
-     * step; any failure falls back to the non-live "Network unavailable." empty state.
+     * show the network's aggregate buffer + member count + bottleneck throughput, plus the clicked
+     * {@code pipe}'s per-face flow states. Null-safe at every step; any failure falls back to the
+     * non-live "Network unavailable." empty state.
      */
     @Nonnull
-    private PanelSnapshot computePipeSnapshot(@Nonnull Store<ChunkStore> blockStore, @Nonnull ChonbosChemistry mod) {
+    private PanelSnapshot computePipeSnapshot(
+            @Nonnull Store<ChunkStore> blockStore, @Nonnull ChonbosChemistry mod, @Nonnull PipeNode pipe) {
         // Decode the clicked block's world (x,y,z) via BlockStateInfo + BlockChunk (same technique as
         // NetworkTickSystem), but reading the components off this.blockRef rather than an ArchetypeChunk.
         BlockModule.BlockStateInfo info = blockStore.getComponent(this.blockRef, this.blockInfoType);
@@ -192,7 +197,40 @@ public final class MachinePanelPage extends CustomUIPage implements PanelRefresh
         if (net == null) {
             return PanelSnapshot.empty("Pipe", "Network unavailable.");
         }
-        return PanelSnapshot.forNetwork(net);
+        // ITEM networks have no shared buffer: compute the discrete-transport stats and pass them in (the
+        // snapshot stays pure). Every other channel renders the fungible gauge with null stats.
+        PanelSnapshot.ItemNetworkStats stats =
+            net.channel() == PortChannel.ITEM ? computeItemStats(net, grid, world, blockStore) : null;
+        return PanelSnapshot.forNetwork(net, pipe, stats);
+    }
+
+    /**
+     * Aggregate an ITEM network's discrete-transport counts for the panel: in-transit = the sum of every
+     * member pipe's {@code inTransit()} size; destinations/sources = the {@link ItemEndpoints} container
+     * endpoints around the network. WorldThread-safe by the same reasoning as the rest of this page (the
+     * class javadoc): build and refresh both run on this world's WorldThread, so resolving member pipe
+     * nodes through the grid and a {@link WorldContainerLookup} over the same block store is safe.
+     */
+    @Nonnull
+    private PanelSnapshot.ItemNetworkStats computeItemStats(
+            @Nonnull Network net,
+            @Nonnull WorldPipeGridView grid,
+            @Nonnull World world,
+            @Nonnull Store<ChunkStore> blockStore) {
+        int inTransit = 0;
+        for (long memberKey : net.memberKeys()) {
+            int mx = NetworkManager.unpackX(memberKey);
+            int my = NetworkManager.unpackY(memberKey);
+            int mz = NetworkManager.unpackZ(memberKey);
+            PipeNode member = grid.pipeAt(mx, my, mz);
+            if (member != null) {
+                inTransit += member.inTransit().size();
+            }
+        }
+        ItemEndpoints.Endpoints endpoints =
+            ItemEndpoints.collect(net, grid, new WorldContainerLookup(world, blockStore));
+        return new PanelSnapshot.ItemNetworkStats(
+            inTransit, endpoints.destinations().size(), endpoints.sources().size());
     }
 
     /** The viewed block's world, off the block ref's external ChunkStore. Null on any failure. */
