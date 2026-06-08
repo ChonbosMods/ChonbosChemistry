@@ -242,53 +242,32 @@ def yaw_size(size, k):
     return {"x": x, "y": y, "z": z}
 
 
-def yaw_texture_layout(tl, k, caps_invariant=False):
+def yaw_texture_layout(tl, k):
     """Yaw the per-face textureLayout by k * 90 deg about +Y, reproducing the authored
     stub/collar convention completely (offset + mirror + angle on all 6 faces).
 
     Side faces (back/front/left/right) cycle back->left->front->right per step and
-    carry their offset/mirror/angle verbatim. The top/bottom caps depend on node kind:
-
-      * STUB tube (caps_invariant=False, default): the caps do NOT ride the side
-        cycle and do NOT keep their own texel either. The authored stub UV wraps the
-        pipe as a strip, so a stub yawed onto its side shows a side-band texel on both
-        caps (k=1/3) and swaps top<->bottom at k=2. Remapped directly off the ORIGINAL
-        layout via CAP_SOURCE. Proven byte-exact vs authored cross Stub_E/S/W.
-
-      * COLLAR ring (caps_invariant=True): the +Y/-Y faces are geometrically INVARIANT
-        under a yaw about +Y, and a collar's top/bottom are a real cap (a uniform rim
-        band), not a wrapped side-band. So the caps KEEP their own texel verbatim:
-        only the 4 side faces cycle. Matches the authored +Z and +Y collar cap values
-        (off 10,50 ang0) under any yaw."""
+    carry their offset/mirror/angle verbatim. The top/bottom caps do NOT ride that
+    cycle: they are remapped directly off the ORIGINAL layout via CAP_SOURCE (a
+    sideways stub shows a side-band texel on both caps at k=1/3, and swaps the caps at
+    k=2). Proven byte-exact vs authored cross Stub_E/S/W on every face."""
     k %= 4
     out = copy.deepcopy(tl)
     for _ in range(k):  # advance the four side faces around the +Y axis
         prev = copy.deepcopy(out)
         for src, dst in FACE_CYCLE.items():
             out[dst] = prev[src]
-    if caps_invariant:
-        # Collar caps are real caps, invariant under Y-yaw: keep the original texel.
-        out["top"] = copy.deepcopy(tl["top"])
-        out["bottom"] = copy.deepcopy(tl["bottom"])
-    else:
-        for cap, src in CAP_SOURCE[k].items():  # caps off the original (stub strip wrap)
-            out[cap] = copy.deepcopy(tl[src])
+    for cap, src in CAP_SOURCE[k].items():  # caps come straight off the original layout
+        out[cap] = copy.deepcopy(tl[src])
     return out
 
 
 def yaw_node(node, k):
-    """Yaw-rotate a whole node (position, size, textureLayout) by k * 90 deg.
-
-    Node kind matters for the textureLayout caps: a "Collar" is a flat ring whose
-    top/bottom are real caps, invariant under a yaw about +Y; any other node (the
-    "Stub" tube) wraps its UV as a strip whose caps follow the CAP_SOURCE remap. See
-    yaw_texture_layout."""
+    """Yaw-rotate a whole node (position, size, textureLayout) by k * 90 deg."""
     n = copy.deepcopy(node)
     n["position"] = yaw_position(node["position"], k)
     n["shape"]["settings"]["size"] = yaw_size(node["shape"]["settings"]["size"], k)
-    caps_invariant = node.get("name", "").startswith("Collar")
-    n["shape"]["textureLayout"] = yaw_texture_layout(
-        node["shape"]["textureLayout"], k, caps_invariant=caps_invariant)
+    n["shape"]["textureLayout"] = yaw_texture_layout(node["shape"]["textureLayout"], k)
     return n
 
 
