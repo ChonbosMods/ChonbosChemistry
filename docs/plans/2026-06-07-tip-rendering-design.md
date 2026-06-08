@@ -30,3 +30,13 @@ Per shape with k arms: `2k` one-tip + `2k(k-1)` two-tip variants. Across the 26 
 ## Out of scope
 
 The `[CC-item]` diagnostics stay until the combined merge (Bug B monitoring). Filter blocks, round-robin routing: later features as already reserved.
+
+## DEFERRED 2026-06-07: rotated-collar UV polish + remaining families
+
+In-game testing surfaced one residual COSMETIC issue and a hard limit; both deferred by user decision ("ship tips as-is, defer the UV polish"):
+
+**Residual: rotated-collar (E/W/S) UV imperfection.** The geometry yaw is correct (arms point at their endpoints), and the rotation/reset bugs are fixed (`e2b65c8`, `a508696`). But the COLLAR's per-face texture UVs are imperfect on yaw-rotated (E/W/S) arms. Root cause is precisely characterized: the yaw textureLayout transform was proven (byte-match) against the authored STUBS, which are tubes whose top face wraps to a side band (`Stub_E.top = Stub_N.left`). The COLLAR is a flat ring whose top is a real cap, so it needs a different transform, AND there is NO authored ground truth for a yawed collar (only +Z and the two verticals are authored, and those two are mutually inconsistent on the rim). Three offline JSON-math attempts (`d654a71`, `7757079` reverted) could not reliably derive it. The current shipped state is `d654a71` ("better but not fully remedied": top cap reads `off(10,52) ang270` where it visually wants the authored cap band).
+
+**The fix path (when resumed): authored ground truth.** The artist authors ONE more orientation: the EAST (+X) push + pull collar with correct UVs (same small effort as the vertical tips). Then the generator needs NO 90-degree UV math: North = authored +Z, East = authored +X, South = 180-degree flip of North, West = 180-degree flip of East (180-degree is a reliable mirror, no angle ambiguity). Feed the authored E collar's textureLayout into the generator as the `+X` source.
+
+**Remaining families deferred too.** Power/Fluid/Gas tip composites (+ their `_On` twins) are NOT generated yet. They are bundled with the collar polish into one future "finish tip rollout" task, because the collar-UV fix will regenerate ALL families anyway: generating them now would bake the imperfect collar UVs into ~1800 files that would immediately be regenerated. ITEM ships with tips (known-imperfect rotated collars); the other channels have full flow-state + transport + base-pipe visuals but no push/pull tip arrows until the rollout finishes.
