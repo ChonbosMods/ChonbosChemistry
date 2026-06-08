@@ -5,7 +5,6 @@ import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.CarryBreakEventSystem;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
-import com.chonbosmods.chemistry.impl.block.TipSpikeCommand;
 import com.chonbosmods.chemistry.impl.block.WrenchInteraction;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
 import com.chonbosmods.chemistry.impl.block.net.NetworkTickSystem;
@@ -160,13 +159,6 @@ public class ChonbosChemistry extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new PanelRefreshSystem(panelRefreshService));
         getLogger().atInfo().log("Registered PanelRefreshSystem (live panel refresh, every "
             + PanelRefreshService.REFRESH_INTERVAL_TICKS + " ticks).");
-
-        // TEMPORARY SPIKE PROBE (DELETE WITH TipSpikeCommand): /cc-tipspike spawns a static prop
-        // overlay-tip entity per the design doc's "Spike findings (overlay tip entities)" recipe, to
-        // verify in-game that the tip renders, is click-through, and is non-persistent. Remove once
-        // the overlay-tip spike is signed off.
-        getCommandRegistry().registerCommand(new TipSpikeCommand());
-        getLogger().atInfo().log("Registered /cc-tipspike command (TEMPORARY overlay-tip spike probe).");
     }
 
     @Override

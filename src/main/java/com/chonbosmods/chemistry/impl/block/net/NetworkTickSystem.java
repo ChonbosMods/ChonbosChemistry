@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
 /**
@@ -68,16 +67,6 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
      * (a driver-from-this-system, not a second ticking system).
      */
     private final ItemTransferSystem itemTransfer = new ItemTransferSystem();
-
-    /** Logger for the gated tick diagnostics ([CC-item] stall log + [CC-tiprot] rotation log). */
-    private static final Logger LOGGER = Logger.getLogger(NetworkTickSystem.class.getName());
-
-    /**
-     * TEMPORARY diagnostics master switch (the [CC-item] stall log + the [CC-tiprot] rotation log).
-     * OFF by default so the server stays quiet; flip to true (or set the {@code cc.debug.tick} system
-     * property) for a single confirmation run. Both diagnostics are removed once their bugs are fixed.
-     */
-    private static final boolean DEBUG_TICK_LOGS = Boolean.getBoolean("cc.debug.tick");
 
     /** Per-world last-seen world tick, to detect when to reset that world's processed-anchor set. */
     private final Map<World, Long> lastTickByWorld = new IdentityHashMap<>();
@@ -222,20 +211,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         if (net.channel() == PortChannel.ITEM) {
             containers = new WorldContainerLookup(world, store);
             ItemEndpoints.Endpoints itemEndpoints = ItemEndpoints.collect(net, grid, containers);
-            // DIAGNOSTIC (2026-06-06 stall report, remove after root-cause): once per pull interval,
-            // log what the glue sees so one in-game run pinpoints the failing phase (endpoint
-            // detection vs extraction vs movement). Rate-limited to the pull boundary: ~1 line/s.
-            boolean diagTick = DEBUG_TICK_LOGS && now % 20 == 0;
-            int beforeTransit = diagTick ? countInTransitDiag(net, grid) : 0;
             itemTransfer.tickNetwork(net, world, containers, grid, itemEndpoints);
-            if (diagTick) {
-                int afterTransit = countInTransitDiag(net, grid);
-                LOGGER.info("[CC-item] tick=" + now + " anchor=" + anchor
-                    + " members=" + net.memberKeys().size()
-                    + " sources=" + itemEndpoints.sources().size()
-                    + " dests=" + itemEndpoints.destinations().size()
-                    + " inTransit " + beforeTransit + "->" + afterTransit);
-            }
             energized = false; // ITEM has no _On twin; Task 9 owns the full item visual integration
         } else {
             NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, grid, lookup);
@@ -380,11 +356,6 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
             @Nonnull MachineLookup lookup,
             WorldContainerLookup containers,
             boolean energized) {
-        // DIAGNOSTIC (2026-06-07 tip-rotation confirmation, remove after root-cause): rate-limit the
-        // per-pipe rotation log to ~1 line/s so one in-game run confirms whether the chosen composite
-        // shape WANTS a rotation the block does not currently have (the suspected tip/collar-misorient
-        // root cause). Gated to the same pull boundary the item diagnostic uses.
-        final boolean diagTick = DEBUG_TICK_LOGS && world.getTick() % 20 == 0;
         for (long key : net.memberKeys()) {
             try {
                 int mx = NetworkManager.unpackX(key);
@@ -473,16 +444,6 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                 // rewritten every tick.
                 if (desired.equals(normalizedCurrent) && currentRotation == wantRot) {
                     continue;
-                }
-
-                // DIAGNOSTIC (2026-06-07 tip-rotation, gated by cc.debug.tick, kept harmless/off for the
-                // confirmation run): the masks, chosen key, wanted rotation, and the block's CURRENT
-                // rotation. Rate-limited (diagTick) to ~1 line/s.
-                if (diagTick) {
-                    LOGGER.info("[CC-tiprot] (" + mx + "," + my + "," + mz + ") eff="
-                        + Integer.toBinaryString(effective) + " phys="
-                        + Integer.toBinaryString(physical) + " key=" + desired
-                        + " wantRot=" + wantRot + " curRot=" + currentRotation);
                 }
 
                 // Resolve the new shape BlockType from the desired state name (mirrors what
@@ -602,18 +563,5 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     @SuppressWarnings("removal")
     private static int currentRotationIndex(@Nonnull BlockAccessor accessor, int x, int y, int z) {
         return accessor.getRotationIndex(x, y, z);
-    }
-
-    /** DIAGNOSTIC helper (2026-06-06 stall report): live in-transit total across member pipes. */
-    private static int countInTransitDiag(Network net, PipeGridView grid) {
-        int total = 0;
-        for (long key : net.memberKeys()) {
-            PipeNode pipe = grid.pipeAt(
-                NetworkManager.unpackX(key), NetworkManager.unpackY(key), NetworkManager.unpackZ(key));
-            if (pipe != null) {
-                total += pipe.inTransit().size();
-            }
-        }
-        return total;
     }
 }
