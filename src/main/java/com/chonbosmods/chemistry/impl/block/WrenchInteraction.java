@@ -21,7 +21,6 @@ import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.movement.MovementStatesComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
-import com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.client.SimpleBlockInteraction;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -125,14 +124,13 @@ public final class WrenchInteraction extends SimpleBlockInteraction {
         }
         ComponentType<ChunkStore, PipeNode> pipeType = plugin.pipeComponentType();
         ComponentType<ChunkStore, MachineBlockState> machineType = plugin.machineComponentType();
-        ComponentType<ChunkStore, TankBlockState> tankType = plugin.tankComponentType();
 
         boolean sneaking = isSneaking(commandBuffer, context);
 
         // Pipe takes precedence: a position is either a pipe or a machine/tank, never both.
         PipeNode pipe = pipeType != null ? store.getComponent(ref, pipeType) : null;
         if (pipe != null) {
-            handlePipe(world, x, y, z, faceIndex, pipe, sneaking, plugin, commandBuffer, context, machineType, tankType);
+            handlePipe(world, x, y, z, faceIndex, pipe, sneaking, plugin, commandBuffer, context);
             return;
         }
 
@@ -160,16 +158,16 @@ public final class WrenchInteraction extends SimpleBlockInteraction {
 
     private void handlePipe(
             World world, int x, int y, int z, int faceIndex, PipeNode pipe, boolean sneaking,
-            ChonbosChemistry plugin, CommandBuffer<EntityStore> commandBuffer, InteractionContext context,
-            @Nullable ComponentType<ChunkStore, MachineBlockState> machineType,
-            @Nullable ComponentType<ChunkStore, TankBlockState> tankType) {
+            ChonbosChemistry plugin, CommandBuffer<EntityStore> commandBuffer, InteractionContext context) {
         int[] off = OFFSETS[faceIndex];
         int nx = x + off[0];
         int ny = y + off[1];
         int nz = z + off[2];
+        // A pipe END (any face NOT touching another pipe: air, a solid block, or an endpoint) gets the
+        // full PUSH/PULL ring so it can be pre-configured before a chest/machine is placed there
+        // (design 2026-06-07). Only a pipe neighbour restricts the face to NORMAL <-> NONE.
         WrenchCycles.Target target =
-            neighbourIsEndpoint(world, nx, ny, nz, machineType, tankType) ? WrenchCycles.Target.MACHINE
-                : WrenchCycles.Target.PIPE;
+            WrenchCycles.targetForNeighbour(neighbourIsPipe(world, nx, ny, nz, plugin));
 
         // The directed-face budget (design 2026-06-07 decision 2): count PUSH/PULL faces EXCLUDING the
         // clicked face so the face's own current state never counts against itself (a directed face can
@@ -221,19 +219,21 @@ public final class WrenchInteraction extends SimpleBlockInteraction {
     }
 
     /**
-     * True when the block across the face is a network endpoint the pipe-face cycle should treat as a
-     * MACHINE-style target (the full 4-state NORMAL→PUSH→PULL→NONE ring rather than the pipe-to-pipe
-     * 2-state ring). That is: a chemistry machine, a tank, or any block carrying an engine
-     * {@link ItemContainerBlock} component (a vanilla chest, the item-channel's passive endpoint). The
-     * container check is component PRESENCE only (the spike's detection, design §"Spike findings (Task 7)":
-     * {@code BlockModule.getBlockEntity} + {@code store.getComponent(ref, ItemContainerBlock.getComponentType())}):
-     * a container advertises no ports, so PUSH/PULL on the pipe face is exactly how the player aims the
-     * arm into/out of it.
+     * True when the block across the face is another pipe (any channel), the ONE neighbour kind that
+     * restricts the clicked face to the pipe-to-pipe 2-state ring ({@code NORMAL <-> NONE}). Every other
+     * neighbour: a machine/tank/container endpoint, a solid block, or empty air, returns false, so
+     * {@link WrenchCycles#targetForNeighbour} hands the face the full {@code NORMAL -> PUSH -> PULL ->
+     * NONE} ring. That is what lets a player pre-configure a bare pipe END to push/pull before a chest or
+     * machine is placed there (design 2026-06-07); the flow state persists in {@link PipeNode}'s codec
+     * and the existing {@code PlaceBlockEvent} invalidation activates the arm + tip when an endpoint
+     * later arrives. The detection mirrors the precedent used elsewhere: {@code BlockModule.getBlockEntity}
+     * + {@code store.getComponent(ref, pipeComponentType())}.
      */
-    private boolean neighbourIsEndpoint(
-            World world, int x, int y, int z,
-            @Nullable ComponentType<ChunkStore, MachineBlockState> machineType,
-            @Nullable ComponentType<ChunkStore, TankBlockState> tankType) {
+    private boolean neighbourIsPipe(World world, int x, int y, int z, ChonbosChemistry plugin) {
+        ComponentType<ChunkStore, PipeNode> pipeType = plugin.pipeComponentType();
+        if (pipeType == null) {
+            return false;
+        }
         Ref<ChunkStore> ref = BlockModule.getBlockEntity(world, x, y, z);
         if (ref == null || !ref.isValid()) {
             return false;
@@ -242,15 +242,7 @@ public final class WrenchInteraction extends SimpleBlockInteraction {
         if (store == null) {
             return false;
         }
-        if (machineType != null && store.getComponent(ref, machineType) != null) {
-            return true;
-        }
-        if (tankType != null && store.getComponent(ref, tankType) != null) {
-            return true;
-        }
-        // A vanilla container (chest, etc.) is a passive ITEM endpoint: component presence == "has a
-        // container", so its pipe face gets the full machine-style 4-cycle to aim the arm.
-        return store.getComponent(ref, ItemContainerBlock.getComponentType()) != null;
+        return store.getComponent(ref, pipeType) != null;
     }
 
     // --- machine face: cycle port capability ---

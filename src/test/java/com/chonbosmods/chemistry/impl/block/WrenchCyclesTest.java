@@ -33,7 +33,28 @@ class WrenchCyclesTest {
         assertEquals(FlowState.NONE, WrenchCycles.previous(FlowState.NORMAL, WrenchCycles.Target.MACHINE));
     }
 
-    // --- Pipe face toward a PIPE (or air): only NORMAL <-> NONE ---
+    // --- Target resolution: a pipe end (any non-pipe face) is configurable ---
+
+    @Test
+    void targetTowardAnotherPipeIsTheTwoStateRing() {
+        // A face touching another pipe stays the pipe-to-pipe connection ring (NORMAL <-> NONE):
+        // push/pull have no meaning between two pipes.
+        assertEquals(WrenchCycles.Target.PIPE, WrenchCycles.targetForNeighbour(true));
+    }
+
+    @Test
+    void targetTowardNonPipeIsTheFullRing() {
+        // A face NOT touching a pipe (air, a solid block, or an endpoint) gets the full four-state ring
+        // (design 2026-06-07): a player can pre-configure a bare pipe END to PUSH/PULL and the config
+        // persists for whenever a chest/machine is later placed there.
+        assertEquals(WrenchCycles.Target.MACHINE, WrenchCycles.targetForNeighbour(false));
+        // End-to-end: a bare air-facing end cycles NORMAL -> PUSH -> PULL (not just NORMAL <-> NONE).
+        WrenchCycles.Target end = WrenchCycles.targetForNeighbour(false);
+        assertEquals(FlowState.PUSH, WrenchCycles.next(FlowState.NORMAL, end));
+        assertEquals(FlowState.PULL, WrenchCycles.next(FlowState.PUSH, end));
+    }
+
+    // --- Pipe face toward a PIPE: only NORMAL <-> NONE ---
 
     @Test
     void pipeTowardPipeForwardCycle() {

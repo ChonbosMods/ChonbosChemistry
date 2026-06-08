@@ -64,10 +64,27 @@ public final class WrenchCycles {
 
     /** What a pipe face points at, resolved by the interaction glue before calling the cycle. */
     public enum Target {
-        /** The face points at a network endpoint (a machine / storage block). */
+        /**
+         * The face does NOT touch another pipe: a network endpoint (machine / storage / container), a
+         * solid block, or empty air. All of these get the full four-state ring so a player can
+         * pre-configure a bare pipe END to PUSH/PULL before the endpoint exists (design 2026-06-07).
+         */
         MACHINE,
-        /** The face points at another pipe, air, or any non-endpoint block. */
+        /** The face touches another pipe: the pipe-to-pipe connection ring only ({@code NORMAL <-> NONE}). */
         PIPE
+    }
+
+    /**
+     * Resolves the {@link Target} ring for a clicked pipe face from a single fact: whether the block
+     * across the face is another pipe (design 2026-06-07). A pipe neighbour is the ONLY thing that
+     * restricts the face to the two-state {@code NORMAL <-> NONE} ring (push/pull have no meaning
+     * between two pipes). Every other neighbour: a machine/tank/container endpoint, a solid block, or
+     * empty air, yields the full {@code NORMAL -> PUSH -> PULL -> NONE} ring, so a pipe END can be
+     * configured to push/pull and the config persists for whenever an endpoint is later placed there.
+     * The interaction glue computes {@code neighbourIsPipe} with a single world lookup and calls this.
+     */
+    public static Target targetForNeighbour(boolean neighbourIsPipe) {
+        return neighbourIsPipe ? Target.PIPE : Target.MACHINE;
     }
 
     /**

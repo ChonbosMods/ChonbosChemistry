@@ -8,6 +8,14 @@
   "PlayerAnimationsId": "Block",
   "BlockType": {
     "Material": "Solid",
+    "Supporting": {
+      "Up": [{ "FaceType": "Full" }],
+      "Down": [{ "FaceType": "Full" }],
+      "North": [{ "FaceType": "Full" }],
+      "South": [{ "FaceType": "Full" }],
+      "East": [{ "FaceType": "Full" }],
+      "West": [{ "FaceType": "Full" }]
+    },
     "DrawType": "Model",
     "Opacity": "Transparent",
     "Effect": [
