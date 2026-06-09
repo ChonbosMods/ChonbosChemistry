@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # ITEM Pipe Channel (§13.4) — Design
 
 *Status: validated 2026-06-06. Discrete item transport, Mekanism-logistical-transporter-faithful, against vanilla storage containers of any kind. Builds directly on the per-face flow states (`docs/plans/2026-06-05-pipe-flow-states-design.md`); executes stacked on `feat/pipe-flow-states` so both features verify in one in-game pass (user decision).*

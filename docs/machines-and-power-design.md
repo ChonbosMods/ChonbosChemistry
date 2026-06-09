@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](design.md) (see its §0 supersession map).
+
 # Hytale Chemistry Mod — Design Document
 
 *Status: working draft. Captures locked-in decisions on architecture, rules, constraints, and interactions. Numbers marked `[TUNE]` are placeholders for balancing.*

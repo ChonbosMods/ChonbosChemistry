@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # Energy + I/O Plumbing — Status & Handoff (2026-06-03)
 
 > ⚠️ **DIRECTION CHANGED (2026-06-03, later same day) — do NOT continue at B5/B6 as written.**

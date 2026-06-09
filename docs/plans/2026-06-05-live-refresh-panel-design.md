@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # Live-Refresh Machine/Pipe Panel — Design
 
 *Status: validated 2026-06-05. First of the transport quick-wins (branch `chore/transport-quick-wins`). Upgrades the snapshot-only `MachinePanelPage` (Task B4) to a live panel.*

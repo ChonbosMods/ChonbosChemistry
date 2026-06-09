@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # BlockHolder Contents Carry (tanks + machines) — Design
 
 *Status: validated and implemented 2026-06-05. Third transport quick-win (branch `chore/transport-quick-wins`). Supersedes the H7 `CC_StoredEnergy` single-field energy carry.*

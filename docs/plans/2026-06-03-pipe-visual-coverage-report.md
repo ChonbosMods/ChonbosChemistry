@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # Pipe Visual Coverage Report (engine connected-block transformations)
 
 Date: 2026-06-03. Investigation deliverable: why pipe auto-connect visuals fail for some directions.

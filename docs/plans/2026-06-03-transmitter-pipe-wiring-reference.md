@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # Transmitter Pipe — block-def wiring reference
 
 How to wire the placeholder transport blocks to the new models + connection templates.

@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # Energy + I/O Plumbing — Design (First Vertical Slice)
 
 **Status:** ⚠️ **PARTIALLY SUPERSEDED (2026-06-03)** by the transport-network pivot. Originally design-validated (brainstorm 2026-06-02) and built ~80% as described. Kept as the historical record of the slice that was actually shipped.

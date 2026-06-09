@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # Storage Balancing (battery↔battery / tank↔tank) — Design
 
 *Status: validated and implemented 2026-06-05. Second transport quick-win (branch `chore/transport-quick-wins`). Closes the "battery↔battery balancing" deferred item from the H6/H8 transport work.*

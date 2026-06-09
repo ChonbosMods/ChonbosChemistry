@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # Push/Pull Tip Rendering + Connection Rules — Design
 
 *Status: validated 2026-06-07. Supersedes the Task 12 end-stub-only indicators (which proved unreachable in real builds: the working end pipe always has 2+ arms). Follows the overlay-entity spike (DEAD: the client raycasts any networked model entity; no protocol exemption) and the combinatorics negotiation. Branch: continues `feat/item-channel`.*

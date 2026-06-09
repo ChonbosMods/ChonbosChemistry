@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # GAS Pipe Channel — Design
 
 *Status: validated and implemented 2026-06-05 (branch `feat/gas-channel-assets`). Brings the GAS channel live by cloning the in-game-verified FLUID pattern. Testing phase dropped by user decision: without final textures this is literally a copy of the fluid system, and the channel-generic network code is already covered.*

@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # Per-Face Pipe Flow States + I/O Wrench — Design
 
 *Status: validated 2026-06-05. Triggered by an in-game find during gas testing: two adjacent pipes carrying different gases (equally: fluids) currently weld into one network. Mekanism-style per-face connection control fixes that and brings the I/O wrench forward.*

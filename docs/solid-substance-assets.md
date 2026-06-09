@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](design.md) (see its §0 supersession map).
+
 # Solid-substance assets (jar items, textures, icons)
 
 Every solid element/compound (`phase() == SOLID`, ~205 of them) ships as a **placeable

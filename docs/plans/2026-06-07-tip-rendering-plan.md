@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # Tip Rendering + Connection Rules Implementation Plan
 
 > **For Claude:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development (continuing the item-channel execution mode).

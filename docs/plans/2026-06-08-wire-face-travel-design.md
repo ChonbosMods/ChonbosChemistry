@@ -1,3 +1,5 @@
+> **HISTORICAL / SUPERSEDED.** This doc is retained as detail/derivation only. The authoritative design is [docs/design.md](../design.md) (see its §0 supersession map).
+
 # Wire Face-Travel & Visual-Connection Layer — Design
 
 *Status: brainstormed + user-validated 2026-06-08. Scope is the GEOMETRY/STATE/RENDERING contract for a redstone-style "dust" wire that travels across Hytale block faces. Signal semantics (strength/boolean/propagation, components, logic) are explicitly OUT of scope and owned by separate agents working the rules; this doc fixes the visual + state contract they build on. Reuses the pipe per-face machinery (`FlowState[6]`, `rotationIndex`, `gen_pipe_tips.py` composite-merge) wholesale.*
