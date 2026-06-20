@@ -1,9 +1,9 @@
 {
   "ConnectsToOtherMaterials": true,
   "DontUpdateAfterInitialPlacement": true,
-  "DefaultShape": "body",
+  "DefaultShape": "machine",
   "Shapes": {
-    "base": {
+    "machine": {
       "FaceTags": {
         "South": [
           "CC_PowerFace"
@@ -15,24 +15,6 @@
           "CC_ItemFace"
         ]
       },
-      "PatternsToMatchAnyOf": [
-        {
-          "Type": "Custom",
-          "TransformRulesToOrientation": false,
-          "RulesToMatch": [
-            {
-              "Position": { "X": 0, "Y": 1, "Z": 0 },
-              "IncludeOrExclude": "Include",
-              "BlockTypes": [
-                "CC_Smelter"
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    "body": {
-      "FaceTags": {},
       "PatternsToMatchAnyOf": []
     }
   }
