@@ -108,6 +108,34 @@ public final class VanillaBenchBridge {
     }
 
     /**
+     * Re-wire an ALREADY-decoded bench's transient slot listeners against the live world, WITHOUT
+     * re-initializing its bench config or discarding its decoded container contents.
+     *
+     * <p>A {@link ProcessingBenchBlock} loses its transient slot-listener wiring across a codec
+     * round-trip (chunk save/reload) and after fresh placement: the persisted form carries the slot
+     * CONTENTS + progress, but the in-memory listener hookup to the live world must be re-established
+     * once after load. Unlike {@link #create}, this does NOT call {@code initializeBenchConfig} (the
+     * decoded bench already has its config); it only re-runs {@code setupSlots} to re-attach the slots
+     * to the world at {@code (x, y, z)}.
+     *
+     * <p>Same full placement context as {@link #create}: the {@code world}, the sibling
+     * {@link BenchBlock}, the {@code stateInfo}, block coords and {@code tier}.
+     */
+    public static void wireSlots(ProcessingBenchBlock b,
+                                 World world,
+                                 BenchBlock bench,
+                                 BlockModule.BlockStateInfo stateInfo,
+                                 int x,
+                                 int y,
+                                 int z,
+                                 BlockType blockType,
+                                 int tier) {
+        // signature: void setupSlots(World, BenchBlock, BlockModule$BlockStateInfo,
+        //            int x, int y, int z, BlockType, int tier)
+        b.setupSlots(world, bench, stateInfo, x, y, z, blockType, tier);
+    }
+
+    /**
      * Advance one processing step: refresh the auto-detected recipe, then run the engine's tick.
      *
      * <p>{@code advanceProcessing} returns an {@code int} (the number of completions / units of work

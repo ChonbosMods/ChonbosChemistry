@@ -91,6 +91,13 @@ public final class MachineBlockState implements Component<ChunkStore> {
     // by the smelter placement path (Task 12) and driven by our own tick (Task 8) via VanillaBenchBridge.
     private ProcessingBenchBlock heldBench;
     private BenchBlock heldBenchBlock;
+    // TRANSIENT (no codec key, never persisted): whether the held bench's slot listeners have been
+    // re-wired against the live world this load. A ProcessingBenchBlock loses its transient slot wiring
+    // across a codec round-trip (chunk save/reload) and after fresh placement, so the tick re-runs
+    // VanillaBenchBridge.wireSlots(...) once when this is false, then sets it true. Defaults false on
+    // every fresh instance (including every codec-decoded one, since the codec never touches it), so a
+    // reloaded bench is always re-wired exactly once before its first advance.
+    private transient boolean benchWired;
 
     /** Public no-arg constructor for the codec supplier. */
     public MachineBlockState() {
@@ -227,6 +234,21 @@ public final class MachineBlockState implements Component<ChunkStore> {
 
     public void setHeldBenchBlock(BenchBlock heldBenchBlock) {
         this.heldBenchBlock = heldBenchBlock;
+    }
+
+    /**
+     * @return whether the held bench's slot listeners have been re-wired against the live world this
+     *     load. TRANSIENT (never persisted): false on every fresh/decoded instance, so the tick
+     *     re-wires a reloaded bench exactly once (via {@code VanillaBenchBridge.wireSlots}) before its
+     *     first advance. See {@link #benchWired}.
+     */
+    public boolean isBenchWired() {
+        return benchWired;
+    }
+
+    /** Marks the held bench's slots as wired (set true by the tick after the one-time re-wire). */
+    public void setBenchWired(boolean benchWired) {
+        this.benchWired = benchWired;
     }
 
     /**
