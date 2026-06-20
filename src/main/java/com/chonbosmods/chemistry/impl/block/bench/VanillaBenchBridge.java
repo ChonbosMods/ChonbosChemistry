@@ -17,10 +17,17 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
  *
  * <p>The machine substrate reuses Hytale's built-in furnace bench engine by composition: our own
  * ECS component holds a real vanilla {@link ProcessingBenchBlock} and drives it from our tick. This
- * class isolates every reference to {@code builtin.crafting.*} so that all of the coupling risk to
- * an internal (non stability-guaranteed) API lives in one file: a Hytale update that shifts an
- * internal signature breaks only this class, guarded by a devServer smoke test. Nothing else in the
- * codebase should import {@code builtin.crafting.*}.
+ * class is the sole place that CALLS {@code builtin.crafting.*} BEHAVIOR (slot setup, recipe
+ * detection, processing advance, container access, component-type lookup), so all of the coupling
+ * risk to an internal (non stability-guaranteed) API lives in one file: a Hytale update that shifts
+ * an internal signature breaks only this class, guarded by a devServer smoke test.
+ *
+ * <p><b>Allowed relaxation:</b> merely HOLDING the bench types as fields and referencing their public
+ * {@code CODEC}s for composition/persistence is permitted elsewhere (e.g. {@code MachineBlockState}
+ * embeds {@link ProcessingBenchBlock} + {@link BenchBlock} as optional codec keys so a placed
+ * smelter's bench contents + progress survive chunk save/reload, per D31). That is data plumbing, not
+ * a behavior call: it does not invoke bench logic, so it carries none of the internal-API coupling
+ * risk this bridge isolates. Invoking any bench BEHAVIOR still belongs here and nowhere else.
  *
  * <p>See {@code docs/design.md} §7.3 / D31 (compose-and-delegate over the bench engine, vanilla
  * never ticks our block) and {@code docs/plans/2026-06-08-vanilla-bench-reuse-design.md} (decompile

@@ -2,6 +2,8 @@ package com.chonbosmods.chemistry.impl.block;
 
 import com.chonbosmods.chemistry.api.energy.EnergyHandler;
 import com.chonbosmods.chemistry.api.io.PortChannel;
+import com.hypixel.hytale.builtin.crafting.component.BenchBlock;
+import com.hypixel.hytale.builtin.crafting.component.ProcessingBenchBlock;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.EmptyExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -60,6 +62,17 @@ public final class MachineBlockState implements Component<ChunkStore> {
         // to 0 rather than tripping the primitive non-null check.
         .append(new KeyedCodec<>("EnergyDrainPerTick", OPTIONAL_LONG, false),
                 (o, v) -> o.energyDrainPerTick = v == null ? 0L : v, o -> o.energyDrainPerTick).add()
+        // The vanilla bench engine (smelter recipe/slots/progress) and its sibling tier-carrier, HELD as
+        // internal fields (not registered ECS components: D31 keeps vanilla's ProcessingBenchTick from
+        // ever seeing our block). Both are OPTIONAL: a machine without a bench (or a pre-existing
+        // persisted machine) decodes fine with the keys absent -> the fields stay null. Mirrors the
+        // "Energy" key above: ProcessingBenchBlock.CODEC / BenchBlock.CODEC are object codecs, so a null
+        // value is simply omitted on encode and an absent key decodes back to null. A present bench
+        // round-trips the vanilla bench data via the vanilla codecs.
+        .append(new KeyedCodec<>("HeldBench", ProcessingBenchBlock.CODEC),
+                (o, v) -> o.heldBench = v, o -> o.heldBench).add()
+        .append(new KeyedCodec<>("HeldBenchBlock", BenchBlock.CODEC),
+                (o, v) -> o.heldBenchBlock = v, o -> o.heldBenchBlock).add()
         .build();
 
     private static final int DEFAULT_THROUGHPUT = 100;
@@ -73,6 +86,11 @@ public final class MachineBlockState implements Component<ChunkStore> {
     // Energy units this machine burns from its own buffer each tick (0 = no self-drain). Default 0 so
     // an absent codec key leaves a normal machine non-draining.
     private long energyDrainPerTick;
+    // The held vanilla bench engine + its sibling tier-carrier. Nullable: a non-bench machine (or a
+    // pre-existing persisted machine) carries neither, so the optional codec keys decode to null. Set
+    // by the smelter placement path (Task 12) and driven by our own tick (Task 8) via VanillaBenchBridge.
+    private ProcessingBenchBlock heldBench;
+    private BenchBlock heldBenchBlock;
 
     /** Public no-arg constructor for the codec supplier. */
     public MachineBlockState() {
@@ -183,6 +201,32 @@ public final class MachineBlockState implements Component<ChunkStore> {
 
     public void setEnergyDrainPerTick(long energyDrainPerTick) {
         this.energyDrainPerTick = energyDrainPerTick;
+    }
+
+    /**
+     * @return the held vanilla {@link ProcessingBenchBlock} (smelter recipe/slots/progress engine), or
+     *     null if this machine carries no bench. Held as an internal field (never a registered ECS
+     *     component) so vanilla never ticks it; our own tick drives it via {@code VanillaBenchBridge}.
+     */
+    public ProcessingBenchBlock heldBench() {
+        return heldBench;
+    }
+
+    public void setHeldBench(ProcessingBenchBlock heldBench) {
+        this.heldBench = heldBench;
+    }
+
+    /**
+     * @return the held sibling {@link BenchBlock} (carries the bench tier), or null if this machine
+     *     carries no bench. Rides alongside {@link #heldBench()} and is passed back into the bench
+     *     engine by {@code VanillaBenchBridge.advance(...)}.
+     */
+    public BenchBlock heldBenchBlock() {
+        return heldBenchBlock;
+    }
+
+    public void setHeldBenchBlock(BenchBlock heldBenchBlock) {
+        this.heldBenchBlock = heldBenchBlock;
     }
 
     /**
