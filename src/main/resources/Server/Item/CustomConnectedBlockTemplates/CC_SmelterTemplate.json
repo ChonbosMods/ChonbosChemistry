@@ -1,0 +1,21 @@
+{
+  "ConnectsToOtherMaterials": true,
+  "DontUpdateAfterInitialPlacement": true,
+  "DefaultShape": "machine",
+  "Shapes": {
+    "machine": {
+      "FaceTags": {
+        "North": [
+          "CC_PowerFace"
+        ],
+        "West": [
+          "CC_ItemFace"
+        ],
+        "East": [
+          "CC_ItemFace"
+        ]
+      },
+      "PatternsToMatchAnyOf": []
+    }
+  }
+}
