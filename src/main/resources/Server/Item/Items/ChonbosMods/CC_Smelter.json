@@ -106,7 +106,8 @@
       "Type": "CustomTemplate",
       "TemplateShapeAssetId": "CC_SmelterTemplate",
       "TemplateShapeBlockPatterns": {
-        "machine": "CC_Smelter"
+        "base": "CC_Smelter",
+        "body": "CC_Smelter"
       }
     }
   }
