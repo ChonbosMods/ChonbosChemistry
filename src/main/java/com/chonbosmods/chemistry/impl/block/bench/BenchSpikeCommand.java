@@ -87,67 +87,73 @@ public final class BenchSpikeCommand extends CommandBase {
         int y = yArg.get(context);
         int z = zArg.get(context);
 
-        // Resolve the block entity at (x,y,z): same lookup WrenchInteraction / MachinePanelPage use.
-        Ref<ChunkStore> blockRef = BlockModule.getBlockEntity(world, x, y, z);
-        if (blockRef == null || !blockRef.isValid()) {
-            context.sendMessage(Message.raw("Not a processing bench"));
-            return;
-        }
-        Store<ChunkStore> blockStore = blockRef.getStore();
-        if (blockStore == null) {
-            context.sendMessage(Message.raw("Not a processing bench"));
-            return;
-        }
-
-        // The vanilla processing-bench component + its sibling BenchBlock, both off the same ref. Every
-        // builtin.crafting.* type funnels through VanillaBenchBridge accessors (no hard dependency here
-        // beyond the component handles the bridge hands back).
-        ComponentType<ChunkStore, ProcessingBenchBlock> benchType = VanillaBenchBridge.benchComponentType();
-        ComponentType<ChunkStore, BenchBlock> benchBlockType = VanillaBenchBridge.benchBlockComponentType();
-        ProcessingBenchBlock bench = blockStore.getComponent(blockRef, benchType);
-        BenchBlock benchBlock = blockStore.getComponent(blockRef, benchBlockType);
-        BlockModule.BlockStateInfo stateInfo =
-            blockStore.getComponent(blockRef, BlockModule.BlockStateInfo.getComponentType());
-        if (bench == null || benchBlock == null || stateInfo == null) {
-            context.sendMessage(Message.raw("Not a processing bench"));
-            return;
-        }
-
-        BlockType blockType = resolveBlockType(blockStore, stateInfo);
-        if (blockType == null) {
-            context.sendMessage(Message.raw("ccbenchspike: could not resolve the block type at the bench."));
-            return;
-        }
-
-        // advanceProcessing reads the tier off BenchBlock.getTierLevel() internally; the positional arg is
-        // only used for sound/eject placement, so the bench's own tier level is a safe value here.
-        int tier = benchBlock.getTierLevel();
-        Store<EntityStore> entityStore = world.getEntityStore().getStore();
-
-        // Ignite the (fueled) furnace ourselves, since no window will (see class javadoc).
-        boolean ignited = VanillaBenchBridge.setActive(bench, true, benchBlock, stateInfo);
-
-        int totalCompletions = 0;
-        StringBuilder steps = new StringBuilder();
-        for (int i = 0; i < ITERATIONS; i++) {
-            boolean worked = VanillaBenchBridge.advance(
-                bench, DT_SECONDS, entityStore, benchBlock, stateInfo, x, y, z, blockType, tier);
-            if (worked) {
-                totalCompletions++;
+        // Command handlers run on a command/ForkJoin thread, not the WorldThread, but all the work below
+        // touches world/ECS state (block entities, components, container mutation) which asserts unless it
+        // runs on the WorldThread. world.execute(...) queues this runnable to run on the world's next tick,
+        // i.e. on the WorldThread: hop there so the bench resolution + drive + reporting all run safely.
+        world.execute(() -> {
+            // Resolve the block entity at (x,y,z): same lookup WrenchInteraction / MachinePanelPage use.
+            Ref<ChunkStore> blockRef = BlockModule.getBlockEntity(world, x, y, z);
+            if (blockRef == null || !blockRef.isValid()) {
+                context.sendMessage(Message.raw("Not a processing bench"));
+                return;
             }
-            steps.append(worked ? '1' : '0');
-        }
+            Store<ChunkStore> blockStore = blockRef.getStore();
+            if (blockStore == null) {
+                context.sendMessage(Message.raw("Not a processing bench"));
+                return;
+            }
 
-        float progress = VanillaBenchBridge.inputProgress(bench);
-        boolean active = VanillaBenchBridge.isActive(bench);
-        String output = describeContainer(VanillaBenchBridge.output(bench));
+            // The vanilla processing-bench component + its sibling BenchBlock, both off the same ref. Every
+            // builtin.crafting.* type funnels through VanillaBenchBridge accessors (no hard dependency here
+            // beyond the component handles the bridge hands back).
+            ComponentType<ChunkStore, ProcessingBenchBlock> benchType = VanillaBenchBridge.benchComponentType();
+            ComponentType<ChunkStore, BenchBlock> benchBlockType = VanillaBenchBridge.benchBlockComponentType();
+            ProcessingBenchBlock bench = blockStore.getComponent(blockRef, benchType);
+            BenchBlock benchBlock = blockStore.getComponent(blockRef, benchBlockType);
+            BlockModule.BlockStateInfo stateInfo =
+                blockStore.getComponent(blockRef, BlockModule.BlockStateInfo.getComponentType());
+            if (bench == null || benchBlock == null || stateInfo == null) {
+                context.sendMessage(Message.raw("Not a processing bench"));
+                return;
+            }
 
-        String report = "ccbenchspike @(" + x + "," + y + "," + z + ") ignited=" + ignited
-            + " active=" + active + " steps[" + steps + "] workedSteps=" + totalCompletions
-            + " progress=" + progress + " output=" + output;
+            BlockType blockType = resolveBlockType(blockStore, stateInfo);
+            if (blockType == null) {
+                context.sendMessage(Message.raw("ccbenchspike: could not resolve the block type at the bench."));
+                return;
+            }
 
-        LOGGER.atInfo().log(report);
-        context.sendMessage(Message.raw(report));
+            // advanceProcessing reads the tier off BenchBlock.getTierLevel() internally; the positional arg is
+            // only used for sound/eject placement, so the bench's own tier level is a safe value here.
+            int tier = benchBlock.getTierLevel();
+            Store<EntityStore> entityStore = world.getEntityStore().getStore();
+
+            // Ignite the (fueled) furnace ourselves, since no window will (see class javadoc).
+            boolean ignited = VanillaBenchBridge.setActive(bench, true, benchBlock, stateInfo);
+
+            int totalCompletions = 0;
+            StringBuilder steps = new StringBuilder();
+            for (int i = 0; i < ITERATIONS; i++) {
+                boolean worked = VanillaBenchBridge.advance(
+                    bench, DT_SECONDS, entityStore, benchBlock, stateInfo, x, y, z, blockType, tier);
+                if (worked) {
+                    totalCompletions++;
+                }
+                steps.append(worked ? '1' : '0');
+            }
+
+            float progress = VanillaBenchBridge.inputProgress(bench);
+            boolean active = VanillaBenchBridge.isActive(bench);
+            String output = describeContainer(VanillaBenchBridge.output(bench));
+
+            String report = "ccbenchspike @(" + x + "," + y + "," + z + ") ignited=" + ignited
+                + " active=" + active + " steps[" + steps + "] workedSteps=" + totalCompletions
+                + " progress=" + progress + " output=" + output;
+
+            LOGGER.atInfo().log(report);
+            context.sendMessage(Message.raw(report));
+        });
     }
 
     /** BlockType at the bench, resolved like the vanilla ProcessingBenchTick (StateInfo → chunk → section). */
