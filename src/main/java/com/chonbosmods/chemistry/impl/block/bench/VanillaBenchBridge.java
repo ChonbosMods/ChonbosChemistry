@@ -45,6 +45,50 @@ public final class VanillaBenchBridge {
     }
 
     /**
+     * The ECS component type vanilla registers for the SIBLING {@link BenchBlock} that rides on every
+     * bench block alongside the {@link ProcessingBenchBlock}. {@code advanceProcessing} /
+     * {@code checkForRecipeUpdate} both take this companion, so any caller driving a real placed bench
+     * must look it up next to the processing component. Kept here so {@code builtin.crafting.*} stays
+     * confined to this bridge.
+     */
+    public static ComponentType<ChunkStore, BenchBlock> benchBlockComponentType() {
+        // signature: CraftingPlugin.get() (static) -> getBenchBlockComponentType()
+        //            : ComponentType<ChunkStore, BenchBlock>
+        return CraftingPlugin.get().getBenchBlockComponentType();
+    }
+
+    /**
+     * Force the bench's {@code active} flag (TEMP: used by the Task 2 spike to ignite a real VANILLA
+     * furnace headlessly). A fueled bench gates {@code advanceProcessing} on {@code active}, which vanilla
+     * only flips true from the player's open-furnace window ({@code SetActiveAction}); driving the bench
+     * from our own tick (no window) needs us to set it ourselves. Returns vanilla's result: {@code false}
+     * if it refused (e.g. asked to activate a fueled bench whose fuel container is empty).
+     *
+     * <p>The future no-fuel smelter does NOT need this: {@code setupSlots} auto-activates a fuel-less
+     * bench (its {@code ProcessingBench} config has no {@code Fuel} slots). This passthrough exists only so
+     * the spike can prove drive-ability against the stock furnace, which is fueled.
+     */
+    public static boolean setActive(ProcessingBenchBlock b,
+                                    boolean active,
+                                    BenchBlock bench,
+                                    BlockModule.BlockStateInfo stateInfo) {
+        // signature: boolean setActive(boolean, BenchBlock, BlockModule$BlockStateInfo)
+        return b.setActive(active, bench, stateInfo);
+    }
+
+    /** Whether the bench currently considers itself processing. */
+    public static boolean isActive(ProcessingBenchBlock b) {
+        // signature: boolean isActive()
+        return b.isActive();
+    }
+
+    /** The bench's current input progress (seconds accumulated toward the next completion). */
+    public static float inputProgress(ProcessingBenchBlock b) {
+        // signature: float getInputProgress()
+        return b.getInputProgress();
+    }
+
+    /**
      * Construct and configure a fresh {@link ProcessingBenchBlock} from a block type's bench config.
      *
      * <p>Intended to produce a NO-FUEL bench (the smelter has no fuel slots): the no-fuel-ness comes

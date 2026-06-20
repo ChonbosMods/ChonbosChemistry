@@ -6,6 +6,7 @@ import com.chonbosmods.chemistry.impl.block.CarryBreakEventSystem;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.chonbosmods.chemistry.impl.block.WrenchInteraction;
+import com.chonbosmods.chemistry.impl.block.bench.BenchSpikeCommand;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
 import com.chonbosmods.chemistry.impl.block.net.NetworkTickSystem;
 import com.chonbosmods.chemistry.impl.block.net.PipeBreakEventSystem;
@@ -152,6 +153,12 @@ public class ChonbosChemistry extends JavaPlugin {
         getCodecRegistry(Interaction.CODEC).register(
             "cc_wrench", WrenchInteraction.class, WrenchInteraction.CODEC);
         getLogger().atInfo().log("Registered cc_wrench interaction (CC_Wrench pipe/machine face config).");
+
+        // TEMP spike (Task 2), remove in Task 4: /ccbenchspike <x y z> drives an already-placed vanilla
+        // furnace through VanillaBenchBridge to prove we can advance a real ProcessingBenchBlock ourselves
+        // (the gating decision for the machine substrate; design §7.3 / D31).
+        getCommandRegistry().registerCommand(new BenchSpikeCommand());
+        getLogger().atInfo().log("Registered /ccbenchspike (TEMP Task 2 spike, remove in Task 4).");
 
         // Live panel refresh (2026-06-05 design): pages register with the service after a successful
         // build; this query-less per-world pulse refreshes them every 10th tick on the WorldThread.
