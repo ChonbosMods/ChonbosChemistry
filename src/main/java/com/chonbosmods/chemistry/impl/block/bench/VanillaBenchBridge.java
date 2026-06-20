@@ -57,25 +57,6 @@ public final class VanillaBenchBridge {
         return CraftingPlugin.get().getBenchBlockComponentType();
     }
 
-    /**
-     * Force the bench's {@code active} flag (TEMP: used by the Task 2 spike to ignite a real VANILLA
-     * furnace headlessly). A fueled bench gates {@code advanceProcessing} on {@code active}, which vanilla
-     * only flips true from the player's open-furnace window ({@code SetActiveAction}); driving the bench
-     * from our own tick (no window) needs us to set it ourselves. Returns vanilla's result: {@code false}
-     * if it refused (e.g. asked to activate a fueled bench whose fuel container is empty).
-     *
-     * <p>The future no-fuel smelter does NOT need this: {@code setupSlots} auto-activates a fuel-less
-     * bench (its {@code ProcessingBench} config has no {@code Fuel} slots). This passthrough exists only so
-     * the spike can prove drive-ability against the stock furnace, which is fueled.
-     */
-    public static boolean setActive(ProcessingBenchBlock b,
-                                    boolean active,
-                                    BenchBlock bench,
-                                    BlockModule.BlockStateInfo stateInfo) {
-        // signature: boolean setActive(boolean, BenchBlock, BlockModule$BlockStateInfo)
-        return b.setActive(active, bench, stateInfo);
-    }
-
     /** Whether the bench currently considers itself processing. */
     public static boolean isActive(ProcessingBenchBlock b) {
         // signature: boolean isActive()
