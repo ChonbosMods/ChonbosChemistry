@@ -73,6 +73,13 @@ public final class MachineBlockState implements Component<ChunkStore> {
                 (o, v) -> o.heldBench = v, o -> o.heldBench).add()
         .append(new KeyedCodec<>("HeldBenchBlock", BenchBlock.CODEC),
                 (o, v) -> o.heldBenchBlock = v, o -> o.heldBenchBlock).add()
+        // On/Off control line: when false the tick system holds the machine (no processing / no power
+        // consumption) but keeps its loaded input + buffered power. This IS the seam the circuit system's
+        // Machine I/O bridge writes ("run/halt"). OPTIONAL (3-arg, not-required): legacy data saved before
+        // the flag has no "Enabled" key, so the setter is never invoked and the field stays its true
+        // default (machines placed before this flag stay ON).
+        .append(new KeyedCodec<>("Enabled", Codec.BOOLEAN, false),
+                (o, v) -> o.enabled = v, o -> o.enabled).add()
         .build();
 
     private static final int DEFAULT_THROUGHPUT = 100;
@@ -83,6 +90,8 @@ public final class MachineBlockState implements Component<ChunkStore> {
     private WorkState work = new WorkState();
     private int throughput = DEFAULT_THROUGHPUT;
     private boolean creativeSource;
+    /** On/Off control line (default ON); the circuit run/halt seam. See the "Enabled" codec key. */
+    private boolean enabled = true;
     // Energy units this machine burns from its own buffer each tick (0 = no self-drain). Default 0 so
     // an absent codec key leaves a normal machine non-draining.
     private long energyDrainPerTick;
@@ -195,6 +204,20 @@ public final class MachineBlockState implements Component<ChunkStore> {
 
     public void setCreativeSource(boolean creativeSource) {
         this.creativeSource = creativeSource;
+    }
+
+    /**
+     * @return whether this machine is ON (enabled). When OFF, the tick system holds it: no processing and
+     *     no power consumption, but its loaded input and buffered power are retained. This is the On/Off
+     *     panel toggle AND the circuit system's "run/halt" control line (the Machine I/O bridge writes it).
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /** Set the On/Off control line. See {@link #isEnabled()}. */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     /**

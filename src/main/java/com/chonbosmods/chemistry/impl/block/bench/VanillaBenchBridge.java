@@ -77,6 +77,22 @@ public final class VanillaBenchBridge {
     }
 
     /**
+     * The current smelt progress as a 0..1 fraction (inputProgress / recipe time at {@code tier}), or 0
+     * when there is no active recipe. For the panel progress bar.
+     */
+    public static float progressFraction(ProcessingBenchBlock b, int tier) {
+        // signature: CraftingRecipe getRecipe(); float getRecipeTimeSeconds(int tier)
+        if (b.getRecipe() == null) {
+            return 0.0F;
+        }
+        float total = b.getRecipeTimeSeconds(tier);
+        if (total <= 0.0F) {
+            return 0.0F;
+        }
+        return Math.max(0.0F, Math.min(1.0F, b.getInputProgress() / total));
+    }
+
+    /**
      * Construct and configure a fresh {@link ProcessingBenchBlock} from a block type's bench config.
      *
      * <p>Intended to produce a NO-FUEL bench (the smelter has no fuel slots): the no-fuel-ness comes
@@ -108,15 +124,16 @@ public final class VanillaBenchBridge {
     }
 
     /**
-     * Re-wire an ALREADY-decoded bench's transient slot listeners against the live world, WITHOUT
-     * re-initializing its bench config or discarding its decoded container contents.
+     * Restore a codec-loaded bench's transient config + re-wire its slot listeners against the live world.
      *
-     * <p>A {@link ProcessingBenchBlock} loses its transient slot-listener wiring across a codec
-     * round-trip (chunk save/reload) and after fresh placement: the persisted form carries the slot
-     * CONTENTS + progress, but the in-memory listener hookup to the live world must be re-established
-     * once after load. Unlike {@link #create}, this does NOT call {@code initializeBenchConfig} (the
-     * decoded bench already has its config); it only re-runs {@code setupSlots} to re-attach the slots
-     * to the world at {@code (x, y, z)}.
+     * <p>A {@link ProcessingBenchBlock} carries its slot CONTENTS + progress + item containers across a
+     * codec round-trip (chunk save/reload), but its {@code processingBench} CONFIG field is
+     * {@code transient} (verified via javap) so it decodes to {@code null} — and {@code setupSlots} calls
+     * {@code processingBench.getInput(...)}, which NPEs on a loaded bench (this crashed the WorldThread:
+     * 2026-06-21). So, unlike its prior contract, this MUST re-run {@code initializeBenchConfig(blockType)}
+     * first to repopulate {@code processingBench} from the block type. That sets only the transient config
+     * (the persisted, separately-stored input/fuel/output containers are left intact), so decoded CONTENTS
+     * are preserved. Then {@code setupSlots} re-attaches the slot listeners to the world at {@code (x,y,z)}.
      *
      * <p>Same full placement context as {@link #create}: the {@code world}, the sibling
      * {@link BenchBlock}, the {@code stateInfo}, block coords and {@code tier}.
@@ -130,6 +147,9 @@ public final class VanillaBenchBridge {
                                  int z,
                                  BlockType blockType,
                                  int tier) {
+        // Repopulate the transient processingBench config (null on a decoded bench) BEFORE setupSlots,
+        // which dereferences it. Does not touch the persisted item containers, so contents are kept.
+        b.initializeBenchConfig(blockType);
         // signature: void setupSlots(World, BenchBlock, BlockModule$BlockStateInfo,
         //            int x, int y, int z, BlockType, int tier)
         b.setupSlots(world, bench, stateInfo, x, y, z, blockType, tier);

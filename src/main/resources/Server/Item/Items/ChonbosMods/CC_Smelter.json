@@ -28,7 +28,7 @@
           {
             "Type": "OpenCustomUI",
             "Page": {
-              "Id": "CC_MachinePanel"
+              "Id": "CC_SmelterPanel"
             }
           }
         ]

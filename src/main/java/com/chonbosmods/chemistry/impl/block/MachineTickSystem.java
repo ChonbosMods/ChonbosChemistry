@@ -11,6 +11,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
@@ -122,8 +123,23 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
         }
 
         // 3. WORK pass (Task 8): energy-gated vanilla-bench drive. No-op for non-bench machines.
-        driveBench(node, dt, index, archetypeChunk, store);
+        // DEFENSIVE: a bench error must NEVER kill the WorldThread (a setupSlots NPE did, 2026-06-21:
+        // the whole world became unavailable). Catch every throwable, log each distinct one once, and
+        // skip this machine's drive for the tick. The class contract (this MUST NEVER throw) is now enforced.
+        try {
+            driveBench(node, dt, index, archetypeChunk, store);
+        } catch (Throwable t) {
+            String msg = String.valueOf(t);
+            if (BENCH_DRIVE_SEEN.add(msg)) {
+                BENCH_DRIVE_LOG.atWarning().log("CC machine bench drive failed (skipped, world tick protected): " + msg);
+            }
+        }
     }
+
+    /** Guards the per-tick bench drive: a failure logs once (per distinct error) and never crashes the tick. */
+    private static final HytaleLogger BENCH_DRIVE_LOG = HytaleLogger.forEnclosingClass();
+    private static final java.util.Set<String> BENCH_DRIVE_SEEN =
+        java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     /**
      * Drive this node's held vanilla bench by the energy it can afford this tick (Task 8). A no-op for
@@ -228,9 +244,13 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
             node.setBenchWired(true);
         }
 
+        // On/Off gate (panel toggle / circuit run/halt line): a disabled machine HOLDS — no processing and
+        // no power consumption this tick, but its loaded input and buffered power are retained (the bench
+        // was still created/wired above, so the panel shows contents and power intake still fills it).
         // Energy gate: how much simulated time we can afford this tick (v1: capped at real dt, no
-        // overclock). Zero when the buffer is empty -> bench freezes (advance does nothing).
-        double affordable = SmelterEnergy.affordableDt(energy.getStored(), SMELTER_DRAW, dt);
+        // overclock). Zero when disabled or the buffer is empty -> bench freezes (advance does nothing).
+        double affordable =
+            node.isEnabled() ? SmelterEnergy.affordableDt(energy.getStored(), SMELTER_DRAW, dt) : 0.0;
         if (affordable > 0) {
             VanillaBenchBridge.advance(
                 bench, (float) affordable, entityStore, benchBlock, stateInfo, x, y, z, blockType, tier);

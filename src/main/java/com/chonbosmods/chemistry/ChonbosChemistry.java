@@ -12,6 +12,7 @@ import com.chonbosmods.chemistry.impl.block.net.PipeBreakEventSystem;
 import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import com.chonbosmods.chemistry.impl.block.net.PipePlaceEventSystem;
 import com.chonbosmods.chemistry.impl.block.ui.MachinePanelPage;
+import com.chonbosmods.chemistry.impl.block.ui.SmelterPanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshService;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshSystem;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
@@ -145,6 +146,11 @@ public class ChonbosChemistry extends JavaPlugin {
         OpenCustomUIInteraction.registerBlockEntityCustomPage(
             this, MachinePanelPage.class, "CC_MachinePanel", MachinePanelPage::new);
         getLogger().atInfo().log("Registered CC_MachinePanel custom UI page (block GUI).");
+
+        // CC_Smelter's furnace-style read-only panel (On/Off toggle + Eject + live progress/power).
+        OpenCustomUIInteraction.registerBlockEntityCustomPage(
+            this, SmelterPanelPage.class, "CC_SmelterPanel", SmelterPanelPage::new);
+        getLogger().atInfo().log("Registered CC_SmelterPanel custom UI page (smelter GUI).");
 
         // CC_Wrench (Task 9): a held tool whose Secondary interaction taps a pipe face to cycle its
         // flow state, or a machine face to cycle its port. The JSON "Type" is this registered id; the

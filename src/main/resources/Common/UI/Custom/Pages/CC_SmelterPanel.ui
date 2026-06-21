@@ -1,0 +1,239 @@
+$C = "../Common.ui";
+$M = "../CC_Master.ui";
+
+// Chonbo's Chemistry: CC Smelter panel. Two-column tech-machine layout sized to VANILLA measurements
+// (see docs/research/2026-06-21-vanilla-ui-measurements.md): 64px item slots, 44px buttons, ~16 content
+// padding, FontSize-15 uppercase headers, vanilla wrapped ProgressBars (EffectWidth 102/Height 58/
+// Offset 74). Dark-gray theme (CC_Master.ui). Column order matches native Hytale: STATUS/controls on the
+// LEFT, the PROCESSING (I/O) block on the RIGHT.
+//
+// Bars use recolored fills shipped in Common/UI/Custom/CC/: energy = #4bfcce, smelting = native progress
+// orange #aa7c4a. Server sets #ProgressBar.Value / #PowerBar.Value (0..1). Texture paths use ../ (resolved
+// relative to THIS file in Pages/). #UpgradePanel is built but hidden (Visible:false) until Phase 2.
+
+@PanelBorderColor = $M.@PanelBorderColor;
+@PanelFillColor = $M.@PanelFillColor;
+@PanelDividerColor = $M.@PanelDividerColor;
+@ValueText = $M.@ValueText;
+@LabelText = $M.@LabelText;
+@ProcessColumnWidth = $M.@ProcessColumnWidth;
+@StatusColumnWidth = $M.@StatusColumnWidth;
+@PanelGap = $M.@PanelGap;
+@ContentPad = $M.@ContentPad;
+@SlotSize = $M.@SlotSize;
+@SlotIconSize = $M.@SlotIconSize;
+@SlotSpacing = $M.@SlotSpacing;
+@BarHeight = $M.@BarHeight;
+@ButtonHeight = $M.@ButtonHeight;
+@HeaderFontSize = $M.@HeaderFontSize;
+
+$C.@PageOverlay {
+  $C.@DecoratedContainer {
+    Anchor: (Width: 800, Height: 360);
+
+    #Title {
+      Group {
+        $C.@Title { @Text = "CC Smelter"; }
+      }
+    }
+
+    #Content {
+      LayoutMode: Left;
+      Padding: (Full: @ContentPad);
+
+      // ---- Left column: status + controls + upgrade ----
+      Group #StatusColumn {
+        Anchor: (Width: @StatusColumnWidth);
+        LayoutMode: Top;
+
+        Group #StatusPanel {
+          Anchor: (Left: 0, Right: 0);
+          Background: @PanelBorderColor;
+          Padding: (Full: 1);
+
+          Group {
+            Anchor: (Full: 0);
+            Background: @PanelFillColor;
+            LayoutMode: Top;
+            Padding: (Top: 10, Left: 14, Right: 14, Bottom: 12);
+
+            Label #TierText {
+              Style: (FontSize: 18, RenderBold: true, TextColor: @ValueText);
+              Text: "Tier: 0";
+            }
+            Group { Anchor: (Height: 6); }
+            Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
+            Group { Anchor: (Height: 12); }
+
+            Label #EnergyText {
+              Anchor: (Left: 0, Right: 0);
+              Style: (FontSize: 14, TextColor: @LabelText);
+              Text: "Energy: 0 / 0";
+            }
+            Group { Anchor: (Height: 8); }
+
+            // Energy bar: teal #4bfcce fill (recolored, shipped in CC/).
+            Group {
+              Anchor: (Left: 0, Right: 0, Height: @BarHeight);
+              Background: "../Common/ProgressBar.png";
+
+              ProgressBar #PowerBar {
+                Anchor: (Full: 0);
+                BarTexturePath: "../CC/ProgressBarFill_Energy.png";
+                EffectTexturePath: "../Common/ProgressBarEffect.png";
+                EffectWidth: 102;
+                EffectHeight: 58;
+                EffectOffset: 74;
+                Value: 0.0;
+              }
+            }
+            Group { Anchor: (Height: 12); }
+
+            Label #StatusText {
+              Style: (FontSize: 14, TextColor: @LabelText);
+              Text: "Status: On";
+            }
+            Group { Anchor: (Height: 16); }
+
+            // Button shows the action (mode to switch TO): when ON it reads "Turn Off". Server sets text.
+            $C.@SecondaryTextButton #PowerToggle {
+              Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+              Text: "Turn Off";
+            }
+            Group { Anchor: (Height: 8); }
+
+            $C.@CancelTextButton #EjectBtn {
+              Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+              Text: "Eject";
+            }
+          }
+        }
+
+        Group { Anchor: (Height: @PanelGap); }
+
+        // Phase 2: functional upgrade panel (hidden until wired).
+        Group #UpgradePanel {
+          Anchor: (Left: 0, Right: 0);
+          Background: @PanelBorderColor;
+          Padding: (Full: 1);
+          Visible: false;
+
+          Group {
+            Anchor: (Full: 0);
+            Background: @PanelFillColor;
+            LayoutMode: Top;
+            Padding: (Top: 10, Left: 14, Right: 14, Bottom: 12);
+
+            Label #NextTierText {
+              Style: (FontSize: @HeaderFontSize, RenderBold: true, RenderUppercase: true, TextColor: @LabelText);
+              Text: "Next Tier";
+            }
+            Group { Anchor: (Height: 6); }
+            Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
+            Group { Anchor: (Height: 12); }
+
+            Label #UpgradeReqText {
+              Anchor: (Left: 0, Right: 0);
+              Style: (FontSize: 13, TextColor: @LabelText, Wrap: true);
+              Text: "";
+            }
+            Group { Anchor: (Height: 10); }
+
+            $C.@TextButton #UpgradeBtn {
+              Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+              Text: "Upgrade";
+            }
+          }
+        }
+      }
+
+      Group { Anchor: (Width: @PanelGap); }
+
+      // ---- Right column: the I/O / processing block (native Hytale puts processing on the right) ----
+      Group #ProcessColumn {
+        Anchor: (Width: @ProcessColumnWidth);
+        LayoutMode: Top;
+
+        Group #ProcessPanel {
+          Anchor: (Left: 0, Right: 0);
+          Background: @PanelBorderColor;
+          Padding: (Full: 1);
+
+          Group {
+            Anchor: (Full: 0);
+            Background: @PanelFillColor;
+            LayoutMode: Top;
+            Padding: (Top: 10, Left: 14, Right: 14, Bottom: 12);
+
+            Label {
+              Style: (FontSize: @HeaderFontSize, RenderBold: true, RenderUppercase: true, TextColor: @LabelText);
+              Text: "Processing";
+            }
+            Group { Anchor: (Height: 6); }
+            Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
+            Group { Anchor: (Height: 14); }
+
+            // Input slot(s) | progress bar (centered) | output slots, furnace layout.
+            Group #IoRow {
+              LayoutMode: Left;
+              Anchor: (Left: 0, Right: 0, Height: 144);
+
+              ItemGrid #InputGrid {
+                Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
+                SlotsPerRow: 1;
+                AreItemsDraggable: false;
+                RenderItemQualityBackground: true;
+                Anchor: (Width: 72);
+              }
+
+              Group { Anchor: (Width: 16); }
+
+              // Center: smelting bar + status text, vertically centered in the I/O row.
+              Group {
+                FlexWeight: 1;
+                LayoutMode: Top;
+                Padding: (Top: 54);
+
+                // Smelting bar: native progress orange #aa7c4a fill (recolored, shipped in CC/).
+                Group {
+                  Anchor: (Left: 0, Right: 0, Height: @BarHeight);
+                  Background: "../Common/ProgressBar.png";
+
+                  ProgressBar #ProgressBar {
+                    Anchor: (Full: 0);
+                    BarTexturePath: "../CC/ProgressBarFill_Smelt.png";
+                    EffectTexturePath: "../Common/ProgressBarEffect.png";
+                    EffectWidth: 102;
+                    EffectHeight: 58;
+                    EffectOffset: 74;
+                    Value: 0.0;
+                  }
+                }
+
+                Group { Anchor: (Height: 10); }
+
+                Label #ProgressText {
+                  Anchor: (Left: 0, Right: 0);
+                  Style: (FontSize: 14, TextColor: @ValueText, HorizontalAlignment: Center);
+                  Text: "Idle";
+                }
+              }
+
+              Group { Anchor: (Width: 16); }
+
+              ItemGrid #OutputGrid {
+                Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
+                SlotsPerRow: 2;
+                AreItemsDraggable: false;
+                RenderItemQualityBackground: true;
+                Anchor: (Width: 140);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+$C.@BackButton {}

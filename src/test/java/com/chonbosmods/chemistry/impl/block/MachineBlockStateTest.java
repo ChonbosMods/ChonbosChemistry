@@ -1,9 +1,11 @@
 package com.chonbosmods.chemistry.impl.block;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.api.io.PortDirection;
@@ -11,6 +13,7 @@ import com.hypixel.hytale.codec.EmptyExtraInfo;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import org.bson.BsonDocument;
 import org.bson.BsonValue;
 import org.junit.jupiter.api.Test;
 
@@ -141,5 +144,41 @@ class MachineBlockStateTest {
 
         assertNull(decoded.energy());
         assertEquals(40, decoded.resource(PortChannel.GAS).amount());
+    }
+
+    // --- enabled (On/Off; the circuit run/halt control line) ---
+
+    @Test
+    void enabledDefaultsTrue() {
+        assertTrue(sample().isEnabled());
+    }
+
+    @Test
+    void setEnabledToggles() {
+        MachineBlockState m = sample();
+        m.setEnabled(false);
+        assertFalse(m.isEnabled());
+        m.setEnabled(true);
+        assertTrue(m.isEnabled());
+    }
+
+    @Test
+    void enabledSurvivesEncodeDecode() {
+        MachineBlockState m = sample();
+        m.setEnabled(false);
+        BsonValue encoded = MachineBlockState.CODEC.encode(m, EmptyExtraInfo.EMPTY);
+        MachineBlockState decoded = MachineBlockState.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
+        assertFalse(decoded.isEnabled());
+    }
+
+    @Test
+    void absentEnabledKeyDecodesTrue() {
+        // Legacy data (saved before the flag) carries no "Enabled" key: it must default to ON.
+        MachineBlockState m = sample();
+        m.setEnabled(false);
+        BsonDocument encoded = MachineBlockState.CODEC.encode(m, EmptyExtraInfo.EMPTY).asDocument();
+        encoded.remove("Enabled");
+        MachineBlockState decoded = MachineBlockState.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
+        assertTrue(decoded.isEnabled());
     }
 }
