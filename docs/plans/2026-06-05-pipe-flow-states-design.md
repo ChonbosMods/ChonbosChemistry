@@ -35,6 +35,7 @@
 
 - Engine patterns can't see flow state → pipes with any suppressed/special arm get **programmatic shape states** (the proven H8 `setBlockInteractionState` path); all-NORMAL unmismatched pipes keep riding the pattern system for free.
 - Suppressed arm = render the lesser topology (tee→straight, straight→end): all 26 shapes exist.
+- **Engine is NOT trusted for endpoint-adjacent pipes (fix 2026-06-20).** The "all-NORMAL pipes ride the engine for free" fast path (`NetworkTickSystem.engineMayOwnVisual`) now applies ONLY to pure pipe-pipe runs (`endpointArmMask == 0`). The engine's `CustomConnectedBlockTemplate` can mis-resolve a pipe bordering a machine port-face + a pipe even when `effective == physical` (observed: a power cable got `End`, dropping the machine arm, instead of `Elbow`). So any pipe touching a machine/container is reconciled to our `PipeShapes` table regardless of mask agreement; only the throttle's read happens when the engine was already right. See [2026-06-20-cc-smelter-footprint-facetag-research.md](2026-06-20-cc-smelter-footprint-facetag-research.md) §"Follow-up FIXED".
 - New art (art track): `<Pipe>_end_push`, `<Pipe>_end_pull`, `<Pipe>_vertical_end_up_push/_pull`, `<Pipe>_vertical_end_down_push/_pull` per family (+`_on` twin states, same model + on texture: +12 states per pipe item).
 - Pipe panel gains a per-face state row (e.g. `Faces: N· E push · W pull · S none`): mid-run configs always inspectable.
 

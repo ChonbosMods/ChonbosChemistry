@@ -1,6 +1,35 @@
 # CC Smelter: Multi-Cell Footprint & Connected-Block FaceTag Research
 
-*Status: research notes captured 2026-06-20 during the CC Smelter in-game asset bring-up. Documents what we learned (and the hard limitations we hit) about Hytale's connected-block FaceTag system as it applies to multi-cell machine footprints, so a future session can resume the "restrict pipe attachment to specific footprint cells/faces" problem without re-doing the decompile + in-game experiments. Parent design: [docs/design.md](../design.md) §7.5 (footprint/ports). Feature plan: [2026-06-19-cc-smelter-implementation-plan.md](2026-06-19-cc-smelter-implementation-plan.md).*
+*Status: **RESOLVED 2026-06-20.** The "restrict pipe attachment to specific footprint cells/faces" problem is SOLVED and confirmed in-game (see [§RESOLVED](#resolved-2026-06-20-per-cell-pipe-attachment-shipped) below). This doc keeps the original research/limitations (the connected-block FaceTag system genuinely cannot tag filler cells per-cell) plus the code-level solution that works around it. Parent design: [docs/design.md](../design.md) §7.5 (footprint/ports). Feature plan: [2026-06-19-cc-smelter-implementation-plan.md](2026-06-19-cc-smelter-implementation-plan.md).*
+
+## RESOLVED (2026-06-20): per-cell pipe attachment, shipped
+
+The spurious pipe stubs (item arms on both rows of a side; power arms on all of the back) are GONE. Solution: **do the per-cell filtering in our own Java**, not in the connected-block template (which provably cannot — FINDING 2 stands). The engine still welds inherited-tag arms to every footprint cell; our existing suppressed-arm override (`NetworkTickSystem.applySuppressedArmVisuals`, comparing `PipeVisualStates.effectiveMask` vs `physicalMask`) then DROPS the arms that land on a cell/face with no real port.
+
+**Key facts established this session (replacing the earlier guesses):**
+
+1. **Footprint is 2(X)×2(Y)×1(Z) = 4 cells**, anchor at the East-bottom corner. (The earlier "1×1×2, one filler above" was WRONG; the furnace-derived hitbox `X −0.9..0.9, Y 0..2` claims 2 cells in X and 2 in Y.) This is why the symptom was "both Y faces on a side" (the 2-tall X faces) **and** "back all four" (the 2×2 grid of rear faces).
+2. **Filler-cell resolution is Case B:** a filler cell is a real `CC_Smelter` block but `BlockModule.getBlockEntity(filler)` returns **null** — only the anchor carries the `MachineBlockState`. (Confirmed with a temporary `WorldMachineLookup` probe; both possibilities from the old "Options" were on the table, Case B won.)
+3. **Ports were never actually seeded.** `SmelterPorts.defaults()` existed only in tests; the smelter's `MachineBlockState` shipped with an EMPTY `PortConfig` (the never-done "Task 12 placement init"), so nothing connected at all. Fixed by seeding `Ports` in `CC_Smelter.json`'s `BlockEntity` (the same mechanism that seeds `Energy`), guarded by `SmelterJsonPortsTest` (decodes the JSON via the real codec, asserts it equals `SmelterPorts.defaults()`).
+
+**The implementation (all in mod code, no engine/JSON-template change):**
+
+- `Port` gained a model-space cell offset `(cellX,cellY,cellZ)` (optional codec keys; legacy data → anchor). `PortConfig.forCell(dx,dy,dz)` returns one cell's ports.
+- `SmelterPorts.defaults()` is now positioned: item-out anchor `(0,0,0)` East, **item-in West-bottom `(-1,0,0)` West**, power anchor `(0,0,0)` North. Upper cells expose nothing.
+- `PortProjection.forWorldCell(model, Rotation, worldCellOffset)` projects model-space ports to world faces/cells via the engine's `Rotation.rotateY` (handles NESW placement).
+- `WorldMachineLookup.at(cell)` resolves filler→anchor (`accessor.getFiller` + `FillerBlockUtil.unpackX/Y/Z`), returns the **per-cell** `ports()` (drives transport + effective mask) and an anchor-level `advertisesChannel()` (drives the physical mask = engine-weld mirror). A filler face thus has `effective < physical` → its inherited arm is dropped.
+
+**In-game confirmation (devserver `2026-06-20_12-42-24_server.log`, footprint-probe, since removed):** a freshly placed smelter (anchor `232,122,275`, `rot=OneEighty`) resolved `off(0,0,0) cellPorts=2`, `off(1,0,0) cellPorts=1` (the West-bottom item-in, model `(-1,0,0)` rotated 180° → world `(+1,0,0)`), `off(0,1,0)/off(1,1,0) cellPorts=0`. Arms render only on the three real port faces. User-confirmed visually.
+
+**Known follow-ups (not blockers):**
+- Rotation proven for `None` (unit) and `OneEighty` (unit + in-game); **90°/270° handedness not yet observed in-game** (relies on `rotationIndex → Rotation.values()[idx]`).
+- An unrelated power-cable visual bug exists (tracked separately).
+- `BlockAccessor.getFiller`/`getRotationIndex` are engine-deprecated (marked for-removal) but still the live accessors.
+- Item ports → bench containers (plan Task 14) is still its own task; this work fixed the attachment/visual layer + power.
+
+---
+
+*Original research notes (the limitation that forced the code-level solution) follow.*
 
 ## Context
 
@@ -36,6 +65,8 @@ We wanted the upper filler cell (Y=1) to expose NO item tags while the base anch
 
 **Conclusion: filler cells of a multi-cell block do NOT run their own connected-block shape resolution; they inherit the anchor cell's resolved FaceTags. A multi-cell machine's pipe-stub faces are therefore uniform across its whole footprint.** (Consistent with design.md §7.5 "FaceTags are uniform across a machine's cells.") The experiment was reverted in commit `6c9ec02`; the flat single-shape template (with the `South` power fix) is what ships. Memory: [[filler-cells-inherit-anchor-facetags]].
 
+> **This limitation is real and permanent — but no longer blocking.** We stopped trying to make the *engine* tag per-cell and instead drop the unwanted (inherited) arms in *our* Java suppressed-arm override, keyed by a per-cell `PortConfig`. See [§RESOLVED](#resolved-2026-06-20-per-cell-pipe-attachment-shipped) at the top.
+
 ## Decompiled reference (Server-0.5.3.jar, `...universe.world.connectedblocks.*`)
 
 For a future attempt, the relevant classes + facts (via `javap -p` and class-string extraction):
@@ -47,15 +78,14 @@ For a future attempt, the relevant classes + facts (via `javap -p` and class-str
 - `CustomConnectedBlockTemplateAsset`: codec keys `ConnectsToOtherMaterials`, `DefaultShape`, `Shapes`. Each shape: `FaceTags` + `PatternsToMatchAnyOf` (a `ConnectedBlockShape`).
 - `FillerBlockUtil`: `public static int pack(int,int,int)`, `unpackX/Y/Z(int)`, `NO_FILLER`, `forEachFillerBlock(...)`, `setFillerBlocksAt(...)`, `removeFillerBlocksAt(...)`. (Anchor = pos − unpack(fillerValue). This is the engine API for the filler footprint; use it directly, do not re-implement.)
 
-## Options to restrict pipe attachment to the base cell (for next session)
+## Options to restrict pipe attachment to the base cell (HISTORICAL — superseded)
 
-Since per-cell tags are out, the realistic levers are:
+*These were the options weighed before the fix. We chose a 4th option not listed here (code-level per-cell suppression). Kept for context.*
 
-1. **Accept the upper stub (lowest effort).** It is purely cosmetic: the real input/output filtering lives in `PortConfig` keyed by (footprint-cell-offset, face), so only the base port actually transfers (Tasks 12-14, not yet built). Ship the smelter functional; revisit visuals later.
-2. **Single-cell footprint (Y=0 only).** Shrink the hitbox to one cell so there is no upper cell to inherit tags. UNVERIFIED RISK: whether a `DrawType: Model` block culls/clips its CustomModel to the footprint (would hide the upper half of the model). Many engines render the full model regardless (fences/tall plants) — **a 1-minute in-game test would settle this** and is the cheapest next experiment. Also loses collision on the upper half.
-3. **Two-block placement (keeps full collision + clean attachment).** Place a 1-cell `CC_Smelter` base (component + ports + tags) and auto-place a separate tagless `CC_Smelter_Top` collision/visual block above it on placement; remove it on break/carry. Pipes only ever see the base's tags. Cost: custom multi-block place/break/carry logic (NOT the anchor+filler system), and splitting/handling the model across two blocks. This is the most robust but most work.
-
-Recommended next-session order: test option 2's model-cull question first; if the model renders full-height, option 2 is the clean answer; else go to option 3 or accept (option 1).
+1. **Accept the upper stub (lowest effort).** Purely cosmetic; real filtering in `PortConfig`. *(Rejected: the stubs looked broken.)*
+2. **Single-cell footprint (Y=0 only).** *(Rejected: loses collision; model-cull risk.)*
+3. **Two-block placement.** *(Rejected: most work; custom multi-block place/break/carry.)*
+4. **CHOSEN — code-level per-cell suppression.** Keep the full anchor+filler footprint and the inherited tags; give `Port` a cell offset, seed the smelter with positioned ports, and let our existing suppressed-arm override drop the arms on portless cells/faces (resolving filler→anchor + rotation in `WorldMachineLookup`/`PortProjection`). No engine/JSON-template change. See [§RESOLVED](#resolved-2026-06-20-per-cell-pipe-attachment-shipped). This directly realizes design.md §7.5's "PortConfig keyed by (footprint-cell-offset, face)".
 
 ## Other gotchas captured this session
 
@@ -65,9 +95,18 @@ Recommended next-session order: test option 2's model-cull question first; if th
 - **Bench recipe matching** is by `BenchRequirement: [{ "Type": "Processing", "Id": <benchId> }]`; the held bench config must use **`Id: "Furnace"`** to surface the 28 vanilla furnace smelting recipes (recipes are defined on the OUTPUT item, e.g. `Ingredient_Bar_Cobalt.json`).
 - **VariantRotation NESW + FaceTags**: in the as-placed (default) orientation the X tags mapped to the intended physical faces; whether tags rotate correctly under all four NESW variants was not exhaustively verified (item worked in the test orientation). Worth a rotation sweep when revisiting.
 
-## Open questions for next session
+## Open questions
 
-1. Does a single-cell-footprint `DrawType: Model` block render its full (taller-than-1-cell) model, or cull it? (cheap in-game test; gates option 2)
-2. Two-block placement: can we cleanly auto-place/remove a companion `CC_Smelter_Top` block, and carry it with the base via the existing `BlockHolder` path? (option 3)
-3. Do FaceTags rotate correctly across all four NESW variants for asymmetric port layouts?
-4. Functional path still TODO regardless of visuals: Tasks 12-16 (placement init, filler->anchor in transport/wrench, item ports -> bench containers, display-only GUI, end-to-end rig).
+1. ~~Single-cell model cull~~ — MOOT (kept the multi-cell footprint; option 2 not taken).
+2. ~~Two-block placement~~ — MOOT (option 3 not taken).
+3. **Rotation across NESW for asymmetric ports** — `None`/`OneEighty` confirmed (unit + in-game); **90°/270° handedness still unverified in-game** (`rotationIndex → Rotation.values()[idx]` in `WorldMachineLookup.rotationAt`). Place a smelter at each facing and confirm item-in lands on the correct world cell.
+4. **Functional path still TODO:** item ports → bench containers (plan Task 14), display-only GUI, end-to-end rig. Placement-init (ports) + filler→anchor transport are now DONE.
+5. ~~Power-cable visual bug~~ — **FIXED 2026-06-20** (see below).
+
+## Follow-up FIXED: power-cable elbow dropped the machine stub
+
+While verifying the footprint fix we hit a separate, pre-existing visual bug: a power cable bordering the smelter's real power face stubbed correctly alone, but adding a second cable to its side made the smelter stub vanish (the cable retargeted to the new cable); a third cable brought it back. Item pipes were unaffected.
+
+**Root cause (probe-confirmed):** the engine's connected-block matcher mis-resolves a power cable that borders **a machine power-face + a pipe** — it welds `End` (the pipe arm only) instead of `Elbow`, dropping the machine arm. Decisive probe line: `(248,122,265) eff=[-X,+Z] phys=[-X,+Z] placed=End rot=3 wantShape=Elbow wantRot=3 overridden=false`. Our suppressed-arm override (`PipeVisualStates` effective-vs-physical) skipped it because `effective == physical` — but the engine had drawn the wrong shape for a *correct* mask. (Power-specific because the power `CustomConnectedBlockTemplate` lacks that machine+pipe elbow coverage that the item template has; the 3-arm recovery is the engine resolving the tee correctly.)
+
+**Fix (mod-side, general):** `NetworkTickSystem.engineMayOwnVisual` — the cheap "trust the engine, skip the read" fast path now excludes **endpoint-adjacent** pipes (`endpointArmMask != 0`). Any pipe touching a machine/container is reconciled to OUR shape table (`PipeShapes`, the authoritative twin), which resolves `Elbow` correctly; pure pipe-pipe runs keep the fast path. The read-before-write throttle means it only writes when the engine actually diverged (no flicker). Unit-tested in `NetworkTickResetTest` (the bug case: endpoint-adjacent + `effective == physical` must not be skipped). Confirmed in-game.

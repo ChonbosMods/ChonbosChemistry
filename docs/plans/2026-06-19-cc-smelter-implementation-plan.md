@@ -210,6 +210,7 @@ Per @hytale-assets. Mirror `models/references/Server/Item/Items/Bench/Bench_Furn
 ### Task 12: Place-time bench config
 **Files:** Likely modify the place path (a `PlaceEventSystem` or the component's post-decode init) so a freshly placed `MachineBlockState` for `CC_Smelter` gets a `VanillaBenchBridge.create(blockType)` held bench + `SmelterPorts.defaults()` if absent. Check how tanks initialize their buffers on place for the existing pattern.
 **Verify (devServer):** place, Interact-F, confirm the component has a held bench (log it). Commit: `git commit -am "feat(smelter): initialize held bench + ports on placement"`
+> **DONE (ports) 2026-06-20:** ports are seeded via `CC_Smelter.json` `BlockEntity.Components.MachineBlockState.Ports` (engine clones the template onto every placed block — the same path that seeds `Energy`), NOT via a place handler. Guarded by `SmelterJsonPortsTest` (JSON decodes to `SmelterPorts.defaults()`). NOTE: `SmelterPorts.defaults()` is now **positioned** — item-out anchor `(0,0,0)` East, item-in **West-bottom `(-1,0,0)`** West, power anchor `(0,0,0)` North (the footprint is **2×2×1**, not the plan's earlier 1×1×2). Held-bench placement init may still be needed separately.
 
 ---
 
@@ -219,6 +220,7 @@ Per @hytale-assets. Mirror `models/references/Server/Item/Items/Bench/Bench_Furn
 **Files:** Modify the endpoint collectors (`impl/block/net/NetworkEndpoints.java` / `EndpointAdapters.java` / `WorldMachineLookup.java`) and `WrenchInteraction.java`: before reading a neighbor cell's `MachineBlockState`, if `BlockModule.getBlockEntity` is null, resolve `anchor = pos − FillerOffset.unpack(getFiller(pos))` and read the anchor. Use the engine's `getFiller`/`FillerBlockUtil` accessor (confirm in jar).
 **Step 1 (test):** unit-test the resolution helper (`AnchorResolver.resolve(world, pos)`) with a faked grid if feasible; otherwise devServer-verify in Task 14.
 **Verify:** covered by Task 14. Commit: `git commit -am "feat(smelter): resolve filler cells to anchor for transport + wrench"`
+> **DONE (transport + visuals) 2026-06-20:** filler→anchor resolution lives entirely in `WorldMachineLookup.at` (`getFiller` + `FillerBlockUtil.unpackX/Y/Z`; `Case B`: filler `getBlockEntity` is null). It returns per-cell `ports()` (transport + effective mask) + anchor-level `advertisesChannel()` (physical mask), with `PortProjection.forWorldCell` handling NESW rotation via engine `Rotation.rotateY`. `NetworkEndpoints` needed NO change — it already queries `at().ports().portAt(...)`, now per-cell. **Wrench** is not yet cell-offset-aware (re-keys by face only); revisit when wrench multi-cell editing is needed.
 
 ### Task 14: Bind ITEM ports → bench containers, POWER → buffer
 **Files:** Modify the ITEM endpoint adapter so an INPUT port targets `VanillaBenchBridge.input(heldBench)` and an OUTPUT port targets `output(heldBench)`; confirm the POWER adapter already targets `EnergyBuffer` (it does for the network). Reuse existing fair-split/endpoint machinery.
