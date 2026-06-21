@@ -2,6 +2,11 @@ package com.chonbosmods.chemistry.impl.block.net.item;
 
 import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
+import com.chonbosmods.chemistry.api.io.PortDirection;
+import com.chonbosmods.chemistry.impl.block.Port;
+import com.chonbosmods.chemistry.impl.block.PortConfig;
+import com.chonbosmods.chemistry.impl.block.net.MachineLookup;
+import com.chonbosmods.chemistry.impl.block.net.MachineLookup.MachinePorts;
 import com.chonbosmods.chemistry.impl.block.net.Network;
 import com.chonbosmods.chemistry.impl.block.net.NetworkManager;
 import com.chonbosmods.chemistry.impl.block.net.PipeGridView;
@@ -91,6 +96,27 @@ public final class ItemEndpoints {
      * @return the classified endpoints. Never null; either list may be empty.
      */
     public static Endpoints collect(Network net, PipeGridView grid, ContainerLookup containers) {
+        return collect(net, grid, containers, null);
+    }
+
+    /**
+     * Machine-aware overload: in addition to passive containers, qualifies a neighbour machine's ITEM
+     * PORT as a directional endpoint (a smelter's item-in / item-out). Unlike a passive container (role
+     * by face flow state alone), a machine port's role is fixed by its {@link PortDirection} and only
+     * qualifies when that direction OVERLAPS the bordering pipe face: an {@code OUTPUT} port is a
+     * {@link Source} on a {@code NORMAL}/{@code PULL} face; an {@code INPUT} port is a {@link Destination}
+     * on a {@code NORMAL}/{@code PUSH} face; {@code BOTH} mirrors a container (PULL extracts, else
+     * delivers); {@code CLOSED} or a non-overlapping face qualifies nothing. A machine ITEM port takes
+     * precedence over (and is mutually exclusive with) a passive container at the same cell. Downstream
+     * the endpoint's view is resolved by ROLE (a Source &rarr; the bench OUTPUT container, a Destination
+     * &rarr; the bench INPUT container) via {@link MachineLookup.MachinePorts#itemContainer}, so the
+     * record itself needs no machine marker.
+     *
+     * @param machines machine/tank port access behind the {@link MachineLookup} seam; {@code null} =
+     *                 machine-unaware (identical to the 3-arg overload: containers only).
+     */
+    public static Endpoints collect(
+            Network net, PipeGridView grid, ContainerLookup containers, MachineLookup machines) {
         List<Destination> destinations = new ArrayList<>();
         List<Source> sources = new ArrayList<>();
         // Channel guard: the ITEM subsystem must not qualify containers around non-item networks.
@@ -124,7 +150,31 @@ public final class ItemEndpoints {
                     continue;
                 }
                 long containerKey = NetworkManager.packKey(nx, ny, nz);
-                // Qualify FIRST (container present?) so an empty cell costs no dedup slot.
+
+                // (1) Machine ITEM port (directional), takes precedence over a passive container at the
+                // same cell. Qualify by the facing port's direction x face overlap; an unqualified port
+                // (CLOSED / non-overlapping face) claims no dedup slot, exactly like an absent container.
+                if (machines != null) {
+                    MachinePorts mp = machines.at(nx, ny, nz);
+                    if (mp != null && mp.ports() != null) {
+                        Port port = mp.ports().portAt(faceIdx ^ 1, PortChannel.ITEM);
+                        if (port != null) {
+                            Boolean isSource = machinePortRole(port.direction(), face);
+                            if (isSource != null && !visitedContainers.contains(containerKey)) {
+                                visitedContainers.add(containerKey);
+                                if (isSource) {
+                                    sources.add(new Source(containerKey, memberKey, faceIdx));
+                                } else {
+                                    destinations.add(new Destination(containerKey, memberKey, faceIdx));
+                                }
+                            }
+                            continue; // a machine ITEM port owns this cell: never also a passive container
+                        }
+                    }
+                }
+
+                // (2) Passive container (chest). Qualify FIRST (container present?) so an empty cell costs
+                // no dedup slot.
                 if (containers.at(nx, ny, nz) == null) {
                     continue;
                 }
@@ -145,5 +195,28 @@ public final class ItemEndpoints {
             }
         }
         return new Endpoints(destinations, sources);
+    }
+
+    /**
+     * The role a machine ITEM {@link Port} of {@code direction} plays for a bordering pipe {@code face},
+     * or {@code null} when the direction does not overlap the face (qualifies nothing). Mirrors the
+     * power/fluid/gas direction&times;flow matrix ({@code NetworkEndpoints.overlaps}) specialised to ITEM:
+     * <ul>
+     *   <li>{@code OUTPUT} &rarr; {@code TRUE} (Source) on a {@code NORMAL}/{@code PULL} face.</li>
+     *   <li>{@code INPUT} &rarr; {@code FALSE} (Destination) on a {@code NORMAL}/{@code PUSH} face.</li>
+     *   <li>{@code BOTH} &rarr; mirrors a passive container: {@code PULL} extracts, else delivers.</li>
+     *   <li>{@code CLOSED} (or a non-overlapping face) &rarr; {@code null} (nothing).</li>
+     * </ul>
+     * The caller has already skipped {@code NONE} faces.
+     *
+     * @return {@code TRUE} = a Source, {@code FALSE} = a Destination, {@code null} = no overlap
+     */
+    private static Boolean machinePortRole(PortDirection direction, FlowState face) {
+        return switch (direction) {
+            case OUTPUT -> (face == FlowState.NORMAL || face == FlowState.PULL) ? Boolean.TRUE : null;
+            case INPUT -> (face == FlowState.NORMAL || face == FlowState.PUSH) ? Boolean.FALSE : null;
+            case BOTH -> face == FlowState.PULL ? Boolean.TRUE : Boolean.FALSE;
+            default -> null; // CLOSED
+        };
     }
 }

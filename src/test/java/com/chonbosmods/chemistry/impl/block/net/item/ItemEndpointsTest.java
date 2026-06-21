@@ -56,6 +56,99 @@ class ItemEndpointsTest {
         }
     }
 
+    /** A MachineLookup reporting a machine with one ITEM port (channel/dir on a face) at a fixed cell. */
+    private static final class FakeMachineLookup
+            implements com.chonbosmods.chemistry.impl.block.net.MachineLookup {
+        private final java.util.Map<Long, com.chonbosmods.chemistry.impl.block.PortConfig> byKey =
+            new java.util.HashMap<>();
+
+        FakeMachineLookup put(int x, int y, int z, int face,
+                com.chonbosmods.chemistry.api.io.PortDirection dir) {
+            byKey.put(NetworkManager.packKey(x, y, z),
+                com.chonbosmods.chemistry.impl.block.PortConfig.of(java.util.List.of(
+                    com.chonbosmods.chemistry.impl.block.Port.of(face, PortChannel.ITEM, dir))));
+            return this;
+        }
+
+        @Override
+        public MachinePorts at(int x, int y, int z) {
+            com.chonbosmods.chemistry.impl.block.PortConfig cfg = byKey.get(NetworkManager.packKey(x, y, z));
+            if (cfg == null) {
+                return null;
+            }
+            return new MachinePorts() {
+                @Override
+                public com.chonbosmods.chemistry.impl.block.PortConfig ports() {
+                    return cfg;
+                }
+
+                @Override
+                public com.chonbosmods.chemistry.api.energy.EnergyHandler energy() {
+                    return null;
+                }
+
+                @Override
+                public com.chonbosmods.chemistry.impl.block.ResourceBuffer resource(PortChannel channel) {
+                    return null;
+                }
+            };
+        }
+    }
+
+    @Test
+    void machineInputPort_normalFace_isDestinationOnly() {
+        // Pipe (5,5,5) face 0 (+X) NORMAL reaches a machine at (6,5,5) whose facing face (1, -X) carries an
+        // ITEM INPUT port: the network delivers INTO it (a Destination), never extracts.
+        PipeGridView grid = itemPipeWithFace(5, 5, 5, 0, FlowState.NORMAL);
+        Network net = itemNetworkAt(5, 5, 5, grid);
+        FakeMachineLookup machines = new FakeMachineLookup()
+            .put(6, 5, 5, 1, com.chonbosmods.chemistry.api.io.PortDirection.INPUT);
+
+        Endpoints endpoints = ItemEndpoints.collect(net, grid, new FakeContainerLookup(), machines);
+        assertEquals(1, endpoints.destinations().size());
+        assertEquals(0, endpoints.sources().size());
+        assertEquals(NetworkManager.packKey(6, 5, 5), endpoints.destinations().get(0).containerKey());
+    }
+
+    @Test
+    void machineOutputPort_pullFace_isSourceOnly() {
+        PipeGridView grid = itemPipeWithFace(5, 5, 5, 0, FlowState.PULL);
+        Network net = itemNetworkAt(5, 5, 5, grid);
+        FakeMachineLookup machines = new FakeMachineLookup()
+            .put(6, 5, 5, 1, com.chonbosmods.chemistry.api.io.PortDirection.OUTPUT);
+
+        Endpoints endpoints = ItemEndpoints.collect(net, grid, new FakeContainerLookup(), machines);
+        assertEquals(0, endpoints.destinations().size());
+        assertEquals(1, endpoints.sources().size());
+        assertEquals(NetworkManager.packKey(6, 5, 5), endpoints.sources().get(0).containerKey());
+    }
+
+    @Test
+    void machineInputPort_pullFace_doesNotExtract() {
+        // INPUT port + PULL face: no overlap (an input-only port offers nothing to extract). Neither list.
+        PipeGridView grid = itemPipeWithFace(5, 5, 5, 0, FlowState.PULL);
+        Network net = itemNetworkAt(5, 5, 5, grid);
+        FakeMachineLookup machines = new FakeMachineLookup()
+            .put(6, 5, 5, 1, com.chonbosmods.chemistry.api.io.PortDirection.INPUT);
+
+        Endpoints endpoints = ItemEndpoints.collect(net, grid, new FakeContainerLookup(), machines);
+        assertEquals(0, endpoints.destinations().size());
+        assertEquals(0, endpoints.sources().size());
+    }
+
+    @Test
+    void machineOutputPort_pushFace_doesNotDeliver() {
+        // OUTPUT port + PUSH face: no overlap. Neither list.
+        PipeGridView grid = itemPipeWithFace(5, 5, 5, 0, FlowState.PUSH);
+        Network net = itemNetworkAt(5, 5, 5, grid);
+        FakeMachineLookup machines = new FakeMachineLookup()
+            .put(6, 5, 5, 1, com.chonbosmods.chemistry.api.io.PortDirection.OUTPUT);
+
+        Endpoints endpoints = ItemEndpoints.collect(net, grid, new FakeContainerLookup(), machines);
+        assertEquals(0, endpoints.destinations().size());
+        assertEquals(0, endpoints.sources().size());
+    }
+
     /** A single ITEM pipe at (x,y,z) whose {@code face} carries {@code state}; all other faces NORMAL. */
     private static PipeGridView itemPipeWithFace(int x, int y, int z, int face, FlowState state) {
         long key = NetworkManager.packKey(x, y, z);

@@ -139,11 +139,6 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
             int index,
             @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
             @Nonnull Store<ChunkStore> store) {
-        ProcessingBenchBlock bench = node.heldBench();
-        if (bench == null) {
-            return; // not a bench machine
-        }
-
         // The energy buffer gates the drive: no buffer means no power gate -> nothing to spend, skip.
         EnergyHandler energyHandler = node.energy();
         if (!(energyHandler instanceof EnergyBuffer energy)) {
@@ -191,7 +186,31 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
             return;
         }
 
+        // Only a bench-configured block drives here (the smelter declares a Processing Bench). A machine
+        // without a Bench config is not a bench machine: nothing to create or advance.
+        if (blockType.getBench() == null) {
+            return;
+        }
+
         BenchBlock benchBlock = node.heldBenchBlock();
+        ProcessingBenchBlock bench = node.heldBench();
+        if (bench == null) {
+            // Task 12 (held-bench init): the engine does NOT attach a vanilla bench to our DrawType:Model
+            // smelter (verified in-game: no sibling ProcessingBenchBlock/BenchBlock components), so we
+            // create + HOLD our own on the first tick after placement. create() runs initializeBenchConfig
+            // + setupSlots, so the bench is fully wired here (no separate wireSlots needed this tick).
+            if (benchBlock == null) {
+                benchBlock = new BenchBlock();
+            }
+            bench = VanillaBenchBridge.create(
+                world, benchBlock, stateInfo, x, y, z, blockType, benchBlock.getTierLevel());
+            if (bench == null) {
+                return; // creation failed: skip defensively, retry next tick
+            }
+            node.setHeldBench(bench);
+            node.setHeldBenchBlock(benchBlock);
+            node.setBenchWired(true); // create() already ran setupSlots against the live world
+        }
         int tier = benchBlock != null ? benchBlock.getTierLevel() : 0;
 
         Store<EntityStore> entityStore = world.getEntityStore().getStore();

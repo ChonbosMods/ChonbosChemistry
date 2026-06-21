@@ -61,6 +61,24 @@ public final class PortConfig {
     }
 
     /**
+     * A view of just the ports on the footprint cell at offset {@code (dx,dy,dz)} from the anchor (model
+     * orientation), so a multi-cell machine exposes the right ports per cell. The transport and visual
+     * layers query a single cell's faces via {@code portAt}/{@code ports()} on this view, unaware of the
+     * footprint: {@code WorldMachineLookup} resolves a touched cell to its anchor + offset and calls this.
+     * A cell with no configured ports yields an empty config (the basis for dropping inherited-tag pipe
+     * arms on portless filler faces). Ports are kept as-is; rotation projection is layered on separately.
+     */
+    public PortConfig forCell(int dx, int dy, int dz) {
+        List<Port> matches = new ArrayList<>();
+        for (Port p : ports) {
+            if (p.cellX() == dx && p.cellY() == dy && p.cellZ() == dz) {
+                matches.add(p);
+            }
+        }
+        return PortConfig.of(matches);
+    }
+
+    /**
      * A new {@link PortConfig} with {@code port}'s face configured to exactly that port: every existing
      * port on the same {@code faceIndex} is dropped first (replace-not-append), so a face never ends up
      * carrying two ports under one-port-per-face (design 2026-06-05 §1). Used by the {@code CC_Wrench}

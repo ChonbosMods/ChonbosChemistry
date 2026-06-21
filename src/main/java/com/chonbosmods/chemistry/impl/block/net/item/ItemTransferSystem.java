@@ -1,5 +1,6 @@
 package com.chonbosmods.chemistry.impl.block.net.item;
 
+import com.chonbosmods.chemistry.impl.block.net.MachineLookup;
 import com.chonbosmods.chemistry.impl.block.net.Network;
 import com.chonbosmods.chemistry.impl.block.net.NetworkManager;
 import com.chonbosmods.chemistry.impl.block.net.PipeGridView;
@@ -66,17 +67,24 @@ public final class ItemTransferSystem {
      *                   container-aware visual masks use: one adapter per ITEM network per tick).
      * @param grid       the per-tick pipe grid view.
      * @param endpoints  the network's collected item endpoints (destinations + PULL sources).
+     * @param machines   machine/tank port access (the SAME lookup the endpoint collection + visual masks
+     *                   use): lets a machine ITEM port's bench input/output resolve as a transport
+     *                   container, so item pipes feed/drain a smelter exactly as they do a chest.
      */
     public void tickNetwork(
             @Nonnull Network net,
             @Nonnull World world,
             @Nonnull WorldContainerLookup containers,
             @Nonnull PipeGridView grid,
-            @Nonnull Endpoints endpoints) {
+            @Nonnull Endpoints endpoints,
+            @Nonnull MachineLookup machines) {
+        // Overlay machine ITEM ports (bench input/output) onto the passive chest lookup, so the driver
+        // resolves a smelter port endpoint's view transparently (no driver-internals change).
+        ContainerLookup resolved = new MachineAwareContainerLookup(containers, machines);
         ItemTransferDriver.DropSink dropSink = (pipeKey, stack) -> spawnDrop(world, pipeKey, stack);
         ItemTransferDriver.SaveMarker saveMarker = pipeKey -> markNeedsSaving(world, pipeKey);
         driver.tickNetwork(
-            net, grid, containers, endpoints, FilterLookup.NONE, world.getTick(), dropSink, saveMarker);
+            net, grid, resolved, endpoints, FilterLookup.NONE, world.getTick(), dropSink, saveMarker);
     }
 
     /**

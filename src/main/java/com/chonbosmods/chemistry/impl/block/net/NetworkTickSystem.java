@@ -210,8 +210,8 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         boolean energized;
         if (net.channel() == PortChannel.ITEM) {
             containers = new WorldContainerLookup(world, store);
-            ItemEndpoints.Endpoints itemEndpoints = ItemEndpoints.collect(net, grid, containers);
-            itemTransfer.tickNetwork(net, world, containers, grid, itemEndpoints);
+            ItemEndpoints.Endpoints itemEndpoints = ItemEndpoints.collect(net, grid, containers, lookup);
+            itemTransfer.tickNetwork(net, world, containers, grid, itemEndpoints, lookup);
             energized = false; // ITEM has no _On twin; Task 9 owns the full item visual integration
         } else {
             NetworkEndpoints.Endpoints endpoints = NetworkEndpoints.collect(net, grid, lookup);
@@ -400,18 +400,21 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
                     }
                 }
 
+                boolean overridden = overriddenPositions.contains(key);
+                if (engineMayOwnVisual(anyTip, effective, physical, endpointArmMask, overridden)) {
+                    // Pure pipe-pipe run, undisturbed, never touched: the engine pattern + H8 flip own this
+                    // pipe's visual correctly. Cheap steady-state fast path: no chunk fetch, no state read.
+                    continue;
+                }
                 if (!anyTip && effective == physical) {
-                    // Undisturbed and no tip. Two sub-cases (see shouldResetOverride):
-                    if (!overriddenPositions.contains(key)) {
-                        // Never programmatically touched: the engine pattern + H8 flip own this pipe's
-                        // visual. Cheap steady-state fast path: no chunk fetch, no state read.
-                        continue;
-                    }
-                    // We previously overrode this pipe (added a container/tip arm) and it has now returned
-                    // to the plain engine topology: the engine will NOT re-resolve it on its own (a
-                    // container/flow change runs no neighbour pass), so the stale override would linger.
-                    // Actively reset it to the plain effective shape via the SAME entity-preserving,
-                    // neighbour-non-wiping setBlock(...,198) path, gated by the read-before-write throttle.
+                    // Undisturbed (effective == physical) but NOT cheap-skippable, for one of two reasons:
+                    //  - previously overridden: the engine won't re-resolve it (a container/flow change runs
+                    //    no neighbour pass), so a stale override would linger; reset it to the plain shape.
+                    //  - endpoint-adjacent: the engine mis-resolves some machine-bordering shapes even at
+                    //    effective == physical (a power cable next to a machine power-face + a pipe gets End,
+                    //    not Elbow, dropping the machine arm — bug 2026-06-20). Reconcile it to our table.
+                    // Both go through the same entity-preserving, neighbour-non-wiping setBlock(...,198) path,
+                    // gated by the read-before-write throttle (a no-op when the engine already drew it right).
                     resetOverriddenToPlain(world, key, mx, my, mz, effective, energized);
                     continue;
                 }
@@ -473,10 +476,12 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     }
 
     /**
-     * Resets a previously-overridden pipe back to its PLAIN effective-topology shape, then drops it from
-     * {@link #overriddenPositions}. Called only from the undisturbed branch of
-     * {@link #applySuppressedArmVisuals} for a position that {@link #shouldResetOverride} flagged
-     * (undisturbed + no tip + currently overridden).
+     * Reconciles a pipe to its PLAIN effective-topology shape ({@link PipeShapes#stateFor}{@code @wantRot}),
+     * then drops it from {@link #overriddenPositions}. Called from the undisturbed branch of
+     * {@link #applySuppressedArmVisuals} for any position that is NOT cheap-skippable
+     * ({@link #engineMayOwnVisual} false): either a previously-overridden pipe returning to plain, OR an
+     * endpoint-adjacent pipe whose engine-resolved shape we no longer trust (bug 2026-06-20). The
+     * read-before-write throttle makes it a no-op when the engine already drew the plain shape.
      *
      * <h2>Why this is needed</h2>
      * Once we programmatically override a pipe (e.g. add a chest/container arm), the engine no longer owns
@@ -552,6 +557,32 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     static boolean shouldResetOverride(
             String desiredStateName, String currentStateName, int wantRotation, int currentRotation) {
         return !desiredStateName.equals(currentStateName) || wantRotation != currentRotation;
+    }
+
+    /**
+     * Whether the engine's connected-block pattern matcher (+ the H8 powered flip) can be TRUSTED to own
+     * this pipe's rendered shape this tick, letting the visual pass skip it with no state read (the cheap
+     * steady-state fast path). True only for a pipe that is undisturbed ({@code effective == physical},
+     * no tip), never programmatically overridden, AND has NO endpoint arm.
+     *
+     * <p><b>Why the endpoint-arm clause exists (bug 2026-06-20).</b> The engine mis-resolves some
+     * endpoint-adjacent topologies even when {@code effective == physical}: a power cable bordering a
+     * machine power-face (+Z endpoint) AND a pipe (-X) was welded as {@code End} (the pipe arm only),
+     * dropping the machine arm, where our table correctly resolves {@code Elbow}. Since the engine is
+     * unreliable for endpoint-adjacent shapes, any pipe with an endpoint arm is reconciled to our table
+     * (which is the authoritative twin) rather than trusted to the engine. Pure pipe-pipe runs
+     * ({@code endpointArmMask == 0}) keep the cheap fast path — the engine resolves those correctly.
+     *
+     * @param anyTip whether any face has a push/pull tip (a tip always needs the composite write)
+     * @param effective the effective connectivity mask
+     * @param physical the physical (engine-weld) connectivity mask
+     * @param endpointArmMask which effective arms point at an endpoint (machine/container), not a pipe
+     * @param overridden whether this pipe currently carries a programmatic override
+     * @return {@code true} iff the engine can be trusted and the pipe may be cheap-skipped
+     */
+    static boolean engineMayOwnVisual(
+            boolean anyTip, int effective, int physical, int endpointArmMask, boolean overridden) {
+        return !anyTip && effective == physical && endpointArmMask == 0 && !overridden;
     }
 
     /**
