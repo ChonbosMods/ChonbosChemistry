@@ -36,10 +36,11 @@ $C.@PageOverlay {
     #Title {
       Group {
         Label #PanelTitle {
-          Style: $C.@TitleStyle;
-          Anchor: (Left: 0, Right: 0);
+          Style: (
+            ...$C.@TitleStyle,
+            HorizontalAlignment: Center
+          );
           Padding: (Horizontal: 19);
-          HorizontalAlignment: Center;
           Text: "";
         }
       }
