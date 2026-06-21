@@ -46,11 +46,12 @@ import javax.annotation.Nonnull;
 import org.joml.Vector3d;
 
 /**
- * Furnace-style READ-ONLY panel for the CC Smelter ({@code Pages/CC_SmelterPanel.ui}): shows the held
- * bench's input/output contents (non-draggable {@code ItemGrid}s populated from Java), live progress +
- * power-buffer bars, and two controls the player CAN use — an On/Off toggle and an Eject button. Items
- * move through the machine via pipes, never by hand, so the slots carry no drag-drop. Live-refreshes via
- * {@link PanelRefreshService} like {@link MachinePanelPage}.
+ * Shared READ-ONLY panel for every CC machine that wraps a vanilla processing bench ({@code
+ * Pages/CC_BenchMachinePanel.ui}): Smelter, Reclaimer, etc. Title + active verb are passed per machine
+ * (the rest of the GUI is identical). Shows the held bench's input/output contents (non-draggable
+ * {@code ItemGrid}s populated from Java), live progress + power-buffer bars, and two controls the player
+ * CAN use — an On/Off toggle and an Eject button. Items move through the machine via pipes, never by hand,
+ * so the slots carry no drag-drop. Live-refreshes via {@link PanelRefreshService} like {@link MachinePanelPage}.
  *
  * <p>On/Off writes {@link MachineBlockState#setEnabled(boolean)} — the SAME run/halt seam the future
  * circuit Machine I/O bridge will drive. Eject drains both bench containers into the player's inventory
@@ -60,19 +61,31 @@ import org.joml.Vector3d;
  * {@code PanelRefreshSystem}); button events ({@link #handleDataEvent}) may arrive off it, so the ECS
  * mutations (toggle / eject) are wrapped in {@link World#execute(Runnable)}.
  */
-public final class SmelterPanelPage extends InteractiveCustomUIPage<SmelterPanelPage.PageData>
+public final class BenchMachinePanelPage extends InteractiveCustomUIPage<BenchMachinePanelPage.PageData>
         implements PanelRefreshService.LivePanel {
 
     @Nonnull
     private final Ref<ChunkStore> blockRef;
+    /** Machine display name shown in the title bar (e.g. "Smelter", "Reclaimer"). */
+    @Nonnull
+    private final String title;
+    /** Active-state verb for the status line (e.g. "Smelting", "Salvaging"). */
+    @Nonnull
+    private final String verb;
     private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType =
         BlockModule.BlockStateInfo.getComponentType();
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType = BlockChunk.getComponentType();
     private World registeredWorld;
 
-    public SmelterPanelPage(@Nonnull PlayerRef playerRef, @Nonnull Ref<ChunkStore> blockRef) {
+    public BenchMachinePanelPage(
+            @Nonnull PlayerRef playerRef,
+            @Nonnull Ref<ChunkStore> blockRef,
+            @Nonnull String title,
+            @Nonnull String verb) {
         super(playerRef, CustomPageLifetime.CanDismissOrCloseThroughInteraction, PageData.CODEC);
         this.blockRef = blockRef;
+        this.title = title;
+        this.verb = verb;
     }
 
     @Override
@@ -81,7 +94,8 @@ public final class SmelterPanelPage extends InteractiveCustomUIPage<SmelterPanel
             @Nonnull UICommandBuilder commandBuilder,
             @Nonnull UIEventBuilder eventBuilder,
             @Nonnull Store<EntityStore> store) {
-        commandBuilder.append("Pages/CC_SmelterPanel.ui");
+        commandBuilder.append("Pages/CC_BenchMachinePanel.ui");
+        commandBuilder.set("#PanelTitle.TextSpans", Message.raw(this.title));
         applyState(commandBuilder);
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#PowerToggle",
             new EventData().append("Action", Action.TOGGLE));
@@ -183,8 +197,8 @@ public final class SmelterPanelPage extends InteractiveCustomUIPage<SmelterPanel
 
         float frac = bench == null ? 0.0F : VanillaBenchBridge.progressFraction(bench, tier);
         boolean active = bench != null && VanillaBenchBridge.isActive(bench);
-        cmd.set("#ProgressBar.Value", SmelterPanelText.clamp01(frac));
-        cmd.set("#ProgressText.TextSpans", Message.raw(SmelterPanelText.status(enabled, active, frac)));
+        cmd.set("#ProgressBar.Value", BenchMachinePanelText.clamp01(frac));
+        cmd.set("#ProgressText.TextSpans", Message.raw(BenchMachinePanelText.status(enabled, active, frac, this.verb)));
 
         long stored = 0;
         long capacity = 0;
@@ -194,8 +208,8 @@ public final class SmelterPanelPage extends InteractiveCustomUIPage<SmelterPanel
             capacity = energy.getMaxStored();
         }
         float powerFrac = capacity > 0 ? (float) stored / capacity : 0.0F;
-        cmd.set("#PowerBar.Value", SmelterPanelText.clamp01(powerFrac));
-        cmd.set("#EnergyText.TextSpans", Message.raw(SmelterPanelText.energy(stored, capacity)));
+        cmd.set("#PowerBar.Value", BenchMachinePanelText.clamp01(powerFrac));
+        cmd.set("#EnergyText.TextSpans", Message.raw(BenchMachinePanelText.energy(stored, capacity)));
         cmd.set("#StatusText.TextSpans",
             Message.raw("Status: " + (enabled ? (active ? "Smelting" : "Idle") : "Off")));
     }

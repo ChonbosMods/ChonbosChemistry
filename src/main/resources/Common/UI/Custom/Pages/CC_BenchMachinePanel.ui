@@ -1,7 +1,7 @@
 $C = "../Common.ui";
 $M = "../CC_Master.ui";
 
-// Chonbo's Chemistry: CC Smelter panel. Two-column tech-machine layout sized to VANILLA measurements
+// Chonbo's Chemistry: SHARED bench-machine panel (Smelter, Reclaimer, ...). Two-column layout sized to VANILLA measurements
 // (see docs/research/2026-06-21-vanilla-ui-measurements.md): 64px item slots, 44px buttons, ~16 content
 // padding, FontSize-15 uppercase headers, vanilla wrapped ProgressBars (EffectWidth 102/Height 58/
 // Offset 74). Dark-gray theme (CC_Master.ui). Column order matches native Hytale: STATUS/controls on the
@@ -31,9 +31,17 @@ $C.@PageOverlay {
   $C.@DecoratedContainer {
     Anchor: (Width: 800, Height: 360);
 
+    // Title set per-machine from Java (#PanelTitle.TextSpans) so one shared panel serves every bench
+    // machine. Vanilla title style.
     #Title {
       Group {
-        $C.@Title { @Text = "CC Smelter"; }
+        Label #PanelTitle {
+          Style: $C.@TitleStyle;
+          Anchor: (Left: 0, Right: 0);
+          Padding: (Horizontal: 19);
+          HorizontalAlignment: Center;
+          Text: "";
+        }
       }
     }
 
