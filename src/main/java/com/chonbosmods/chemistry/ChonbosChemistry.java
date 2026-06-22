@@ -152,10 +152,10 @@ public class ChonbosChemistry extends JavaPlugin {
         // referenced by each machine block's Interactions.Use (OpenCustomUI Page.Id) in JSON.
         OpenCustomUIInteraction.registerBlockEntityCustomPage(
             this, BenchMachinePanelPage.class, "CC_SmelterPanel",
-            (playerRef, blockRef) -> new BenchMachinePanelPage(playerRef, blockRef, "Smelter", "Smelting"));
+            (playerRef, blockRef) -> new BenchMachinePanelPage(playerRef, blockRef, "Smelter"));
         OpenCustomUIInteraction.registerBlockEntityCustomPage(
             this, BenchMachinePanelPage.class, "CC_ReclaimerPanel",
-            (playerRef, blockRef) -> new BenchMachinePanelPage(playerRef, blockRef, "Reclaimer", "Salvaging"));
+            (playerRef, blockRef) -> new BenchMachinePanelPage(playerRef, blockRef, "Reclaimer"));
         getLogger().atInfo().log("Registered CC_SmelterPanel + CC_ReclaimerPanel bench-machine GUIs.");
 
         // CC_Wrench (Task 9): a held tool whose Secondary interaction taps a pipe face to cycle its

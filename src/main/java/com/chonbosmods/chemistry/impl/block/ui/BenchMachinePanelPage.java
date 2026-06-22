@@ -69,9 +69,6 @@ public final class BenchMachinePanelPage extends InteractiveCustomUIPage<BenchMa
     /** Machine display name shown in the title bar (e.g. "Smelter", "Reclaimer"). */
     @Nonnull
     private final String title;
-    /** Active-state verb for the status line (e.g. "Smelting", "Salvaging"). */
-    @Nonnull
-    private final String verb;
     private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType =
         BlockModule.BlockStateInfo.getComponentType();
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType = BlockChunk.getComponentType();
@@ -80,12 +77,10 @@ public final class BenchMachinePanelPage extends InteractiveCustomUIPage<BenchMa
     public BenchMachinePanelPage(
             @Nonnull PlayerRef playerRef,
             @Nonnull Ref<ChunkStore> blockRef,
-            @Nonnull String title,
-            @Nonnull String verb) {
+            @Nonnull String title) {
         super(playerRef, CustomPageLifetime.CanDismissOrCloseThroughInteraction, PageData.CODEC);
         this.blockRef = blockRef;
         this.title = title;
-        this.verb = verb;
     }
 
     @Override
@@ -198,7 +193,7 @@ public final class BenchMachinePanelPage extends InteractiveCustomUIPage<BenchMa
         float frac = bench == null ? 0.0F : VanillaBenchBridge.progressFraction(bench, tier);
         boolean active = bench != null && VanillaBenchBridge.isActive(bench);
         cmd.set("#ProgressBar.Value", BenchMachinePanelText.clamp01(frac));
-        cmd.set("#ProgressText.TextSpans", Message.raw(BenchMachinePanelText.status(enabled, active, frac, this.verb)));
+        cmd.set("#ProgressText.TextSpans", Message.raw(BenchMachinePanelText.progress(enabled, active, frac)));
 
         long stored = 0;
         long capacity = 0;
@@ -211,7 +206,7 @@ public final class BenchMachinePanelPage extends InteractiveCustomUIPage<BenchMa
         cmd.set("#PowerBar.Value", BenchMachinePanelText.clamp01(powerFrac));
         cmd.set("#EnergyText.TextSpans", Message.raw(BenchMachinePanelText.energy(stored, capacity)));
         cmd.set("#StatusText.TextSpans",
-            Message.raw("Status: " + (enabled ? (active ? "Smelting" : "Idle") : "Off")));
+            Message.raw("Status: " + BenchMachinePanelText.state(enabled, active)));
     }
 
     /** One {@link ItemGridSlot} per container slot (empty slots render empty); read-only display only. */

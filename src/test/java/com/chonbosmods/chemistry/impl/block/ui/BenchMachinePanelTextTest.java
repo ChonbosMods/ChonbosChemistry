@@ -7,29 +7,33 @@ import org.junit.jupiter.api.Test;
 class BenchMachinePanelTextTest {
 
     @Test
-    void statusOffWhenDisabled() {
-        assertEquals("Off", BenchMachinePanelText.status(false, true, 0.5f, "Smelting"));
-        assertEquals("Off", BenchMachinePanelText.status(false, false, 0.0f, "Salvaging"));
+    void progressOffWhenDisabled() {
+        // Disabled wins regardless of activity/progress.
+        assertEquals("Off", BenchMachinePanelText.progress(false, true, 0.5f));
+        assertEquals("Off", BenchMachinePanelText.progress(false, false, 0.0f));
     }
 
     @Test
-    void statusIdleWhenEnabledButNotActive() {
-        assertEquals("Idle", BenchMachinePanelText.status(true, false, 0.0f, "Smelting"));
+    void progressIdleWhenEnabledButNotActive() {
+        assertEquals("Idle", BenchMachinePanelText.progress(true, false, 0.0f));
     }
 
     @Test
-    void statusUsesMachineVerbWithRoundedPercentWhenActive() {
-        assertEquals("Smelting 0%", BenchMachinePanelText.status(true, true, 0.0f, "Smelting"));
-        assertEquals("Salvaging 50%", BenchMachinePanelText.status(true, true, 0.5f, "Salvaging"));
-        assertEquals("Processing 100%", BenchMachinePanelText.status(true, true, 1.0f, "Processing"));
-        assertEquals("Smelting 47%", BenchMachinePanelText.status(true, true, 0.474f, "Smelting"));
-        assertEquals("Smelting 48%", BenchMachinePanelText.status(true, true, 0.475f, "Smelting"));
+    void progressActiveWithRoundedPercent() {
+        // Canonical machine states: Off / Idle / Active. The active line carries the progress %.
+        assertEquals("Active 0%", BenchMachinePanelText.progress(true, true, 0.0f));
+        assertEquals("Active 50%", BenchMachinePanelText.progress(true, true, 0.5f));
+        assertEquals("Active 100%", BenchMachinePanelText.progress(true, true, 1.0f));
+        assertEquals("Active 47%", BenchMachinePanelText.progress(true, true, 0.474f));
+        assertEquals("Active 48%", BenchMachinePanelText.progress(true, true, 0.475f));
     }
 
     @Test
-    void statusFallsBackToProcessingWhenVerbBlank() {
-        assertEquals("Processing 50%", BenchMachinePanelText.status(true, true, 0.5f, null));
-        assertEquals("Processing 50%", BenchMachinePanelText.status(true, true, 0.5f, ""));
+    void stateIsOffIdleOrActive() {
+        assertEquals("Off", BenchMachinePanelText.state(false, true));
+        assertEquals("Off", BenchMachinePanelText.state(false, false));
+        assertEquals("Idle", BenchMachinePanelText.state(true, false));
+        assertEquals("Active", BenchMachinePanelText.state(true, true));
     }
 
     @Test

@@ -11,23 +11,29 @@ final class BenchMachinePanelText {
     }
 
     /**
-     * The status line shown under the progress bar.
-     *
-     * @param enabled  the machine's On/Off line ({@link com.chonbosmods.chemistry.impl.block.MachineBlockState#isEnabled()})
-     * @param active   whether the held bench is currently processing
-     * @param fraction smelt/process progress 0..1 (only used when {@code active})
-     * @param verb     the machine's active verb (e.g. "Smelting", "Salvaging"); blank falls back to "Processing"
-     * @return {@code "Off"} when disabled, else {@code "Idle"} when not active, else {@code "<Verb> NN%"}
+     * The canonical machine state word, uniform across all CC machines: {@code "Off"} (disabled),
+     * {@code "Idle"} (on but doing nothing), or {@code "Active"} (on and processing).
      */
-    static String status(boolean enabled, boolean active, float fraction, String verb) {
+    static String state(boolean enabled, boolean active) {
         if (!enabled) {
             return "Off";
         }
-        if (!active) {
-            return "Idle";
+        return active ? "Active" : "Idle";
+    }
+
+    /**
+     * The line shown under the progress bar: the machine {@link #state}, with the progress percent
+     * appended in the Active state (e.g. {@code "Active 47%"}).
+     *
+     * @param enabled  the machine's On/Off line ({@link com.chonbosmods.chemistry.impl.block.MachineBlockState#isEnabled()})
+     * @param active   whether the held bench is currently processing
+     * @param fraction process progress 0..1 (only used when {@code active})
+     */
+    static String progress(boolean enabled, boolean active, float fraction) {
+        if (!enabled || !active) {
+            return state(enabled, active);
         }
-        String v = (verb == null || verb.isEmpty()) ? "Processing" : verb;
-        return v + " " + Math.round(clamp01(fraction) * 100.0f) + "%";
+        return "Active " + Math.round(clamp01(fraction) * 100.0f) + "%";
     }
 
     /** Clamp a bar fraction into the {@code [0, 1]} range a {@code ProgressBar.Value} expects. */
