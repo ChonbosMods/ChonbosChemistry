@@ -71,8 +71,8 @@
           "Ports": {
             "Ports": [
               { "Face": 0, "Channel": "item", "Direction": "output", "CellX": 0, "CellY": 0, "CellZ": 0 },
-              { "Face": 1, "Channel": "item", "Direction": "input", "CellX": -1, "CellY": 0, "CellZ": 0 },
-              { "Face": 5, "Channel": "power", "Direction": "input", "CellX": 0, "CellY": 0, "CellZ": -1 }
+              { "Face": 1, "Channel": "item", "Direction": "input", "CellX": 0, "CellY": 0, "CellZ": 0 },
+              { "Face": 5, "Channel": "power", "Direction": "input", "CellX": 0, "CellY": 0, "CellZ": 0 }
             ]
           }
         }
