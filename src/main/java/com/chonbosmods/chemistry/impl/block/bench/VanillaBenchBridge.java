@@ -185,6 +185,27 @@ public final class VanillaBenchBridge {
         return completions > 0;
     }
 
+    /**
+     * Drive the placed block's interaction (visual) state by name, exactly as vanilla's
+     * {@code BenchSystems$ProcessingBenchTick} does for engine-ticked benches: it passes {@code "Processing"}
+     * while active and {@code "default"} otherwise to this same method. Our held-bench machine is never seen
+     * by that tick, so {@link com.chonbosmods.chemistry.impl.block.MachineTickSystem} calls this to swap the
+     * block texture / play the {@code CustomModelAnimation} declared on the matching {@code State.Definitions}.
+     *
+     * <p>Internally delegates to {@code World.setBlockInteractionState(Vector3i, BlockType, String)}; kept
+     * here so the {@code builtin.crafting.*} behavior call stays confined to this bridge.
+     */
+    public static void setVisualState(ProcessingBenchBlock b,
+                                      String state,
+                                      BlockType blockType,
+                                      World world,
+                                      int x,
+                                      int y,
+                                      int z) {
+        // signature: void setBlockInteractionState(String state, BlockType, World, int x, int y, int z)
+        b.setBlockInteractionState(state, blockType, world, x, y, z);
+    }
+
     /** The bench's input (ingredient) container. */
     public static ItemContainer input(ProcessingBenchBlock b) {
         // signature: ItemContainer getInputContainer()

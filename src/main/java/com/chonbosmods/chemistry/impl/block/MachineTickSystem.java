@@ -251,13 +251,32 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
         // overclock). Zero when disabled or the buffer is empty -> bench freezes (advance does nothing).
         double affordable =
             node.isEnabled() ? SmelterEnergy.affordableDt(energy.getStored(), SMELTER_DRAW, dt) : 0.0;
-        if (affordable > 0) {
-            VanillaBenchBridge.advance(
+        boolean poweredThisTick = affordable > 0;
+        boolean completedThisTick = false;
+        float progressBefore = VanillaBenchBridge.inputProgress(bench);
+        if (poweredThisTick) {
+            completedThisTick = VanillaBenchBridge.advance(
                 bench, (float) affordable, entityStore, benchBlock, stateInfo, x, y, z, blockType, tier);
             long drained = SmelterEnergy.drainFor(affordable, SMELTER_DRAW);
             if (drained > 0) {
                 energy.extractEnergyInternal(drained, false);
             }
+        }
+        float progressAfter = VanillaBenchBridge.inputProgress(bench);
+
+        // Block visual state (vanilla-parity, Task: on/off + furnace animation). Vanilla's ProcessingBenchTick
+        // never sees our held-bench block, so we drive the block interaction state ourselves: "Processing"
+        // (active texture + CustomModelAnimation + glow + particles) only while a recipe actually ADVANCED
+        // this tick, else "default" (root off texture, no animation). We must NOT trust bench.isActive(): the
+        // vanilla tick is what sets active=true, and it never runs here, while advanceProcessing only ever
+        // clears active (and early-returns without clearing when idle) -> it sticks ON, animating a merely
+        // powered-but-idle machine. Real progress across our advance() is the truthful signal. The change-
+        // guard issues the state packet only on a transition (never restarts the looping animation each tick).
+        boolean processing =
+            MachineVisualState.isProcessing(poweredThisTick, progressBefore, progressAfter, completedThisTick);
+        String desiredState = MachineVisualState.desired(poweredThisTick, processing);
+        if (node.shouldUpdateVisualState(desiredState)) {
+            VanillaBenchBridge.setVisualState(bench, desiredState, blockType, world, x, y, z);
         }
     }
 

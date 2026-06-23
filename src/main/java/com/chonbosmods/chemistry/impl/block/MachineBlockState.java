@@ -92,6 +92,13 @@ public final class MachineBlockState implements Component<ChunkStore> {
     private boolean creativeSource;
     /** On/Off control line (default ON); the circuit run/halt seam. See the "Enabled" codec key. */
     private boolean enabled = true;
+    /**
+     * Last block-visual-state ({@code "Processing"}/{@code "default"}) this machine drove into the world.
+     * Transient (NOT a codec key): purely a per-tick de-dup so we only re-issue an interaction-state update
+     * on a transition. Null on a fresh/decoded block so the first tick re-syncs. See
+     * {@link #shouldUpdateVisualState(String)}.
+     */
+    private transient String lastVisualState;
     // Energy units this machine burns from its own buffer each tick (0 = no self-drain). Default 0 so
     // an absent codec key leaves a normal machine non-draining.
     private long energyDrainPerTick;
@@ -218,6 +225,22 @@ public final class MachineBlockState implements Component<ChunkStore> {
     /** Set the On/Off control line. See {@link #isEnabled()}. */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * Per-block change-guard for the driven block visual state ({@code "Processing"} / {@code "default"}):
+     * returns {@code true} (and records {@code desired} as the new last-applied) only when {@code desired}
+     * differs from the last applied value, so {@link MachineTickSystem} re-issues a block-interaction-state
+     * update only on a transition rather than every tick (avoids restarting the looping animation and
+     * spamming a state packet). Transient (never codec-persisted): after a chunk reload {@code lastVisualState}
+     * is null, so the first tick always applies and re-syncs the world to the machine's real state.
+     */
+    public boolean shouldUpdateVisualState(String desired) {
+        if (java.util.Objects.equals(lastVisualState, desired)) {
+            return false;
+        }
+        lastVisualState = desired;
+        return true;
     }
 
     /**

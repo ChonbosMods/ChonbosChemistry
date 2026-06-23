@@ -93,7 +93,20 @@
               "Texture": "Blocks/ChonbosMods/Machines/CC_Smelter_Texture.png",
               "Weight": 1
             }
-          ]
+          ],
+          "Particles": [
+            {
+              "SystemId": "Fire_Furnace_On",
+              "TargetNodeName": "Fire",
+              "Scale": 0.7,
+              "PositionOffset": {
+                "X": 0,
+                "Y": -0.3,
+                "Z": 0.3
+              }
+            }
+          ],
+          "CustomModelAnimation": "Blocks/ChonbosMods/Machines/CC_Smelter_Smelting.blockyanim"
         },
         "ProcessCompleted": {
           "Looping": true,
@@ -105,7 +118,8 @@
               "Texture": "Blocks/ChonbosMods/Machines/CC_Smelter_Texture.png",
               "Weight": 1
             }
-          ]
+          ],
+          "CustomModelAnimation": "Blocks/ChonbosMods/Machines/CC_Smelter_Smelting.blockyanim"
         }
       }
     },
