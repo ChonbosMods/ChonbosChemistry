@@ -162,6 +162,85 @@ public final class FluidAssets {
             """.formatted(itemId, iconPath, blockId);
     }
 
+    /**
+     * Renders ONE {@code "Filled_<blockId>": { ... }} item-state member (NO surrounding braces : the
+     * container generator merges it into the item's {@code State} map). The body mirrors the vanilla
+     * drinkable filled state (e.g. {@code Container_Bucket.State.Filled_Milk} / {@code
+     * Deco_Mug.State.Filled_Water}): a {@code DrawType: Model} appearance with the per-substance
+     * tinted {@code CustomModelTexture}, the {@code Root_Secondary_Consume_Drink} routing, the
+     * {@code InteractionVars} (Effect / ConsumeSFX / ConsumedSFX / DurabilityModify), {@code
+     * Consumable}, and {@code MaxDurability: 1}.
+     *
+     * <p>{@code CustomModelAnimation} is spliced only when {@code container.animation() != null} (mug
+     * only : same null-guard style as {@link SolidSubstanceAssets#itemJson}'s Light field). Hazardous
+     * fluids emit their {@link FluidHazardJson#drinkEffects} as the {@code Effect.Interactions} array;
+     * a benign fluid (empty hazard list) emits {@code []}, so NO {@code ApplyEffect}/{@code CC_Effect_}
+     * appears : it still drinks, empties the container (the durability hit returns {@code
+     * container.brokenItem()}), but applies no status effect.
+     *
+     * <p>This method renders ONLY the appearance + drink + durability of the variant. The fill-source
+     * wiring (RefillContainer / AllowedFluids) is deliberately NOT here : vanilla {@code Filled_*}
+     * states themselves carry no inline RefillContainer (the empty container's top-level Secondary owns
+     * the fill mapping), and the per-container fill divergence (bucket inline vs mug/tankard shared
+     * {@code Mug_Fill.json}) is the next task.
+     *
+     * @param container     the container config (model, animation, tinted-texture path, brokenItem)
+     * @param blockId       the fluid block id (the {@code Filled_<blockId>} variant + texture suffix)
+     * @param drinkHazards  hazards applied on drink (empty = benign, no effect)
+     */
+    public static String filledStateJson(FluidContainers.FluidContainer container,
+                                         String blockId, List<FluidHazard> drinkHazards) {
+        String animation = container.animation() == null
+            ? ""
+            : "\n        \"CustomModelAnimation\": \"%s\",".formatted(container.animation());
+        String effects = drinkHazards.isEmpty()
+            ? ""
+            : "\n" + indent(FluidHazardJson.drinkEffects(drinkHazards), "            ") + "\n          ";
+        String nameKey = "server.items.%s_%s.name".formatted(container.id(), blockId);
+        return """
+            "Filled_%s": {
+              "Variant": true,
+              "TranslationProperties": { "Name": "%s" },
+              "Recipe": null,
+              "Consumable": true,
+              "MaxDurability": 1,
+              "DurabilityLossOnDeath": false,
+              "MaxStack": 1,
+              "BlockType": {
+                "DrawType": "Model",
+                "Opacity": "Transparent",
+                "CustomModel": "%s",%s
+                "CustomModelTexture": [
+                  { "Weight": 1, "Texture": "%s" }
+                ]
+              },
+              "Interactions": {
+                "Secondary": "Root_Secondary_Consume_Drink"
+              },
+              "InteractionVars": {
+                "Effect": {
+                  "Interactions": [%s]
+                },
+                "ConsumeSFX": {
+                  "Interactions": [
+                    { "Parent": "Consume_SFX", "Effects": { "LocalSoundEventId": "SFX_Health_Potion_Low_Drink" } }
+                  ]
+                },
+                "ConsumedSFX": {
+                  "Interactions": [
+                    { "Parent": "Consume_SFX", "Effects": { "LocalSoundEventId": "SFX_WATER_MoveOut" } }
+                  ]
+                },
+                "DurabilityModify": {
+                  "Interactions": [
+                    { "Type": "ModifyInventory", "AdjustHeldItemDurability": -1, "BrokenItem": "%s" }
+                  ]
+                }
+              }
+            }""".formatted(blockId, nameKey, container.model(), animation,
+                container.tintedTexturePath(blockId), effects, container.brokenItem());
+    }
+
     /** Render a double as a JSON-valid numeric literal (e.g. {@code 1.0}, {@code -1.35}). */
     private static String num(double d) {
         return Double.toString(d);
