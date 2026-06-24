@@ -84,6 +84,12 @@ public final class ForgeCraftState implements Component<ChunkStore> {
     private ItemStack card;
     /** Accumulated craft seconds. */
     private float progress;
+    /**
+     * Transient post-craft pause: ticks remaining to idle after a completed craft before sourcing the next
+     * recipe (a cosmetic beat so a completion reads visually before the next pull begins). NOT codec-persisted
+     * (it is momentary; a reload simply starts with no pending pause).
+     */
+    private int craftDelay;
     /** Round-robin cursor over selectable recipes (null until first selection). See the "Cursor" key. */
     private String lastSelectedId;
     /** On/Off control line (default ON); the circuit run/halt seam. See the "Enabled" codec key. */
@@ -153,6 +159,17 @@ public final class ForgeCraftState implements Component<ChunkStore> {
 
     public void setProgress(float progress) {
         this.progress = progress;
+    }
+
+    // --- post-craft visual pause (transient; not persisted) ---
+
+    /** @return ticks remaining to idle after a completed craft before sourcing the next recipe. */
+    public int craftDelay() {
+        return craftDelay;
+    }
+
+    public void setCraftDelay(int craftDelay) {
+        this.craftDelay = Math.max(0, craftDelay);
     }
 
     // --- round-robin cursor ---
