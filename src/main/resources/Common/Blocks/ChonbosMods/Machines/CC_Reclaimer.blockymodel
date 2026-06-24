@@ -41,15 +41,15 @@
             {
               "id": "3",
               "name": "Legs",
-              "position": {"x": -5.5, "y": -4.5, "z": 6},
+              "position": {"x": -11, "y": -4.5, "z": 12},
               "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
               "shape": {
                 "type": "box",
-                "offset": {"x": -0.5, "y": 0, "z": 0},
+                "offset": {"x": -1, "y": 0, "z": 0},
                 "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                 "settings": {
                   "isPiece": false,
-                  "size": {"x": 6, "y": 18, "z": 6}
+                  "size": {"x": 12, "y": 18, "z": 12}
                 },
                 "textureLayout": {
                   "back": {
@@ -87,15 +87,15 @@
                 {
                   "id": "4",
                   "name": "Leg--C1",
-                  "position": {"x": 44, "y": 0, "z": 0},
+                  "position": {"x": 88, "y": 0, "z": 0},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": -32, "y": 0, "z": 0},
+                    "offset": {"x": -64, "y": 0, "z": 0},
                     "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 6, "y": 18, "z": 6},
+                      "size": {"x": 12, "y": 18, "z": 12},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -134,15 +134,15 @@
                 {
                   "id": "5",
                   "name": "Leg--C2",
-                  "position": {"x": 44, "y": 0, "z": -12},
+                  "position": {"x": 88, "y": 0, "z": -24},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": -32, "y": 0, "z": 0},
+                    "offset": {"x": -64, "y": 0, "z": 0},
                     "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 6, "y": 18, "z": 6},
+                      "size": {"x": 12, "y": 18, "z": 12},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -181,7 +181,7 @@
                 {
                   "id": "6",
                   "name": "Leg--C3",
-                  "position": {"x": 0, "y": 0, "z": -12},
+                  "position": {"x": 0, "y": 0, "z": -24},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "box",
@@ -189,7 +189,7 @@
                     "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 6, "y": 18, "z": 6},
+                      "size": {"x": 12, "y": 18, "z": 12},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -238,7 +238,7 @@
                 "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                 "settings": {
                   "isPiece": false,
-                  "size": {"x": 30, "y": 52, "z": 32}
+                  "size": {"x": 60, "y": 52, "z": 64}
                 },
                 "textureLayout": {
                   "back": {
@@ -266,15 +266,15 @@
                 {
                   "id": "8",
                   "name": "TrimSide--C1",
-                  "position": {"x": -6.475, "y": -1, "z": 8},
+                  "position": {"x": -12.95, "y": -1, "z": 16},
                   "orientation": {"x": 0.70711, "y": 0, "z": 0, "w": 0.70711},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": -0.25, "y": -1.5, "z": -3.5},
+                    "offset": {"x": -0.5, "y": -1.5, "z": -7},
                     "stretch": {"x": 0.55, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 3, "y": 6, "z": 14},
+                      "size": {"x": 6, "y": 6, "z": 28},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -318,15 +318,15 @@
                 {
                   "id": "9",
                   "name": "PlateFront--C2",
-                  "position": {"x": 6, "y": -5, "z": 0},
+                  "position": {"x": 12, "y": -5, "z": 0},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": -6, "y": -3.5, "z": 7.25},
+                    "offset": {"x": -12, "y": -3.5, "z": 14.5},
                     "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 30, "y": 18, "z": 3},
+                      "size": {"x": 60, "y": 18, "z": 6},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -355,15 +355,15 @@
                 {
                   "id": "10",
                   "name": "Inner--C3",
-                  "position": {"x": 6, "y": -2, "z": 0},
+                  "position": {"x": 12, "y": -2, "z": 0},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": -6, "y": 4.5, "z": 0.25},
+                    "offset": {"x": -12, "y": 4.5, "z": 0.5},
                     "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 24, "y": 42, "z": 27},
+                      "size": {"x": 48, "y": 42, "z": 54},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -397,15 +397,15 @@
                 {
                   "id": "11",
                   "name": "TrimSide--C4",
-                  "position": {"x": 8.5, "y": -27, "z": 0},
+                  "position": {"x": 17, "y": -27, "z": 0},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": -15.25, "y": 24.5, "z": 7.25},
+                    "offset": {"x": -30.5, "y": 24.5, "z": 14.5},
                     "stretch": {"x": 0.525, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 3, "y": 6, "z": 3},
+                      "size": {"x": 6, "y": 6, "z": 6},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -449,15 +449,15 @@
                 {
                   "id": "12",
                   "name": "Tabletop--C5",
-                  "position": {"x": 39.75, "y": -1.82556, "z": -0.90939},
+                  "position": {"x": 79.5, "y": -1.82556, "z": -1.81879},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": -32, "y": 3, "z": 0},
+                    "offset": {"x": -64, "y": 3, "z": 0},
                     "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 1, "y": 22, "z": 11},
+                      "size": {"x": 2, "y": 22, "z": 22},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -496,15 +496,15 @@
                 {
                   "id": "13",
                   "name": "Tabletop--C6",
-                  "position": {"x": -39.75, "y": -1.82556, "z": -1.40939},
+                  "position": {"x": -79.5, "y": -1.82556, "z": -2.81879},
                   "orientation": {"x": 0, "y": 1, "z": 0, "w": 0},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": -32, "y": 3, "z": 0},
+                    "offset": {"x": -64, "y": 3, "z": 0},
                     "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 1, "y": 22, "z": 11},
+                      "size": {"x": 2, "y": 22, "z": 22},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -543,15 +543,15 @@
                 {
                   "id": "14",
                   "name": "TrimSide--C7",
-                  "position": {"x": 6.475, "y": -1, "z": 8},
+                  "position": {"x": 12.95, "y": -1, "z": 16},
                   "orientation": {"x": 0.70711, "y": 0, "z": 0, "w": 0.70711},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": 0.25, "y": -1.5, "z": -3.5},
+                    "offset": {"x": 0.5, "y": -1.5, "z": -7},
                     "stretch": {"x": 0.55, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 3, "y": 6, "z": 14},
+                      "size": {"x": 6, "y": 6, "z": 28},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -595,15 +595,15 @@
                 {
                   "id": "15",
                   "name": "TrimSide--C8",
-                  "position": {"x": -8.5, "y": -27, "z": 0},
+                  "position": {"x": -17, "y": -27, "z": 0},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": 15.25, "y": 24.5, "z": 7.25},
+                    "offset": {"x": 30.5, "y": 24.5, "z": 14.5},
                     "stretch": {"x": 0.525, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 3, "y": 6, "z": 3},
+                      "size": {"x": 6, "y": 6, "z": 6},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -647,7 +647,7 @@
                 {
                   "id": "16",
                   "name": "Crusher",
-                  "position": {"x": -5, "y": -7.5, "z": 18.75},
+                  "position": {"x": -10, "y": -7.5, "z": 37.5},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "none",
@@ -666,15 +666,15 @@
                     {
                       "id": "17",
                       "name": "Arm1",
-                      "position": {"x": 4.4, "y": 13, "z": -20},
+                      "position": {"x": 8.8, "y": 13, "z": -40},
                       "orientation": {"x": 0.65935, "y": 0, "z": 0, "w": 0.75184},
                       "shape": {
                         "type": "box",
-                        "offset": {"x": 0.6, "y": 0, "z": 0},
+                        "offset": {"x": 1.2, "y": 0, "z": 0},
                         "stretch": {"x": 1, "y": 1, "z": 1},
                         "settings": {
                           "isPiece": false,
-                          "size": {"x": 12, "y": 5, "z": 2.5}
+                          "size": {"x": 24, "y": 5, "z": 5}
                         },
                         "textureLayout": {
                           "back": {
@@ -707,15 +707,15 @@
                         {
                           "id": "18",
                           "name": "Ring--C1",
-                          "position": {"x": 0.25, "y": 0, "z": 0},
+                          "position": {"x": 0.5, "y": 0, "z": 0},
                           "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                           "shape": {
                             "type": "box",
-                            "offset": {"x": -5.5, "y": 0, "z": 0},
+                            "offset": {"x": -11, "y": 0, "z": 0},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
-                              "size": {"x": 1.5, "y": 11, "z": 5.5},
+                              "size": {"x": 3, "y": 11, "z": 11},
                               "isStaticBox": true
                             },
                             "textureLayout": {
@@ -759,15 +759,15 @@
                         {
                           "id": "19",
                           "name": "Ring--C2",
-                          "position": {"x": 0.25, "y": 0, "z": 0},
+                          "position": {"x": 0.5, "y": 0, "z": 0},
                           "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                           "shape": {
                             "type": "box",
-                            "offset": {"x": -2.5, "y": 0, "z": 0},
+                            "offset": {"x": -5, "y": 0, "z": 0},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
-                              "size": {"x": 1.5, "y": 11, "z": 5.5},
+                              "size": {"x": 3, "y": 11, "z": 11},
                               "isStaticBox": true
                             },
                             "textureLayout": {
@@ -811,15 +811,15 @@
                         {
                           "id": "20",
                           "name": "Ring--C3",
-                          "position": {"x": 0.25, "y": 0, "z": 0},
+                          "position": {"x": 0.5, "y": 0, "z": 0},
                           "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                           "shape": {
                             "type": "box",
-                            "offset": {"x": 0.5, "y": 0, "z": 0},
+                            "offset": {"x": 1, "y": 0, "z": 0},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
-                              "size": {"x": 1.5, "y": 11, "z": 5.5},
+                              "size": {"x": 3, "y": 11, "z": 11},
                               "isStaticBox": true
                             },
                             "textureLayout": {
@@ -863,15 +863,15 @@
                         {
                           "id": "21",
                           "name": "Ring--C4",
-                          "position": {"x": 0.25, "y": 0, "z": 0},
+                          "position": {"x": 0.5, "y": 0, "z": 0},
                           "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                           "shape": {
                             "type": "box",
-                            "offset": {"x": 3.5, "y": 0, "z": 0},
+                            "offset": {"x": 7, "y": 0, "z": 0},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
-                              "size": {"x": 1.5, "y": 11, "z": 5.5},
+                              "size": {"x": 3, "y": 11, "z": 11},
                               "isStaticBox": true
                             },
                             "textureLayout": {
@@ -917,15 +917,15 @@
                     {
                       "id": "22",
                       "name": "Arm2",
-                      "position": {"x": 5.6, "y": 5.66878, "z": -16.15958},
+                      "position": {"x": 11.2, "y": 5.66878, "z": -32.31917},
                       "orientation": {"x": -0.92388, "y": 0, "z": 0, "w": 0.38268},
                       "shape": {
                         "type": "box",
-                        "offset": {"x": -0.6, "y": -0.02269, "z": -0.00075},
+                        "offset": {"x": -1.2, "y": -0.02269, "z": -0.0015},
                         "stretch": {"x": 1, "y": 1, "z": 1},
                         "settings": {
                           "isPiece": false,
-                          "size": {"x": 12, "y": 5, "z": 2.5}
+                          "size": {"x": 24, "y": 5, "z": 5}
                         },
                         "textureLayout": {
                           "back": {
@@ -958,15 +958,15 @@
                         {
                           "id": "23",
                           "name": "Ring--C1",
-                          "position": {"x": 0.25, "y": 0.01418, "z": 0.00047},
+                          "position": {"x": 0.5, "y": 0.01418, "z": 0.00093},
                           "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                           "shape": {
                             "type": "box",
-                            "offset": {"x": -4, "y": 0.01418, "z": 0.00047},
+                            "offset": {"x": -8, "y": 0.01418, "z": 0.00094},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
-                              "size": {"x": 1.5, "y": 11, "z": 5.5},
+                              "size": {"x": 3, "y": 11, "z": 11},
                               "isStaticBox": true
                             },
                             "textureLayout": {
@@ -1010,15 +1010,15 @@
                         {
                           "id": "24",
                           "name": "Ring--C2",
-                          "position": {"x": 0.25, "y": 0.01418, "z": 0.00047},
+                          "position": {"x": 0.5, "y": 0.01418, "z": 0.00093},
                           "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                           "shape": {
                             "type": "box",
-                            "offset": {"x": -1, "y": 0.01418, "z": 0.00047},
+                            "offset": {"x": -2, "y": 0.01418, "z": 0.00094},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
-                              "size": {"x": 1.5, "y": 11, "z": 5.5},
+                              "size": {"x": 3, "y": 11, "z": 11},
                               "isStaticBox": true
                             },
                             "textureLayout": {
@@ -1062,15 +1062,15 @@
                         {
                           "id": "25",
                           "name": "Ring--C3",
-                          "position": {"x": 0.25, "y": 0.01418, "z": 0.00047},
+                          "position": {"x": 0.5, "y": 0.01418, "z": 0.00093},
                           "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                           "shape": {
                             "type": "box",
-                            "offset": {"x": 2, "y": 0.01418, "z": 0.00047},
+                            "offset": {"x": 4, "y": 0.01418, "z": 0.00094},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
-                              "size": {"x": 1.5, "y": 11, "z": 5.5},
+                              "size": {"x": 3, "y": 11, "z": 11},
                               "isStaticBox": true
                             },
                             "textureLayout": {
@@ -1114,15 +1114,15 @@
                         {
                           "id": "26",
                           "name": "Ring--C4",
-                          "position": {"x": 0.25, "y": 0.01418, "z": 0.00047},
+                          "position": {"x": 0.5, "y": 0.01418, "z": 0.00093},
                           "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                           "shape": {
                             "type": "box",
-                            "offset": {"x": 5, "y": 0.01418, "z": 0.00047},
+                            "offset": {"x": 10, "y": 0.01418, "z": 0.00094},
                             "stretch": {"x": 1, "y": 1, "z": 1},
                             "settings": {
                               "isPiece": false,
-                              "size": {"x": 1.5, "y": 11, "z": 5.5},
+                              "size": {"x": 3, "y": 11, "z": 11},
                               "isStaticBox": true
                             },
                             "textureLayout": {
@@ -1170,15 +1170,15 @@
                 {
                   "id": "27",
                   "name": "Base--C9",
-                  "position": {"x": -6.75, "y": -11, "z": 2.5},
+                  "position": {"x": -13.5, "y": -11, "z": 5},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": 6.75, "y": -9, "z": -2.5},
+                    "offset": {"x": 13.5, "y": -9, "z": -5},
                     "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 30, "y": 28, "z": 32},
+                      "size": {"x": 60, "y": 28, "z": 64},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -1217,15 +1217,15 @@
                 {
                   "id": "28",
                   "name": "Hole--C10",
-                  "position": {"x": 0, "y": -24.02556, "z": 7.99061},
+                  "position": {"x": 0, "y": -24.02556, "z": 15.98121},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": 0, "y": 7, "z": -3},
+                    "offset": {"x": 0, "y": 7, "z": -6},
                     "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 14, "y": 28, "z": 12},
+                      "size": {"x": 28, "y": 28, "z": 24},
                       "isStaticBox": true
                     },
                     "textureLayout": {
@@ -1264,15 +1264,15 @@
                 {
                   "id": "29",
                   "name": "Door",
-                  "position": {"x": 0, "y": -23.52556, "z": 7.99061},
+                  "position": {"x": 0, "y": -23.52556, "z": 15.98121},
                   "orientation": {"x": 0.38268, "y": 0, "z": 0, "w": 0.92388},
                   "shape": {
                     "type": "box",
-                    "offset": {"x": 0.25, "y": 5.5, "z": 0},
+                    "offset": {"x": 0.5, "y": 5.5, "z": 0},
                     "stretch": {"x": 0.5, "y": 0.375, "z": 0.5},
                     "settings": {
                       "isPiece": false,
-                      "size": {"x": 16, "y": 28, "z": 1}
+                      "size": {"x": 32, "y": 28, "z": 2}
                     },
                     "textureLayout": {
                       "back": {
@@ -1315,15 +1315,15 @@
                     {
                       "id": "30",
                       "name": "Door--C1",
-                      "position": {"x": -0.25, "y": 5, "z": -2.5},
+                      "position": {"x": -0.5, "y": 5, "z": -5},
                       "orientation": {"x": 0.70711, "y": 0, "z": 0, "w": 0.70711},
                       "shape": {
                         "type": "box",
-                        "offset": {"x": 0.25, "y": 0, "z": 0},
+                        "offset": {"x": 0.5, "y": 0, "z": 0},
                         "stretch": {"x": 0.5, "y": 0.375, "z": 0.5},
                         "settings": {
                           "isPiece": false,
-                          "size": {"x": 16, "y": 28, "z": 1},
+                          "size": {"x": 32, "y": 28, "z": 2},
                           "isStaticBox": true
                         },
                         "textureLayout": {
@@ -1367,15 +1367,15 @@
                     {
                       "id": "31",
                       "name": "Chute2--C2",
-                      "position": {"x": -0.25, "y": 1, "z": -6.75},
+                      "position": {"x": -0.5, "y": 1, "z": -13.5},
                       "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                       "shape": {
                         "type": "box",
-                        "offset": {"x": 0, "y": -6.5, "z": 6.25},
+                        "offset": {"x": 0, "y": -6.5, "z": 12.5},
                         "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
                         "settings": {
                           "isPiece": false,
-                          "size": {"x": 15, "y": 2, "z": 1},
+                          "size": {"x": 30, "y": 2, "z": 2},
                           "isStaticBox": true
                         },
                         "textureLayout": {
@@ -1404,15 +1404,15 @@
                     {
                       "id": "32",
                       "name": "Chute3--C3",
-                      "position": {"x": -4, "y": -1.00002, "z": -3.13687},
+                      "position": {"x": -8, "y": -1.00002, "z": -6.27374},
                       "orientation": {"x": -0.00873, "y": 0, "z": 0, "w": 0.99996},
                       "shape": {
                         "type": "box",
-                        "offset": {"x": 0.25, "y": 0, "z": 0},
+                        "offset": {"x": 0.5, "y": 0, "z": 0},
                         "stretch": {"x": 0.425, "y": 0.5, "z": 0.5},
                         "settings": {
                           "isPiece": false,
-                          "size": {"x": 1, "y": 24, "z": 12},
+                          "size": {"x": 2, "y": 24, "z": 24},
                           "isStaticBox": true
                         },
                         "textureLayout": {
@@ -1451,15 +1451,15 @@
                     {
                       "id": "33",
                       "name": "Chute4--C4",
-                      "position": {"x": 3.5, "y": -1.00002, "z": -3.13687},
+                      "position": {"x": 7, "y": -1.00002, "z": -6.27374},
                       "orientation": {"x": -0.00873, "y": 0, "z": 0, "w": 0.99996},
                       "shape": {
                         "type": "box",
-                        "offset": {"x": 0.25, "y": 0, "z": 0},
+                        "offset": {"x": 0.5, "y": 0, "z": 0},
                         "stretch": {"x": 0.425, "y": 0.5, "z": 0.5},
                         "settings": {
                           "isPiece": false,
-                          "size": {"x": 1, "y": 24, "z": 12},
+                          "size": {"x": 2, "y": 24, "z": 24},
                           "isStaticBox": true
                         },
                         "textureLayout": {
@@ -1500,7 +1500,7 @@
                 {
                   "id": "34",
                   "name": "Fire",
-                  "position": {"x": 0, "y": 0, "z": 1.5},
+                  "position": {"x": 0, "y": 0, "z": 3},
                   "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
                   "shape": {
                     "type": "none",
@@ -1533,7 +1533,7 @@
         "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
         "settings": {
           "isPiece": false,
-          "size": {"x": 28, "y": 19, "z": 26},
+          "size": {"x": 56, "y": 19, "z": 52},
           "isStaticBox": true
         },
         "textureLayout": {
@@ -1581,11 +1581,11 @@
       "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
       "shape": {
         "type": "box",
-        "offset": {"x": -7.5, "y": 16, "z": 0},
+        "offset": {"x": -14.5, "y": 16, "z": 0},
         "stretch": {"x": 1, "y": 1, "z": 1},
         "settings": {
           "isPiece": false,
-          "size": {"x": 1.5, "y": 16, "z": 8},
+          "size": {"x": 3, "y": 16, "z": 16},
           "isStaticBox": true
         },
         "textureLayout": {
@@ -1633,11 +1633,11 @@
       "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
       "shape": {
         "type": "box",
-        "offset": {"x": 7.5, "y": 16, "z": 0},
+        "offset": {"x": 14.5, "y": 16, "z": 0},
         "stretch": {"x": 1, "y": 1, "z": 1},
         "settings": {
           "isPiece": false,
-          "size": {"x": 1.5, "y": 16, "z": 8},
+          "size": {"x": 3, "y": 16, "z": 16},
           "isStaticBox": true
         },
         "textureLayout": {
@@ -1685,11 +1685,11 @@
       "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
       "shape": {
         "type": "box",
-        "offset": {"x": 0, "y": 16, "z": -7.5},
+        "offset": {"x": 0, "y": 16, "z": -15},
         "stretch": {"x": 1, "y": 1, "z": 1},
         "settings": {
           "isPiece": false,
-          "size": {"x": 8, "y": 16, "z": 1.5},
+          "size": {"x": 16, "y": 16, "z": 3},
           "isStaticBox": true
         },
         "textureLayout": {
@@ -1733,7 +1733,7 @@
     {
       "id": "39",
       "name": "ControlPanel",
-      "position": {"x": 0.375, "y": 24, "z": 10.25},
+      "position": {"x": 0.75, "y": 24, "z": 20.5},
       "orientation": {"x": -0.28006, "y": 0.64892, "z": -0.28091, "w": 0.64928},
       "shape": {
         "type": "box",
@@ -1741,7 +1741,7 @@
         "stretch": {"x": 1, "y": 1, "z": 1},
         "settings": {
           "isPiece": false,
-          "size": {"x": 1, "y": 10, "z": 6},
+          "size": {"x": 2, "y": 10, "z": 12},
           "isStaticBox": true
         },
         "textureLayout": {
@@ -1789,11 +1789,11 @@
       "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
       "shape": {
         "type": "box",
-        "offset": {"x": -6.75, "y": 50.5, "z": -1},
+        "offset": {"x": -13.5, "y": 50.5, "z": -2},
         "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
         "settings": {
           "isPiece": false,
-          "size": {"x": 3, "y": 6, "z": 28},
+          "size": {"x": 6, "y": 6, "z": 56},
           "isStaticBox": true
         },
         "textureLayout": {
@@ -1841,11 +1841,11 @@
       "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
       "shape": {
         "type": "box",
-        "offset": {"x": 6.75, "y": 50.5, "z": -1},
+        "offset": {"x": 13.5, "y": 50.5, "z": -2},
         "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
         "settings": {
           "isPiece": false,
-          "size": {"x": 3, "y": 6, "z": 28},
+          "size": {"x": 6, "y": 6, "z": 56},
           "isStaticBox": true
         },
         "textureLayout": {
@@ -1893,11 +1893,11 @@
       "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
       "shape": {
         "type": "box",
-        "offset": {"x": 0, "y": 50.5, "z": -7.25},
+        "offset": {"x": 0, "y": 50.5, "z": -14.5},
         "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
         "settings": {
           "isPiece": false,
-          "size": {"x": 24, "y": 6, "z": 3},
+          "size": {"x": 48, "y": 6, "z": 6},
           "isStaticBox": true
         },
         "textureLayout": {
@@ -1945,11 +1945,11 @@
       "orientation": {"x": 0, "y": 0, "z": 0, "w": 1},
       "shape": {
         "type": "box",
-        "offset": {"x": 0, "y": 50.5, "z": 5.25},
+        "offset": {"x": 0, "y": 50.5, "z": 10.5},
         "stretch": {"x": 0.5, "y": 0.5, "z": 0.5},
         "settings": {
           "isPiece": false,
-          "size": {"x": 24, "y": 6, "z": 3},
+          "size": {"x": 48, "y": 6, "z": 6},
           "isStaticBox": true
         },
         "textureLayout": {
