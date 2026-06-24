@@ -17,8 +17,8 @@ $M = "../CC_Master.ui";
 @PanelDividerColor = $M.@PanelDividerColor;
 @ValueText = $M.@ValueText;
 @LabelText = $M.@LabelText;
-// Forge override: wider than the shared bench column. The Forge's 3x3 input grid (204px) + 2x2 output
-// (140px) would crush the center to ~6px on the shared 404 width; 530 restores a ~130px progress bar
+// Forge override: wider than the shared bench column. The Forge's held-ingredients scroll list (204px) + 2x2
+// output (140px) would crush the center to ~6px on the shared 404 width; 530 restores a ~130px progress bar
 // (the same size as the Smelter's center bar).
 @ProcessColumnWidth = 530;
 @StatusColumnWidth = $M.@StatusColumnWidth;
@@ -213,17 +213,26 @@ $C.@PageOverlay {
             Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
             Group { Anchor: (Height: 14); }
 
-            // Input slots | progress bar (centered) | output slots.
+            // Held ingredients (the active craft's pulled stacks) | progress bar (centered) | output slots.
             Group #IoRow {
               LayoutMode: Left;
               Anchor: (Left: 0, Right: 0, Height: 220);
 
-              ItemGrid #InputGrid {
-                Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
-                SlotsPerRow: 3;
-                AreItemsDraggable: false;
-                RenderItemQualityBackground: true;
-                Anchor: (Width: 204);
+              // Held ingredients: a vertically-scrolling viewport (TopScrolling + vanilla scrollbar style)
+              // wrapping the read-only #InputGrid. Empty while idle; the grid grows downward as ingredients
+              // are pulled and scrolls within this fixed 200px height instead of overflowing the I/O row.
+              Group #HeldScroll {
+                Anchor: (Width: 204, Height: 200);
+                LayoutMode: TopScrolling;
+                ScrollbarStyle: $C.@DefaultScrollbarStyle;
+
+                ItemGrid #InputGrid {
+                  Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
+                  SlotsPerRow: 3;
+                  AreItemsDraggable: false;
+                  RenderItemQualityBackground: true;
+                  Anchor: (Left: 0, Right: 0);
+                }
               }
 
               Group { Anchor: (Width: 12); }

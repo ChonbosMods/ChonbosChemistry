@@ -1,5 +1,7 @@
 package com.chonbosmods.chemistry.impl.block;
 
+import com.chonbosmods.chemistry.api.io.PortChannel;
+import com.chonbosmods.chemistry.api.io.PortDirection;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.Rotation;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,34 @@ public final class PortProjection {
             matches.add(Port.of(wcx, wcy, wcz, worldFace, p.channel(), p.direction()));
         }
         return PortConfig.of(matches);
+    }
+
+    /**
+     * The WORLD coords of the cell the pipe serving {@code model}'s {@code (channel, direction)} port
+     * occupies, for a block anchored at {@code (ax,ay,az)} with yaw {@code rotation}: rotate the port's
+     * model cell offset to world ({@code anchor + rotated offset} = the port cell), then step one cell along
+     * the rotated face direction to land on the adjacent pipe cell. Returns {@code null} if no such port
+     * exists in {@code model}.
+     *
+     * <p>Sanity (identity rotation, the Forge item-in at cell {@code (-1,0,0)} face 1 = West/-X): the port
+     * cell is {@code anchor + (-1,0,0)} and the West face offset is {@code (-1,0,0)}, so the pipe cell is
+     * {@code anchor + (-2,0,0)}. (See {@code ForgePorts}.)
+     */
+    public static Vector3i pipeCellForPort(PortConfig model, Rotation rotation, int ax, int ay, int az,
+            PortChannel channel, PortDirection direction) {
+        if (model == null) {
+            return null;
+        }
+        for (Port p : model.ports()) {
+            if (p == null || p.channel() != channel || p.direction() != direction) {
+                continue;
+            }
+            Vector3i cell = rotate(rotation, p.cellX(), p.cellY(), p.cellZ()); // model offset -> world offset
+            int worldFace = rotateFace(rotation, p.faceIndex());
+            int[] o = FACE_OFFSETS[worldFace];
+            return new Vector3i(ax + cell.x() + o[0], ay + cell.y() + o[1], az + cell.z() + o[2]);
+        }
+        return null;
     }
 
     private static Vector3i rotate(Rotation rotation, int x, int y, int z) {

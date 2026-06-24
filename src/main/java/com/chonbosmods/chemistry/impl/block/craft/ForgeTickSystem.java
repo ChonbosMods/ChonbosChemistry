@@ -1,10 +1,15 @@
 package com.chonbosmods.chemistry.impl.block.craft;
 
 import com.chonbosmods.chemistry.api.energy.EnergyHandler;
+import com.chonbosmods.chemistry.api.io.PortChannel;
+import com.chonbosmods.chemistry.api.io.PortDirection;
 import com.chonbosmods.chemistry.impl.block.EnergyBuffer;
 import com.chonbosmods.chemistry.impl.block.MachineVisualState;
+import com.chonbosmods.chemistry.impl.block.PortProjection;
 import com.chonbosmods.chemistry.impl.block.SmelterEnergy;
 import com.chonbosmods.chemistry.impl.block.bench.VanillaCraftBridge;
+import com.chonbosmods.chemistry.impl.block.net.NetworkService;
+import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.component.ArchetypeChunk;
@@ -18,8 +23,10 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.protocol.BenchType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
+import com.hypixel.hytale.server.core.asset.type.blocktype.config.Rotation;
 import com.hypixel.hytale.server.core.asset.type.item.config.CraftingRecipe;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.accessor.BlockAccessor;
@@ -33,20 +40,27 @@ import java.util.Set;
 import java.util.TreeMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.joml.Vector3i;
 
 /**
- * Per-tick driver for the autonomous Forge block (Task 5). For every live {@link ForgeCraftState} on the
- * {@link ChunkStore}, it runs one energy-gated round-robin craft step:
+ * Per-tick driver for the autonomous Forge block (the demand-driven "pull-crafter"). For every live
+ * {@link ForgeCraftState} on the {@link ChunkStore}, it runs one energy-gated step of the discrete pull
+ * loop (idle &rarr; pull &rarr; craft &rarr; complete &rarr; repeat):
  *
  * <ol>
  *   <li>resolve the live drive context (ref / world / block coords / block type) exactly like
- *       {@code MachineTickSystem.driveBench} — every lookup guarded, the node skipped on the first
+ *       {@code MachineTickSystem.driveBench}: every lookup guarded, the node skipped on the first
  *       missing piece;</li>
- *   <li>compute the currently-craftable recipe ids from the shared (cached) bench recipe pool: card-allowed
- *       AND inputs present AND output has room (backpressure);</li>
- *   <li>gate on the energy buffer ({@link SmelterEnergy#affordableDt}) and run the pure
- *       {@link CraftStep#step decision}, applying its progress/cursor and, on completion, consuming inputs +
- *       producing outputs through {@link VanillaCraftBridge};</li>
+ *   <li>when IDLE and powered, project the Forge's item-in port to the world pipe cell, snapshot the ITEM
+ *       network reachable there ({@link ForgeSourcePull#snapshot}), and compute the craftable recipe ids:
+ *       card-allowed AND fully sourceable from that network ({@link ForgeSourcePull#available}) AND output
+ *       has room ({@link VanillaCraftBridge#canProduce} backpressure). While CRAFTING, no sourcing happens;
+ *       the loop just advances the active craft;</li>
+ *   <li>run the pure {@link PullCraftStep#decide decision}. On START the chosen recipe's ingredients are
+ *       atomically pulled from the network ({@link ForgeSourcePull#tryPull}, at most once per tick) into the
+ *       held container; on ADVANCE progress accrues; on COMPLETE the held ingredients are consumed and the
+ *       outputs produced through {@link VanillaCraftBridge}. Energy drains ONLY on a tick that drove real
+ *       work;</li>
  *   <li>drive the block's {@code "Processing"} / {@code "default"} visual state directly on the placed block
  *       (the Forge holds no vanilla bench, so we swap via the {@link BlockAccessor}, not a bench).</li>
  * </ol>
@@ -57,7 +71,8 @@ import javax.annotation.Nullable;
  * that logs each distinct error once and skips the node for the tick.
  *
  * <p>Unlike the Smelter, the Forge does not delegate to a vanilla autonomous bench (vanilla crafting has no
- * such block); it drives the crafting helpers itself through {@link VanillaCraftBridge}.
+ * such block); it drives the crafting helpers itself through {@link VanillaCraftBridge} and sources its
+ * ingredients from the item-pipe network via {@link ForgeSourcePull}.
  */
 public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
 
@@ -82,11 +97,18 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
         new KeyedCodec<>("CC_ForgeAllow", Codec.STRING_ARRAY);
 
     private final ComponentType<ChunkStore, ForgeCraftState> forgeType;
+    private final ComponentType<ChunkStore, PipeNode> pipeType;
+    private final NetworkService networkService;
     private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType;
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType;
 
-    public ForgeTickSystem(@Nonnull ComponentType<ChunkStore, ForgeCraftState> forgeType) {
+    public ForgeTickSystem(
+            @Nonnull ComponentType<ChunkStore, ForgeCraftState> forgeType,
+            @Nonnull ComponentType<ChunkStore, PipeNode> pipeType,
+            @Nonnull NetworkService networkService) {
         this.forgeType = forgeType;
+        this.pipeType = pipeType;
+        this.networkService = networkService;
         this.blockInfoType = BlockModule.BlockStateInfo.getComponentType();
         this.blockChunkType = BlockChunk.getComponentType();
     }
@@ -188,75 +210,185 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
         // 2. The shared (cached) bench recipe pool: stable id order + id -> recipe map.
         RecipePool pool = recipePool();
 
-        // 3-5. Compute the currently-craftable subset: card-allowed AND inputs present AND output has room.
-        // v1 crafts ONE recipe set per cycle. This is the BATCH multiplier vanilla's getInputMaterials
-        // applies (it returns quantity * batch), NOT the machine tier: passing 0 zeroed every ingredient
-        // quantity and threw "quantity 0 must be >0", which the drive guard swallowed every tick (nothing
-        // ever crafted). The output side already uses count=1, so 1 keeps inputs and outputs consistent.
-        int batch = 1;
-        Set<String> allow = cardAllowSet(node.card());
-        Set<String> craftable = new java.util.HashSet<>();
-        for (String id : pool.stableOrder) {
-            if (!CraftSelection.allowed(id, allow)) {
-                continue;
-            }
-            CraftingRecipe r = pool.map.get(id);
-            if (r == null) {
-                continue;
-            }
-            try {
-                if (!VanillaCraftBridge.inputsPresent(r, node.input(), batch)) {
-                    continue;
-                }
-                // Backpressure: a full output stalls the craft (don't consume inputs we can't bank).
-                if (!VanillaCraftBridge.canProduce(node.output(), VanillaCraftBridge.outputs(r))) {
-                    continue;
-                }
-            } catch (RuntimeException ex) {
-                // A single malformed recipe (e.g. a 0-quantity ingredient) must not poison the whole scan:
-                // skip it rather than aborting every recipe's evaluation (and the craft) for this tick.
-                continue;
-            }
-            craftable.add(id);
-        }
-
-        // 6. Energy gate: simulated craft seconds affordable this tick (0 when disabled or empty buffer).
+        // 3. State: are we mid-craft? and the energy gate (simulated craft seconds affordable this tick,
+        // 0 when disabled or the buffer is empty).
+        boolean crafting = node.currentRecipeId() != null;
         double affordable =
             node.isEnabled() ? SmelterEnergy.affordableDt(energy.getStored(), FORGE_DRAW, dt) : 0.0;
         boolean powered = affordable > 0;
 
-        // 7. The pure per-tick decision.
-        CraftStep.Outcome o = CraftStep.step(
-            pool.stableOrder, craftable, node.lastSelectedId(), powered, (float) affordable,
-            node.progress(), FORGE_DURATION);
+        // 4. Build the craftable set + the network snapshot ONLY when IDLE AND powered: never reserve
+        // ingredients we cannot craft, and no point sourcing while a craft is mid-flight (PullCraftStep
+        // ignores `craftable` while crafting). `snapshot` is reused for the chosen pick's atomic pull below.
+        Set<String> craftable = java.util.Collections.emptySet();
+        ForgeSourcePull.Snapshot snapshot = null;
+        if (!crafting && powered) {
+            int[] pipeCell = inputPipeCell(world, x, y, z, node);
+            if (pipeCell != null) {
+                snapshot = ForgeSourcePull.snapshot(
+                    world, store, pipeType, networkService, pipeCell[0], pipeCell[1], pipeCell[2]);
+            }
+            if (snapshot != null) {
+                Set<String> allow = cardAllowSet(node.card());
+                java.util.HashSet<String> set = new java.util.HashSet<>();
+                for (String id : pool.stableOrder) {
+                    if (!CraftSelection.allowed(id, allow)) {
+                        continue;
+                    }
+                    CraftingRecipe r = pool.map.get(id);
+                    if (r == null) {
+                        continue;
+                    }
+                    try {
+                        // Fully sourceable from the input network AND the output has room (backpressure).
+                        if (!ForgeSourcePull.available(snapshot, r)) {
+                            continue;
+                        }
+                        if (!VanillaCraftBridge.canProduce(node.output(), VanillaCraftBridge.outputs(r))) {
+                            continue;
+                        }
+                    } catch (RuntimeException ex) {
+                        // A single malformed recipe (e.g. a 0-quantity ingredient) must not poison the
+                        // whole scan: skip it rather than aborting every recipe's evaluation this tick.
+                        continue;
+                    }
+                    set.add(id);
+                }
+                craftable = set;
+            }
+        }
 
-        // 8. Apply progress + cursor, drain energy for work done, and produce on completion.
-        node.setProgress(o.newProgress());
-        node.setLastSelectedId(o.newCursor());
+        // 5. The pure per-tick decision (idle -> START a pick, crafting -> ADVANCE / COMPLETE).
+        PullCraftStep.Decision d = PullCraftStep.decide(
+            crafting, node.currentRecipeId(), node.progress(), FORGE_DURATION, powered, (float) affordable,
+            pool.stableOrder, craftable, node.lastSelectedId());
 
-        boolean workedThisTick = o.pick() != null && powered;
-        if (workedThisTick) {
+        // 6. Apply the decision. `activeCraft` = we drove real work this tick (drain energy + show Processing).
+        boolean activeCraft = false;
+        switch (d.action()) {
+            case IDLE -> {
+                node.setProgress(0f);
+                node.setCurrentRecipeId(null);
+                clearHeld(node); // invariant: idle => held empty (defends against any path leaving stale held)
+                node.setLastSelectedId(d.newCursor());
+            }
+            case START -> {
+                CraftingRecipe r = pool.map.get(d.pick());
+                // tryPull MUTATES + spends the snapshot: call it AT MOST ONCE per tick, only for the pick,
+                // and only after every `available()` probe above is done.
+                List<ItemStack> pulled =
+                    (r != null && snapshot != null) ? ForgeSourcePull.tryPull(snapshot, r) : null;
+                if (pulled != null) {
+                    loadHeld(node, pulled);
+                    node.setCurrentRecipeId(d.pick());
+                    node.setProgress(0f);
+                    activeCraft = true; // committed a craft this tick
+                } else {
+                    // lost the pull (race / vanished): stay idle this tick, retry next.
+                    node.setProgress(0f);
+                    node.setCurrentRecipeId(null);
+                }
+                node.setLastSelectedId(d.newCursor()); // unchanged on START
+            }
+            case ADVANCE -> {
+                node.setProgress(d.newProgress());
+                node.setLastSelectedId(d.newCursor());
+                activeCraft = powered;
+            }
+            case COMPLETE -> {
+                CraftingRecipe r = pool.map.get(d.pick());
+                List<ItemStack> outs = (r != null) ? VanillaCraftBridge.outputs(r) : java.util.List.of();
+                // Completion backpressure (defensive: START reserved output room and only we add / the net
+                // removes, so this should pass; guard anyway so a full output never destroys the held
+                // ingredients).
+                if (r != null && VanillaCraftBridge.canProduce(node.output(), outs)) {
+                    VanillaCraftBridge.addOutputs(node.output(), outs);
+                    clearHeld(node); // the held ingredients are consumed by the craft
+                    node.setCurrentRecipeId(null);
+                    node.setProgress(0f);
+                    node.setLastSelectedId(d.newCursor()); // cursor advances to the crafted id
+                    activeCraft = powered;
+                } else {
+                    // STALL: output full -> keep the craft + held intact, sit at the completion threshold
+                    // and retry next tick when the output drains. Do NOT advance the cursor or drain energy.
+                    node.setProgress(FORGE_DURATION);
+                    // currentRecipeId + held untouched; activeCraft stays false (blocked, not working).
+                }
+            }
+        }
+
+        // 7. Drain energy only for a tick that drove real work.
+        if (activeCraft) {
             long drained = SmelterEnergy.drainFor(affordable, FORGE_DRAW);
             if (drained > 0) {
                 energy.extractEnergyInternal(drained, false);
             }
         }
-        if (o.completed()) {
-            CraftingRecipe r = pool.map.get(o.pick());
-            // Atomic consume: only produce if the inputs were actually removed (we already gated on
-            // inputsPresent + canProduce above, so this should succeed; keep the guard regardless).
-            if (r != null && VanillaCraftBridge.consumeInputs(r, node.input(), batch)) {
-                VanillaCraftBridge.addOutputs(node.output(), VanillaCraftBridge.outputs(r));
-            }
-        }
 
-        // 9. Block visual state (vanilla-parity): "Processing" only while we actually powered a craft this
-        // tick, else "default". The Forge has NO held bench, so we swap the placed block's interaction state
+        // 8. Block visual state (vanilla-parity): "Processing" only while we actually crafted this tick,
+        // else "default". The Forge has NO held bench, so we swap the placed block's interaction state
         // directly via the BlockAccessor (mirroring NetworkTickSystem's cable-visual swaps), reading the
         // current state first so we issue a packet only on a real transition (no per-tick animation restart).
-        boolean processing = powered && o.pick() != null;
+        boolean processing = activeCraft;
         String desired = MachineVisualState.desired(powered, processing);
         applyVisualState(world, x, y, z, blockType, desired);
+    }
+
+    /**
+     * Clear {@code node}'s held container, then place each {@code pulled} stack into consecutive slots
+     * (the active craft's pulled ingredients). {@code filter=false}: the test-/asset-safe raw write the
+     * codebase already uses (mirrors {@code ForgeSourcePull}'s aggregate writes). Clamps defensively to the
+     * held capacity (27 slots; a recipe never exceeds it).
+     */
+    private static void loadHeld(@Nonnull ForgeCraftState node, @Nonnull List<ItemStack> pulled) {
+        SimpleItemContainer held = node.held();
+        clearHeld(node);
+        short cap = held.getCapacity();
+        int n = Math.min(pulled.size(), cap);
+        for (int i = 0; i < n; i++) {
+            ItemStack s = pulled.get(i);
+            if (s == null) {
+                continue;
+            }
+            held.setItemStackForSlot((short) i, s, false);
+        }
+    }
+
+    /** Empty every slot of {@code node}'s held container ({@code filter=false} raw write). */
+    private static void clearHeld(@Nonnull ForgeCraftState node) {
+        SimpleItemContainer held = node.held();
+        short cap = held.getCapacity();
+        for (short slot = 0; slot < cap; slot++) {
+            held.setItemStackForSlot(slot, ItemStack.EMPTY, false);
+        }
+    }
+
+    /**
+     * The WORLD coords of the cell the input pipe occupies (the pipe adjacent to the Forge's ITEM INPUT
+     * face), or {@code null} if it cannot be resolved (no input port, or the chunk isn't loaded).
+     *
+     * <p>The Forge's item-in port lives at model cell offset {@code (-1,0,0)}, face 1 (West); see
+     * {@code ForgePorts}. We resolve the placed block's yaw {@link Rotation} the same way
+     * {@code WorldMachineLookup.rotationAt} does ({@code accessor.getRotationIndex}), then project the port
+     * through {@link PortProjection#pipeCellForPort}: rotate the cell offset + face to world and step one
+     * cell along the rotated face to land on the pipe cell. For identity rotation that is
+     * {@code anchor + (-1,0,0)} (port cell) {@code + (-1,0,0)} (West face) = {@code anchor + (-2,0,0)}.
+     */
+    @Nullable
+    private int[] inputPipeCell(@Nonnull World world, int x, int y, int z, @Nonnull ForgeCraftState node) {
+        BlockAccessor accessor = world.getChunkIfLoaded(ChunkUtil.indexChunkFromBlock(x, z));
+        if (accessor == null) {
+            return null; // chunk not loaded: cannot resolve rotation
+        }
+        int idx = accessor.getRotationIndex(x, y, z);
+        Rotation[] vals = Rotation.values();
+        Rotation rotation = vals[((idx % vals.length) + vals.length) % vals.length];
+        Vector3i pipe = PortProjection.pipeCellForPort(
+            node.ports(), rotation, x, y, z, PortChannel.ITEM, PortDirection.INPUT);
+        if (pipe == null) {
+            return null; // no ITEM INPUT port configured
+        }
+        return new int[] {pipe.x(), pipe.y(), pipe.z()};
     }
 
     /**

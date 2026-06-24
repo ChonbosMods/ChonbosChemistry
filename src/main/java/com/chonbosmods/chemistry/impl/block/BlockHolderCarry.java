@@ -91,6 +91,40 @@ public final class BlockHolderCarry {
         return buffer != null && buffer.amount() > 0;
     }
 
+    /**
+     * A Forge carries when it has anything worth preserving: positive stored energy, OR any item in its
+     * held (active-craft ingredients pulled from real chests) or output container. This matters most for
+     * the held container: breaking a Forge mid-craft would otherwise DESTROY the real player items it
+     * pulled from the network for the in-flight craft (design doc: held + output carry on break). The
+     * active craft id + card ride along for free in the encoded holder.
+     */
+    public static boolean shouldCarry(@Nullable com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState forge) {
+        if (forge == null) {
+            return false;
+        }
+        EnergyHandler energy = forge.energy();
+        if (energy != null && energy.getStored() > 0L) {
+            return true;
+        }
+        return hasAnyItem(forge.held()) || hasAnyItem(forge.output());
+    }
+
+    /** Whether {@code container} holds at least one non-empty stack. Null container reads as empty. */
+    private static boolean hasAnyItem(
+            @Nullable com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer container) {
+        if (container == null) {
+            return false;
+        }
+        short cap = container.getCapacity();
+        for (short slot = 0; slot < cap; slot++) {
+            ItemStack s = container.getItemStack(slot);
+            if (s != null && !ItemStack.isEmpty(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // --- ItemStack glue (thin, verified in-game) ---
 
     /**

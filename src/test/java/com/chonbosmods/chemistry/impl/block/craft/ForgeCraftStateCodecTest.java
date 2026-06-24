@@ -37,21 +37,23 @@ class ForgeCraftStateCodecTest {
         s.setEnabled(false);
         // filter=false bypasses the asset-store-backed stack-size/filter checks (unloaded in tests);
         // it writes straight into the slot map, which is what the codec persists.
-        s.input().setItemStackForSlot((short) 0, stack("Ore_Iron", 3), false);
+        s.held().setItemStackForSlot((short) 0, stack("Ore_Iron", 3), false);
         s.setCard(stack("CC_RecipeCard", 1));
+        s.setCurrentRecipeId("Weapon_Sword_Iron");
         return s;
     }
 
     @Test
     void defaultsAreSane() {
         ForgeCraftState s = new ForgeCraftState();
-        assertNotNull(s.input());
-        assertEquals(9, s.input().getCapacity());
+        assertNotNull(s.held());
+        assertEquals(27, s.held().getCapacity());
         assertNotNull(s.output());
         assertEquals(4, s.output().getCapacity());
         assertNull(s.card());
         assertEquals(0f, s.progress(), 1e-6);
         assertNull(s.lastSelectedId());
+        assertNull(s.currentRecipeId());
         assertTrue(s.isEnabled());
     }
 
@@ -63,9 +65,10 @@ class ForgeCraftStateCodecTest {
 
         assertEquals(2.5f, decoded.progress(), 1e-6);
         assertEquals("Weapon_Sword_Iron", decoded.lastSelectedId());
+        assertEquals("Weapon_Sword_Iron", decoded.currentRecipeId());
         assertFalse(decoded.isEnabled());
 
-        ItemStack in = decoded.input().getItemStack((short) 0);
+        ItemStack in = decoded.held().getItemStack((short) 0);
         assertNotNull(in);
         assertEquals("Ore_Iron", in.getItemId());
         assertEquals(3, in.getQuantity());
@@ -81,10 +84,10 @@ class ForgeCraftStateCodecTest {
         ForgeCraftState copy = (ForgeCraftState) original.clone();
 
         assertEquals(2.5f, copy.progress(), 1e-6);
-        assertEquals("Ore_Iron", copy.input().getItemStack((short) 0).getItemId());
+        assertEquals("Ore_Iron", copy.held().getItemStack((short) 0).getItemId());
 
         original.setProgress(9.0f);
-        original.input().setItemStackForSlot((short) 1, stack("Ore_Copper", 5), false);
+        original.held().setItemStackForSlot((short) 1, stack("Ore_Copper", 5), false);
 
         assertEquals(2.5f, copy.progress(), 1e-6);
     }
@@ -99,6 +102,18 @@ class ForgeCraftStateCodecTest {
 
         ForgeCraftState decoded = ForgeCraftState.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
         assertNull(decoded.card());
+    }
+
+    @Test
+    void currentRecipeIdOptionalOmittedWhenNull() {
+        ForgeCraftState state = new ForgeCraftState();
+        assertNull(state.currentRecipeId());
+
+        BsonDocument encoded = ForgeCraftState.CODEC.encode(state, EmptyExtraInfo.EMPTY).asDocument();
+        assertFalse(encoded.containsKey("Current"));
+
+        ForgeCraftState decoded = ForgeCraftState.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
+        assertNull(decoded.currentRecipeId());
     }
 
     @Test

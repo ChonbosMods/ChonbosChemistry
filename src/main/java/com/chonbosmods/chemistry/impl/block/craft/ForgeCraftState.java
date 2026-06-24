@@ -22,16 +22,18 @@ import java.util.List;
  *
  * <h2>Fields</h2>
  * <ul>
- *   <li>{@code energy} — the power buffer (optional; a Forge with no power decodes to null), mirroring
+ *   <li>{@code energy}: the power buffer (optional; a Forge with no power decodes to null), mirroring
  *       {@code MachineBlockState}'s "Energy" key.</li>
- *   <li>{@code ports} — the per-face port configuration, mirroring {@code MachineBlockState}'s "Ports".</li>
- *   <li>{@code input} — the 9-slot ingredient container (enough for multi-ingredient recipes).</li>
- *   <li>{@code output} — the 4-slot result container.</li>
- *   <li>{@code card} — the inserted recipe card item (optional; null = no card), omitted on encode when
+ *   <li>{@code ports}: the per-face port configuration, mirroring {@code MachineBlockState}'s "Ports".</li>
+ *   <li>{@code held}: the ingredients pulled for the ACTIVE craft (empty when idle; generous size so a
+ *       future many-ingredient recipe fits, and the GUI scrolls it).</li>
+ *   <li>{@code output}: the 4-slot result container.</li>
+ *   <li>{@code currentRecipeId}: the recipe currently being crafted (null = idle = no active craft).</li>
+ *   <li>{@code card}: the inserted recipe card item (optional; null = no card), omitted on encode when
  *       null exactly like the "Energy" object-codec pattern.</li>
- *   <li>{@code progress} — accumulated craft seconds.</li>
- *   <li>{@code lastSelectedId} — the round-robin cursor over selectable recipes (optional String).</li>
- *   <li>{@code enabled} — the On/Off control line (default ON), mirroring {@code MachineBlockState}.</li>
+ *   <li>{@code progress}: accumulated craft seconds.</li>
+ *   <li>{@code lastSelectedId}: the round-robin cursor over selectable recipes (optional String).</li>
+ *   <li>{@code enabled}: the On/Off control line (default ON), mirroring {@code MachineBlockState}.</li>
  * </ul>
  *
  * <h2>clone()</h2>
@@ -40,8 +42,8 @@ import java.util.List;
  */
 public final class ForgeCraftState implements Component<ChunkStore> {
 
-    /** Ingredient slots: enough for multi-ingredient recipes. */
-    private static final short INPUT_SLOTS = 9;
+    /** Held slots: generous size so a future many-ingredient recipe fits (the GUI scrolls it). */
+    private static final short HELD_SLOTS = 27;
     /** Result slots. */
     private static final short OUTPUT_SLOTS = 4;
 
@@ -50,7 +52,7 @@ public final class ForgeCraftState implements Component<ChunkStore> {
         // null value is simply omitted on encode and decodes back to null. Mirrors MachineBlockState.
         .append(new KeyedCodec<>("Energy", EnergyBuffer.CODEC), (o, v) -> o.energy = v, o -> o.energy).add()
         .append(new KeyedCodec<>("Ports", PortConfig.CODEC), (o, v) -> o.ports = v, o -> o.ports).add()
-        .append(new KeyedCodec<>("Input", SimpleItemContainer.CODEC), (o, v) -> o.input = v, o -> o.input).add()
+        .append(new KeyedCodec<>("Held", SimpleItemContainer.CODEC), (o, v) -> o.held = v, o -> o.held).add()
         .append(new KeyedCodec<>("Output", SimpleItemContainer.CODEC), (o, v) -> o.output = v, o -> o.output).add()
         // The inserted recipe card: optional. ItemStack.CODEC is an object codec, so a null value is
         // omitted on encode and an absent key decodes back to null (same pattern as "Energy").
@@ -62,6 +64,10 @@ public final class ForgeCraftState implements Component<ChunkStore> {
         // setter as null rather than tripping a primitive non-null check.
         .append(new KeyedCodec<>("Cursor", Codec.STRING, false),
                 (o, v) -> o.lastSelectedId = v, o -> o.lastSelectedId).add()
+        // The recipe currently being crafted. OPTIONAL (3-arg, not-required): an idle Forge has no active
+        // craft, so the key is omitted and the field stays null. Same object-codec pattern as "Cursor".
+        .append(new KeyedCodec<>("Current", Codec.STRING, false),
+                (o, v) -> o.currentRecipeId = v, o -> o.currentRecipeId).add()
         // On/Off control line (default ON). OPTIONAL (3-arg, not-required): legacy/fresh data with no
         // "Enabled" key leaves the field its true default. Mirrors MachineBlockState verbatim.
         .append(new KeyedCodec<>("Enabled", Codec.BOOLEAN, false),
@@ -70,8 +76,10 @@ public final class ForgeCraftState implements Component<ChunkStore> {
 
     private EnergyBuffer energy;
     private PortConfig ports = PortConfig.of(List.of());
-    private SimpleItemContainer input = new SimpleItemContainer(INPUT_SLOTS);
+    private SimpleItemContainer held = new SimpleItemContainer(HELD_SLOTS);
     private SimpleItemContainer output = new SimpleItemContainer(OUTPUT_SLOTS);
+    /** The recipe currently being crafted, or null if idle (no active craft). See the "Current" key. */
+    private String currentRecipeId;
     /** The inserted recipe card, or null if no card is loaded. See the "Card" codec key. */
     private ItemStack card;
     /** Accumulated craft seconds. */
@@ -103,14 +111,25 @@ public final class ForgeCraftState implements Component<ChunkStore> {
 
     // --- container accessors (the Forge owns these directly) ---
 
-    /** @return the 9-slot ingredient container. */
-    public SimpleItemContainer input() {
-        return input;
+    /** @return the held ingredients pulled for the active craft (empty when idle). */
+    public SimpleItemContainer held() {
+        return held;
     }
 
     /** @return the 4-slot result container. */
     public SimpleItemContainer output() {
         return output;
+    }
+
+    // --- current craft ---
+
+    /** @return the recipe currently being crafted, or null if idle (no active craft). */
+    public String currentRecipeId() {
+        return currentRecipeId;
+    }
+
+    public void setCurrentRecipeId(String currentRecipeId) {
+        this.currentRecipeId = currentRecipeId;
     }
 
     // --- recipe card ---
@@ -151,7 +170,7 @@ public final class ForgeCraftState implements Component<ChunkStore> {
 
     /**
      * @return whether this Forge is ON (enabled). When OFF, the tick holds it: no crafting, but its
-     *     loaded input and buffered power are retained. Mirrors {@code MachineBlockState.isEnabled()}.
+     *     held ingredients and buffered power are retained. Mirrors {@code MachineBlockState.isEnabled()}.
      */
     public boolean isEnabled() {
         return enabled;
