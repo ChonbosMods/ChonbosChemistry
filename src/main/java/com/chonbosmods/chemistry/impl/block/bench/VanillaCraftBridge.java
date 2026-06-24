@@ -55,8 +55,11 @@ import java.util.List;
  *       partitioned to the exact amount) ALSO fails the check, not just {@code > 0} (not enough). The
  *       convenience {@code canRemoveMaterials(List)} passes {@code (true, true)}.</li>
  * </ul>
- * Both the present-check ({@link #inputsPresent}) and the consume ({@link #consumeInputs}) therefore use
- * {@code (true, true)} — the vanilla crafting defaults — so they agree on what "satisfiable" means.
+ * Both the present-check ({@link #inputsPresent}) and the consume ({@link #consumeInputs}) use
+ * {@code matchExactType=true} but {@code forbidOverRemoval=FALSE} — NOT vanilla crafting's {@code true}.
+ * Vanilla's {@code true} is the player-grid exact-fit guard (fail if the container holds MORE than exactly
+ * one recipe's worth); an autonomous, pipe-fed machine's buffer always carries surplus, so {@code false}
+ * ("enough or more") is the correct buffer semantics. The two agree on what "satisfiable" means.
  *
  * <h2>Atomicity</h2>
  * {@code removeMaterials(...)} delegates to {@code InternalContainerUtilMaterial.internal_removeMaterials},
@@ -101,10 +104,14 @@ public final class VanillaCraftBridge {
      * True iff every input material of {@code r} (at {@code tier}) can currently be sourced from
      * {@code input}, WITHOUT mutating it. Mirrors vanilla's pre-craft availability test.
      *
-     * <p>Uses {@code canRemoveMaterials(materials, true, true)} — the same {@code (matchExactType,
-     * forbidOverRemoval)} booleans vanilla crafting uses (see class javadoc) — so it agrees exactly
-     * with {@link #consumeInputs} on what counts as satisfiable. An empty material list (a recipe with
-     * no inputs) trivially returns {@code true}, matching vanilla.
+     * <p>Uses {@code canRemoveMaterials(materials, matchExactType=true, forbidOverRemoval=FALSE)}. We pass
+     * {@code forbidOverRemoval=false} (NOT vanilla crafting's {@code true}): vanilla's {@code true} is the
+     * player-GRID exact-fit guard — it FAILS when the container holds MORE than exactly one recipe's worth
+     * (the internal test returns {@code needed - available < 0}). An autonomous, pipe-fed machine's buffer
+     * always holds surplus (a stack of ingredients), so {@code true} would make every recipe permanently
+     * un-craftable. {@code false} accepts "enough or more" (still fails when there is not enough), which is
+     * the correct semantics for a buffer. Agrees with {@link #consumeInputs}. An empty material list (a
+     * recipe with no inputs) trivially returns {@code true}.
      */
     public static boolean inputsPresent(CraftingRecipe r, ItemContainer input, int tier) {
         // signature: CraftingManager.getInputMaterials(CraftingRecipe, int tier) (static)
@@ -112,7 +119,7 @@ public final class VanillaCraftBridge {
         List<MaterialQuantity> materials = CraftingManager.getInputMaterials(r, tier);
         // signature: ItemContainer.canRemoveMaterials(List<MaterialQuantity>, boolean matchExactType,
         //            boolean forbidOverRemoval) : boolean  [pure test, no mutation]
-        return input.canRemoveMaterials(materials, true, true);
+        return input.canRemoveMaterials(materials, true, false);
     }
 
     /**
@@ -130,8 +137,9 @@ public final class VanillaCraftBridge {
         //            boolean forbidOverRemoval, boolean sendUpdate)
         //            : ListTransaction<MaterialTransaction>   [atomic: no-op on failure]
         //            then ListTransaction.succeeded() : boolean.
-        //            Vanilla removeInputFromInventory passes (true, true, true).
-        return input.removeMaterials(materials, true, true, true).succeeded();
+        // forbidOverRemoval=FALSE (see inputsPresent): consume ONE recipe set, leaving the buffer surplus.
+        // Vanilla's player path uses true (exact-fit grid); an autonomous machine removes from a stack.
+        return input.removeMaterials(materials, true, false, true).succeeded();
     }
 
     /**
