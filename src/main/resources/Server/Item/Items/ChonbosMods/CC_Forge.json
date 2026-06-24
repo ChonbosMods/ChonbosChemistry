@@ -1,0 +1,107 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CC_Forge.name"
+  },
+  "Categories": [
+    "Furniture.Benches"
+  ],
+  "PlayerAnimationsId": "Block",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Model",
+    "Opacity": "Transparent",
+    "CustomModel": "Blocks/ChonbosMods/Machines/CC_Forge.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/ChonbosMods/Machines/CC_Forge_Texture_Off.png",
+        "Weight": 1
+      }
+    ],
+    "VariantRotation": "NESW",
+    "HitboxType": "CC_Forge",
+    "Flags": {
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "CC_ForgePanel"
+            }
+          }
+        ]
+      }
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "Benches"
+      }
+    },
+    "Support": {
+      "Down": [
+        {
+          "FaceType": "Full"
+        }
+      ]
+    },
+    "BlockParticleSetId": "Stone",
+    "ParticleColor": "#5C583E",
+    "BlockSoundSetId": "Stone",
+    "PhysicalMaterialId": "Stone",
+    "TextureComputedColor": "#29281F",
+    "BlockEntity": {
+      "Components": {
+        "ForgeCraftState": {
+          "Energy": {
+            "Stored": 0,
+            "Capacity": 40000
+          },
+          "Ports": {
+            "Ports": [
+              { "Face": 0, "Channel": "item", "Direction": "output", "CellX": 0, "CellY": 0, "CellZ": 0 },
+              { "Face": 1, "Channel": "item", "Direction": "input", "CellX": 0, "CellY": 0, "CellZ": 0 },
+              { "Face": 5, "Channel": "power", "Direction": "input", "CellX": 0, "CellY": 0, "CellZ": 0 }
+            ]
+          }
+        }
+      }
+    },
+    "State": {
+      "Definitions": {
+        "Processing": {
+          "Looping": true,
+          "Light": {
+            "Color": "#F73"
+          },
+          "CustomModelTexture": [
+            {
+              "Texture": "Blocks/ChonbosMods/Machines/CC_Forge_Texture.png",
+              "Weight": 1
+            }
+          ]
+        },
+        "ProcessCompleted": {
+          "Looping": true,
+          "Light": {
+            "Color": "#F73"
+          },
+          "CustomModelTexture": [
+            {
+              "Texture": "Blocks/ChonbosMods/Machines/CC_Forge_Texture.png",
+              "Weight": 1
+            }
+          ]
+        }
+      }
+    },
+    "ConnectedBlockRuleSet": {
+      "Type": "CustomTemplate",
+      "TemplateShapeAssetId": "CC_ForgeTemplate",
+      "TemplateShapeBlockPatterns": {
+        "machine": "CC_Forge"
+      }
+    }
+  }
+}

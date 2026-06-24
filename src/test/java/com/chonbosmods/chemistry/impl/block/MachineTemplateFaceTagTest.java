@@ -71,9 +71,15 @@ class MachineTemplateFaceTagTest {
     }
 
     private void assertTemplateTagsMatchPorts(String machine) throws Exception {
+        // Bench machines (Smelter/Reclaimer) seed ports under "MachineBlockState"; the Forge is an
+        // autonomous crafter and seeds them under "ForgeCraftState" instead.
+        assertTemplateTagsMatchPorts(machine, "MachineBlockState");
+    }
+
+    private void assertTemplateTagsMatchPorts(String machine, String componentKey) throws Exception {
         BsonDocument ports = BsonDocument.parse(resource("/Server/Item/Items/ChonbosMods/" + machine + ".json"))
             .getDocument("BlockType").getDocument("BlockEntity").getDocument("Components")
-            .getDocument("MachineBlockState").getDocument("Ports");
+            .getDocument(componentKey).getDocument("Ports");
         PortConfig config = PortConfig.CODEC.decode(ports, EmptyExtraInfo.EMPTY);
 
         BsonDocument template = BsonDocument.parse(
@@ -98,5 +104,12 @@ class MachineTemplateFaceTagTest {
     @Test
     void reclaimerTemplateTagsMatchPorts() throws Exception {
         assertTemplateTagsMatchPorts("CC_Reclaimer");
+    }
+
+    @Test
+    void forgeTemplateTagsMatchPorts() throws Exception {
+        // The Forge seeds its ports under the ForgeCraftState component (no vanilla bench), so the
+        // helper must read that path instead of MachineBlockState.
+        assertTemplateTagsMatchPorts("CC_Forge", "ForgeCraftState");
     }
 }
