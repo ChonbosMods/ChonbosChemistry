@@ -17,7 +17,10 @@ $M = "../CC_Master.ui";
 @PanelDividerColor = $M.@PanelDividerColor;
 @ValueText = $M.@ValueText;
 @LabelText = $M.@LabelText;
-@ProcessColumnWidth = $M.@ProcessColumnWidth;
+// Forge override: wider than the shared bench column. The Forge's 3x3 input grid (204px) + 2x2 output
+// (140px) would crush the center to ~6px on the shared 404 width; 530 restores a ~130px progress bar
+// (the same size as the Smelter's center bar).
+@ProcessColumnWidth = 530;
 @StatusColumnWidth = $M.@StatusColumnWidth;
 @PanelGap = $M.@PanelGap;
 @ContentPad = $M.@ContentPad;
@@ -30,7 +33,7 @@ $M = "../CC_Master.ui";
 
 $C.@PageOverlay {
   $C.@DecoratedContainer {
-    Anchor: (Width: 800, Height: 460);
+    Anchor: (Width: 920, Height: 460);
 
     // Title set from Java (#PanelTitle.TextSpans). Vanilla title style.
     #Title {

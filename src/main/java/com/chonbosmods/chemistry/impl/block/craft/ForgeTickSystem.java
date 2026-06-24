@@ -338,6 +338,9 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
             Map<String, CraftingRecipe> map = new LinkedHashMap<>(byId);
             List<String> order = List.copyOf(byId.keySet());
             POOL = new RecipePool(order, map);
+            // Diagnostic (logged once): if this is 0, the bench ids did not resolve to recipes and the Forge
+            // can never craft. Expected ~100 across Weapon_Bench / Armor_Bench / ArmorBench / Armory.
+            FORGE_DRIVE_LOG.atInfo().log("Forge recipe pool built: " + order.size() + " recipes.");
             return POOL;
         }
     }
