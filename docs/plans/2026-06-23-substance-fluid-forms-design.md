@@ -1,7 +1,7 @@
 # Substance Fluid Forms: Design
 
 Date: 2026-06-23
-Status: Design accepted (this doc). Plan + implementation not yet written.
+Status: Implemented on `feature/cc-fluids-mugtastic-party` (plan: `2026-06-23-substance-fluid-forms-plan.md`). All generator code + assets build clean and unit-tested; 66 world fluids + 198 container filled-states generate. REMAINING: in-game / headless server-load verification (Phase 7.2-7.3) and coolant tags (§8, deferred until the power-milestone supplies heat data).
 Branch context: authored off `feature/cc-reclaimer` work; fluids are a standalone feature.
 
 ---
