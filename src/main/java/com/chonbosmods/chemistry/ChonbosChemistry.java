@@ -121,9 +121,6 @@ public class ChonbosChemistry extends JavaPlugin {
         // (No longer pushes resources to neighbors: the NetworkTickSystem below does that over pipes.)
         getChunkStoreRegistry().registerSystem(new MachineTickSystem(machineComponentType));
         getLogger().atInfo().log("Registered MachineTickSystem (creative-refill then work).");
-        // Autonomous-craft driver for the Forge (no held bench; own containers + even round-robin selection).
-        getChunkStoreRegistry().registerSystem(new ForgeTickSystem(forgeComponentType));
-        getLogger().atInfo().log("Registered ForgeTickSystem (autonomous crafting).");
 
         // Transport network cache (per-world) + the events that invalidate it on pipe topology changes
         // (H3). Place/break fire on the EntityStore (the acting entity); chunk-unload fires on the
@@ -134,16 +131,22 @@ public class ChonbosChemistry extends JavaPlugin {
         getChunkStoreRegistry().registerSystem(new NetworkTickSystem(
             pipeComponentType, machineComponentType, tankComponentType, forgeComponentType, networkService));
         getLogger().atInfo().log("Registered NetworkTickSystem (per-tick pipe-network distribution).");
+        // Demand-driven craft driver for the Forge (no held bench; own containers + even round-robin
+        // selection). Registered AFTER networkService: it pulls each craft's ingredients from the ITEM
+        // pipe network on its input face (idle -> pull -> craft -> complete -> repeat).
+        getChunkStoreRegistry().registerSystem(
+            new ForgeTickSystem(forgeComponentType, pipeComponentType, networkService));
+        getLogger().atInfo().log("Registered ForgeTickSystem (autonomous crafting).");
         getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService, pipeComponentType));
         getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService, pipeComponentType));
 
         // Contents-preservation (H7, rebuilt 2026-06-05 on the engine's native BlockHolder path): a
-        // machine or tank broken with contents drops an item carrying the FULL encoded block entity
-        // under "BlockHolder" (CarryBreakEventSystem). Placement needs no mod code: the engine's
+        // machine, tank, or Forge broken with contents drops an item carrying the FULL encoded block
+        // entity under "BlockHolder" (CarryBreakEventSystem). Placement needs no mod code: the engine's
         // BlockPlaceUtils.onPlaceBlockSuccess natively restores every component. Pure stamping/predicate
         // logic lives in BlockHolderCarry (unit-tested); the system is thin glue verified in-game.
         getEntityStoreRegistry().registerSystem(new CarryBreakEventSystem(
-            machineComponentType, tankComponentType, pipeComponentType, networkService));
+            machineComponentType, tankComponentType, forgeComponentType, pipeComponentType, networkService));
         getLogger().atInfo().log("Registered CarryBreakEventSystem (BlockHolder contents carry).");
         // NOTE: NO ChunkUnloadEvent handler. In Server 0.5.3 the engine's ChunkUnloadingSystem dispatches
         // ChunkUnloadEvent from PARALLEL worker threads (forEachEntityParallel), and delivering it to an
