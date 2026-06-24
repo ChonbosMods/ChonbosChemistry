@@ -2,24 +2,20 @@ package com.chonbosmods.chemistry.impl.block.craft;
 
 import com.chonbosmods.chemistry.api.energy.EnergyHandler;
 import com.chonbosmods.chemistry.impl.block.EnergyBuffer;
+import com.chonbosmods.chemistry.impl.block.MachineDriveContext;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
 import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.protocol.BenchType;
-import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.asset.type.item.config.CraftingRecipe;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
-import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
-import com.hypixel.hytale.server.core.universe.world.chunk.section.BlockSection;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.List;
 import java.util.Set;
@@ -142,65 +138,20 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
             return;
         }
 
-        // Resolve the live drive context off the same block-entity ref + sibling components. Mirrors
-        // MachineTickSystem.driveBench; guard every step.
-        Ref<ChunkStore> blockRef = archetypeChunk.getReferenceTo(index);
-        if (blockRef == null || !blockRef.isValid()) {
-            return;
-        }
-        BlockModule.BlockStateInfo stateInfo = archetypeChunk.getComponent(index, blockInfoType);
-        if (stateInfo == null) {
-            return;
-        }
-        Ref<ChunkStore> chunkRef = stateInfo.getChunkRef();
-        if (chunkRef == null || !chunkRef.isValid()) {
-            return;
-        }
-        BlockChunk blockChunk = chunkRef.getStore().getComponent(chunkRef, blockChunkType);
-        if (blockChunk == null) {
-            return;
-        }
-        int blockIndex = stateInfo.getIndex();
-        int localX = ChunkUtil.xFromBlockInColumn(blockIndex);
-        int localY = ChunkUtil.yFromBlockInColumn(blockIndex);
-        int localZ = ChunkUtil.zFromBlockInColumn(blockIndex);
-        int x = (blockChunk.getX() << 5) | localX;
-        int y = localY;
-        int z = (blockChunk.getZ() << 5) | localZ;
-
-        ChunkStore external = store.getExternalData();
-        if (external == null) {
-            return;
-        }
-        World world = external.getWorld();
-        if (world == null) {
-            return;
-        }
-        BlockType blockType = resolveBlockType(blockChunk, localX, localY, localZ);
-        if (blockType == null) {
+        // Resolve the live drive context off the same block-entity ref + sibling components. The shared
+        // prologue (MachineDriveContext) guards every step and returns null on the first missing piece.
+        MachineDriveContext.Resolved ctx =
+            MachineDriveContext.resolve(index, archetypeChunk, store, blockInfoType, blockChunkType);
+        if (ctx == null) {
             return;
         }
 
         // Hand the resolved context to the shared craft engine: it owns the full pull/craft/complete loop +
         // the block visual swap, configured by FORGE_SPEC. The engine never throws (the tick's catch is the
         // backstop).
-        AutoCraftEngine.Context ctx = new AutoCraftEngine.Context(
-            world, store, x, y, z, blockType, dt, energy, networkService, pipeType);
-        AutoCraftEngine.drive(node, ctx, FORGE_SPEC);
-    }
-
-    /**
-     * The {@link BlockType} at the Forge, resolved like {@code MachineTickSystem.resolveBlockType} (section
-     * block id at the local coords -> asset map). Null if the section or id can't be resolved.
-     */
-    @Nullable
-    private BlockType resolveBlockType(@Nonnull BlockChunk blockChunk, int localX, int localY, int localZ) {
-        BlockSection section = blockChunk.getSectionAtBlockY(localY);
-        if (section == null) {
-            return null;
-        }
-        int blockId = section.get(localX, localY, localZ);
-        return BlockType.getAssetMap().getAsset(blockId);
+        AutoCraftEngine.Context engineCtx = new AutoCraftEngine.Context(
+            ctx.world(), store, ctx.x(), ctx.y(), ctx.z(), ctx.blockType(), dt, energy, networkService, pipeType);
+        AutoCraftEngine.drive(node, engineCtx, FORGE_SPEC);
     }
 
     // --- the Forge's engine configuration (the machine-specific Spec) ---
