@@ -39,6 +39,11 @@ class FluidAssetsJsonTest {
             FluidAssets.texturePath("Fluid_Compound_Sulfuric_Acid"),
             RED, null, List.of(FluidHazard.CORROSIVE), FluidPhysics.waterLike());
         assertTrue(json.contains("\"MaxFluidLevel\": 1"), json);
+        // The vanilla animated translucent surface shader (reused from Water_Source.json); without it
+        // the generated fluid surface is flat/static rather than the rippling translucent water look.
+        assertTrue(json.contains("\"Effect\""), json);
+        assertTrue(json.contains("\"Water\""), json);
+        assertTrue(json.contains("\"Opacity\": \"Transparent\""), json);
         assertTrue(json.contains(RED.toHex()), json);            // ParticleColor
         assertTrue(json.contains("CC_Effect_Corrosion"), json);  // contact hazard
         // FluidFXId links the source block to its FluidFX asset (keyed by the bare blockId):

@@ -57,6 +57,18 @@ class SubstanceLiquidTinterTest {
     }
 
     @Test
+    void translucentLiquidStaysTranslucentAfterTint() {
+        // The vanilla-derived fluid master is translucent (alpha 224); tinting must preserve that
+        // exact alpha so the generated world-fluid surface keeps the translucent water look.
+        BufferedImage master = solid(2, 2, (224 << 24) | 0xFFFFFF); // grayscale, alpha 224
+        LiquidMask mask = new LiquidMask(0, 0, 2, 2);
+
+        BufferedImage out = SubstanceLiquidTinter.tint(master, mask, new Color(200, 30, 20));
+
+        assertEquals(224, (out.getRGB(0, 0) >>> 24) & 0xFF);
+    }
+
+    @Test
     void doesNotMutateMaster() {
         BufferedImage master = solid(2, 2, 0xFFFFFFFF);
         LiquidMask mask = new LiquidMask(0, 0, 2, 2);
