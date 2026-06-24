@@ -73,3 +73,13 @@ src/main/resources/Common/Icons/ItemsGenerated/Chem_Fluid_*.png
 src/main/resources/Server/Item/Block/Fluids/
 src/main/resources/Server/Item/Block/FluidFX/
 src/main/resources/Server/Item/Items/Fluid/
+
+# Generated container overrides (produced by generateFluidContainers): overridden vanilla item JSONs,
+# the shared mug/tankard fill file, and the per-substance tinted liquid textures.
+src/main/resources/Server/Item/Items/Deco/Deco_Mug.json
+src/main/resources/Server/Item/Items/Deco/Deco_Tankard.json
+src/main/resources/Server/Item/Items/Container/Container_Bucket.json
+src/main/resources/Server/Item/Interactions/Consumables/Mug_Fill.json
+src/main/resources/Common/Blocks/Miscellaneous/Mug_Texture_Fluid_*.png
+src/main/resources/Common/Blocks/Miscellaneous/Tankard_Texture_Fluid_*.png
+src/main/resources/Common/Blocks/Decorative_Sets/Village/Bucket_Texture_Fluid_*.png

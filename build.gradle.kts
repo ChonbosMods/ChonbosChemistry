@@ -78,3 +78,19 @@ tasks.register<JavaExec>("generateWorldFluids") {
         project.file("assets-src/icon_liquid_mask.png").absolutePath,
     )
 }
+
+// Override the three water-capable containers (Deco_Mug, Deco_Tankard, Container_Bucket) with a
+// per-substance Filled state + tinted liquid texture for every fluid, and wire the fill mappings
+// (bucket inline RefillContainer; mug/tankard via the shared Mug_Fill override). Preserves vanilla
+// Filled_* states. Run before devServer/build:
+//   ./gradlew generateFluidContainers
+tasks.register<JavaExec>("generateFluidContainers") {
+    group = "chemistry"
+    description = "Override water-capable containers with per-substance Filled states + tinted liquid textures."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.chonbosmods.chemistry.impl.assetgen.FluidContainerGenerator")
+    args(
+        project.file("assets-src/containers").absolutePath,
+        project.file("src/main/resources").absolutePath,
+    )
+}

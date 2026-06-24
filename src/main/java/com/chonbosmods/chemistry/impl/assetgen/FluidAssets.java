@@ -187,9 +187,11 @@ public final class FluidAssets {
      * @param container     the container config (model, animation, tinted-texture path, brokenItem)
      * @param blockId       the fluid block id (the {@code Filled_<blockId>} variant + texture suffix)
      * @param drinkHazards  hazards applied on drink (empty = benign, no effect)
+     * @param iconPath      per-substance inventory icon (the world-fluid {@code Chem_<blockId>} icon)
      */
     public static String filledStateJson(FluidContainers.FluidContainer container,
-                                         String blockId, List<FluidHazard> drinkHazards) {
+                                         String blockId, List<FluidHazard> drinkHazards,
+                                         String iconPath) {
         String animation = container.animation() == null
             ? ""
             : "\n        \"CustomModelAnimation\": \"%s\",".formatted(container.animation());
@@ -201,6 +203,7 @@ public final class FluidAssets {
             "Filled_%s": {
               "Variant": true,
               "TranslationProperties": { "Name": "%s" },
+              "Icon": "%s",
               "Recipe": null,
               "Consumable": true,
               "MaxDurability": 1,
@@ -212,7 +215,7 @@ public final class FluidAssets {
                 "CustomModel": "%s",%s
                 "CustomModelTexture": [
                   { "Weight": 1, "Texture": "%s" }
-                ]
+                ]%s
               },
               "Interactions": {
                 "Secondary": "Root_Secondary_Consume_Drink"
@@ -236,9 +239,10 @@ public final class FluidAssets {
                     { "Type": "ModifyInventory", "AdjustHeldItemDurability": -1, "BrokenItem": "%s" }
                   ]
                 }
-              }
-            }""".formatted(blockId, nameKey, container.model(), animation,
-                container.tintedTexturePath(blockId), effects, container.brokenItem());
+              }%s
+            }""".formatted(blockId, nameKey, iconPath, container.model(), animation,
+                container.tintedTexturePath(blockId), container.filledBlockTypeExtras(),
+                effects, container.brokenItem(), container.filledStateExtras());
     }
 
     /** Render a double as a JSON-valid numeric literal (e.g. {@code 1.0}, {@code -1.35}). */
