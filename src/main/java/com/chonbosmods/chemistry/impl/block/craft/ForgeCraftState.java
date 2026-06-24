@@ -40,7 +40,7 @@ import java.util.List;
  * Deep copy is performed by a codec round-trip (encode then decode), exactly like
  * {@code MachineBlockState}, so each placed Forge receives fully independent containers + buffers.
  */
-public final class ForgeCraftState implements Component<ChunkStore> {
+public final class ForgeCraftState implements Component<ChunkStore>, AutoCraftNode {
 
     /** Held slots: generous size so a future many-ingredient recipe fits (the GUI scrolls it). */
     private static final short HELD_SLOTS = 27;
@@ -102,10 +102,12 @@ public final class ForgeCraftState implements Component<ChunkStore> {
     // --- energy/ports accessors (mirror MachineBlockState) ---
 
     /** @return the energy handler, or null if this Forge carries no power. */
+    @Override
     public EnergyHandler energy() {
         return energy;
     }
 
+    @Override
     public PortConfig ports() {
         return ports;
     }
@@ -118,11 +120,13 @@ public final class ForgeCraftState implements Component<ChunkStore> {
     // --- container accessors (the Forge owns these directly) ---
 
     /** @return the held ingredients pulled for the active craft (empty when idle). */
+    @Override
     public SimpleItemContainer held() {
         return held;
     }
 
     /** @return the 4-slot result container. */
+    @Override
     public SimpleItemContainer output() {
         return output;
     }
@@ -130,10 +134,12 @@ public final class ForgeCraftState implements Component<ChunkStore> {
     // --- current craft ---
 
     /** @return the recipe currently being crafted, or null if idle (no active craft). */
+    @Override
     public String currentRecipeId() {
         return currentRecipeId;
     }
 
+    @Override
     public void setCurrentRecipeId(String currentRecipeId) {
         this.currentRecipeId = currentRecipeId;
     }
@@ -141,6 +147,7 @@ public final class ForgeCraftState implements Component<ChunkStore> {
     // --- recipe card ---
 
     /** @return the inserted recipe card item, or null if no card is loaded. */
+    @Override
     public ItemStack card() {
         return card;
     }
@@ -153,10 +160,12 @@ public final class ForgeCraftState implements Component<ChunkStore> {
     // --- craft progress ---
 
     /** @return accumulated craft seconds. */
+    @Override
     public float progress() {
         return progress;
     }
 
+    @Override
     public void setProgress(float progress) {
         this.progress = progress;
     }
@@ -164,10 +173,12 @@ public final class ForgeCraftState implements Component<ChunkStore> {
     // --- post-craft visual pause (transient; not persisted) ---
 
     /** @return ticks remaining to idle after a completed craft before sourcing the next recipe. */
+    @Override
     public int craftDelay() {
         return craftDelay;
     }
 
+    @Override
     public void setCraftDelay(int craftDelay) {
         this.craftDelay = Math.max(0, craftDelay);
     }
@@ -175,10 +186,12 @@ public final class ForgeCraftState implements Component<ChunkStore> {
     // --- round-robin cursor ---
 
     /** @return the last selected recipe id (round-robin cursor), or null until first selection. */
+    @Override
     public String lastSelectedId() {
         return lastSelectedId;
     }
 
+    @Override
     public void setLastSelectedId(String lastSelectedId) {
         this.lastSelectedId = lastSelectedId;
     }
@@ -189,6 +202,7 @@ public final class ForgeCraftState implements Component<ChunkStore> {
      * @return whether this Forge is ON (enabled). When OFF, the tick holds it: no crafting, but its
      *     held ingredients and buffered power are retained. Mirrors {@code MachineBlockState.isEnabled()}.
      */
+    @Override
     public boolean isEnabled() {
         return enabled;
     }
