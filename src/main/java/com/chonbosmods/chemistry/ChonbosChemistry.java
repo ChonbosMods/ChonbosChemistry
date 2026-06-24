@@ -2,6 +2,7 @@ package com.chonbosmods.chemistry;
 
 import com.chonbosmods.chemistry.api.registry.Chemistry;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
+import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.CarryBreakEventSystem;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
@@ -47,6 +48,7 @@ public class ChonbosChemistry extends JavaPlugin {
     private static ChonbosChemistry instance;
 
     private ComponentType<ChunkStore, MachineBlockState> machineComponentType;
+    private ComponentType<ChunkStore, ForgeCraftState> forgeComponentType;
     private ComponentType<ChunkStore, TankBlockState> tankComponentType;
     private ComponentType<ChunkStore, PipeNode> pipeComponentType;
 
@@ -68,6 +70,11 @@ public class ChonbosChemistry extends JavaPlugin {
     /** The {@link ChunkStore} component type backing machine blocks (used by the ticking system + GUI). */
     public ComponentType<ChunkStore, MachineBlockState> machineComponentType() {
         return machineComponentType;
+    }
+
+    /** The {@link ChunkStore} component type backing Forge blocks (the autonomous crafter's own state). */
+    public ComponentType<ChunkStore, ForgeCraftState> forgeComponentType() {
+        return forgeComponentType;
     }
 
     /** The {@link ChunkStore} component type backing tank blocks (used by the ticking system + GUI). */
@@ -100,11 +107,13 @@ public class ChonbosChemistry extends JavaPlugin {
 
         machineComponentType = getChunkStoreRegistry()
             .registerComponent(MachineBlockState.class, "MachineBlockState", MachineBlockState.CODEC);
+        forgeComponentType = getChunkStoreRegistry()
+            .registerComponent(ForgeCraftState.class, "ForgeCraftState", ForgeCraftState.CODEC);
         tankComponentType = getChunkStoreRegistry()
             .registerComponent(TankBlockState.class, "TankBlockState", TankBlockState.CODEC);
         pipeComponentType = getChunkStoreRegistry()
             .registerComponent(PipeNode.class, "PipeNode", PipeNode.CODEC);
-        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, TankBlockState, PipeNode.");
+        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, ForgeCraftState, TankBlockState, PipeNode.");
 
         // Per-tick driver: creative-refill then work pass. Must be registered AFTER the components above.
         // (No longer pushes resources to neighbors: the NetworkTickSystem below does that over pipes.)
