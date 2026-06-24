@@ -30,22 +30,54 @@ class FluidContainersTest {
         var acid = new FluidForm(reg.compound("H2SO4").orElseThrow(), false);
         var mug = FluidContainers.ALL.stream().filter(c -> c.id().equals("Deco_Mug")).findFirst().orElseThrow();
         String blockId = FluidAssets.blockId(acid.isElement(), acid.liquefied(), acid.substance().name());
-        String json = FluidAssets.filledStateJson(mug, blockId, List.of(FluidHazard.CORROSIVE), icon(blockId));
+        String json = FluidAssets.filledStateJson(mug, blockId, List.of(FluidHazard.CORROSIVE), icon(mug, blockId));
         assertTrue(json.contains("Filled_" + blockId), json);                 // state key
         assertTrue(json.contains("CC_Effect_Corrosion"), json);               // drink hazard
         assertTrue(json.contains("Root_Secondary_Consume_Drink"), json);      // drink routing
         assertTrue(json.contains("Mug_Texture_" + blockId), json);            // tinted texture ref
         assertTrue(json.contains("\"BrokenItem\": \"Deco_Mug\""), json);      // empty return
         // per-substance icon + carried vanilla render fields (faithful to vanilla filled state)
-        assertTrue(json.contains("\"Icon\": \"" + icon(blockId) + "\""), json);
+        assertTrue(json.contains("\"Icon\": \"" + icon(mug, blockId) + "\""), json);
         assertTrue(json.contains("\"CustomModelScale\": 0.6"), json);         // mug vanilla render field
         assertTrue(json.contains("\"HitboxType\": \"Food_Medium\""), json);   // mug vanilla render field
         assertTrue(json.contains("\"IconProperties\""), json);                // state-level extras
+        // BUG 2: emits both Name + Description translation keys
+        assertTrue(json.contains("\"Name\": \"server.items.Deco_Mug_" + blockId + ".name\""), json);
+        assertTrue(json.contains("\"Description\": \"server.items.Deco_Mug_" + blockId + ".description\""), json);
     }
 
-    /** The per-substance world-fluid icon path the generator passes for a filled state. */
-    private static String icon(String blockId) {
-        return "Icons/ItemsGenerated/Chem_" + blockId + ".png";
+    @Test
+    void bucketFilledStatePoursAndDoesNotDrink() {
+        var bucket = FluidContainers.ALL.stream().filter(c -> c.id().equals("Container_Bucket")).findFirst().orElseThrow();
+        assertTrue(bucket.pours(), "bucket must be POUR mode");
+        String blockId = FluidAssets.blockId(false, false, "Water");
+        String json = FluidAssets.filledStateJson(bucket, blockId, List.of(FluidHazard.CORROSIVE), icon(bucket, blockId));
+        // BUG 1: bucket pours (PlaceFluid -> <blockId>_Source) and does NOT drink.
+        assertTrue(json.contains("\"Type\": \"PlaceFluid\""), json);
+        assertTrue(json.contains("\"FluidToPlace\": \"" + blockId + "_Source\""), json);
+        assertTrue(!json.contains("Root_Secondary_Consume_Drink"), json);   // no drink routing
+        assertTrue(!json.contains("InteractionVars"), json);                // no drink vars
+        assertTrue(!json.contains("CC_Effect_"), json);                     // hazard carried by fluid, not drink
+        // still empties to the broken item on pour (durability -1)
+        assertTrue(json.contains("\"BrokenItem\": \"Container_Bucket\""), json);
+        assertTrue(json.contains("\"AdjustHeldItemDurability\": -1"), json);
+    }
+
+    @Test
+    void mugAndTankardDrinkNotPour() {
+        for (String id : List.of("Deco_Mug", "Deco_Tankard")) {
+            var c = FluidContainers.ALL.stream().filter(x -> x.id().equals(id)).findFirst().orElseThrow();
+            assertTrue(!c.pours(), id + " must be DRINK mode");
+            String blockId = FluidAssets.blockId(false, false, "Water");
+            String json = FluidAssets.filledStateJson(c, blockId, List.of(), icon(c, blockId));
+            assertTrue(json.contains("Root_Secondary_Consume_Drink"), id + ": " + json);
+            assertTrue(!json.contains("\"Type\": \"PlaceFluid\""), id + ": " + json);
+        }
+    }
+
+    /** The per-substance tinted CONTAINER icon path the generator passes for a filled state (BUG 4). */
+    private static String icon(FluidContainers.FluidContainer c, String blockId) {
+        return c.iconPath(blockId);
     }
 
     @Test
@@ -54,7 +86,7 @@ class FluidContainersTest {
         var water = new FluidForm(reg.compound("H2O").orElseThrow(), false);
         var mug = FluidContainers.ALL.stream().filter(c -> c.id().equals("Deco_Mug")).findFirst().orElseThrow();
         String blockId = FluidAssets.blockId(water.isElement(), water.liquefied(), water.substance().name());
-        String json = FluidAssets.filledStateJson(mug, blockId, List.of(), icon(blockId));
+        String json = FluidAssets.filledStateJson(mug, blockId, List.of(), icon(mug, blockId));
         assertTrue(!json.contains("CC_Effect_"), json);       // no hazard effect
         // still drinkable + empties: routes to consume-drink and returns the empty item
         assertTrue(json.contains("Root_Secondary_Consume_Drink"), json);
@@ -66,15 +98,15 @@ class FluidContainersTest {
         String blockId = FluidAssets.blockId(false, false, "Water");
         var mug = FluidContainers.ALL.stream().filter(c -> c.id().equals("Deco_Mug")).findFirst().orElseThrow();
         var tank = FluidContainers.ALL.stream().filter(c -> c.id().equals("Deco_Tankard")).findFirst().orElseThrow();
-        assertTrue(FluidAssets.filledStateJson(mug, blockId, List.of(), icon(blockId)).contains("CustomModelAnimation"));
-        assertTrue(!FluidAssets.filledStateJson(tank, blockId, List.of(), icon(blockId)).contains("CustomModelAnimation"));
+        assertTrue(FluidAssets.filledStateJson(mug, blockId, List.of(), icon(mug, blockId)).contains("CustomModelAnimation"));
+        assertTrue(!FluidAssets.filledStateJson(tank, blockId, List.of(), icon(tank, blockId)).contains("CustomModelAnimation"));
     }
 
     @Test
     void filledStateIsValidJsonWhenWrapped() throws Exception {
         var bucket = FluidContainers.ALL.stream().filter(c -> c.id().equals("Container_Bucket")).findFirst().orElseThrow();
         String blockId = FluidAssets.blockId(false, false, "Sulfuric acid");
-        String state = FluidAssets.filledStateJson(bucket, blockId, List.of(FluidHazard.CORROSIVE), icon(blockId));
+        String state = FluidAssets.filledStateJson(bucket, blockId, List.of(FluidHazard.CORROSIVE), icon(bucket, blockId));
         // filledStateJson returns a single "Filled_X": { ... } member; wrap as an object and parse
         com.hypixel.hytale.codec.util.RawJsonReader.readBsonDocument(
             com.hypixel.hytale.codec.util.RawJsonReader.fromJsonString("{" + state + "}"));

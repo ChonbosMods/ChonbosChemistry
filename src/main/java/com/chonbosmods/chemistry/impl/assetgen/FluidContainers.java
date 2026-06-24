@@ -18,13 +18,34 @@ public final class FluidContainers {
     private FluidContainers() {}
 
     /**
+     * How a filled container's Secondary interaction behaves (BUG 1):
+     * <ul>
+     *   <li>{@link #DRINK}: route to {@code Root_Secondary_Consume_Drink} + emit the
+     *       {@code InteractionVars} (Effect / ConsumeSFX / ConsumedSFX / DurabilityModify). The
+     *       container is consumed/placeable as a deco block exactly like vanilla mug/tankard.</li>
+     *   <li>{@link #POUR}: route to a {@code PlaceFluid} that spills the held fluid into the world
+     *       (modeled on the vanilla bucket {@code Filled_Water.Secondary}), then ModifyInventory
+     *       (durability -1, BrokenItem = empty container). NO drink {@code InteractionVars} : the
+     *       poured fluid block carries the contact hazard, not the drink.</li>
+     * </ul>
+     */
+    public enum FillMode { DRINK, POUR }
+
+    /**
      * One container's config.
      *
      * @param id              item id (e.g. {@code "Deco_Mug"})
      * @param model           filled-state model path under the asset pack {@code Common/}
      * @param animation       filled-state {@code CustomModelAnimation} (nullable: mug only)
+     * @param fillMode        how the filled state's Secondary behaves : {@link FillMode#DRINK} (mug,
+     *        tankard) or {@link FillMode#POUR} (bucket). See {@link FillMode}.
      * @param masterFile      neutral grayscale master PNG (under {@code assets-src/containers/})
      * @param liquidMask      tintable rectangle in master-texture pixels
+     * @param iconMasterFile  neutral grayscale CONTAINER ICON master PNG (under {@code assets-src/
+     *        containers/}) : the vanilla {@code <id>_Water} icon with its liquid pixels desaturated.
+     *        Tinted per substance into the filled-state {@code Icon} (BUG 4).
+     * @param iconMaskFile    per-pixel liquid mask PNG for the icon master (opaque only on liquid
+     *        pixels), consumed by {@link SubstanceIcon#tint}.
      * @param tintedTextureDir directory of the per-substance tinted texture under {@code Common/}
      * @param tintedTexturePrefix base name of the tinted texture (a {@code _<blockId>.png} is appended)
      * @param brokenItem      item returned when the container is emptied
@@ -44,8 +65,11 @@ public final class FluidContainers {
         String id,
         String model,
         String animation,
+        FillMode fillMode,
         String masterFile,
         LiquidMask liquidMask,
+        String iconMasterFile,
+        String iconMaskFile,
         String tintedTextureDir,
         String tintedTexturePrefix,
         String brokenItem,
@@ -59,9 +83,19 @@ public final class FluidContainers {
             return tintedTextureDir + tintedTexturePrefix + "_" + blockId + ".png";
         }
 
+        /** Per-substance tinted container-icon path under {@code Common/}, e.g. {@code Icons/ItemsGenerated/Deco_Mug_<blockId>.png}. */
+        public String iconPath(String blockId) {
+            return "Icons/ItemsGenerated/" + id + "_" + blockId + ".png";
+        }
+
         /** Whether this container's filled state plays a fill animation (mug only). */
         public boolean hasAnimation() {
             return animation != null;
+        }
+
+        /** Whether the filled state pours its fluid out (bucket) instead of being drunk (mug/tankard). */
+        public boolean pours() {
+            return fillMode == FillMode.POUR;
         }
     }
 
@@ -137,8 +171,11 @@ public final class FluidContainers {
             "Deco_Mug",
             "Blocks/Miscellaneous/Mug.blockymodel",
             "Blocks/Miscellaneous/Mug_Full.blockyanim",
+            FillMode.DRINK,
             "mug_master.png",
             new LiquidMask(37, 41, 12, 12),
+            "Deco_Mug_icon_master.png",
+            "Deco_Mug_icon_mask.png",
             "Blocks/Miscellaneous/",
             "Mug_Texture",
             "Deco_Mug",
@@ -150,8 +187,11 @@ public final class FluidContainers {
             "Deco_Tankard",
             "Blocks/Miscellaneous/Tankard.blockymodel",
             null,
+            FillMode.DRINK,
             "tankard_master.png",
             new LiquidMask(2, 2, 6, 6),
+            "Deco_Tankard_icon_master.png",
+            "Deco_Tankard_icon_mask.png",
             "Blocks/Miscellaneous/",
             "Tankard_Texture",
             "Deco_Tankard",
@@ -163,8 +203,11 @@ public final class FluidContainers {
             "Container_Bucket",
             "Blocks/Decorative_Sets/Village/Bucket_Full.blockymodel",
             null,
+            FillMode.POUR,
             "bucket_master.png",
             new LiquidMask(4, 5, 24, 24),
+            "Container_Bucket_icon_master.png",
+            "Container_Bucket_icon_mask.png",
             "Blocks/Decorative_Sets/Village/",
             "Bucket_Texture",
             "Container_Bucket",

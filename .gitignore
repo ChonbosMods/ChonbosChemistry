@@ -83,3 +83,7 @@ src/main/resources/Server/Item/Interactions/Consumables/Mug_Fill.json
 src/main/resources/Common/Blocks/Miscellaneous/Mug_Texture_Fluid_*.png
 src/main/resources/Common/Blocks/Miscellaneous/Tankard_Texture_Fluid_*.png
 src/main/resources/Common/Blocks/Decorative_Sets/Village/Bucket_Texture_Fluid_*.png
+# Per-substance tinted container icons (filled-state Icon, BUG 4).
+src/main/resources/Common/Icons/ItemsGenerated/Deco_Mug_Fluid_*.png
+src/main/resources/Common/Icons/ItemsGenerated/Deco_Tankard_Fluid_*.png
+src/main/resources/Common/Icons/ItemsGenerated/Container_Bucket_Fluid_*.png

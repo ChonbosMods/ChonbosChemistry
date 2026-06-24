@@ -85,6 +85,10 @@ public final class FluidContainerGenerator {
 
         for (FluidContainers.FluidContainer container : FluidContainers.ALL) {
             BufferedImage master = ImageIO.read(containersDir.resolve(container.masterFile()).toFile());
+            // BUG 4: per-substance tinted CONTAINER ICON, derived from the vanilla <id>_Water icon
+            // (grayscale liquid master + per-pixel liquid mask). Tinted with SubstanceIcon.tint.
+            BufferedImage iconMaster = ImageIO.read(containersDir.resolve(container.iconMasterFile()).toFile());
+            BufferedImage iconMask = ImageIO.read(containersDir.resolve(container.iconMaskFile()).toFile());
 
             List<String> stateMembers = new ArrayList<>();   // "Filled_X": { ... } item states
             List<String> bucketFillMembers = new ArrayList<>(); // bucket-only RefillContainer.States
@@ -106,20 +110,29 @@ public final class FluidContainerGenerator {
                 ImageIO.write(tinted, "png", texOut.toFile());
                 tintedTextureCount++;
 
-                // Filled state member (appearance + drink + durability; no fill mapping). The icon is
-                // the per-substance world-fluid icon WorldFluidGenerator writes to
-                // Common/Icons/ItemsGenerated/Chem_<blockId>.png (itemId = "Chem_" + blockId).
+                // BUG 4: per-substance tinted container ICON, written to the path the filled state
+                // references (Common/Icons/ItemsGenerated/<id>_<blockId>.png). No glow tier: the
+                // container icon is a desaturated vanilla render, kept faithful to vanilla.
+                BufferedImage tintedIcon = SubstanceIcon.tint(iconMaster, iconMask, c);
+                Path iconOut = out.resolve("Common").resolve(container.iconPath(blockId));
+                Files.createDirectories(iconOut.getParent());
+                ImageIO.write(tintedIcon, "png", iconOut.toFile());
+
+                // Filled state member (appearance + drink-or-pour + durability; no fill mapping).
                 List<FluidHazard> hazards = FluidHazardComposer.hazardsFor(form, registry);
-                String iconPath = "Icons/ItemsGenerated/"
-                    + FluidAssets.itemId(form.isElement(), form.liquefied(), substance.name()) + ".png";
-                stateMembers.add(FluidAssets.filledStateJson(container, blockId, hazards, iconPath));
+                stateMembers.add(FluidAssets.filledStateJson(
+                    container, blockId, hazards, container.iconPath(blockId)));
                 filledStateCount++;
 
-                // Lang: the filledStateJson name key is "server.items.<id>_<blockId>.name"; LangWriter
-                // stores under "items.<id>_<blockId>.name" (the loader prefixes "server.").
+                // Lang (BUG 2): the filledStateJson emits BOTH Name + Description keys; write both
+                // lang lines. LangWriter stores under "items.<id>_<blockId>.{name,description}"
+                // (the loader prefixes "server.").
                 langEntries.put(
                     "items." + container.id() + "_" + blockId + ".name",
                     "Filled " + form.displayName());
+                langEntries.put(
+                    "items." + container.id() + "_" + blockId + ".description",
+                    "Contains " + form.displayName() + ".");
 
                 // Bucket: inline RefillContainer fill mapping (AllowedFluids + TransformFluid).
                 if (container.id().equals("Container_Bucket")) {

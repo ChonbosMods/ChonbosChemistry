@@ -74,8 +74,10 @@ tasks.register<JavaExec>("generateWorldFluids") {
     args(
         project.file("assets-src/fluid_master.png").absolutePath,
         project.file("src/main/resources").absolutePath,
-        project.file("assets-src/icon_master.png").absolutePath,
-        project.file("assets-src/icon_liquid_mask.png").absolutePath,
+        // BUG 3: loose-fluid icon is now a tinted fluid CUBE (matching vanilla Fluid_Water.png),
+        // not the jar/vial. Pass the desaturated vanilla cube master + its silhouette mask.
+        project.file("assets-src/fluid_icon_master.png").absolutePath,
+        project.file("assets-src/fluid_icon_mask.png").absolutePath,
     )
 }
 

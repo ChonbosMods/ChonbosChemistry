@@ -195,14 +195,17 @@ public final class FluidAssets {
         String animation = container.animation() == null
             ? ""
             : "\n        \"CustomModelAnimation\": \"%s\",".formatted(container.animation());
-        String effects = drinkHazards.isEmpty()
-            ? ""
-            : "\n" + indent(FluidHazardJson.drinkEffects(drinkHazards), "            ") + "\n          ";
+        // BUG 2: emit both Name AND Description keys (matching vanilla Container_Bucket_Water), so
+        // Item.getTranslationKey() resolves to our lang line instead of falling back to the raw id.
         String nameKey = "server.items.%s_%s.name".formatted(container.id(), blockId);
+        String descKey = "server.items.%s_%s.description".formatted(container.id(), blockId);
+        String secondaryAndVars = container.pours()
+            ? pourSecondary(blockId, container.brokenItem())
+            : drinkSecondary(drinkHazards, container.brokenItem());
         return """
             "Filled_%s": {
               "Variant": true,
-              "TranslationProperties": { "Name": "%s" },
+              "TranslationProperties": { "Name": "%s", "Description": "%s" },
               "Icon": "%s",
               "Recipe": null,
               "Consumable": true,
@@ -217,7 +220,24 @@ public final class FluidAssets {
                   { "Weight": 1, "Texture": "%s" }
                 ]%s
               },
-              "Interactions": {
+              %s%s
+            }""".formatted(blockId, nameKey, descKey, iconPath, container.model(), animation,
+                container.tintedTexturePath(blockId), container.filledBlockTypeExtras(),
+                secondaryAndVars, container.filledStateExtras());
+    }
+
+    /**
+     * DRINK mode (mug / tankard): route Secondary to {@code Root_Secondary_Consume_Drink} and emit
+     * the {@code InteractionVars} (Effect / ConsumeSFX / ConsumedSFX / DurabilityModify). Hazardous
+     * fluids emit their {@link FluidHazardJson#drinkEffects} as the {@code Effect.Interactions}; a
+     * benign fluid emits {@code []} (drinks + empties, no status effect).
+     */
+    private static String drinkSecondary(List<FluidHazard> drinkHazards, String brokenItem) {
+        String effects = drinkHazards.isEmpty()
+            ? ""
+            : "\n" + indent(FluidHazardJson.drinkEffects(drinkHazards), "            ") + "\n          ";
+        return """
+            "Interactions": {
                 "Secondary": "Root_Secondary_Consume_Drink"
               },
               "InteractionVars": {
@@ -239,10 +259,38 @@ public final class FluidAssets {
                     { "Type": "ModifyInventory", "AdjustHeldItemDurability": -1, "BrokenItem": "%s" }
                   ]
                 }
-              }%s
-            }""".formatted(blockId, nameKey, iconPath, container.model(), animation,
-                container.tintedTexturePath(blockId), container.filledBlockTypeExtras(),
-                effects, container.brokenItem(), container.filledStateExtras());
+              }""".formatted(effects, brokenItem);
+    }
+
+    /**
+     * POUR mode (bucket): Secondary places the held fluid into the world, modeled EXACTLY on the
+     * vanilla bucket {@code Filled_Water.Secondary} ({@code PlaceFluid} with
+     * {@code RemoveItemInHand:false}, then ModifyInventory durability -1 + BrokenItem, and the same
+     * {@code SFX_WATER_MoveOut} pour sound). NO drink {@code InteractionVars} : the poured fluid
+     * block already carries the contact hazard.
+     */
+    private static String pourSecondary(String blockId, String brokenItem) {
+        return """
+            "Interactions": {
+                "Secondary": {
+                  "Interactions": [
+                    {
+                      "Type": "PlaceFluid",
+                      "RemoveItemInHand": false,
+                      "Next": {
+                        "Type": "ModifyInventory",
+                        "AdjustHeldItemDurability": -1,
+                        "BrokenItem": "%s"
+                      },
+                      "FluidToPlace": "%s_Source",
+                      "Effects": {
+                        "ClearSoundEventOnFinish": true,
+                        "LocalSoundEventId": "SFX_WATER_MoveOut"
+                      }
+                    }
+                  ]
+                }
+              }""".formatted(brokenItem, blockId);
     }
 
     /** Render a double as a JSON-valid numeric literal (e.g. {@code 1.0}, {@code -1.35}). */

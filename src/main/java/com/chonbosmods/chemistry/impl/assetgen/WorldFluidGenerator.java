@@ -100,9 +100,12 @@ public final class WorldFluidGenerator {
                 SubstanceLiquidTinter.tint(master, SURFACE_MASK, c), SURFACE_MASK, tier);
             ImageIO.write(tinted, "png", texDir.resolve(blockId + ".png").toFile());
 
-            // Inventory icon: recolored jar render.
+            // BUG 3: loose-fluid icon = a tinted colored CUBE, matching vanilla Fluid_Water.png
+            // (a 3D-rendered fluid cube), NOT the jar/vial. iconMaster/iconMask are the desaturated
+            // vanilla Fluid_Water cube + its silhouette mask; SubstanceIcon.tint multiplies the
+            // substance color into the cube (glow-boosted per tier), keeping the 64px frame as-is.
             ImageIO.write(
-                SubstanceIcon.render(iconMaster, iconMask, c, 64, tier),
+                SubstanceIcon.tint(iconMaster, iconMask, c, tier),
                 "png", iconDir.resolve(itemId + ".png").toFile());
 
             List<FluidHazard> hazards = FluidHazardComposer.hazardsFor(form, registry);
