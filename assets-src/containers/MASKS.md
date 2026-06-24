@@ -57,3 +57,38 @@ tankard/bucket; model-UV + texture scan for the mug). Coordinates are top-left o
 
 The generator must inject `Filled_<substance>` states while PRESERVING the vanilla Filled_*
 states listed above (do not drop Filled_Water / Filled_Milk / Filled_Mosshorn_Milk).
+
+## How to add a new fluid container
+
+The whole filled-container system (tinted liquid textures, filled-state JSON, tinted container
+icons, AND item name + description lang) is driven by the `FluidContainers.ALL` registry. Adding a
+new container type is a **registry entry + art masters only** : NO generator/renderer code edits.
+
+`FluidContainers.FluidContainer` is the single source of truth for a container: `id`, `displayName`,
+`model`, `animation`, `fillMode` (DRINK/POUR), `masterFile`, `liquidMask`, `iconMasterFile`,
+`iconMaskFile`, `tintedTextureDir`/`tintedTexturePrefix`, `brokenItem`, `vanillaTemplate`,
+`itemOutputPath`, `preservedStates`, and the carried vanilla render extras. Everything the generator
+loops over comes from this record : nothing about a specific container is hardcoded elsewhere.
+
+Steps:
+
+1. **Capture the vanilla item template.** Copy the vanilla `<Id>.json` item into this directory as
+   `<Id>.vanilla.json` (the override base). Note its real asset-pack path : that is the
+   `itemOutputPath`. Also note its vanilla display name from `server.lang`
+   (`items.<Id>.name`) : that is the `displayName` (used verbatim for `<displayName> (<Fluid>)`).
+2. **Derive the liquid master + `LiquidMask`** with `tools/derive_masks.py` (neutral grayscale
+   master PNG + the `LiquidMask(x, y, w, h)` rectangle the tinter recolors).
+3. **Derive the icon master + mask** with `tools/derive_icon_masks.py`
+   (`<Id>_icon_master.png` + `<Id>_icon_mask.png` : grayscale container-icon master + per-pixel
+   liquid mask, tinted per substance into the filled state's `Icon`).
+4. **Add one `FluidContainer` entry** to `FluidContainers.ALL` with `id`, `displayName`, `model`,
+   `animation` (null if none), `fillMode` (DRINK = drinkable mug/tankard, POUR = bucket that spills
+   into the world), the master/mask files, tinted-texture dir/prefix, `brokenItem`, `vanillaTemplate`,
+   `itemOutputPath`, `preservedStates` (the vanilla `Filled_*` states to keep), and the carried
+   vanilla render extras.
+5. **Re-run** `./gradlew generateFluidContainers`.
+
+The generated filled item reads `<displayName> (<Fluid name>)`, e.g.
+`Wooden Bucket (Hydrogen peroxide)`, mimicking vanilla `Wooden Bucket (Water)`. The description is
+`Contains <color is="#ffffff"><Fluid></color> that can be {placed in the world | drunk}.`, chosen by
+`fillMode`.

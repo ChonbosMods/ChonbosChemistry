@@ -35,6 +35,10 @@ public final class FluidContainers {
      * One container's config.
      *
      * @param id              item id (e.g. {@code "Deco_Mug"})
+     * @param displayName     vanilla item display name, verbatim from {@code server.lang}
+     *        ({@code items.<id>.name} : e.g. "Wooden Mug", "Wooden Bucket", "Tankard"). The filled
+     *        item name is generated as {@code <displayName> (<FluidName>)}, mimicking vanilla
+     *        ({@code Wooden Bucket (Water)}).
      * @param model           filled-state model path under the asset pack {@code Common/}
      * @param animation       filled-state {@code CustomModelAnimation} (nullable: mug only)
      * @param fillMode        how the filled state's Secondary behaves : {@link FillMode#DRINK} (mug,
@@ -50,6 +54,9 @@ public final class FluidContainers {
      * @param tintedTexturePrefix base name of the tinted texture (a {@code _<blockId>.png} is appended)
      * @param brokenItem      item returned when the container is emptied
      * @param vanillaTemplate captured vanilla item JSON used as the override base
+     * @param itemOutputPath  real asset-pack path of the overridden item JSON, under the output root
+     *        (e.g. {@code Server/Item/Items/Deco/Deco_Mug.json}). The override replaces the vanilla
+     *        item at this exact path.
      * @param preservedStates vanilla {@code Filled_*} states the override must keep
      * @param filledBlockTypeExtras JSON fragment of the container's vanilla filled-state {@code BlockType}
      *        render/placement fields that we carry verbatim (everything EXCEPT our intentional swaps:
@@ -63,6 +70,7 @@ public final class FluidContainers {
      */
     public record FluidContainer(
         String id,
+        String displayName,
         String model,
         String animation,
         FillMode fillMode,
@@ -74,6 +82,7 @@ public final class FluidContainers {
         String tintedTexturePrefix,
         String brokenItem,
         String vanillaTemplate,
+        String itemOutputPath,
         List<String> preservedStates,
         String filledBlockTypeExtras,
         String filledStateExtras) {
@@ -96,6 +105,25 @@ public final class FluidContainers {
         /** Whether the filled state pours its fluid out (bucket) instead of being drunk (mug/tankard). */
         public boolean pours() {
             return fillMode == FillMode.POUR;
+        }
+
+        /**
+         * The vanilla-style filled-item DISPLAY NAME: {@code <displayName> (<fluidName>)}, e.g.
+         * {@code Wooden Bucket (Hydrogen peroxide)}. Mirrors vanilla
+         * ({@code items.Container_Bucket_Water.name = Wooden Bucket (Water)}). {@code fluidName} is
+         * the fluid's {@code FluidForm.displayName()} verbatim.
+         */
+        public String filledName(String fluidName) {
+            return displayName + " (" + fluidName + ")";
+        }
+
+        /**
+         * The vanilla-style filled-item DESCRIPTION, mimicking the vanilla bucket style
+         * ({@code Contains <color is="#ffffff">Water</color> that can be placed in the world.}).
+         */
+        public String filledDescription(String fluidName) {
+            return "Contains <color is=\"#ffffff\">" + fluidName + "</color>"
+                + (pours() ? " that can be placed in the world." : " that can be drunk.");
         }
     }
 
@@ -169,6 +197,7 @@ public final class FluidContainers {
     public static final List<FluidContainer> ALL = List.of(
         new FluidContainer(
             "Deco_Mug",
+            "Wooden Mug",
             "Blocks/Miscellaneous/Mug.blockymodel",
             "Blocks/Miscellaneous/Mug_Full.blockyanim",
             FillMode.DRINK,
@@ -180,11 +209,13 @@ public final class FluidContainers {
             "Mug_Texture",
             "Deco_Mug",
             "Deco_Mug.vanilla.json",
+            "Server/Item/Items/Deco/Deco_Mug.json",
             List.of("Filled_Water"),
             MUG_BLOCKTYPE_EXTRAS,
             MUG_STATE_EXTRAS),
         new FluidContainer(
             "Deco_Tankard",
+            "Tankard",
             "Blocks/Miscellaneous/Tankard.blockymodel",
             null,
             FillMode.DRINK,
@@ -196,11 +227,13 @@ public final class FluidContainers {
             "Tankard_Texture",
             "Deco_Tankard",
             "Deco_Tankard.vanilla.json",
+            "Server/Item/Items/Deco/Deco_Tankard.json",
             List.of("Filled_Water"),
             TANKARD_BLOCKTYPE_EXTRAS,
             TANKARD_STATE_EXTRAS),
         new FluidContainer(
             "Container_Bucket",
+            "Wooden Bucket",
             "Blocks/Decorative_Sets/Village/Bucket_Full.blockymodel",
             null,
             FillMode.POUR,
@@ -212,6 +245,7 @@ public final class FluidContainers {
             "Bucket_Texture",
             "Container_Bucket",
             "Container_Bucket.vanilla.json",
+            "Server/Item/Items/Container/Container_Bucket.json",
             List.of("Filled_Water", "Filled_Milk", "Filled_Mosshorn_Milk"),
             BUCKET_BLOCKTYPE_EXTRAS,
             BUCKET_STATE_EXTRAS));

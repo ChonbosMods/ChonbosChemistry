@@ -19,6 +19,37 @@ class FluidContainersTest {
     }
 
     @Test
+    void containersCarryVanillaDisplayNames() {
+        assertEquals("Wooden Mug", container("Deco_Mug").displayName());
+        assertEquals("Tankard", container("Deco_Tankard").displayName());
+        assertEquals("Wooden Bucket", container("Container_Bucket").displayName());
+    }
+
+    @Test
+    void filledNameMimicsVanillaContainerParenFluidFormat() {
+        // vanilla: items.Container_Bucket_Water.name = "Wooden Bucket (Water)"
+        assertEquals("Wooden Bucket (Water)", container("Container_Bucket").filledName("Water"));
+        assertEquals("Wooden Bucket (Hydrogen peroxide)",
+            container("Container_Bucket").filledName("Hydrogen peroxide"));
+        assertEquals("Wooden Mug (Liquid Helium)", container("Deco_Mug").filledName("Liquid Helium"));
+        assertEquals("Tankard (Mercury)", container("Deco_Tankard").filledName("Mercury"));
+    }
+
+    @Test
+    void filledDescriptionDiffersByFillMode() {
+        // POUR (bucket) mimics vanilla bucket: "...that can be placed in the world."
+        assertEquals("Contains <color is=\"#ffffff\">Water</color> that can be placed in the world.",
+            container("Container_Bucket").filledDescription("Water"));
+        // DRINK (mug/tankard): "...that can be drunk."
+        assertEquals("Contains <color is=\"#ffffff\">Water</color> that can be drunk.",
+            container("Deco_Mug").filledDescription("Water"));
+    }
+
+    private static FluidContainers.FluidContainer container(String id) {
+        return FluidContainers.ALL.stream().filter(c -> c.id().equals(id)).findFirst().orElseThrow();
+    }
+
+    @Test
     void bucketPreservesItsThreeVanillaStates() {
         var bucket = FluidContainers.ALL.stream().filter(c -> c.id().equals("Container_Bucket")).findFirst().orElseThrow();
         assertTrue(bucket.preservedStates().containsAll(List.of("Filled_Water", "Filled_Milk", "Filled_Mosshorn_Milk")));

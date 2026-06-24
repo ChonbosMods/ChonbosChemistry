@@ -49,12 +49,6 @@ import javax.imageio.ImageIO;
  */
 public final class FluidContainerGenerator {
 
-    /** Real output paths for each container's overridden item JSON, keyed by container id. */
-    private static final Map<String, String> ITEM_OUTPUT_PATH = Map.of(
-        "Deco_Mug", "Server/Item/Items/Deco/Deco_Mug.json",
-        "Deco_Tankard", "Server/Item/Items/Deco/Deco_Tankard.json",
-        "Container_Bucket", "Server/Item/Items/Container/Container_Bucket.json");
-
     /** The shared mug/tankard fill file we capture + override once (STEP 0). */
     private static final String MUG_FILL_VANILLA = "Mug_Fill.vanilla.json";
     private static final String MUG_FILL_OUTPUT = "Server/Item/Interactions/Consumables/Mug_Fill.json";
@@ -126,16 +120,21 @@ public final class FluidContainerGenerator {
 
                 // Lang (BUG 2): the filledStateJson emits BOTH Name + Description keys; write both
                 // lang lines. LangWriter stores under "items.<id>_<blockId>.{name,description}"
-                // (the loader prefixes "server.").
+                // (the loader prefixes "server."). The name MIMICS VANILLA :
+                // "<container displayName> (<fluid name>)" (e.g. "Wooden Bucket (Hydrogen peroxide)"),
+                // matching items.Container_Bucket_Water.name = "Wooden Bucket (Water)". Both strings
+                // are derived from the registry record (displayName + fillMode), nothing per-container
+                // is hardcoded here.
                 langEntries.put(
                     "items." + container.id() + "_" + blockId + ".name",
-                    "Filled " + form.displayName());
+                    container.filledName(form.displayName()));
                 langEntries.put(
                     "items." + container.id() + "_" + blockId + ".description",
-                    "Contains " + form.displayName() + ".");
+                    container.filledDescription(form.displayName()));
 
-                // Bucket: inline RefillContainer fill mapping (AllowedFluids + TransformFluid).
-                if (container.id().equals("Container_Bucket")) {
+                // POUR containers (bucket): inline RefillContainer fill mapping (AllowedFluids +
+                // TransformFluid). Keyed off the registry fillMode, not a hardcoded container id.
+                if (container.pours()) {
                     bucketFillMembers.add(bucketFillMember(blockId));
                 }
             }
@@ -145,14 +144,15 @@ public final class FluidContainerGenerator {
             String itemTemplate = Files.readString(containersDir.resolve(container.vanillaTemplate()));
             String overriddenItem = spliceMembers(itemTemplate, "\"State\":", String.join(",\n", stateMembers));
 
-            // Bucket: also splice the fill mappings into EVERY inline RefillContainer.States (two:
-            // crouching + not-crouching). The "States" objects live inside Interactions.Secondary.
-            if (container.id().equals("Container_Bucket")) {
+            // POUR containers (bucket): also splice the fill mappings into EVERY inline
+            // RefillContainer.States (two: crouching + not-crouching). The "States" objects live
+            // inside Interactions.Secondary. Keyed off the registry fillMode, not a hardcoded id.
+            if (container.pours()) {
                 overriddenItem = spliceAllMembers(
                     overriddenItem, "\"States\":", String.join(",\n", bucketFillMembers));
             }
 
-            Path itemOut = out.resolve(ITEM_OUTPUT_PATH.get(container.id()));
+            Path itemOut = out.resolve(container.itemOutputPath());
             Files.createDirectories(itemOut.getParent());
             Files.writeString(itemOut, overriddenItem);
             validateParses(overriddenItem, itemOut.toString());
