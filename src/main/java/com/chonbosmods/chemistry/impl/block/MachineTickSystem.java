@@ -7,21 +7,17 @@ import com.hypixel.hytale.builtin.crafting.component.ProcessingBenchBlock;
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
-import com.hypixel.hytale.server.core.universe.world.chunk.section.BlockSection;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Per-tick driver for machine block entities (Task B2). Each tick, for every live
@@ -161,46 +157,17 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
             return;
         }
 
-        // Resolve the live drive context off the same block-entity ref + sibling components. Mirrors the
-        // proven BenchSpikeCommand / NetworkTickSystem resolution; guard every step.
-        Ref<ChunkStore> blockRef = archetypeChunk.getReferenceTo(index);
-        if (blockRef == null || !blockRef.isValid()) {
+        // Resolve the live drive context off the same block-entity ref + sibling components via the shared
+        // prologue (MachineDriveContext): guards every step and returns null on the first missing piece.
+        MachineDriveContext.Resolved ctx =
+            MachineDriveContext.resolve(index, archetypeChunk, store, blockInfoType, blockChunkType);
+        if (ctx == null) {
             return;
         }
-
-        BlockModule.BlockStateInfo stateInfo = archetypeChunk.getComponent(index, blockInfoType);
-        if (stateInfo == null) {
-            return;
-        }
-        Ref<ChunkStore> chunkRef = stateInfo.getChunkRef();
-        if (chunkRef == null || !chunkRef.isValid()) {
-            return;
-        }
-        BlockChunk blockChunk = chunkRef.getStore().getComponent(chunkRef, blockChunkType);
-        if (blockChunk == null) {
-            return;
-        }
-        int blockIndex = stateInfo.getIndex();
-        int localX = ChunkUtil.xFromBlockInColumn(blockIndex);
-        int localY = ChunkUtil.yFromBlockInColumn(blockIndex);
-        int localZ = ChunkUtil.zFromBlockInColumn(blockIndex);
-        int x = (blockChunk.getX() << 5) | localX;
-        int y = localY;
-        int z = (blockChunk.getZ() << 5) | localZ;
-
-        ChunkStore external = store.getExternalData();
-        if (external == null) {
-            return;
-        }
-        World world = external.getWorld();
-        if (world == null) {
-            return;
-        }
-
-        BlockType blockType = resolveBlockType(blockChunk, localX, localY, localZ);
-        if (blockType == null) {
-            return;
-        }
+        BlockModule.BlockStateInfo stateInfo = ctx.stateInfo();
+        int x = ctx.x(), y = ctx.y(), z = ctx.z();
+        World world = ctx.world();
+        BlockType blockType = ctx.blockType();
 
         // Only a bench-configured block drives here (the smelter declares a Processing Bench). A machine
         // without a Bench config is not a bench machine: nothing to create or advance.
@@ -278,19 +245,5 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
         if (node.shouldUpdateVisualState(desiredState)) {
             VanillaBenchBridge.setVisualState(bench, desiredState, blockType, world, x, y, z);
         }
-    }
-
-    /**
-     * The {@link BlockType} at the bench, resolved like the vanilla {@code ProcessingBenchTick}
-     * (section block id at the local coords -> asset map). Null if the section or id can't be resolved.
-     */
-    @Nullable
-    private BlockType resolveBlockType(@Nonnull BlockChunk blockChunk, int localX, int localY, int localZ) {
-        BlockSection section = blockChunk.getSectionAtBlockY(localY);
-        if (section == null) {
-            return null;
-        }
-        int blockId = section.get(localX, localY, localZ);
-        return BlockType.getAssetMap().getAsset(blockId);
     }
 }

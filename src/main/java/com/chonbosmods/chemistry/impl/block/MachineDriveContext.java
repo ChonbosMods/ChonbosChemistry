@@ -23,8 +23,11 @@ import javax.annotation.Nullable;
 public final class MachineDriveContext {
     private MachineDriveContext() {}
 
-    /** The resolved block context: the world, the block's world coords, and its BlockType. */
-    public record Resolved(World world, int x, int y, int z, BlockType blockType) {}
+    /** The resolved block context: the world, the block's world coords, its BlockType, and the
+     *  {@link BlockModule.BlockStateInfo} the resolution fetched (the bench drive passes it to the
+     *  vanilla-bench create/wire/advance calls). */
+    public record Resolved(World world, int x, int y, int z, BlockType blockType,
+            BlockModule.BlockStateInfo stateInfo) {}
 
     /** Resolve the live block context for the component at {@code index} in {@code chunk}. Returns null when
      *  any piece is missing (chunk unloaded, block gone, world absent, etc.): the caller then skips the tick.
@@ -75,7 +78,7 @@ public final class MachineDriveContext {
             return null;
         }
 
-        return new Resolved(world, x, y, z, blockType);
+        return new Resolved(world, x, y, z, blockType, stateInfo);
     }
 
     /** Section block id at the local coords -> asset BlockType. Null if section/id unresolved. (Moved verbatim
