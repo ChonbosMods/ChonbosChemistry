@@ -2,6 +2,8 @@ package com.chonbosmods.chemistry;
 
 import com.chonbosmods.chemistry.api.registry.Chemistry;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
+import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
+import com.chonbosmods.chemistry.impl.block.craft.ForgeTickSystem;
 import com.chonbosmods.chemistry.impl.block.CarryBreakEventSystem;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
@@ -13,6 +15,7 @@ import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import com.chonbosmods.chemistry.impl.block.net.PipePlaceEventSystem;
 import com.chonbosmods.chemistry.impl.block.ui.MachinePanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.BenchMachinePanelPage;
+import com.chonbosmods.chemistry.impl.block.ui.ForgePanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshService;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshSystem;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
@@ -47,6 +50,7 @@ public class ChonbosChemistry extends JavaPlugin {
     private static ChonbosChemistry instance;
 
     private ComponentType<ChunkStore, MachineBlockState> machineComponentType;
+    private ComponentType<ChunkStore, ForgeCraftState> forgeComponentType;
     private ComponentType<ChunkStore, TankBlockState> tankComponentType;
     private ComponentType<ChunkStore, PipeNode> pipeComponentType;
 
@@ -68,6 +72,11 @@ public class ChonbosChemistry extends JavaPlugin {
     /** The {@link ChunkStore} component type backing machine blocks (used by the ticking system + GUI). */
     public ComponentType<ChunkStore, MachineBlockState> machineComponentType() {
         return machineComponentType;
+    }
+
+    /** The {@link ChunkStore} component type backing Forge blocks (the autonomous crafter's own state). */
+    public ComponentType<ChunkStore, ForgeCraftState> forgeComponentType() {
+        return forgeComponentType;
     }
 
     /** The {@link ChunkStore} component type backing tank blocks (used by the ticking system + GUI). */
@@ -100,16 +109,21 @@ public class ChonbosChemistry extends JavaPlugin {
 
         machineComponentType = getChunkStoreRegistry()
             .registerComponent(MachineBlockState.class, "MachineBlockState", MachineBlockState.CODEC);
+        forgeComponentType = getChunkStoreRegistry()
+            .registerComponent(ForgeCraftState.class, "ForgeCraftState", ForgeCraftState.CODEC);
         tankComponentType = getChunkStoreRegistry()
             .registerComponent(TankBlockState.class, "TankBlockState", TankBlockState.CODEC);
         pipeComponentType = getChunkStoreRegistry()
             .registerComponent(PipeNode.class, "PipeNode", PipeNode.CODEC);
-        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, TankBlockState, PipeNode.");
+        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, ForgeCraftState, TankBlockState, PipeNode.");
 
         // Per-tick driver: creative-refill then work pass. Must be registered AFTER the components above.
         // (No longer pushes resources to neighbors: the NetworkTickSystem below does that over pipes.)
         getChunkStoreRegistry().registerSystem(new MachineTickSystem(machineComponentType));
         getLogger().atInfo().log("Registered MachineTickSystem (creative-refill then work).");
+        // Autonomous-craft driver for the Forge (no held bench; own containers + even round-robin selection).
+        getChunkStoreRegistry().registerSystem(new ForgeTickSystem(forgeComponentType));
+        getLogger().atInfo().log("Registered ForgeTickSystem (autonomous crafting).");
 
         // Transport network cache (per-world) + the events that invalidate it on pipe topology changes
         // (H3). Place/break fire on the EntityStore (the acting entity); chunk-unload fires on the
@@ -118,7 +132,7 @@ public class ChonbosChemistry extends JavaPlugin {
         // Per-tick pipe-network distribution (H4): for each pipe network, pull from OUTPUT-port machines
         // and fair-split into INPUT-port machines once per tick. This is what moves resources now.
         getChunkStoreRegistry().registerSystem(new NetworkTickSystem(
-            pipeComponentType, machineComponentType, tankComponentType, networkService));
+            pipeComponentType, machineComponentType, tankComponentType, forgeComponentType, networkService));
         getLogger().atInfo().log("Registered NetworkTickSystem (per-tick pipe-network distribution).");
         getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService, pipeComponentType));
         getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService, pipeComponentType));
@@ -157,6 +171,14 @@ public class ChonbosChemistry extends JavaPlugin {
             this, BenchMachinePanelPage.class, "CC_ReclaimerPanel",
             (playerRef, blockRef) -> new BenchMachinePanelPage(playerRef, blockRef, "Reclaimer"));
         getLogger().atInfo().log("Registered CC_SmelterPanel + CC_ReclaimerPanel bench-machine GUIs.");
+
+        // The Forge panel: a sibling of the bench-machine GUI, but reading the autonomous Forge's own
+        // ForgeCraftState (own input/output containers + recipe-card slot) rather than a held vanilla bench.
+        // The "CC_ForgePanel" id is referenced by CC_Forge.json's Interactions.Use (OpenCustomUI Page.Id).
+        OpenCustomUIInteraction.registerBlockEntityCustomPage(
+            this, ForgePanelPage.class, "CC_ForgePanel",
+            (playerRef, blockRef) -> new ForgePanelPage(playerRef, blockRef, "Forge"));
+        getLogger().atInfo().log("Registered CC_ForgePanel forge GUI.");
 
         // CC_Wrench (Task 9): a held tool whose Secondary interaction taps a pipe face to cycle its
         // flow state, or a machine face to cycle its port. The JSON "Type" is this registered id; the

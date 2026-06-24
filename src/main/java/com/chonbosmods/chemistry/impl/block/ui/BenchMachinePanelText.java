@@ -45,4 +45,18 @@ final class BenchMachinePanelText {
     static String energy(long stored, long max) {
         return "Energy: " + stored + " / " + max;
     }
+
+    /**
+     * Progress as a {@code [0, 1]} bar fraction for the autonomous Forge, which tracks raw accumulated
+     * craft seconds rather than a 0..1 value: {@code clamp01(progress / duration)}. A non-positive
+     * {@code duration} yields {@code 0} (degenerate config never divides by zero). Unlike the held-bench
+     * machines (which expose a fraction directly), the Forge owns its progress, so the panel derives the
+     * fraction here against {@code ForgeTickSystem.FORGE_DURATION} (the shared craft-length constant).
+     */
+    static float forgeFraction(float progressSeconds, float duration) {
+        if (duration <= 0.0f) {
+            return 0.0f;
+        }
+        return clamp01(progressSeconds / duration);
+    }
 }

@@ -4,6 +4,7 @@ import com.chonbosmods.chemistry.api.energy.EnergyHandler;
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.api.io.PortDirection;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
+import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.Port;
 import com.chonbosmods.chemistry.impl.block.PortConfig;
 import com.chonbosmods.chemistry.impl.block.PortProjection;
@@ -51,16 +52,19 @@ public final class WorldMachineLookup implements MachineLookup {
     private final Store<ChunkStore> store;
     private final ComponentType<ChunkStore, MachineBlockState> machineType;
     private final ComponentType<ChunkStore, TankBlockState> tankType;
+    private final ComponentType<ChunkStore, ForgeCraftState> forgeType;
 
     public WorldMachineLookup(
             @Nonnull World world,
             @Nonnull Store<ChunkStore> store,
             @Nonnull ComponentType<ChunkStore, MachineBlockState> machineType,
-            @Nonnull ComponentType<ChunkStore, TankBlockState> tankType) {
+            @Nonnull ComponentType<ChunkStore, TankBlockState> tankType,
+            @Nonnull ComponentType<ChunkStore, ForgeCraftState> forgeType) {
         this.world = world;
         this.store = store;
         this.machineType = machineType;
         this.tankType = tankType;
+        this.forgeType = forgeType;
     }
 
     @Override
@@ -93,13 +97,23 @@ public final class WorldMachineLookup implements MachineLookup {
         if (machine != null) {
             PortConfig model = machine.ports();
             PortConfig cell = PortProjection.forWorldCell(model, rotation, wcx, wcy, wcz);
-            return adapt(cell, model, machine.energy(), machine::resource, machine.heldBench());
+            // The Smelter/Reclaimer borrows its held vanilla bench's input/output containers.
+            return adapt(cell, model, machine.energy(), machine::resource, benchItems(machine.heldBench()));
         }
         TankBlockState tank = store.getComponent(ref, tankType);
         if (tank != null) {
             PortConfig model = tank.ports();
             PortConfig cell = PortProjection.forWorldCell(model, rotation, wcx, wcy, wcz);
-            return adapt(cell, model, tank.energy(), tank::resource, null); // tanks hold no item bench
+            // Tanks hold no item bench: their item-container source returns null for every direction.
+            return adapt(cell, model, tank.energy(), tank::resource, NO_ITEMS);
+        }
+        ForgeCraftState forge = store.getComponent(ref, forgeType);
+        if (forge != null) {
+            PortConfig model = forge.ports();
+            PortConfig cell = PortProjection.forWorldCell(model, rotation, wcx, wcy, wcz);
+            // The Forge has no vanilla bench: it owns its input/output containers directly. It carries no
+            // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
+            return adapt(cell, model, forge.energy(), channel -> null, forgeItems(forge));
         }
         return null;
     }
@@ -117,13 +131,54 @@ public final class WorldMachineLookup implements MachineLookup {
     }
 
     /**
+     * Functional view over a block-state's per-direction item container. Generalizes the item-container
+     * source so each block-state path supplies its own: the Smelter/Reclaimer from its held vanilla bench
+     * ({@link #benchItems}), the Forge from its own owned containers ({@link #forgeItems}), and a tank from
+     * nothing ({@link #NO_ITEMS}). Returns {@code null} for a direction with no item container.
+     */
+    private interface ItemContainerFn {
+        ItemContainer apply(PortDirection direction);
+    }
+
+    /** The no-item source (tanks): no item container in any direction. */
+    private static final ItemContainerFn NO_ITEMS = direction -> null;
+
+    /**
+     * The Smelter/Reclaimer item source: borrows the held vanilla bench's input (ingredients fed IN) and
+     * output (results drained OUT) containers. {@code null} bench (no held bench) yields no item container.
+     */
+    private static ItemContainerFn benchItems(ProcessingBenchBlock bench) {
+        if (bench == null) {
+            return NO_ITEMS;
+        }
+        return direction -> switch (direction) {
+            case INPUT -> VanillaBenchBridge.input(bench);   // ingredients fed IN
+            case OUTPUT -> VanillaBenchBridge.output(bench);  // results drained OUT
+            default -> null; // BOTH/CLOSED: the bench's item ports are INPUT/OUTPUT only
+        };
+    }
+
+    /**
+     * The Forge item source: the Forge owns its containers directly (no vanilla bench), exposing its
+     * {@link ForgeCraftState#input()} on INPUT and {@link ForgeCraftState#output()} on OUTPUT. Same
+     * INPUT/OUTPUT-only shape as the bench source (the Forge, like the Smelter, has item-in + item-out).
+     */
+    private static ItemContainerFn forgeItems(ForgeCraftState forge) {
+        return direction -> switch (direction) {
+            case INPUT -> forge.input();   // ingredients fed IN
+            case OUTPUT -> forge.output(); // results drained OUT
+            default -> null; // BOTH/CLOSED: the Forge's item ports are INPUT/OUTPUT only
+        };
+    }
+
+    /**
      * @param cellPorts the per-cell, world-face {@link PortConfig} for the queried cell (drives transport +
      *     effective mask); {@code modelPorts} the anchor's whole model-space config (drives the anchor-level
      *     {@link MachinePorts#advertisesChannel}, which mirrors the engine's inherited-tag welding).
      */
     private static MachinePorts adapt(
             PortConfig cellPorts, PortConfig modelPorts, EnergyHandler energy, ResourceFn resource,
-            ProcessingBenchBlock bench) {
+            ItemContainerFn items) {
         return new MachinePorts() {
             @Override
             public PortConfig ports() {
@@ -155,14 +210,7 @@ public final class WorldMachineLookup implements MachineLookup {
 
             @Override
             public ContainerLookup.ContainerView itemContainer(PortDirection direction) {
-                if (bench == null) {
-                    return null; // no held bench (a tank, or a non-bench machine): no item container
-                }
-                ItemContainer container = switch (direction) {
-                    case INPUT -> VanillaBenchBridge.input(bench);   // ingredients fed IN
-                    case OUTPUT -> VanillaBenchBridge.output(bench);  // results drained OUT
-                    default -> null; // BOTH/CLOSED: the smelter's item ports are INPUT/OUTPUT only
-                };
+                ItemContainer container = items.apply(direction);
                 return container == null ? null : new ItemContainerView(container);
             }
         };

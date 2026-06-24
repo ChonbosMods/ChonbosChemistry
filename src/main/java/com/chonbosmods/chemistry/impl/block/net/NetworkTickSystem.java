@@ -4,6 +4,7 @@ import com.chonbosmods.chemistry.api.io.FlowState;
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
+import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.net.item.ItemEndpoints;
 import com.chonbosmods.chemistry.impl.block.net.item.ItemTransferSystem;
 import com.chonbosmods.chemistry.impl.block.net.item.WorldContainerLookup;
@@ -56,6 +57,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     private final ComponentType<ChunkStore, PipeNode> pipeType;
     private final ComponentType<ChunkStore, MachineBlockState> machineType;
     private final ComponentType<ChunkStore, TankBlockState> tankType;
+    private final ComponentType<ChunkStore, ForgeCraftState> forgeType;
     private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType;
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType;
     private final NetworkService networkService;
@@ -98,10 +100,12 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
             @Nonnull ComponentType<ChunkStore, PipeNode> pipeType,
             @Nonnull ComponentType<ChunkStore, MachineBlockState> machineType,
             @Nonnull ComponentType<ChunkStore, TankBlockState> tankType,
+            @Nonnull ComponentType<ChunkStore, ForgeCraftState> forgeType,
             @Nonnull NetworkService networkService) {
         this.pipeType = pipeType;
         this.machineType = machineType;
         this.tankType = tankType;
+        this.forgeType = forgeType;
         this.networkService = networkService;
         this.blockInfoType = BlockModule.BlockStateInfo.getComponentType();
         this.blockChunkType = BlockChunk.getComponentType();
@@ -193,7 +197,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
             return; // no anchor, or this network already distributed this tick
         }
 
-        MachineLookup lookup = new WorldMachineLookup(world, store, machineType, tankType);
+        MachineLookup lookup = new WorldMachineLookup(world, store, machineType, tankType, forgeType);
 
         // ITEM networks transport DISCRETE stacks, not a fungible shared buffer: they run the dedicated
         // item driver (Task 7) instead of NetworkTransfer.distribute, and skip the energy/lock write-back
