@@ -113,10 +113,10 @@ public final class VanillaCraftBridge {
      * the correct semantics for a buffer. Agrees with {@link #consumeInputs}. An empty material list (a
      * recipe with no inputs) trivially returns {@code true}.
      */
-    public static boolean inputsPresent(CraftingRecipe r, ItemContainer input, int tier) {
+    public static boolean inputsPresent(CraftingRecipe r, ItemContainer input, int batch) {
         // signature: CraftingManager.getInputMaterials(CraftingRecipe, int tier) (static)
         //            : List<MaterialQuantity>
-        List<MaterialQuantity> materials = CraftingManager.getInputMaterials(r, tier);
+        List<MaterialQuantity> materials = CraftingManager.getInputMaterials(r, batch); // batch=1 => one recipe set (NOT the machine tier; *0 zeroes qty)
         // signature: ItemContainer.canRemoveMaterials(List<MaterialQuantity>, boolean matchExactType,
         //            boolean forbidOverRemoval) : boolean  [pure test, no mutation]
         return input.canRemoveMaterials(materials, true, false);
@@ -129,10 +129,10 @@ public final class VanillaCraftBridge {
      * class javadoc "Atomicity"). This is the exact path vanilla's
      * {@code CraftingManager.removeInputFromInventory(ItemContainer, CraftingRecipe, int)} uses.
      */
-    public static boolean consumeInputs(CraftingRecipe r, ItemContainer input, int tier) {
+    public static boolean consumeInputs(CraftingRecipe r, ItemContainer input, int batch) {
         // signature: CraftingManager.getInputMaterials(CraftingRecipe, int tier) (static)
         //            : List<MaterialQuantity>
-        List<MaterialQuantity> materials = CraftingManager.getInputMaterials(r, tier);
+        List<MaterialQuantity> materials = CraftingManager.getInputMaterials(r, batch); // batch=1 => one recipe set (NOT the machine tier; *0 zeroes qty)
         // signature: ItemContainer.removeMaterials(List<MaterialQuantity>, boolean matchExactType,
         //            boolean forbidOverRemoval, boolean sendUpdate)
         //            : ListTransaction<MaterialTransaction>   [atomic: no-op on failure]

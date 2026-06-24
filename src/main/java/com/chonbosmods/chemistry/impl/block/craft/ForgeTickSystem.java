@@ -189,7 +189,11 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
         RecipePool pool = recipePool();
 
         // 3-5. Compute the currently-craftable subset: card-allowed AND inputs present AND output has room.
-        int tier = 0; // v1: no tier upgrades yet.
+        // v1 crafts ONE recipe set per cycle. This is the BATCH multiplier vanilla's getInputMaterials
+        // applies (it returns quantity * batch), NOT the machine tier: passing 0 zeroed every ingredient
+        // quantity and threw "quantity 0 must be >0", which the drive guard swallowed every tick (nothing
+        // ever crafted). The output side already uses count=1, so 1 keeps inputs and outputs consistent.
+        int batch = 1;
         Set<String> allow = cardAllowSet(node.card());
         Set<String> craftable = new java.util.HashSet<>();
         for (String id : pool.stableOrder) {
@@ -200,11 +204,17 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
             if (r == null) {
                 continue;
             }
-            if (!VanillaCraftBridge.inputsPresent(r, node.input(), tier)) {
-                continue;
-            }
-            // Backpressure: a full output stalls the craft (don't consume inputs we can't bank).
-            if (!VanillaCraftBridge.canProduce(node.output(), VanillaCraftBridge.outputs(r))) {
+            try {
+                if (!VanillaCraftBridge.inputsPresent(r, node.input(), batch)) {
+                    continue;
+                }
+                // Backpressure: a full output stalls the craft (don't consume inputs we can't bank).
+                if (!VanillaCraftBridge.canProduce(node.output(), VanillaCraftBridge.outputs(r))) {
+                    continue;
+                }
+            } catch (RuntimeException ex) {
+                // A single malformed recipe (e.g. a 0-quantity ingredient) must not poison the whole scan:
+                // skip it rather than aborting every recipe's evaluation (and the craft) for this tick.
                 continue;
             }
             craftable.add(id);
@@ -235,7 +245,7 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
             CraftingRecipe r = pool.map.get(o.pick());
             // Atomic consume: only produce if the inputs were actually removed (we already gated on
             // inputsPresent + canProduce above, so this should succeed; keep the guard regardless).
-            if (r != null && VanillaCraftBridge.consumeInputs(r, node.input(), tier)) {
+            if (r != null && VanillaCraftBridge.consumeInputs(r, node.input(), batch)) {
                 VanillaCraftBridge.addOutputs(node.output(), VanillaCraftBridge.outputs(r));
             }
         }
