@@ -54,7 +54,13 @@ import org.joml.Vector3d;
  * <p>Layout mirrors the bench panel (status/controls on the LEFT, processing I/O on the RIGHT) and ADDS a
  * single-slot {@code #CardSlot} for the inserted recipe card. Like the bench panel the slots are read-only
  * display ({@code AreItemsDraggable: false}): items flow through pipes, not by hand, and the recipe card is
- * DISPLAY-ONLY for v1 (card insert/remove via hand is deferred — the card-programming UX is a later task).
+ * DISPLAY-ONLY for v1 (card insert/remove via hand is deferred: the card-programming UX is a later task).
+ *
+ * <p>The left "input" grid is NOT a push-fed input buffer: the Forge is a demand-driven puller, so its
+ * {@code held()} container holds ONLY the active craft's pulled ingredients (empty when idle, a few stacks
+ * during a craft). The panel DISPLAYS those held ingredients as a scrolling list ({@code #InputGrid}, filled
+ * slots only): empty while idle, populated during a craft, scrolling if a recipe ever needs more than the
+ * viewport. The output grid ({@code #OutputGrid}) is the fixed 4-slot result buffer and shows empty slots.
  *
  * <p>The two player controls are the same as the bench panel: an On/Off toggle (writes
  * {@link ForgeCraftState#setEnabled(boolean)}) and an Eject button draining the Forge's own input + output
@@ -63,7 +69,9 @@ import org.joml.Vector3d;
  * <p>Progress bar fraction is {@code progress() / FORGE_DURATION} via
  * {@link BenchMachinePanelText#forgeFraction}; {@code FORGE_DURATION} comes from
  * {@link ForgeTickSystem#FORGE_DURATION} (the single craft-length source of truth shared with the tick). A
- * craft is treated as ACTIVE while {@code progress() > 0}.
+ * craft is treated as ACTIVE while {@code currentRecipeId() != null} (the tick's real "crafting" definition:
+ * on the START tick the ingredients are pulled but progress is still 0, yet the Forge IS crafting, so
+ * {@code progress > 0} would wrongly flash "Idle").
  *
  * <p><b>Threading:</b> identical to {@link BenchMachinePanelPage} — {@link #build}/{@link #refresh()} run on
  * the WorldThread; button events ({@link #handleDataEvent}) may arrive off it, so the ECS mutations are
@@ -189,7 +197,8 @@ public final class ForgePanelPage extends InteractiveCustomUIPage<ForgePanelPage
         // Toggle button shows the ACTION (mode to switch to), not the current state: ON -> "Turn Off".
         cmd.set("#PowerToggle.Text", enabled ? "Turn Off" : "Turn On");
 
-        cmd.set("#InputGrid.Slots", slotsOf(forge.held()));
+        // Held = the active craft's pulled ingredients: show FILLED slots only (idle -> empty list).
+        cmd.set("#InputGrid.Slots", filledSlotsOf(forge.held()));
         cmd.set("#InputGrid.DisplayItemQuantity", true);
         cmd.set("#OutputGrid.Slots", slotsOf(forge.output()));
         cmd.set("#OutputGrid.DisplayItemQuantity", true);
@@ -201,9 +210,10 @@ public final class ForgePanelPage extends InteractiveCustomUIPage<ForgePanelPage
         // The Forge has no tier upgrades yet (tier 0).
         cmd.set("#TierText.TextSpans", Message.raw("Tier: 0"));
 
-        // A craft is in flight while progress has accumulated; raw seconds -> 0..1 against FORGE_DURATION.
+        // A craft is in flight while a recipe is loaded (start tick pulls ingredients before progress > 0).
+        // Progress fraction stays raw-seconds based: seconds -> 0..1 against FORGE_DURATION.
         float progressSeconds = forge.progress();
-        boolean active = progressSeconds > 0.0F;
+        boolean active = forge.currentRecipeId() != null;
         float frac = BenchMachinePanelText.forgeFraction(progressSeconds, ForgeTickSystem.FORGE_DURATION);
         cmd.set("#ProgressBar.Value", frac);
         cmd.set("#ProgressText.TextSpans", Message.raw(BenchMachinePanelText.progress(enabled, active, frac)));
@@ -234,6 +244,26 @@ public final class ForgePanelPage extends InteractiveCustomUIPage<ForgePanelPage
             slots.add(stack == null || ItemStack.isEmpty(stack)
                 ? new ItemGridSlot()
                 : new ItemGridSlot(stack));
+        }
+        return slots;
+    }
+
+    /**
+     * One {@link ItemGridSlot} per NON-EMPTY stack only (empties/nulls skipped); read-only display. Used for
+     * the held ingredients list so an idle Forge renders an empty list and a crafting Forge renders just the
+     * pulled ingredient stacks.
+     */
+    private static List<ItemGridSlot> filledSlotsOf(ItemContainer container) {
+        List<ItemGridSlot> slots = new ArrayList<>();
+        if (container == null) {
+            return slots;
+        }
+        short capacity = container.getCapacity();
+        for (short s = 0; s < capacity; s++) {
+            ItemStack stack = container.getItemStack(s);
+            if (stack != null && !ItemStack.isEmpty(stack)) {
+                slots.add(new ItemGridSlot(stack));
+            }
         }
         return slots;
     }
