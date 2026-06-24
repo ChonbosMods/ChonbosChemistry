@@ -189,7 +189,7 @@ public final class ForgePanelPage extends InteractiveCustomUIPage<ForgePanelPage
         // Toggle button shows the ACTION (mode to switch to), not the current state: ON -> "Turn Off".
         cmd.set("#PowerToggle.Text", enabled ? "Turn Off" : "Turn On");
 
-        cmd.set("#InputGrid.Slots", slotsOf(forge.input()));
+        cmd.set("#InputGrid.Slots", slotsOf(forge.held()));
         cmd.set("#InputGrid.DisplayItemQuantity", true);
         cmd.set("#OutputGrid.Slots", slotsOf(forge.output()));
         cmd.set("#OutputGrid.DisplayItemQuantity", true);
@@ -257,7 +257,7 @@ public final class ForgePanelPage extends InteractiveCustomUIPage<ForgePanelPage
             (id, metadata, amount) -> invView.insert(new ItemKey(id, amount), metadata, amount, false);
 
         List<ContainerView> sources = List.of(
-            new ItemContainerView(forge.input()),
+            new ItemContainerView(forge.held()),
             new ItemContainerView(forge.output()));
         List<MachineEject.EjectStack> overflow = MachineEject.ejectAll(sources, sink);
         if (overflow.isEmpty()) {

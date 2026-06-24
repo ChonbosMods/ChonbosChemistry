@@ -205,7 +205,7 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
                 continue;
             }
             try {
-                if (!VanillaCraftBridge.inputsPresent(r, node.input(), batch)) {
+                if (!VanillaCraftBridge.inputsPresent(r, node.held(), batch)) {
                     continue;
                 }
                 // Backpressure: a full output stalls the craft (don't consume inputs we can't bank).
@@ -245,7 +245,7 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
             CraftingRecipe r = pool.map.get(o.pick());
             // Atomic consume: only produce if the inputs were actually removed (we already gated on
             // inputsPresent + canProduce above, so this should succeed; keep the guard regardless).
-            if (r != null && VanillaCraftBridge.consumeInputs(r, node.input(), batch)) {
+            if (r != null && VanillaCraftBridge.consumeInputs(r, node.held(), batch)) {
                 VanillaCraftBridge.addOutputs(node.output(), VanillaCraftBridge.outputs(r));
             }
         }

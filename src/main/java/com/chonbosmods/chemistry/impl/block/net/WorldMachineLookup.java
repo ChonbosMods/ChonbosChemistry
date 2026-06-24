@@ -165,7 +165,7 @@ public final class WorldMachineLookup implements MachineLookup {
      */
     private static ItemContainerFn forgeItems(ForgeCraftState forge) {
         return direction -> switch (direction) {
-            case INPUT -> forge.input();   // ingredients fed IN
+            case INPUT -> forge.held();   // ingredients fed IN
             case OUTPUT -> forge.output(); // results drained OUT
             default -> null; // BOTH/CLOSED: the Forge's item ports are INPUT/OUTPUT only
         };
