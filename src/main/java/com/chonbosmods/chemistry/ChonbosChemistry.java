@@ -3,6 +3,7 @@ package com.chonbosmods.chemistry;
 import com.chonbosmods.chemistry.api.registry.Chemistry;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
+import com.chonbosmods.chemistry.impl.block.craft.ForgeTickSystem;
 import com.chonbosmods.chemistry.impl.block.CarryBreakEventSystem;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
@@ -119,6 +120,9 @@ public class ChonbosChemistry extends JavaPlugin {
         // (No longer pushes resources to neighbors: the NetworkTickSystem below does that over pipes.)
         getChunkStoreRegistry().registerSystem(new MachineTickSystem(machineComponentType));
         getLogger().atInfo().log("Registered MachineTickSystem (creative-refill then work).");
+        // Autonomous-craft driver for the Forge (no held bench; own containers + even round-robin selection).
+        getChunkStoreRegistry().registerSystem(new ForgeTickSystem(forgeComponentType));
+        getLogger().atInfo().log("Registered ForgeTickSystem (autonomous crafting).");
 
         // Transport network cache (per-world) + the events that invalidate it on pipe topology changes
         // (H3). Place/break fire on the EntityStore (the acting entity); chunk-unload fires on the
