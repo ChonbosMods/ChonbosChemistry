@@ -66,3 +66,10 @@ src/main/resources/Common/Items/Chemistry/Substance_Textures/
 src/main/resources/Common/Icons/ItemsGenerated/Chem_Solid_*.png
 src/main/resources/Server/Item/Items/Chemistry/
 src/main/resources/Server/Languages/en-US/server.lang
+
+# Generated world-fluid asset pack (produced by generateWorldFluids)
+src/main/resources/Common/BlockTextures/
+src/main/resources/Common/Icons/ItemsGenerated/Chem_Fluid_*.png
+src/main/resources/Server/Item/Block/Fluids/
+src/main/resources/Server/Item/Block/FluidFX/
+src/main/resources/Server/Item/Items/Fluid/

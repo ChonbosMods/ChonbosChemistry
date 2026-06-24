@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +61,7 @@ public final class SubstanceAssetGenerator {
         registry.elements().stream().filter(s -> s.phase() == Phase.SOLID).forEach(solids::add);
         registry.compounds().stream().filter(s -> s.phase() == Phase.SOLID).forEach(solids::add);
 
-        StringBuilder lang = new StringBuilder();
+        Map<String, String> langEntries = new LinkedHashMap<>();
         Set<String> seen = new HashSet<>();
         Map<GlowTier, Integer> tierCounts = new EnumMap<>(GlowTier.class);
         for (Substance s : solids) {
@@ -86,9 +87,9 @@ public final class SubstanceAssetGenerator {
             Files.writeString(
                 itemDir.resolve(id + ".json"),
                 SolidSubstanceAssets.itemJson(id, texturePath, tier, SolidSubstanceAssets.lightJson(c, tier)));
-            lang.append("items.").append(id).append(".name = ").append(s.name()).append('\n');
+            langEntries.put("items." + id + ".name", s.name());
         }
-        Files.writeString(langDir.resolve("server.lang"), lang.toString());
+        LangWriter.merge(langDir.resolve("server.lang"), langEntries);
 
         System.out.println("Generated " + solids.size() + " solid-substance items -> " + out);
         StringBuilder summary = new StringBuilder("Glow tiers:");

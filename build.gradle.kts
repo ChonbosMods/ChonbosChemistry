@@ -61,3 +61,20 @@ tasks.register<JavaExec>("generateFluidPipeTextures") {
         project.file("src/main/resources/Common/Blocks/ChonbosMods/Pipes/Substances").absolutePath,
     )
 }
+
+// Bake substance colors + hazards into the world-fluid asset set (source/flowing blocks, FluidFX,
+// placement items, the CC_Fluids BlockTypeList, and the merged server.lang names). Run before
+// devServer/build:
+//   ./gradlew generateWorldFluids
+tasks.register<JavaExec>("generateWorldFluids") {
+    group = "chemistry"
+    description = "Bake substance colors + hazards into world fluid blocks, FX, and placement items."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.chonbosmods.chemistry.impl.assetgen.WorldFluidGenerator")
+    args(
+        project.file("assets-src/fluid_master.png").absolutePath,
+        project.file("src/main/resources").absolutePath,
+        project.file("assets-src/icon_master.png").absolutePath,
+        project.file("assets-src/icon_liquid_mask.png").absolutePath,
+    )
+}
