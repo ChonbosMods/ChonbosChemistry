@@ -1,0 +1,117 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CC_Reclaimer.name"
+  },
+  "Categories": [
+    "Furniture.Benches"
+  ],
+  "PlayerAnimationsId": "Block",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Model",
+    "Opacity": "Transparent",
+    "CustomModel": "Blocks/ChonbosMods/Machines/CC_Reclaimer.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/ChonbosMods/Machines/CC_Reclaimer_Texture_Off.png",
+        "Weight": 1
+      }
+    ],
+    "VariantRotation": "NESW",
+    "HitboxType": "CC_Reclaimer",
+    "Flags": {
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "CC_ReclaimerPanel"
+            }
+          }
+        ]
+      }
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "Benches"
+      }
+    },
+    "Support": {
+      "Down": [
+        {
+          "FaceType": "Full"
+        }
+      ]
+    },
+    "BlockParticleSetId": "Stone",
+    "ParticleColor": "#5C583E",
+    "BlockSoundSetId": "Stone",
+    "PhysicalMaterialId": "Stone",
+    "TextureComputedColor": "#29281F",
+    "Bench": {
+      "Type": "Processing",
+      "Id": "Salvagebench",
+      "Input": [
+        {
+          "FilterValidIngredients": true
+        }
+      ],
+      "OutputSlotsCount": 4
+    },
+    "BlockEntity": {
+      "Components": {
+        "MachineBlockState": {
+          "Energy": {
+            "Stored": 0,
+            "Capacity": 40000
+          },
+          "Ports": {
+            "Ports": [
+              { "Face": 0, "Channel": "item", "Direction": "output", "CellX": 0, "CellY": 0, "CellZ": 0 },
+              { "Face": 1, "Channel": "item", "Direction": "input", "CellX": 0, "CellY": 0, "CellZ": 0 },
+              { "Face": 5, "Channel": "power", "Direction": "input", "CellX": 0, "CellY": 0, "CellZ": 0 }
+            ]
+          }
+        }
+      }
+    },
+    "State": {
+      "Definitions": {
+        "Processing": {
+          "Looping": true,
+          "Light": {
+            "Color": "#4BE"
+          },
+          "CustomModelTexture": [
+            {
+              "Texture": "Blocks/ChonbosMods/Machines/CC_Reclaimer_Texture.png",
+              "Weight": 1
+            }
+          ]
+        },
+        "ProcessCompleted": {
+          "Looping": true,
+          "Light": {
+            "Color": "#4BE"
+          },
+          "CustomModelTexture": [
+            {
+              "Texture": "Blocks/ChonbosMods/Machines/CC_Reclaimer_Texture.png",
+              "Weight": 1
+            }
+          ]
+        }
+      }
+    },
+    "ConnectedBlockRuleSet": {
+      "Type": "CustomTemplate",
+      "TemplateShapeAssetId": "CC_ReclaimerTemplate",
+      "TemplateShapeBlockPatterns": {
+        "machine": "CC_Reclaimer"
+      }
+    }
+  }
+}

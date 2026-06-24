@@ -149,4 +149,46 @@ class PortConfigTest {
         assertEquals(1, next.ports().size());
         assertNotNull(next.portAt(2, PortChannel.POWER));
     }
+
+    @Test
+    void portCodecRoundTripsCellOffset() throws Exception {
+        Port p = decode(Port.CODEC,
+            "{\"Face\":1,\"Channel\":\"item\",\"Direction\":\"input\",\"CellX\":-1,\"CellY\":0,\"CellZ\":2}");
+        assertEquals(-1, p.cellX());
+        assertEquals(0, p.cellY());
+        assertEquals(2, p.cellZ());
+        assertEquals(1, p.faceIndex());
+    }
+
+    @Test
+    void legacyPortJsonWithoutCellKeysDecodesToAnchor() throws Exception {
+        Port p = decode(Port.CODEC, "{\"Face\":2,\"Channel\":\"fluid\",\"Direction\":\"output\"}");
+        assertEquals(0, p.cellX());
+        assertEquals(0, p.cellY());
+        assertEquals(0, p.cellZ());
+    }
+
+    @Test
+    void forCellKeepsOnlyThatCellsPorts() {
+        // Smelter-shaped layout: item-out on anchor (0,0,0) East, item-in on West-bottom (-1,0,0) West,
+        // power on anchor (0,0,0) North. Upper cells carry nothing.
+        PortConfig cfg = PortConfig.of(List.of(
+            Port.of(0, 0, 0, 0, PortChannel.ITEM, PortDirection.OUTPUT),
+            Port.of(0, 0, 0, 5, PortChannel.POWER, PortDirection.INPUT),
+            Port.of(-1, 0, 0, 1, PortChannel.ITEM, PortDirection.INPUT)));
+
+        PortConfig anchor = cfg.forCell(0, 0, 0);
+        assertEquals(2, anchor.ports().size());
+        assertNotNull(anchor.portAt(0, PortChannel.ITEM));
+        assertNotNull(anchor.portAt(5, PortChannel.POWER));
+        assertNull(anchor.portAt(1, PortChannel.ITEM)); // the West item-in belongs to a different cell
+
+        PortConfig westBottom = cfg.forCell(-1, 0, 0);
+        assertEquals(1, westBottom.ports().size());
+        assertNotNull(westBottom.portAt(1, PortChannel.ITEM));
+
+        // An upper filler cell exposes no ports at all.
+        assertTrue(cfg.forCell(0, 1, 0).ports().isEmpty());
+        assertTrue(cfg.forCell(-1, 1, 0).ports().isEmpty());
+    }
 }

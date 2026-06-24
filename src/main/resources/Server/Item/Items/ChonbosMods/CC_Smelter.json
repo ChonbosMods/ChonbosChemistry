@@ -1,0 +1,133 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CC_Smelter.name"
+  },
+  "Categories": [
+    "Furniture.Benches"
+  ],
+  "PlayerAnimationsId": "Block",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Model",
+    "Opacity": "Transparent",
+    "CustomModel": "Blocks/ChonbosMods/Machines/CC_Smelter.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/ChonbosMods/Machines/CC_Smelter_Texture_Off.png",
+        "Weight": 1
+      }
+    ],
+    "VariantRotation": "NESW",
+    "HitboxType": "CC_Smelter",
+    "Flags": {
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "CC_SmelterPanel"
+            }
+          }
+        ]
+      }
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "Benches"
+      }
+    },
+    "Support": {
+      "Down": [
+        {
+          "FaceType": "Full"
+        }
+      ]
+    },
+    "BlockParticleSetId": "Stone",
+    "ParticleColor": "#5C583E",
+    "BlockSoundSetId": "Stone",
+    "PhysicalMaterialId": "Stone",
+    "TextureComputedColor": "#29281F",
+    "Bench": {
+      "Type": "Processing",
+      "Id": "Furnace",
+      "Input": [
+        {
+          "FilterValidIngredients": true
+        },
+        {
+          "FilterValidIngredients": true
+        }
+      ],
+      "OutputSlotsCount": 4
+    },
+    "BlockEntity": {
+      "Components": {
+        "MachineBlockState": {
+          "Energy": {
+            "Stored": 0,
+            "Capacity": 40000
+          },
+          "Ports": {
+            "Ports": [
+              { "Face": 0, "Channel": "item", "Direction": "output", "CellX": 0, "CellY": 0, "CellZ": 0 },
+              { "Face": 1, "Channel": "item", "Direction": "input", "CellX": -1, "CellY": 0, "CellZ": 0 },
+              { "Face": 5, "Channel": "power", "Direction": "input", "CellX": 0, "CellY": 0, "CellZ": 0 }
+            ]
+          }
+        }
+      }
+    },
+    "State": {
+      "Definitions": {
+        "Processing": {
+          "Looping": true,
+          "Light": {
+            "Color": "#B72"
+          },
+          "CustomModelTexture": [
+            {
+              "Texture": "Blocks/ChonbosMods/Machines/CC_Smelter_Texture.png",
+              "Weight": 1
+            }
+          ],
+          "Particles": [
+            {
+              "SystemId": "Fire_Furnace_On",
+              "TargetNodeName": "Fire",
+              "Scale": 0.7,
+              "PositionOffset": {
+                "X": 0,
+                "Z": 0.3
+              }
+            }
+          ],
+          "CustomModelAnimation": "Blocks/ChonbosMods/Machines/CC_Smelter_Smelting.blockyanim"
+        },
+        "ProcessCompleted": {
+          "Looping": true,
+          "Light": {
+            "Color": "#B72"
+          },
+          "CustomModelTexture": [
+            {
+              "Texture": "Blocks/ChonbosMods/Machines/CC_Smelter_Texture.png",
+              "Weight": 1
+            }
+          ],
+          "CustomModelAnimation": "Blocks/ChonbosMods/Machines/CC_Smelter_Smelting.blockyanim"
+        }
+      }
+    },
+    "ConnectedBlockRuleSet": {
+      "Type": "CustomTemplate",
+      "TemplateShapeAssetId": "CC_SmelterTemplate",
+      "TemplateShapeBlockPatterns": {
+        "machine": "CC_Smelter"
+      }
+    }
+  }
+}

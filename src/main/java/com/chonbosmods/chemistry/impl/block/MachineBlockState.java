@@ -2,6 +2,8 @@ package com.chonbosmods.chemistry.impl.block;
 
 import com.chonbosmods.chemistry.api.energy.EnergyHandler;
 import com.chonbosmods.chemistry.api.io.PortChannel;
+import com.hypixel.hytale.builtin.crafting.component.BenchBlock;
+import com.hypixel.hytale.builtin.crafting.component.ProcessingBenchBlock;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.EmptyExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -60,6 +62,24 @@ public final class MachineBlockState implements Component<ChunkStore> {
         // to 0 rather than tripping the primitive non-null check.
         .append(new KeyedCodec<>("EnergyDrainPerTick", OPTIONAL_LONG, false),
                 (o, v) -> o.energyDrainPerTick = v == null ? 0L : v, o -> o.energyDrainPerTick).add()
+        // The vanilla bench engine (smelter recipe/slots/progress) and its sibling tier-carrier, HELD as
+        // internal fields (not registered ECS components: D31 keeps vanilla's ProcessingBenchTick from
+        // ever seeing our block). Both are OPTIONAL: a machine without a bench (or a pre-existing
+        // persisted machine) decodes fine with the keys absent -> the fields stay null. Mirrors the
+        // "Energy" key above: ProcessingBenchBlock.CODEC / BenchBlock.CODEC are object codecs, so a null
+        // value is simply omitted on encode and an absent key decodes back to null. A present bench
+        // round-trips the vanilla bench data via the vanilla codecs.
+        .append(new KeyedCodec<>("HeldBench", ProcessingBenchBlock.CODEC),
+                (o, v) -> o.heldBench = v, o -> o.heldBench).add()
+        .append(new KeyedCodec<>("HeldBenchBlock", BenchBlock.CODEC),
+                (o, v) -> o.heldBenchBlock = v, o -> o.heldBenchBlock).add()
+        // On/Off control line: when false the tick system holds the machine (no processing / no power
+        // consumption) but keeps its loaded input + buffered power. This IS the seam the circuit system's
+        // Machine I/O bridge writes ("run/halt"). OPTIONAL (3-arg, not-required): legacy data saved before
+        // the flag has no "Enabled" key, so the setter is never invoked and the field stays its true
+        // default (machines placed before this flag stay ON).
+        .append(new KeyedCodec<>("Enabled", Codec.BOOLEAN, false),
+                (o, v) -> o.enabled = v, o -> o.enabled).add()
         .build();
 
     private static final int DEFAULT_THROUGHPUT = 100;
@@ -70,9 +90,30 @@ public final class MachineBlockState implements Component<ChunkStore> {
     private WorkState work = new WorkState();
     private int throughput = DEFAULT_THROUGHPUT;
     private boolean creativeSource;
+    /** On/Off control line (default ON); the circuit run/halt seam. See the "Enabled" codec key. */
+    private boolean enabled = true;
+    /**
+     * Last block-visual-state ({@code "Processing"}/{@code "default"}) this machine drove into the world.
+     * Transient (NOT a codec key): purely a per-tick de-dup so we only re-issue an interaction-state update
+     * on a transition. Null on a fresh/decoded block so the first tick re-syncs. See
+     * {@link #shouldUpdateVisualState(String)}.
+     */
+    private transient String lastVisualState;
     // Energy units this machine burns from its own buffer each tick (0 = no self-drain). Default 0 so
     // an absent codec key leaves a normal machine non-draining.
     private long energyDrainPerTick;
+    // The held vanilla bench engine + its sibling tier-carrier. Nullable: a non-bench machine (or a
+    // pre-existing persisted machine) carries neither, so the optional codec keys decode to null. Set
+    // by the smelter placement path (Task 12) and driven by our own tick (Task 8) via VanillaBenchBridge.
+    private ProcessingBenchBlock heldBench;
+    private BenchBlock heldBenchBlock;
+    // TRANSIENT (no codec key, never persisted): whether the held bench's slot listeners have been
+    // re-wired against the live world this load. A ProcessingBenchBlock loses its transient slot wiring
+    // across a codec round-trip (chunk save/reload) and after fresh placement, so the tick re-runs
+    // VanillaBenchBridge.wireSlots(...) once when this is false, then sets it true. Defaults false on
+    // every fresh instance (including every codec-decoded one, since the codec never touches it), so a
+    // reloaded bench is always re-wired exactly once before its first advance.
+    private transient boolean benchWired;
 
     /** Public no-arg constructor for the codec supplier. */
     public MachineBlockState() {
@@ -173,6 +214,36 @@ public final class MachineBlockState implements Component<ChunkStore> {
     }
 
     /**
+     * @return whether this machine is ON (enabled). When OFF, the tick system holds it: no processing and
+     *     no power consumption, but its loaded input and buffered power are retained. This is the On/Off
+     *     panel toggle AND the circuit system's "run/halt" control line (the Machine I/O bridge writes it).
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /** Set the On/Off control line. See {@link #isEnabled()}. */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    /**
+     * Per-block change-guard for the driven block visual state ({@code "Processing"} / {@code "default"}):
+     * returns {@code true} (and records {@code desired} as the new last-applied) only when {@code desired}
+     * differs from the last applied value, so {@link MachineTickSystem} re-issues a block-interaction-state
+     * update only on a transition rather than every tick (avoids restarting the looping animation and
+     * spamming a state packet). Transient (never codec-persisted): after a chunk reload {@code lastVisualState}
+     * is null, so the first tick always applies and re-syncs the world to the machine's real state.
+     */
+    public boolean shouldUpdateVisualState(String desired) {
+        if (java.util.Objects.equals(lastVisualState, desired)) {
+            return false;
+        }
+        lastVisualState = desired;
+        return true;
+    }
+
+    /**
      * @return energy units this machine burns from its own buffer each tick (0 = none). Drives the
      *     test-rig "burning sink": the tick system calls {@code extractEnergyInternal(drain, false)}
      *     so the sink's stored energy visibly drains after the network fills it.
@@ -183,6 +254,47 @@ public final class MachineBlockState implements Component<ChunkStore> {
 
     public void setEnergyDrainPerTick(long energyDrainPerTick) {
         this.energyDrainPerTick = energyDrainPerTick;
+    }
+
+    /**
+     * @return the held vanilla {@link ProcessingBenchBlock} (smelter recipe/slots/progress engine), or
+     *     null if this machine carries no bench. Held as an internal field (never a registered ECS
+     *     component) so vanilla never ticks it; our own tick drives it via {@code VanillaBenchBridge}.
+     */
+    public ProcessingBenchBlock heldBench() {
+        return heldBench;
+    }
+
+    public void setHeldBench(ProcessingBenchBlock heldBench) {
+        this.heldBench = heldBench;
+    }
+
+    /**
+     * @return the held sibling {@link BenchBlock} (carries the bench tier), or null if this machine
+     *     carries no bench. Rides alongside {@link #heldBench()} and is passed back into the bench
+     *     engine by {@code VanillaBenchBridge.advance(...)}.
+     */
+    public BenchBlock heldBenchBlock() {
+        return heldBenchBlock;
+    }
+
+    public void setHeldBenchBlock(BenchBlock heldBenchBlock) {
+        this.heldBenchBlock = heldBenchBlock;
+    }
+
+    /**
+     * @return whether the held bench's slot listeners have been re-wired against the live world this
+     *     load. TRANSIENT (never persisted): false on every fresh/decoded instance, so the tick
+     *     re-wires a reloaded bench exactly once (via {@code VanillaBenchBridge.wireSlots}) before its
+     *     first advance. See {@link #benchWired}.
+     */
+    public boolean isBenchWired() {
+        return benchWired;
+    }
+
+    /** Marks the held bench's slots as wired (set true by the tick after the one-time re-wire). */
+    public void setBenchWired(boolean benchWired) {
+        this.benchWired = benchWired;
     }
 
     /**

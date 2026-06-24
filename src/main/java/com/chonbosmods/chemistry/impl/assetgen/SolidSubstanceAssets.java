@@ -33,18 +33,7 @@ public final class SolidSubstanceAssets {
      */
     public static String assetId(boolean isElement, String identity) {
         String kind = isElement ? "Element" : "Compound";
-        String[] parts = identity.replaceAll("[^A-Za-z0-9]+", "_").replaceAll("^_+|_+$", "").split("_");
-        StringBuilder safe = new StringBuilder();
-        for (String p : parts) {
-            if (p.isEmpty()) {
-                continue;
-            }
-            if (safe.length() > 0) {
-                safe.append('_');
-            }
-            safe.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1));
-        }
-        return "Chem_Solid_" + kind + "_" + safe;
+        return "Chem_Solid_" + kind + "_" + AssetIds.pascalSegments(identity);
     }
 
     /** Texture path (relative to the asset pack {@code Common/}) for a given item id. */

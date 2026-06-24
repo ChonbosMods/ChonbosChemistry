@@ -50,4 +50,42 @@ class NetworkTickResetTest {
         // powered cable lands on its energized plain shape (no flicker).
         assertTrue(NetworkTickSystem.shouldResetOverride("Elbow_On", "Elbow", 0, 0));
     }
+
+    // --- engineMayOwnVisual: the cheap-skip gate (the power-cable elbow bug lived here) ---
+
+    private static final int MASK_NX_PZ = (1 << 1) | (1 << 4); // -X | +Z  (an elbow topology)
+    private static final int BIT_PZ = 1 << 4;                  // +Z endpoint arm
+
+    @Test
+    void engineMayOwn_pureUndisturbedPipeRun_isCheapSkipped() {
+        // No tip, effective == physical, no endpoint neighbour, never overridden: the engine + H8 flip
+        // own it correctly. The cheap fast path (no state read) is allowed.
+        assertTrue(NetworkTickSystem.engineMayOwnVisual(false, MASK_NX_PZ, MASK_NX_PZ, 0, false));
+    }
+
+    @Test
+    void engineMayOwn_endpointAdjacentUndisturbed_isNOTskipped() {
+        // THE BUG: a power cable bordering a machine power-face (+Z endpoint) AND a pipe (-X) has
+        // effective == physical, yet the engine mis-resolves it to End (drops the +Z arm). An
+        // endpoint-adjacent pipe must NOT be trusted to the engine — it must be reconciled to our table.
+        assertFalse(NetworkTickSystem.engineMayOwnVisual(false, MASK_NX_PZ, MASK_NX_PZ, BIT_PZ, false));
+    }
+
+    @Test
+    void engineMayOwn_previouslyOverridden_isNOTskipped() {
+        // A pipe we previously overrode must be revisited to reset it (the engine won't re-resolve it).
+        assertFalse(NetworkTickSystem.engineMayOwnVisual(false, MASK_NX_PZ, MASK_NX_PZ, 0, true));
+    }
+
+    @Test
+    void engineMayOwn_withTip_isNOTskipped() {
+        // A tip needs the composite shape write; never the cheap skip.
+        assertFalse(NetworkTickSystem.engineMayOwnVisual(true, MASK_NX_PZ, MASK_NX_PZ, 0, false));
+    }
+
+    @Test
+    void engineMayOwn_divergentMasks_isNOTskipped() {
+        // effective != physical is the classic suppression case (handled by the override path).
+        assertFalse(NetworkTickSystem.engineMayOwnVisual(false, 1 << 1, MASK_NX_PZ, BIT_PZ, false));
+    }
 }

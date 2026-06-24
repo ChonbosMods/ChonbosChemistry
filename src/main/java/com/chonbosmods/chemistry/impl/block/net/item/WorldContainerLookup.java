@@ -3,17 +3,12 @@ package com.chonbosmods.chemistry.impl.block.net.item;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.server.core.asset.type.item.config.Item;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.block.components.ItemContainerBlock;
-import com.hypixel.hytale.server.core.inventory.transaction.ItemStackSlotTransaction;
-import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import javax.annotation.Nonnull;
-import org.bson.BsonDocument;
 
 /**
  * Live {@link ContainerLookup} over a {@link World}: bridges the pure ITEM transport layer to the engine
@@ -77,7 +72,7 @@ public final class WorldContainerLookup implements ContainerLookup {
     @Override
     public ContainerView at(int x, int y, int z) {
         ItemContainer container = containerAt(x, y, z);
-        return container == null ? null : new WorldContainerView(container);
+        return container == null ? null : new ItemContainerView(container);
     }
 
     /** Resolves the engine {@link ItemContainer} at a position, or null when there is no container block. */
@@ -97,172 +92,4 @@ public final class WorldContainerLookup implements ContainerLookup {
         }
     }
 
-    /** The per-container operations, wrapping one live engine {@link ItemContainer}. */
-    private static final class WorldContainerView implements ContainerView {
-
-        private final ItemContainer container;
-
-        WorldContainerView(ItemContainer container) {
-            this.container = container;
-        }
-
-        @Override
-        public int insert(ItemKey key, BsonDocument metadata, int amount, boolean simulate) {
-            if (key == null || amount <= 0 || key.id() == null || key.id().isEmpty()) {
-                return 0;
-            }
-            try {
-                if (simulate) {
-                    return simulateInsert(key.id(), metadata, amount);
-                }
-                ItemStack stack = new ItemStack(key.id(), amount);
-                if (metadata != null) {
-                    // Mirror DropSink (ItemTransferSystem.spawnDrop): attach a cloned metadata document so
-                    // the delivered stack round-trips byte-for-byte and we never alias the caller's doc.
-                    stack = stack.withMetadata(metadata.clone());
-                }
-                ItemStackTransaction tx = container.addItemStack(stack, false, false, false);
-                if (tx == null || !tx.succeeded()) {
-                    // A failed transaction still reports the remainder; succeeded() is false only when
-                    // NOTHING went in. Compute from the remainder either way (0 when fully rejected).
-                    return tx == null ? 0 : accepted(amount, tx.getRemainder());
-                }
-                return accepted(amount, tx.getRemainder());
-            } catch (Throwable t) {
-                return 0;
-            }
-        }
-
-        /**
-         * Read-only "how much of {@code id} (with {@code metadata}) would fit" scan (spike finding: no
-         * engine dry-run yields a partial count). Sums room in STACKABLE same-id slots plus empty-slot
-         * capacity, capped at {@code amount}. Mirrors the engine's {@code testAddTo*} grain using only
-         * public accessors.
-         *
-         * <p>NAMED DIVERGENCE from the engine's {@code isStackableWith} (documented residual, CRITICAL
-         * review fix): an occupied same-id slot counts as room ONLY when its metadata matches the
-         * inserting stack's ({@link java.util.Objects#equals} on the documents, both-null included). The
-         * engine's {@code isStackableWith} ALSO compares a durability field that is not exposed on the
-         * public {@link ItemStack} surface, so we cannot replicate it here. The consequence is a
-         * CONSERVATIVE under-promise on durability-edge cases (two same-id same-metadata stacks the
-         * engine would actually merge might be counted as non-stackable if their hidden durability
-         * differs): a later re-route simply finds the real room with no churn. We never OVER-promise on
-         * metadata (that would cause launch-then-bounce), which is the failure mode this fix exists to
-         * prevent: the commit always reconciles via the real {@code addItemStack} remainder (T2
-         * staleness contract).
-         */
-        private int simulateInsert(String id, BsonDocument metadata, int amount) {
-            int maxStack = maxStackOf(id);
-            if (maxStack <= 0) {
-                return 0;
-            }
-            short capacity = container.getCapacity();
-            int room = 0;
-            for (short slot = 0; slot < capacity && room < amount; slot++) {
-                ItemStack inSlot = container.getItemStack(slot);
-                if (inSlot == null || ItemStack.isEmpty(inSlot)) {
-                    room += maxStack; // an empty slot can take a full stack of any id
-                } else if (id.equals(inSlot.getItemId())
-                        && java.util.Objects.equals(metadata, inSlot.getMetadata())) {
-                    // Same id AND matching metadata: the engine would stack into this slot.
-                    int free = maxStack - inSlot.getQuantity();
-                    if (free > 0) {
-                        room += free;
-                    }
-                }
-            }
-            return Math.min(amount, room);
-        }
-
-        @Override
-        public Peek firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
-            if (cap <= 0) {
-                return null;
-            }
-            try {
-                short capacity = container.getCapacity();
-                for (short slot = 0; slot < capacity; slot++) {
-                    ItemStack inSlot = container.getItemStack(slot);
-                    if (inSlot == null || ItemStack.isEmpty(inSlot)) {
-                        continue;
-                    }
-                    String id = inSlot.getItemId();
-                    if (id == null || id.isEmpty()) {
-                        continue;
-                    }
-                    int available = Math.min(inSlot.getQuantity(), cap);
-                    if (available <= 0) {
-                        continue;
-                    }
-                    ItemKey candidate = new ItemKey(id, available);
-                    if (filter == null || filter.admits(candidate, pipeKey, viaFace)) {
-                        // Carry the matched slot's metadata so the destination-confirmation simulate sees
-                        // the REAL stack about to travel (engine isStackableWith compares metadata).
-                        return new Peek(candidate, cloneMetadata(inSlot.getMetadata()));
-                    }
-                }
-                return null;
-            } catch (Throwable t) {
-                return null;
-            }
-        }
-
-        @Override
-        public Extracted extract(ItemKey key, int amount, boolean simulate) {
-            if (key == null || amount <= 0 || key.id() == null || key.id().isEmpty()) {
-                return new Extracted(0, null);
-            }
-            try {
-                String id = key.id();
-                short capacity = container.getCapacity();
-                // Re-find the slot by id at commit time (staleness contract: contents may have raced).
-                for (short slot = 0; slot < capacity; slot++) {
-                    ItemStack inSlot = container.getItemStack(slot);
-                    if (inSlot == null || ItemStack.isEmpty(inSlot) || !id.equals(inSlot.getItemId())) {
-                        continue;
-                    }
-                    int take = Math.min(amount, inSlot.getQuantity());
-                    if (take <= 0) {
-                        continue;
-                    }
-                    if (simulate) {
-                        return new Extracted(take, cloneMetadata(inSlot.getMetadata()));
-                    }
-                    ItemStackSlotTransaction tx = container.removeItemStackFromSlot(slot, take, false, false);
-                    if (tx == null || !tx.succeeded()) {
-                        continue; // raced empty on this slot; try the next matching slot
-                    }
-                    ItemStack out = tx.getOutput();
-                    int got = out == null ? 0 : out.getQuantity();
-                    if (got <= 0) {
-                        continue;
-                    }
-                    BsonDocument metadata = out == null ? null : cloneMetadata(out.getMetadata());
-                    return new Extracted(got, metadata);
-                }
-                return new Extracted(0, null);
-            } catch (Throwable t) {
-                return new Extracted(0, null);
-            }
-        }
-
-        private static int accepted(int requested, ItemStack remainder) {
-            int left = remainder == null || ItemStack.isEmpty(remainder) ? 0 : remainder.getQuantity();
-            int acc = requested - left;
-            return Math.max(0, acc);
-        }
-
-        private static int maxStackOf(String id) {
-            try {
-                Item item = new ItemStack(id, 1).getItem();
-                return item == null ? 0 : item.getMaxStack();
-            } catch (Throwable t) {
-                return 0;
-            }
-        }
-
-        private static BsonDocument cloneMetadata(BsonDocument metadata) {
-            return metadata == null ? null : metadata.clone();
-        }
-    }
 }

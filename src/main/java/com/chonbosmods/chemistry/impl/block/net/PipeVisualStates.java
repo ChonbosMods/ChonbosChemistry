@@ -310,15 +310,10 @@ public final class PipeVisualStates {
         if (neighbour == null) {
             return false;
         }
-        PortConfig ports = neighbour.ports();
-        if (ports == null) {
-            return false;
-        }
-        for (Port p : ports.ports()) {
-            if (p != null && p.channel() == channel) {
-                return true;
-            }
-        }
-        return false;
+        // Anchor-level, NOT per-cell: the engine welds an arm toward every footprint cell that inherits
+        // the machine's FaceTags, so a multi-cell FILLER cell (whose per-cell ports() is empty) must still
+        // count here. Using advertisesChannel keeps physical >= effective on filler faces, so the
+        // suppressed-arm override drops the inherited arm. See MachineLookup.MachinePorts#advertisesChannel.
+        return neighbour.advertisesChannel(channel);
     }
 }

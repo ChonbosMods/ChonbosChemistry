@@ -61,3 +61,38 @@ tasks.register<JavaExec>("generateFluidPipeTextures") {
         project.file("src/main/resources/Common/Blocks/ChonbosMods/Pipes/Substances").absolutePath,
     )
 }
+
+// Bake substance colors + hazards into the world-fluid asset set (source/flowing blocks, FluidFX,
+// placement items, the CC_Fluids BlockTypeList, and the merged server.lang names). Run before
+// devServer/build:
+//   ./gradlew generateWorldFluids
+tasks.register<JavaExec>("generateWorldFluids") {
+    group = "chemistry"
+    description = "Bake substance colors + hazards into world fluid blocks, FX, and placement items."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.chonbosmods.chemistry.impl.assetgen.WorldFluidGenerator")
+    args(
+        project.file("assets-src/fluid_master.png").absolutePath,
+        project.file("src/main/resources").absolutePath,
+        // BUG 3: loose-fluid icon is now a tinted fluid CUBE (matching vanilla Fluid_Water.png),
+        // not the jar/vial. Pass the desaturated vanilla cube master + its silhouette mask.
+        project.file("assets-src/fluid_icon_master.png").absolutePath,
+        project.file("assets-src/fluid_icon_mask.png").absolutePath,
+    )
+}
+
+// Override the three water-capable containers (Deco_Mug, Deco_Tankard, Container_Bucket) with a
+// per-substance Filled state + tinted liquid texture for every fluid, and wire the fill mappings
+// (bucket inline RefillContainer; mug/tankard via the shared Mug_Fill override). Preserves vanilla
+// Filled_* states. Run before devServer/build:
+//   ./gradlew generateFluidContainers
+tasks.register<JavaExec>("generateFluidContainers") {
+    group = "chemistry"
+    description = "Override water-capable containers with per-substance Filled states + tinted liquid textures."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.chonbosmods.chemistry.impl.assetgen.FluidContainerGenerator")
+    args(
+        project.file("assets-src/containers").absolutePath,
+        project.file("src/main/resources").absolutePath,
+    )
+}

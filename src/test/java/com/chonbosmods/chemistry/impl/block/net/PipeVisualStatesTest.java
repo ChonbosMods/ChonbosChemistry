@@ -50,16 +50,38 @@ class PipeVisualStatesTest {
         private final PortConfig ports;
         private final EnergyHandler energy;
         private final Map<PortChannel, ResourceBuffer> buffers;
+        private final java.util.Set<PortChannel> advertisedOverride; // null = derive from ports
 
         FakePorts(PortConfig ports, EnergyHandler energy, Map<PortChannel, ResourceBuffer> buffers) {
+            this(ports, energy, buffers, null);
+        }
+
+        FakePorts(PortConfig ports, EnergyHandler energy, Map<PortChannel, ResourceBuffer> buffers,
+                java.util.Set<PortChannel> advertisedOverride) {
             this.ports = ports;
             this.energy = energy;
             this.buffers = buffers;
+            this.advertisedOverride = advertisedOverride;
+        }
+
+        /**
+         * A multi-cell FILLER cell as seen by a pipe: its own (per-cell) {@code ports()} is EMPTY, but the
+         * whole machine advertises {@code channel} (the engine welds an inherited-tag arm anyway).
+         */
+        static FakePorts advertisingOnly(PortChannel channel) {
+            return new FakePorts(PortConfig.of(List.of()), null, Map.of(), java.util.Set.of(channel));
         }
 
         @Override
         public PortConfig ports() {
             return ports;
+        }
+
+        @Override
+        public boolean advertisesChannel(PortChannel channel) {
+            return advertisedOverride != null
+                ? advertisedOverride.contains(channel)
+                : MachinePorts.super.advertisesChannel(channel);
         }
 
         @Override
@@ -214,6 +236,23 @@ class PipeVisualStatesTest {
     }
 
     // --- pipe-machine edges ---
+
+    @Test
+    void fillerCellWithNoPerCellPort_droppedFromEffective_keptInPhysical() {
+        // A multi-cell machine's FILLER cell at +X: its own per-cell ports() is EMPTY (no port lives on
+        // this cell), yet the engine still welds an arm because the filler inherits the anchor's FaceTags
+        // (which advertise the channel). So effective drops the face while physical keeps it -> the
+        // suppressed-arm override drops the inherited arm. This is the multi-cell footprint fix.
+        PipeNode self = PipeNode.of(PortChannel.ITEM, 1);
+        FakeGrid grid = new FakeGrid().put(0, 0, 0, self);
+        FakeLookup lookup = new FakeLookup().put(1, 0, 0, FakePorts.advertisingOnly(PortChannel.ITEM));
+        FakeContainers containers = new FakeContainers(); // no chest beyond the filler
+
+        assertEquals(0, PipeVisualStates.effectiveMask(self, 0, 0, 0, grid, lookup, containers),
+            "filler cell exposes no per-cell port -> effective drops the face");
+        assertEquals(BIT_PX, PipeVisualStates.physicalMask(self, 0, 0, 0, grid, lookup, containers),
+            "filler inherits the anchor's tag -> engine welds -> physical keeps the face");
+    }
 
     @Test
     void facingPortMachine_countsInBothMasks() {
