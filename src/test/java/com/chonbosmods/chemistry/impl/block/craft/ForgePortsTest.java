@@ -11,14 +11,15 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * The Forge is a single-cell footprint, anchor at {@code (0,0,0)} (mirrors the Reclaimer's anchor-cell
- * port layout). Ports (default/model orientation):
+ * The Forge is a 2(X)×2(Y)×1(Z) footprint (2 wide like the Smelter), anchor at the East-bottom corner
+ * {@code (0,0,0)}; it mirrors {@code SmelterPorts}. Ports (default/model orientation):
  * <ul>
  *   <li>item-out: anchor {@code (0,0,0)}, East face (0)</li>
- *   <li>item-in: anchor {@code (0,0,0)}, West face (1)</li>
+ *   <li>item-in: West-bottom cell {@code (-1,0,0)}, West face (1)</li>
  *   <li>power-in: anchor {@code (0,0,0)}, North face (5)</li>
  * </ul>
- * Distinct INPUT + OUTPUT item ports are required: the network splits endpoints per (cell,face).
+ * item-in lives on the West cell (not the anchor) so a West pipe connects to a 2-wide block. Distinct
+ * INPUT + OUTPUT item ports are required: the network splits endpoints per (cell,face).
  */
 class ForgePortsTest {
 
@@ -34,12 +35,12 @@ class ForgePortsTest {
     }
 
     @Test
-    void itemInputIsWestFaceOnAnchor() {
+    void itemInputIsWestFaceOnWestCell() {
         List<Port> ports = ForgePorts.defaults().portsFor(PortChannel.ITEM, PortDirection.INPUT);
         assertEquals(1, ports.size());
         Port p = ports.get(0);
         assertEquals(1, p.faceIndex());
-        assertEquals(0, p.cellX());
+        assertEquals(-1, p.cellX()); // West-bottom cell of the 2-wide footprint, not the anchor
         assertEquals(0, p.cellY());
         assertEquals(0, p.cellZ());
     }
@@ -56,9 +57,11 @@ class ForgePortsTest {
     }
 
     @Test
-    void anchorCellHasItemInItemOutAndPower() {
+    void anchorCellHasItemOutAndPower_westCellHasItemIn() {
         PortConfig anchor = ForgePorts.defaults().forCell(0, 0, 0);
-        assertEquals(3, anchor.ports().size());
+        assertEquals(2, anchor.ports().size()); // item-out + power on the anchor
+        PortConfig westCell = ForgePorts.defaults().forCell(-1, 0, 0);
+        assertEquals(1, westCell.ports().size()); // item-in on the West-bottom cell
     }
 
     @Test

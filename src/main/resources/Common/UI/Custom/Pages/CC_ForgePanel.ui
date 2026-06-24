@@ -30,7 +30,7 @@ $M = "../CC_Master.ui";
 
 $C.@PageOverlay {
   $C.@DecoratedContainer {
-    Anchor: (Width: 800, Height: 360);
+    Anchor: (Width: 800, Height: 460);
 
     // Title set from Java (#PanelTitle.TextSpans). Vanilla title style.
     #Title {
