@@ -48,4 +48,20 @@ class BenchMachinePanelTextTest {
         assertEquals("Energy: 250 / 1000", BenchMachinePanelText.energy(250L, 1000L));
         assertEquals("Energy: 0 / 0", BenchMachinePanelText.energy(0L, 0L));
     }
+
+    @Test
+    void forgeFractionDividesProgressByDuration() {
+        // The Forge tracks raw craft seconds; the panel derives the bar fraction against FORGE_DURATION.
+        assertEquals(0.0f, BenchMachinePanelText.forgeFraction(0.0f, 4.0f));
+        assertEquals(0.5f, BenchMachinePanelText.forgeFraction(2.0f, 4.0f));
+        assertEquals(1.0f, BenchMachinePanelText.forgeFraction(4.0f, 4.0f));
+    }
+
+    @Test
+    void forgeFractionClampsAndGuardsDegenerateDuration() {
+        // Over-full progress clamps to 1; a non-positive duration never divides by zero (yields 0).
+        assertEquals(1.0f, BenchMachinePanelText.forgeFraction(9.0f, 4.0f));
+        assertEquals(0.0f, BenchMachinePanelText.forgeFraction(2.0f, 0.0f));
+        assertEquals(0.0f, BenchMachinePanelText.forgeFraction(2.0f, -1.0f));
+    }
 }

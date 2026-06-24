@@ -64,8 +64,14 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
     /** [TUNE] Per-second energy draw of a running Forge. Placeholder, matches {@code SMELTER_DRAW}. */
     private static final long FORGE_DRAW = 200L;
 
-    /** [TUNE] Seconds one craft takes. Placeholder until per-recipe craft times land. */
-    private static final float FORGE_DURATION = 4.0f;
+    /**
+     * [TUNE] Seconds one craft takes. Placeholder until per-recipe craft times land.
+     *
+     * <p>Public single source of truth: {@code ForgePanelPage} reads it to render the progress bar
+     * fraction ({@code progress / FORGE_DURATION}), so the GUI and the tick never disagree on a craft's
+     * length. When per-recipe craft times land, the panel must switch to the same per-recipe lookup.
+     */
+    public static final float FORGE_DURATION = 4.0f;
 
     /**
      * The metadata key on a recipe card carrying its allow-set (the recipe ids the Forge may craft). A card

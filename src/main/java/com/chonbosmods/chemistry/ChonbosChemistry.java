@@ -15,6 +15,7 @@ import com.chonbosmods.chemistry.impl.block.net.PipeNode;
 import com.chonbosmods.chemistry.impl.block.net.PipePlaceEventSystem;
 import com.chonbosmods.chemistry.impl.block.ui.MachinePanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.BenchMachinePanelPage;
+import com.chonbosmods.chemistry.impl.block.ui.ForgePanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshService;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshSystem;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
@@ -170,6 +171,14 @@ public class ChonbosChemistry extends JavaPlugin {
             this, BenchMachinePanelPage.class, "CC_ReclaimerPanel",
             (playerRef, blockRef) -> new BenchMachinePanelPage(playerRef, blockRef, "Reclaimer"));
         getLogger().atInfo().log("Registered CC_SmelterPanel + CC_ReclaimerPanel bench-machine GUIs.");
+
+        // The Forge panel: a sibling of the bench-machine GUI, but reading the autonomous Forge's own
+        // ForgeCraftState (own input/output containers + recipe-card slot) rather than a held vanilla bench.
+        // The "CC_ForgePanel" id is referenced by CC_Forge.json's Interactions.Use (OpenCustomUI Page.Id).
+        OpenCustomUIInteraction.registerBlockEntityCustomPage(
+            this, ForgePanelPage.class, "CC_ForgePanel",
+            (playerRef, blockRef) -> new ForgePanelPage(playerRef, blockRef, "Forge"));
+        getLogger().atInfo().log("Registered CC_ForgePanel forge GUI.");
 
         // CC_Wrench (Task 9): a held tool whose Secondary interaction taps a pipe face to cycle its
         // flow state, or a machine face to cycle its port. The JSON "Type" is this registered id; the
