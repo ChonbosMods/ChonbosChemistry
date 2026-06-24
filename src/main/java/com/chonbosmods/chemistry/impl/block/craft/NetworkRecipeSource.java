@@ -101,12 +101,12 @@ import javax.annotation.Nullable;
  * <p>Defensive throughout: every engine call is guarded; the class never throws on the world thread
  * (the caller's tick has a catch-Throwable backstop, but we avoid even reaching it on the steady path).
  */
-public final class ForgeSourcePull {
+public final class NetworkRecipeSource {
 
     private static final HytaleLogger LOG = HytaleLogger.forEnclosingClass();
     private static final Set<String> WARN_SEEN = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
-    private ForgeSourcePull() {
+    private NetworkRecipeSource() {
     }
 
     /**
@@ -422,7 +422,7 @@ public final class ForgeSourcePull {
 
     private static void warnOnce(String where, Throwable t) {
         if (WARN_SEEN.add(where + ":" + t)) {
-            LOG.atWarning().log("CC ForgeSourcePull." + where + " failed (skipped): " + t);
+            LOG.atWarning().log("CC NetworkRecipeSource." + where + " failed (skipped): " + t);
         }
     }
 }

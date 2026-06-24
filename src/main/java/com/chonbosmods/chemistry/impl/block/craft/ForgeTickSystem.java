@@ -45,7 +45,7 @@ import javax.annotation.Nullable;
  * <p>Unlike the Smelter, the Forge does not delegate to a vanilla autonomous bench (vanilla crafting has no
  * such block); the {@link AutoCraftEngine} drives the crafting helpers itself through
  * {@code VanillaCraftBridge} and sources its ingredients from the item-pipe network via
- * {@code ForgeSourcePull}.
+ * {@code NetworkRecipeSource}.
  */
 public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
 

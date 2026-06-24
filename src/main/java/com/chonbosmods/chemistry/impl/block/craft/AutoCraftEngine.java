@@ -37,12 +37,12 @@ import org.joml.Vector3i;
  *
  * <ol>
  *   <li>when IDLE and powered, project the machine's item-in port to the world pipe cell, snapshot the ITEM
- *       network reachable there ({@link ForgeSourcePull#snapshot}), and compute the craftable recipe ids:
- *       allow-set-permitted AND fully sourceable from that network ({@link ForgeSourcePull#available}) AND
+ *       network reachable there ({@link NetworkRecipeSource#snapshot}), and compute the craftable recipe ids:
+ *       allow-set-permitted AND fully sourceable from that network ({@link NetworkRecipeSource#available}) AND
  *       output has room ({@link VanillaCraftBridge#canProduce} backpressure). While CRAFTING, no sourcing
  *       happens; the loop just advances the active craft;</li>
  *   <li>run the pure {@link PullCraftStep#decide decision}. On START the chosen recipe's ingredients are
- *       atomically pulled from the network ({@link ForgeSourcePull#tryPull}, at most once per tick) into the
+ *       atomically pulled from the network ({@link NetworkRecipeSource#tryPull}, at most once per tick) into the
  *       held container; on ADVANCE progress accrues; on COMPLETE the held ingredients are consumed and the
  *       outputs produced through {@link VanillaCraftBridge}. Energy drains ONLY on a tick that drove real
  *       work;</li>
@@ -106,11 +106,11 @@ public final class AutoCraftEngine {
         // pause: never reserve ingredients we cannot craft, and no point sourcing while a craft is mid-flight
         // (PullCraftStep ignores `craftable` while crafting). `snapshot` is reused for the chosen pull below.
         Set<String> craftable = java.util.Collections.emptySet();
-        ForgeSourcePull.Snapshot snapshot = null;
+        NetworkRecipeSource.Snapshot snapshot = null;
         if (!crafting && powered && !delaying) {
             int[] pipeCell = inputPipeCell(world, x, y, z, node, ctx);
             if (pipeCell != null) {
-                snapshot = ForgeSourcePull.snapshot(
+                snapshot = NetworkRecipeSource.snapshot(
                     world, store, ctx.pipeType(), ctx.networkService(), pipeCell[0], pipeCell[1], pipeCell[2]);
             }
             if (snapshot != null) {
@@ -126,7 +126,7 @@ public final class AutoCraftEngine {
                     }
                     try {
                         // Fully sourceable from the input network AND the output has room (backpressure).
-                        if (!ForgeSourcePull.available(snapshot, r)) {
+                        if (!NetworkRecipeSource.available(snapshot, r)) {
                             continue;
                         }
                         if (!VanillaCraftBridge.canProduce(node.output(), VanillaCraftBridge.outputs(r))) {
@@ -169,7 +169,7 @@ public final class AutoCraftEngine {
                 // tryPull MUTATES + spends the snapshot: call it AT MOST ONCE per tick, only for the pick,
                 // and only after every `available()` probe above is done.
                 List<ItemStack> pulled =
-                    (r != null && snapshot != null) ? ForgeSourcePull.tryPull(snapshot, r) : null;
+                    (r != null && snapshot != null) ? NetworkRecipeSource.tryPull(snapshot, r) : null;
                 if (pulled != null) {
                     loadHeld(node, pulled);
                     node.setCurrentRecipeId(d.pick());
@@ -230,7 +230,7 @@ public final class AutoCraftEngine {
     /**
      * Clear {@code node}'s held container, then place each {@code pulled} stack into consecutive slots
      * (the active craft's pulled ingredients). {@code filter=false}: the test-/asset-safe raw write the
-     * codebase already uses (mirrors {@code ForgeSourcePull}'s aggregate writes). Clamps defensively to the
+     * codebase already uses (mirrors {@code NetworkRecipeSource}'s aggregate writes). Clamps defensively to the
      * held capacity (27 slots; a recipe never exceeds it).
      */
     private static void loadHeld(@Nonnull AutoCraftNode node, @Nonnull List<ItemStack> pulled) {

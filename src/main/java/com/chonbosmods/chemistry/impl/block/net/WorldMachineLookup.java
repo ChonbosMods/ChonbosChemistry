@@ -161,10 +161,10 @@ public final class WorldMachineLookup implements MachineLookup {
     /**
      * The Forge item source: the Forge is a demand-driven PULLER, so it advertises NO pushable input
      * container. The West ITEM INPUT port still exists (it drives the pipe connection and lets
-     * {@link com.chonbosmods.chemistry.impl.block.craft.ForgeSourcePull} resolve the input network), but
+     * {@link com.chonbosmods.chemistry.impl.block.craft.NetworkRecipeSource} resolve the input network), but
      * INPUT returns {@code null}: the generic push transport must never deposit into {@code held()}, which
      * holds only the active craft's pulled ingredients (a stray push would clog that invariant). The Forge
-     * sources its own ingredients via {@code ForgeSourcePull}; only the OUTPUT side ({@link
+     * sources its own ingredients via {@code NetworkRecipeSource}; only the OUTPUT side ({@link
      * ForgeCraftState#output()}) participates in network push (results drained OUT). Same INPUT/OUTPUT-only
      * port shape as the bench source, but with the INPUT container deliberately withheld.
      */
