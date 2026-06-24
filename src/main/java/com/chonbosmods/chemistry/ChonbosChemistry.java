@@ -131,7 +131,7 @@ public class ChonbosChemistry extends JavaPlugin {
         // Per-tick pipe-network distribution (H4): for each pipe network, pull from OUTPUT-port machines
         // and fair-split into INPUT-port machines once per tick. This is what moves resources now.
         getChunkStoreRegistry().registerSystem(new NetworkTickSystem(
-            pipeComponentType, machineComponentType, tankComponentType, networkService));
+            pipeComponentType, machineComponentType, tankComponentType, forgeComponentType, networkService));
         getLogger().atInfo().log("Registered NetworkTickSystem (per-tick pipe-network distribution).");
         getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService, pipeComponentType));
         getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService, pipeComponentType));
