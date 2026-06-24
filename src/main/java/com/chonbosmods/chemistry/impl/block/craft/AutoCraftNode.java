@@ -1,7 +1,6 @@
 package com.chonbosmods.chemistry.impl.block.craft;
 
-import com.chonbosmods.chemistry.api.energy.EnergyHandler;
-import com.chonbosmods.chemistry.impl.block.PortConfig;
+import com.chonbosmods.chemistry.impl.block.PoweredMachineNode;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 
@@ -9,11 +8,11 @@ import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
  * The state contract an autonomous-crafting machine exposes to the shared craft engine ({@code
  * AutoCraftEngine}, added next). Every accessor here already exists on {@link ForgeCraftState}; future
  * crafting machines (Cooker, Outfitter) implement the same contract so the engine drives them uniformly.
+ *
+ * <p>Extends {@link PoweredMachineNode}, the shared powered-machine contract (energy + ports + on/off),
+ * so the energy/ports/enabled accessors are inherited rather than redeclared here.
  */
-public interface AutoCraftNode {
-
-    /** @return the energy buffer, or null if this machine carries no power. */
-    EnergyHandler energy();
+public interface AutoCraftNode extends PoweredMachineNode {
 
     /** @return the held ingredients pulled for the active craft (empty when idle). */
     SimpleItemContainer held();
@@ -23,12 +22,6 @@ public interface AutoCraftNode {
 
     /** @return the inserted recipe card, or null if no card is loaded. */
     ItemStack card();
-
-    /** @return the per-face port configuration. */
-    PortConfig ports();
-
-    /** @return whether the machine is ON (enabled). */
-    boolean isEnabled();
 
     /** @return the recipe currently being crafted, or null if idle. */
     String currentRecipeId();
