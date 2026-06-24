@@ -33,9 +33,11 @@ public final class FluidAssets {
 
     /**
      * The still-pool source block JSON, modeled on vanilla {@code Water_Source.json}/{@code
-     * Lava_Source.json}. {@code MaxFluidLevel} 1, {@code Effect} {@code ["Water"]} (the vanilla
-     * animated translucent surface shader, reused like other vanilla ids : the flowing variant
-     * inherits it via {@code Parent}, so it is emitted only here), {@code Opacity} Transparent, the
+     * Lava_Source.json}. {@code MaxFluidLevel} 1, {@code Effect} {@code ["Slime"]} (an animated
+     * surface shader that, unlike {@code ["Water"]}, does NOT impose a hardcoded blue tint : vanilla
+     * Tar/Slime_Red use it and show their own texture color, so our per-substance tint shows through;
+     * the flowing variant inherits it via {@code Parent}, so it is emitted only here),
+     * {@code Opacity} Transparent, the
      * single surface texture, {@code ParticleColor} = {@code color.toHex()}, and a {@code Ticker} that spreads
      * {@code blockId} at the substance's {@link FluidPhysics#flowRate()} (never demoting : the
      * flowing variant carries demotion). {@code FluidFXId} = {@code blockId} : the only link to the
@@ -70,7 +72,7 @@ public final class FluidAssets {
         return """
             {
               "MaxFluidLevel": 1,
-              "Effect": [ "Water" ],
+              "Effect": [ "Slime" ],
               "Opacity": "Transparent",
               "Textures": [
                 { "Weight": 1, "All": "%s" }
