@@ -159,13 +159,18 @@ public final class WorldMachineLookup implements MachineLookup {
     }
 
     /**
-     * The Forge item source: the Forge owns its containers directly (no vanilla bench), exposing its
-     * {@link ForgeCraftState#input()} on INPUT and {@link ForgeCraftState#output()} on OUTPUT. Same
-     * INPUT/OUTPUT-only shape as the bench source (the Forge, like the Smelter, has item-in + item-out).
+     * The Forge item source: the Forge is a demand-driven PULLER, so it advertises NO pushable input
+     * container. The West ITEM INPUT port still exists (it drives the pipe connection and lets
+     * {@link com.chonbosmods.chemistry.impl.block.craft.ForgeSourcePull} resolve the input network), but
+     * INPUT returns {@code null}: the generic push transport must never deposit into {@code held()}, which
+     * holds only the active craft's pulled ingredients (a stray push would clog that invariant). The Forge
+     * sources its own ingredients via {@code ForgeSourcePull}; only the OUTPUT side ({@link
+     * ForgeCraftState#output()}) participates in network push (results drained OUT). Same INPUT/OUTPUT-only
+     * port shape as the bench source, but with the INPUT container deliberately withheld.
      */
     private static ItemContainerFn forgeItems(ForgeCraftState forge) {
         return direction -> switch (direction) {
-            case INPUT -> forge.held();   // ingredients fed IN
+            case INPUT -> null;            // pull-window: port exists, but no pushable container (Forge PULLS)
             case OUTPUT -> forge.output(); // results drained OUT
             default -> null; // BOTH/CLOSED: the Forge's item ports are INPUT/OUTPUT only
         };
