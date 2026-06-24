@@ -290,6 +290,17 @@ public final class ForgePanelPage extends InteractiveCustomUIPage<ForgePanelPage
             new ItemContainerView(forge.held()),
             new ItemContainerView(forge.output()));
         List<MachineEject.EjectStack> overflow = MachineEject.ejectAll(sources, sink);
+
+        // Ejecting the held ingredients mid-craft MUST cancel the active craft. Otherwise next tick still
+        // sees currentRecipeId != null (crafting == true) and advances/completes a craft whose ingredients
+        // have already left into the player's inventory: the output is produced from nothing and the player
+        // keeps both the ingredients and the finished item (item duplication). Resetting here drops the Forge
+        // back to IDLE next tick, which re-pulls fresh only if the ingredients are still available. This runs
+        // on the WorldThread (applyAction is invoked via world.execute), so it is race-safe against the tick.
+        // Placed before the overflow handling so the reset ALWAYS runs, even on the early returns below.
+        forge.setCurrentRecipeId(null);
+        forge.setProgress(0f);
+
         if (overflow.isEmpty()) {
             return;
         }

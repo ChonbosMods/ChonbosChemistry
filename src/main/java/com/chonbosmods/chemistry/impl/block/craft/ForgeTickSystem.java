@@ -269,6 +269,7 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
             case IDLE -> {
                 node.setProgress(0f);
                 node.setCurrentRecipeId(null);
+                clearHeld(node); // invariant: idle => held empty (defends against any path leaving stale held)
                 node.setLastSelectedId(d.newCursor());
             }
             case START -> {
