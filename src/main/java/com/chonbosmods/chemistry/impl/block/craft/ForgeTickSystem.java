@@ -89,6 +89,13 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
     public static final float FORGE_DURATION = 4.0f;
 
     /**
+     * [TUNE] Ticks the Forge idles after completing a craft before sourcing the next recipe. A cosmetic
+     * beat so a completed craft reads visually before the next pull begins (the pull amount itself is
+     * already exactly one recipe). 0 = no pause (back-to-back, the pre-pause behavior).
+     */
+    private static final int POST_CRAFT_DELAY_TICKS = 2;
+
+    /**
      * The metadata key on a recipe card carrying its allow-set (the recipe ids the Forge may craft). A card
      * with no such key imposes NO filter (a blank card crafts everything; the card-PROGRAMMING UX is
      * deferred). Read as a {@code String[]} via {@code ItemStack.getFromMetadataOrNull}.
@@ -217,12 +224,21 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
             node.isEnabled() ? SmelterEnergy.affordableDt(energy.getStored(), FORGE_DRAW, dt) : 0.0;
         boolean powered = affordable > 0;
 
-        // 4. Build the craftable set + the network snapshot ONLY when IDLE AND powered: never reserve
-        // ingredients we cannot craft, and no point sourcing while a craft is mid-flight (PullCraftStep
-        // ignores `craftable` while crafting). `snapshot` is reused for the chosen pick's atomic pull below.
+        // 3b. Post-craft pause: when idle with a pending delay, burn one tick of it and DON'T source this
+        // tick (the Forge sits in its default visual state for a couple ticks after a completed craft, so
+        // the completion reads before the next pull). Cosmetic only: the pull amount is already exact.
+        boolean delaying = false;
+        if (!crafting && node.craftDelay() > 0) {
+            node.setCraftDelay(node.craftDelay() - 1);
+            delaying = true;
+        }
+
+        // 4. Build the craftable set + the network snapshot ONLY when IDLE, powered AND not in the post-craft
+        // pause: never reserve ingredients we cannot craft, and no point sourcing while a craft is mid-flight
+        // (PullCraftStep ignores `craftable` while crafting). `snapshot` is reused for the chosen pull below.
         Set<String> craftable = java.util.Collections.emptySet();
         ForgeSourcePull.Snapshot snapshot = null;
-        if (!crafting && powered) {
+        if (!crafting && powered && !delaying) {
             int[] pipeCell = inputPipeCell(world, x, y, z, node);
             if (pipeCell != null) {
                 snapshot = ForgeSourcePull.snapshot(
@@ -307,6 +323,7 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
                     node.setCurrentRecipeId(null);
                     node.setProgress(0f);
                     node.setLastSelectedId(d.newCursor()); // cursor advances to the crafted id
+                    node.setCraftDelay(POST_CRAFT_DELAY_TICKS); // brief idle beat before the next pull
                     activeCraft = powered;
                 } else {
                     // STALL: output full -> keep the craft + held intact, sit at the completion threshold
