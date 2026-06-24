@@ -39,7 +39,8 @@ Changes (mirror the existing codec field style exactly):
 **Files:**
 - Create: `src/main/java/com/chonbosmods/chemistry/impl/block/craft/PullCraftStep.java`
 - Test: `src/test/java/com/chonbosmods/chemistry/impl/block/craft/PullCraftStepTest.java`
-- Remove: `CraftStep.java` + `CraftStepTest.java` (superseded by the pull state machine).
+- NOTE: `CraftStep.java` + `CraftStepTest.java` stay for now (still used by the old `ForgeTickSystem`);
+  Task 4 removes them when it rewrites the tick to `PullCraftStep`, so the build stays green here.
 
 The pure decision — engine-free, over `List`/`Set`/primitives. Models BOTH phases:
 ```java
@@ -63,7 +64,9 @@ public final class PullCraftStep {
         if (crafting) {
             if (!powered) return new Decision(Action.ADVANCE, currentId, progress, cursor); // hold: progress unchanged
             float np = progress + affordableDt;
-            if (np >= duration) return new Decision(Action.COMPLETE, currentId, np - duration, currentId); // cursor advances
+            // Discrete pull cycle: each craft is a fresh pull starting at 0, so the fractional remainder
+            // (np - duration) is NOT carried; reset to 0 on completion. cursor advances to the crafted id.
+            if (np >= duration) return new Decision(Action.COMPLETE, currentId, 0f, currentId);
             return new Decision(Action.ADVANCE, currentId, np, cursor);
         }
         // idle
@@ -76,7 +79,7 @@ public final class PullCraftStep {
 ```
 TDD cases: idle+unpowered→IDLE; idle+powered+empty craftable→IDLE; idle+powered+craftable→START(round-robin
 pick); crafting+unpowered→ADVANCE hold (progress unchanged); crafting+powered+below duration→ADVANCE
-(progress+dt); crafting+powered+at duration→COMPLETE (remainder, cursor=currentId); rotation across cycles.
+(progress+dt); crafting+powered+at duration→COMPLETE (progress reset to 0, cursor=currentId); rotation across cycles.
 Write red, implement, green. **Commit:** `feat(forge): pure pull-craft state machine (TDD)`.
 
 ---
@@ -115,7 +118,8 @@ Testing: engine-bound (network + inventory + AssetStore) — NOT headless-unit-t
 multiset/aggregation bit emerges, factor + TDD it. **Commit:** `feat(forge): ForgeSourcePull — input-network aggregate + atomic recipe extract`.
 
 ### Task 4: Rewrite `ForgeTickSystem` to the pull-craft loop
-**Files:** Modify `src/main/java/com/chonbosmods/chemistry/impl/block/craft/ForgeTickSystem.java`.
+**Files:** Modify `src/main/java/com/chonbosmods/chemistry/impl/block/craft/ForgeTickSystem.java`; REMOVE
+`CraftStep.java` + `CraftStepTest.java` (superseded by `PullCraftStep`, now that the tick no longer calls them).
 
 Replace the push-buffer drive with: resolve context (unchanged) → energy gate → build `craftable` (when
 IDLE: `ForgeSourcePull.aggregate` + `available(snapshot, r)` per recipe + card-allow + output room) →
