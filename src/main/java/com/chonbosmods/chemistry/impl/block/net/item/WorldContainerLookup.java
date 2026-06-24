@@ -78,7 +78,7 @@ public final class WorldContainerLookup implements ContainerLookup {
     /**
      * The raw engine {@link ItemContainer} at a position (the block-entity {@link ItemContainerBlock}'s
      * container), or null when there is no container block. Public so the Forge pull-crafter
-     * ({@code ForgeSourcePull}) can reach the SAME live container instances the transport layer reads/writes,
+     * ({@code NetworkRecipeSource}) can reach the SAME live container instances the transport layer reads/writes,
      * without duplicating the block-entity plumbing (component lookup, lazy allocation, defensive
      * null/throw guards). The transport-facing {@link #at} wraps this in an {@link ItemContainerView}; the
      * pull-crafter needs the raw {@link ItemContainer} to drive vanilla's {@code canRemoveMaterials} /

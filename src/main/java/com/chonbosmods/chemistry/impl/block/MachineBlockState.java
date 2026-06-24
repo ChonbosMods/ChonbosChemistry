@@ -34,7 +34,7 @@ import java.util.Map;
  * Deep copy is performed by a codec round-trip (encode then decode), reusing the tested bean codecs.
  * This guarantees each placed block receives fully independent buffers.
  */
-public final class MachineBlockState implements Component<ChunkStore> {
+public final class MachineBlockState implements Component<ChunkStore>, PoweredMachineNode {
 
     /**
      * Shared non-primitive {@code Codec<Long>} (also a {@code RawJsonCodec<Long>}) for optional Long
@@ -159,6 +159,7 @@ public final class MachineBlockState implements Component<ChunkStore> {
 
     // --- port/energy/resource accessors (read directly by network adapters + GUI) ---
 
+    @Override
     public PortConfig ports() {
         return ports;
     }
@@ -174,6 +175,7 @@ public final class MachineBlockState implements Component<ChunkStore> {
     }
 
     /** @return the energy handler, or null if this node carries no power. */
+    @Override
     public EnergyHandler energy() {
         return energy;
     }
@@ -218,6 +220,7 @@ public final class MachineBlockState implements Component<ChunkStore> {
      *     no power consumption, but its loaded input and buffered power are retained. This is the On/Off
      *     panel toggle AND the circuit system's "run/halt" control line (the Machine I/O bridge writes it).
      */
+    @Override
     public boolean isEnabled() {
         return enabled;
     }
