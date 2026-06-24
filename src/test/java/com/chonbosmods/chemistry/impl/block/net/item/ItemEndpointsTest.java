@@ -70,6 +70,14 @@ class ItemEndpointsTest {
             return this;
         }
 
+        /** A machine carrying SEVERAL ports on one cell (e.g. the Reclaimer's item-in + item-out). */
+        FakeMachineLookup putPorts(int x, int y, int z,
+                com.chonbosmods.chemistry.impl.block.Port... ports) {
+            byKey.put(NetworkManager.packKey(x, y, z),
+                com.chonbosmods.chemistry.impl.block.PortConfig.of(java.util.List.of(ports)));
+            return this;
+        }
+
         @Override
         public MachinePorts at(int x, int y, int z) {
             com.chonbosmods.chemistry.impl.block.PortConfig cfg = byKey.get(NetworkManager.packKey(x, y, z));
@@ -147,6 +155,53 @@ class ItemEndpointsTest {
         Endpoints endpoints = ItemEndpoints.collect(net, grid, new FakeContainerLookup(), machines);
         assertEquals(0, endpoints.destinations().size());
         assertEquals(0, endpoints.sources().size());
+    }
+
+    @Test
+    void machineWithInputAndOutputOnSameCell_collectsBothPorts() {
+        // Regression (CC Reclaimer): item-in (West, face 1) AND item-out (East, face 0) both sit on the
+        // machine's single anchor cell (6,5,5). A U-shaped ITEM network borders that ONE cell from BOTH
+        // opposite faces: (5,5,5)-(5,6,5)-(6,6,5)-(7,6,5)-(7,5,5), all NORMAL. Endpoint dedup must key per
+        // PORT (cell+face), not per cell: cell-only keying collapsed the two ports and dropped one role, so
+        // piped items bypassed the machine ("went straight through"). The Smelter never hit this because its
+        // item-in / item-out live on DIFFERENT footprint cells.
+        PipeNode n555 = PipeNode.of(PortChannel.ITEM, 1);
+        PipeNode n565 = PipeNode.of(PortChannel.ITEM, 1);
+        PipeNode n665 = PipeNode.of(PortChannel.ITEM, 1);
+        PipeNode n765 = PipeNode.of(PortChannel.ITEM, 1);
+        PipeNode n755 = PipeNode.of(PortChannel.ITEM, 1);
+        PipeGridView grid = (px, py, pz) -> {
+            long k = NetworkManager.packKey(px, py, pz);
+            if (k == NetworkManager.packKey(5, 5, 5)) {
+                return n555;
+            }
+            if (k == NetworkManager.packKey(5, 6, 5)) {
+                return n565;
+            }
+            if (k == NetworkManager.packKey(6, 6, 5)) {
+                return n665;
+            }
+            if (k == NetworkManager.packKey(7, 6, 5)) {
+                return n765;
+            }
+            if (k == NetworkManager.packKey(7, 5, 5)) {
+                return n755;
+            }
+            return null;
+        };
+        Network net = itemNetworkAt(5, 5, 5, grid);
+        FakeMachineLookup machines = new FakeMachineLookup().putPorts(6, 5, 5,
+            com.chonbosmods.chemistry.impl.block.Port.of(0, PortChannel.ITEM,
+                com.chonbosmods.chemistry.api.io.PortDirection.OUTPUT),
+            com.chonbosmods.chemistry.impl.block.Port.of(1, PortChannel.ITEM,
+                com.chonbosmods.chemistry.api.io.PortDirection.INPUT));
+
+        Endpoints endpoints = ItemEndpoints.collect(net, grid, new FakeContainerLookup(), machines);
+
+        assertEquals(1, endpoints.destinations().size(), "item-in (West) must be collected as a destination");
+        assertEquals(1, endpoints.sources().size(), "item-out (East) must be collected as a source");
+        assertEquals(NetworkManager.packKey(6, 5, 5), endpoints.destinations().get(0).containerKey());
+        assertEquals(NetworkManager.packKey(6, 5, 5), endpoints.sources().get(0).containerKey());
     }
 
     /** A single ITEM pipe at (x,y,z) whose {@code face} carries {@code state}; all other faces NORMAL. */

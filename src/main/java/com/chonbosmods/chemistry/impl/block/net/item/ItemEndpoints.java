@@ -129,6 +129,12 @@ public final class ItemEndpoints {
         // the known simplification in the class javadoc: among NON-NONE faces a multi-face container
         // takes the FIRST-encountered face's flow-state role.
         Set<Long> visitedContainers = new HashSet<>();
+        // Machine ports dedup per PORT (cell + machine face), NOT per cell: a single footprint cell can
+        // expose several item ports (the CC Reclaimer's item-in + item-out both sit on its anchor cell).
+        // Keying machine ports by cell alone collapsed them so only the first-walked role registered,
+        // dropping the other — piped items then bypassed the machine entirely ("went straight through").
+        // Passive containers below stay cell-keyed (a chest is one inventory).
+        Set<String> visitedMachinePorts = new HashSet<>();
 
         for (long memberKey : net.memberKeys()) {
             int px = NetworkManager.unpackX(memberKey);
@@ -157,10 +163,14 @@ public final class ItemEndpoints {
                 if (machines != null) {
                     MachinePorts mp = machines.at(nx, ny, nz);
                     if (mp != null && mp.ports() != null) {
-                        Port port = mp.ports().portAt(faceIdx ^ 1, PortChannel.ITEM);
+                        int machineFace = faceIdx ^ 1;
+                        Port port = mp.ports().portAt(machineFace, PortChannel.ITEM);
                         if (port != null) {
                             Boolean isSource = machinePortRole(port.direction(), face);
-                            if (isSource != null && !visitedContainers.contains(containerKey)) {
+                            // Dedup by (cell, machine face) so multiple item ports on one cell each register
+                            // (see visitedMachinePorts above). Still claim the cell in visitedContainers so a
+                            // machine ITEM port suppresses any passive container at the same cell.
+                            if (isSource != null && visitedMachinePorts.add(containerKey + ":" + machineFace)) {
                                 visitedContainers.add(containerKey);
                                 if (isSource) {
                                     sources.add(new Source(containerKey, memberKey, faceIdx));
