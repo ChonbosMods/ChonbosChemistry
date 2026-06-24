@@ -1,0 +1,15 @@
+{
+  "ApplicationEffects": {
+    "HorizontalSpeedMultiplier": 0.5
+  },
+  "DamageCalculatorCooldown": 1,
+  "DamageCalculator": {
+    "BaseDamage": {
+      "Physical": 2
+    }
+  },
+  "OverlapBehavior": "Overwrite",
+  "Infinite": false,
+  "Debuff": true,
+  "Duration": 6
+}
