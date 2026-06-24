@@ -38,12 +38,14 @@ class FluidHazardJsonTest {
     }
 
     @Test
-    void contactGivesEachHazardItsOwnCooldownId() {
+    void contactGivesEachHazardItsOwnApplyEffect() {
+        // Cooldown is emitted ONCE at the Collision level by the caller, not per ApplyEffect entry:
+        // vanilla SimpleInteraction has no cooldown field (only RootInteraction does).
         String contact = FluidHazardJson.contactInteractions(List.of(FluidHazard.RADIATION, FluidHazard.CORROSIVE));
         assertTrue(contact.contains("CC_Effect_Radiation"), contact);
         assertTrue(contact.contains("CC_Effect_Corrosion"), contact);
-        assertTrue(contact.contains("CC_Fluid_RADIATION"), contact);
-        assertTrue(contact.contains("CC_Fluid_CORROSIVE"), contact);
+        // two ApplyEffect entries -> one separating comma between objects
+        assertEquals(2, contact.split("\"Type\"", -1).length - 1, contact);
     }
 
     @Test

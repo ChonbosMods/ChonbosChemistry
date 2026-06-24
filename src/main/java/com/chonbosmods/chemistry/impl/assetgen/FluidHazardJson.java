@@ -27,25 +27,33 @@ public final class FluidHazardJson {
 
     /** Drink-effect array entries (the inside of InteractionVars.Effect.Interactions). */
     public static String drinkEffects(List<FluidHazard> hazards) {
+        return applyEffectEntries(hazards);
+    }
+
+    /**
+     * Contact collision entries, one {@code ApplyEffect} per hazard. The cooldown is NOT emitted
+     * per entry: the vanilla interaction schema (decompiled {@code SimpleInteraction} has only
+     * {@code next}/{@code failed} fields, no {@code cooldown}; {@code RootInteraction} alone owns
+     * {@code InteractionCooldown}) puts a single {@code Cooldown} once at the {@code Collision}
+     * level. The caller ({@link FluidAssets#sourceBlockJson}) wraps these in that single Collision.
+     */
+    public static String contactInteractions(List<FluidHazard> hazards) {
+        return applyEffectEntries(hazards);
+    }
+
+    /**
+     * The shared body of {@link #drinkEffects} and {@link #contactInteractions}: comma-joined
+     * {@code ApplyEffect} object fragments (no surrounding brackets), one per hazard. Both call sites
+     * emit the same per-hazard entry post-cooldown-refactor; they differ only in where the caller
+     * wraps the result (a drink-effect array vs. a Collision interactions array).
+     */
+    private static String applyEffectEntries(List<FluidHazard> hazards) {
         StringBuilder b = new StringBuilder();
         for (FluidHazard h : hazards) {
             if (b.length() > 0) {
                 b.append(",\n");
             }
             b.append("{ \"Type\": \"ApplyEffect\", \"EffectId\": \"%s\" }".formatted(effectId(h)));
-        }
-        return b.toString();
-    }
-
-    /** Contact collision entries, one per hazard, each with its own cooldown id so they stack. */
-    public static String contactInteractions(List<FluidHazard> hazards) {
-        StringBuilder b = new StringBuilder();
-        for (FluidHazard h : hazards) {
-            if (b.length() > 0) {
-                b.append(",\n");
-            }
-            b.append("{ \"Type\": \"ApplyEffect\", \"EffectId\": \"%s\", \"Cooldown\": { \"Id\": \"%s\", \"Cooldown\": 1 } }"
-                .formatted(effectId(h), "CC_Fluid_" + h.name()));
         }
         return b.toString();
     }
