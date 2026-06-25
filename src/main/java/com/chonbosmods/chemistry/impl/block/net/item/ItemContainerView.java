@@ -20,8 +20,13 @@ import org.bson.BsonDocument;
  * damaged/enchanted/BlockHolder item round-trips byte-for-byte; simulate is a read-only slot scan
  * (no engine dry-run yields a partial count). The metadata stackability match mirrors the engine's
  * {@code isStackableWith} (id AND metadata; the hidden durability field is a documented conservative
- * under-promise, never an over-promise). {@code filter=false} on add/remove: transport is gated by OUR
- * {@link ItemFilter}, not the container's own slot filters. Defensive throughout; never throws.
+ * under-promise, never an over-promise). Insert (commit + simulate) HONORS the destination container's
+ * own slot filter so a filtered machine input (e.g. a Smelter/Reclaimer input that admits only valid
+ * recipe ingredients) rejects non-admitted items pushed by the network: commit passes
+ * {@code applyFilter=true} to {@code addItemStack}, and simulate probes each slot via
+ * {@code canAddItemStackToSlot(.., applyFilter=true)}. Unfiltered containers (chests) admit everything,
+ * so both paths are unchanged for them. Extraction stays gated solely by OUR {@link ItemFilter}
+ * ({@code filter=false} on remove). Defensive throughout; never throws.
  */
 public final class ItemContainerView implements ContainerLookup.ContainerView {
 
@@ -46,7 +51,13 @@ public final class ItemContainerView implements ContainerLookup.ContainerView {
                 // we never alias the caller's doc (mirrors DropSink).
                 stack = stack.withMetadata(metadata.clone());
             }
-            ItemStackTransaction tx = container.addItemStack(stack, false, false, false);
+            // addItemStack(stack, b1, b2, applyFilter): the 3rd boolean is the filter-apply gate
+            // (bytecode-verified: it propagates to internal_addToEmptySlot / internal_addToExistingSlot,
+            // whose final boolean gates cantAddToSlot -> the slot's SlotFilter). Pass true so a filtered
+            // destination (e.g. a Smelter/Reclaimer input that admits only valid recipe ingredients)
+            // rejects a non-admitted item on commit. Unfiltered containers (chests) admit everything,
+            // so this is a no-op for them.
+            ItemStackTransaction tx = container.addItemStack(stack, false, false, true);
             return tx == null ? 0 : accepted(amount, tx.getRemainder());
         } catch (Throwable t) {
             return 0;
@@ -59,9 +70,22 @@ public final class ItemContainerView implements ContainerLookup.ContainerView {
         if (maxStack <= 0) {
             return 0;
         }
+        // A 1-count probe of this id+metadata, reused across slots to test the destination's slot filter
+        // without mutating anything. canAddItemStackToSlot(slot, stack, matchExactType=false,
+        // applyFilter=true): the 4th boolean is the filter-apply gate (bytecode-verified). On an
+        // unfiltered container/slot the engine's filter test passes for everything, so a chest's room
+        // count is unchanged; on a filtered Smelter/Reclaimer input a non-admitted item makes every slot
+        // contribute 0 room, so simulateInsert == 0 and the network never routes the junk here.
+        ItemStack probe = new ItemStack(id, 1);
+        if (metadata != null) {
+            probe = probe.withMetadata(metadata.clone());
+        }
         short capacity = container.getCapacity();
         int room = 0;
         for (short slot = 0; slot < capacity && room < amount; slot++) {
+            if (!container.canAddItemStackToSlot(slot, probe, false, true)) {
+                continue; // the slot's filter rejects this id -> contributes no room
+            }
             ItemStack inSlot = container.getItemStack(slot);
             if (inSlot == null || ItemStack.isEmpty(inSlot)) {
                 room += maxStack; // an empty slot can take a full stack of any id
