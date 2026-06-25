@@ -1,6 +1,8 @@
 package com.chonbosmods.chemistry.impl.block.craft;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -38,6 +40,32 @@ public final class CraftSelection {
             }
         }
         return null; // craftableIds disjoint from stableOrder (defensive; shouldn't happen)
+    }
+
+    /**
+     * The subset of {@code craftable} whose priority value (from {@code priority}) is the MAXIMUM among the
+     * set: the "top tier" to prefer. Even rotation then runs within this subset (via {@link #selectNext}).
+     * Empty in -&gt; empty out. An id missing from {@code priority} counts as priority 0.
+     *
+     * <p>This is how crafting machines prefer the most-ingredient (more "advanced") recipe over a basic one
+     * while still even-rotating among equally-ranked recipes: the engine ranks craftable ids by their
+     * distinct-ingredient count, keeps only the top tier here, then hands that tier to {@link #selectNext}.
+     */
+    public static Set<String> topByPriority(Set<String> craftable, Map<String, Integer> priority) {
+        if (craftable.isEmpty()) {
+            return Set.of();
+        }
+        int max = Integer.MIN_VALUE;
+        for (String id : craftable) {
+            max = Math.max(max, priority.getOrDefault(id, 0));
+        }
+        Set<String> top = new HashSet<>();
+        for (String id : craftable) {
+            if (priority.getOrDefault(id, 0) == max) {
+                top.add(id);
+            }
+        }
+        return top;
     }
 
     /** Card permission: a null allow-set (no card) permits everything; otherwise membership. */
