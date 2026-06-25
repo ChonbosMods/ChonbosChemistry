@@ -4,6 +4,7 @@ import com.chonbosmods.chemistry.api.energy.EnergyHandler;
 import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.api.io.PortDirection;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
+import com.chonbosmods.chemistry.impl.block.craft.CookerState;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.Port;
 import com.chonbosmods.chemistry.impl.block.PortConfig;
@@ -53,18 +54,21 @@ public final class WorldMachineLookup implements MachineLookup {
     private final ComponentType<ChunkStore, MachineBlockState> machineType;
     private final ComponentType<ChunkStore, TankBlockState> tankType;
     private final ComponentType<ChunkStore, ForgeCraftState> forgeType;
+    private final ComponentType<ChunkStore, CookerState> cookerType;
 
     public WorldMachineLookup(
             @Nonnull World world,
             @Nonnull Store<ChunkStore> store,
             @Nonnull ComponentType<ChunkStore, MachineBlockState> machineType,
             @Nonnull ComponentType<ChunkStore, TankBlockState> tankType,
-            @Nonnull ComponentType<ChunkStore, ForgeCraftState> forgeType) {
+            @Nonnull ComponentType<ChunkStore, ForgeCraftState> forgeType,
+            @Nonnull ComponentType<ChunkStore, CookerState> cookerType) {
         this.world = world;
         this.store = store;
         this.machineType = machineType;
         this.tankType = tankType;
         this.forgeType = forgeType;
+        this.cookerType = cookerType;
     }
 
     @Override
@@ -114,6 +118,14 @@ public final class WorldMachineLookup implements MachineLookup {
             // The Forge has no vanilla bench: it owns its input/output containers directly. It carries no
             // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
             return adapt(cell, model, forge.energy(), channel -> null, forgeItems(forge));
+        }
+        CookerState cooker = store.getComponent(ref, cookerType);
+        if (cooker != null) {
+            PortConfig model = cooker.ports();
+            PortConfig cell = PortProjection.forWorldCell(model, rotation, wcx, wcy, wcz);
+            // The Cooker has no vanilla bench: it owns its input/output containers directly. It carries no
+            // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
+            return adapt(cell, model, cooker.energy(), channel -> null, cookerItems(cooker));
         }
         return null;
     }
@@ -173,6 +185,24 @@ public final class WorldMachineLookup implements MachineLookup {
             case INPUT -> null;            // pull-window: port exists, but no pushable container (Forge PULLS)
             case OUTPUT -> forge.output(); // results drained OUT
             default -> null; // BOTH/CLOSED: the Forge's item ports are INPUT/OUTPUT only
+        };
+    }
+
+    /**
+     * The Cooker item source: like the Forge, the Cooker is a demand-driven PULLER, so it advertises NO
+     * pushable input container. The ITEM INPUT port still exists (it drives the pipe connection and lets
+     * {@link com.chonbosmods.chemistry.impl.block.craft.NetworkRecipeSource} resolve the input network), but
+     * INPUT returns {@code null}: the generic push transport must never deposit into {@code held()}, which
+     * holds only the active craft's pulled ingredients (a stray push would clog that invariant). The Cooker
+     * sources its own ingredients via {@code NetworkRecipeSource}; only the OUTPUT side ({@link
+     * CookerState#output()}) participates in network push (results drained OUT). Same INPUT/OUTPUT-only port
+     * shape as the Forge source, with the INPUT container deliberately withheld.
+     */
+    private static ItemContainerFn cookerItems(CookerState cooker) {
+        return direction -> switch (direction) {
+            case INPUT -> null;             // pull-window: port exists, but no pushable container (Cooker PULLS)
+            case OUTPUT -> cooker.output(); // results drained OUT
+            default -> null; // BOTH/CLOSED: the Cooker's item ports are INPUT/OUTPUT only
         };
     }
 

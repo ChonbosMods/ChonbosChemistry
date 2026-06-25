@@ -100,6 +100,12 @@ public final class VanillaCraftBridge {
         return r.getId();
     }
 
+    /** The recipe's processing/cook time in seconds (vanilla {@code CraftingRecipe.getTimeSeconds()}). A
+     *  crafting recipe with no timed processing returns 0; the caller supplies a default. */
+    public static float recipeTimeSeconds(CraftingRecipe r) {
+        return r.getTimeSeconds();  // verified public float on CraftingRecipe (Server-0.5.3)
+    }
+
     /**
      * True iff every input material of {@code r} (at {@code tier}) can currently be sourced from
      * {@code input}, WITHOUT mutating it. Mirrors vanilla's pre-craft availability test.

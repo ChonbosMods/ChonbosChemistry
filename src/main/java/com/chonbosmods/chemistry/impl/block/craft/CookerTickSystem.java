@@ -1,0 +1,223 @@
+package com.chonbosmods.chemistry.impl.block.craft;
+
+import com.chonbosmods.chemistry.api.energy.EnergyHandler;
+import com.chonbosmods.chemistry.impl.block.EnergyBuffer;
+import com.chonbosmods.chemistry.impl.block.MachineDriveContext;
+import com.chonbosmods.chemistry.impl.block.bench.VanillaCraftBridge;
+import com.chonbosmods.chemistry.impl.block.net.NetworkService;
+import com.chonbosmods.chemistry.impl.block.net.PipeNode;
+import com.hypixel.hytale.component.ArchetypeChunk;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
+import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.protocol.BenchType;
+import com.hypixel.hytale.server.core.asset.type.item.config.CraftingRecipe;
+import com.hypixel.hytale.server.core.modules.block.BlockModule;
+import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
+import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+/**
+ * Per-tick driver for the autonomous Cooker block (a PURE auto-craft machine). For every live
+ * {@link CookerState} on the {@link ChunkStore}, it resolves the live drive context (ref / world / block
+ * coords / block type / energy) and hands it to the shared {@link AutoCraftEngine}, which runs one
+ * energy-gated step of the discrete pull loop (idle &rarr; pull &rarr; craft &rarr; complete &rarr; repeat).
+ *
+ * <p>Mirrors the thin {@link ForgeTickSystem}: this system owns ONLY the context-resolution prologue
+ * (via {@link MachineDriveContext}: every lookup guarded, the node skipped on the first missing piece) and
+ * the never-throw wrapper; the entire craft loop lives in {@link AutoCraftEngine}, configured by
+ * {@link #COOKER_SPEC} (the Cooker's bench pool, energy draw, post-craft delay, and the two improvement
+ * hooks). Unlike the Forge, the Cooker's pool unions BOTH a Campfire processing bench AND a Cooking
+ * crafting bench: both are {@link CraftingRecipe} objects, so the engine reads input&rarr;output off either,
+ * and each recipe cooks for its own time via {@link VanillaCraftBridge#recipeTimeSeconds}.
+ *
+ * <h2>Defensive contract</h2>
+ * Mirrors {@code MachineTickSystem}: this runs every server tick on hot ECS data and MUST NEVER throw on a
+ * missing component, chunk, world, or bridge call. The whole per-node drive is wrapped in a catch-Throwable
+ * that logs each distinct error once and skips the node for the tick.
+ */
+public final class CookerTickSystem extends EntityTickingSystem<ChunkStore> {
+
+    /** [TUNE] Per-second energy draw of a running Cooker. Placeholder, matches {@code FORGE_DRAW}. */
+    private static final long COOKER_DRAW = 200L;
+
+    /**
+     * [TUNE] Fallback seconds one craft takes for instant (time-0) crafting recipes. Campfire raw-cooks use
+     * their real {@link VanillaCraftBridge#recipeTimeSeconds}; Cooking dishes are instant in vanilla so they
+     * fall back to this.
+     *
+     * <p>Public single source of truth: kept PUBLIC so a future GUI can read it to render a fallback progress
+     * fraction (mirroring how {@link ForgeTickSystem#FORGE_DURATION} is public), so the GUI and the tick
+     * never disagree on a fallen-back craft's length.
+     */
+    public static final float COOKER_DEFAULT_DURATION = 4.0f;
+
+    /**
+     * [TUNE] Ticks the Cooker idles after completing a craft before sourcing the next recipe. A cosmetic
+     * beat so a completed craft reads visually before the next pull begins (the pull amount itself is
+     * already exactly one recipe). 0 = no pause (back-to-back).
+     */
+    private static final int POST_CRAFT_DELAY_TICKS = 2;
+
+    private final ComponentType<ChunkStore, CookerState> cookerType;
+    private final ComponentType<ChunkStore, PipeNode> pipeType;
+    private final NetworkService networkService;
+    private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType;
+    private final ComponentType<ChunkStore, BlockChunk> blockChunkType;
+
+    public CookerTickSystem(
+            @Nonnull ComponentType<ChunkStore, CookerState> cookerType,
+            @Nonnull ComponentType<ChunkStore, PipeNode> pipeType,
+            @Nonnull NetworkService networkService) {
+        this.cookerType = cookerType;
+        this.pipeType = pipeType;
+        this.networkService = networkService;
+        this.blockInfoType = BlockModule.BlockStateInfo.getComponentType();
+        this.blockChunkType = BlockChunk.getComponentType();
+    }
+
+    @Override
+    public boolean isParallel(int archetypeChunkSize, int taskCount) {
+        // Energy + containers are mutated in place on the live component; keep it single-threaded.
+        return false;
+    }
+
+    @Override
+    public Query<ChunkStore> getQuery() {
+        return cookerType;
+    }
+
+    @Override
+    public void tick(
+            float dt,
+            int index,
+            @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+            @Nonnull Store<ChunkStore> store,
+            @Nonnull CommandBuffer<ChunkStore> commandBuffer) {
+        CookerState node = archetypeChunk.getComponent(index, cookerType);
+        if (node == null) {
+            return;
+        }
+        // DEFENSIVE: a craft drive error must NEVER kill the WorldThread. Catch every throwable, log each
+        // distinct one once, and skip this Cooker's drive for the tick (same contract as MachineTickSystem).
+        try {
+            driveCook(node, dt, index, archetypeChunk, store);
+        } catch (Throwable t) {
+            String msg = String.valueOf(t);
+            if (COOKER_DRIVE_SEEN.add(msg)) {
+                COOKER_DRIVE_LOG.atWarning().log("CC cooker craft drive failed (skipped, world tick protected): " + msg);
+            }
+        }
+    }
+
+    /** Guards the per-tick craft drive: a failure logs once (per distinct error) and never crashes the tick. */
+    private static final HytaleLogger COOKER_DRIVE_LOG = HytaleLogger.forEnclosingClass();
+    private static final java.util.Set<String> COOKER_DRIVE_SEEN =
+        java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    /**
+     * Resolve this Cooker node's live drive context (the prologue) and hand it to {@link AutoCraftEngine}. A
+     * no-op whenever any piece of the context (energy buffer, ref, world, block coords, block type) cannot be
+     * resolved. NEVER throws.
+     */
+    private void driveCook(
+            @Nonnull CookerState node,
+            float dt,
+            int index,
+            @Nonnull ArchetypeChunk<ChunkStore> archetypeChunk,
+            @Nonnull Store<ChunkStore> store) {
+        // The energy buffer gates the drive: no buffer means no power gate -> nothing to spend, skip.
+        EnergyHandler energyHandler = node.energy();
+        if (!(energyHandler instanceof EnergyBuffer energy)) {
+            return;
+        }
+
+        // Resolve the live drive context off the same block-entity ref + sibling components. The shared
+        // prologue (MachineDriveContext) guards every step and returns null on the first missing piece.
+        MachineDriveContext.Resolved ctx =
+            MachineDriveContext.resolve(index, archetypeChunk, store, blockInfoType, blockChunkType);
+        if (ctx == null) {
+            return;
+        }
+
+        // Hand the resolved context to the shared craft engine: it owns the full pull/craft/complete loop +
+        // the block visual swap, configured by COOKER_SPEC. The engine never throws (the tick's catch is the
+        // backstop).
+        AutoCraftEngine.Context engineCtx = new AutoCraftEngine.Context(
+            ctx.world(), store, ctx.x(), ctx.y(), ctx.z(), ctx.blockType(), dt, energy, networkService, pipeType);
+        AutoCraftEngine.drive(node, engineCtx, COOKER_SPEC);
+    }
+
+    // --- the Cooker's engine configuration (the machine-specific Spec) ---
+
+    /**
+     * The Cooker's {@link AutoCraftEngine.Spec}: its bench pool (cached on first use), energy draw, post-craft
+     * delay, and the two improvement hooks. {@code craftDuration} returns the recipe's real cook time
+     * ({@link VanillaCraftBridge#recipeTimeSeconds}) or {@link #COOKER_DEFAULT_DURATION} for instant (time-0)
+     * crafting recipes; {@code allowSet} delegates to {@link AutoCraftEngine#cardAllowSet}.
+     */
+    private static final AutoCraftEngine.Spec COOKER_SPEC = new AutoCraftEngine.Spec() {
+        @Override
+        public RecipePool recipePool() {
+            return cookerRecipePool();
+        }
+
+        @Override
+        public long energyDraw() {
+            return COOKER_DRAW;
+        }
+
+        @Override
+        public int postCraftDelayTicks() {
+            return POST_CRAFT_DELAY_TICKS;
+        }
+
+        @Override
+        public float craftDuration(@Nullable CraftingRecipe r) {
+            // Per-recipe cook time: Campfire raw-cooks carry real seconds; Cooking dishes are instant in
+            // vanilla (time 0) so they fall back to the default.
+            float t = VanillaCraftBridge.recipeTimeSeconds(r);
+            return t > 0f ? t : COOKER_DEFAULT_DURATION;
+        }
+
+        @Override
+        public Set<String> allowSet(AutoCraftNode node) {
+            return AutoCraftEngine.cardAllowSet(node.card()); // IMPROVEMENT AXIS: recipe scripting.
+        }
+    };
+
+    // --- shared recipe pool (load-time-fixed; built once, lazily) ---
+
+    private static volatile RecipePool POOL;
+
+    /**
+     * The Cooker's shared recipe pool, built once on first tick and cached (the recipe registry is
+     * load-time-fixed). Unions the Campfire processing bench + the Cooking crafting bench and dedups by id
+     * into a deterministic (natural String) order via {@link RecipePool#union}.
+     */
+    private static RecipePool cookerRecipePool() {
+        RecipePool p = POOL;
+        if (p != null) {
+            return p;
+        }
+        synchronized (CookerTickSystem.class) {
+            if (POOL != null) {
+                return POOL;
+            }
+            RecipePool pool = RecipePool.union(List.of(
+                new RecipePool.BenchRef(BenchType.Processing, "Campfire"),
+                new RecipePool.BenchRef(BenchType.Crafting, "Cookingbench")));
+            POOL = pool;
+            // Diagnostic (logged once): if this is 0, the bench ids did not resolve to recipes and the Cooker
+            // can never craft. Confirms the Campfire + Cooking benches resolved.
+            COOKER_DRIVE_LOG.atInfo().log("Cooker recipe pool built: " + pool.stableOrder().size() + " recipes.");
+            return POOL;
+        }
+    }
+}
