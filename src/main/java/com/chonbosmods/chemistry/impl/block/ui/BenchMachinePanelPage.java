@@ -73,6 +73,13 @@ public final class BenchMachinePanelPage extends InteractiveCustomUIPage<BenchMa
         BlockModule.BlockStateInfo.getComponentType();
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType = BlockChunk.getComponentType();
     private World registeredWorld;
+    /**
+     * The enabled state last reflected in {@code #PowerToggle.Text} for THIS open panel (per-instance).
+     * Null = never sent yet, so the first {@link #applyState} always sends. We only re-send the clickable
+     * button's text when this differs from the live {@code enabled}, to avoid re-rendering the button every
+     * refresh (a redundant re-render can swallow a click landing in that window).
+     */
+    private Boolean lastSentEnabled;
 
     public BenchMachinePanelPage(
             @Nonnull PlayerRef playerRef,
@@ -179,7 +186,12 @@ public final class BenchMachinePanelPage extends InteractiveCustomUIPage<BenchMa
         }
         boolean enabled = machine.isEnabled();
         // Toggle button shows the ACTION (mode to switch to), not the current state: ON -> "Turn Off".
-        cmd.set("#PowerToggle.Text", enabled ? "Turn Off" : "Turn On");
+        // Only re-send when the state actually changed: re-rendering this clickable button every refresh
+        // can drop a click landing in that window. Other selectors below are display-only and re-send freely.
+        if (lastSentEnabled == null || lastSentEnabled != enabled) {
+            cmd.set("#PowerToggle.Text", enabled ? "Turn Off" : "Turn On");
+            lastSentEnabled = enabled;
+        }
 
         ProcessingBenchBlock bench = machine.heldBench();
         cmd.set("#InputGrid.Slots", slotsOf(bench == null ? null : VanillaBenchBridge.input(bench)));
