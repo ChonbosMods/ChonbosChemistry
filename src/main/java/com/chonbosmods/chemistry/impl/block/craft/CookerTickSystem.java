@@ -181,7 +181,11 @@ public final class CookerTickSystem extends EntityTickingSystem<ChunkStore> {
         @Override
         public float craftDuration(@Nullable CraftingRecipe r) {
             // Per-recipe cook time: Campfire raw-cooks carry real seconds; Cooking dishes are instant in
-            // vanilla (time 0) so they fall back to the default.
+            // vanilla (time 0) so they fall back to the default. The engine passes null when idle (no active
+            // recipe) -> default (the value is unused while idle); MUST null-guard or every idle tick NPEs.
+            if (r == null) {
+                return COOKER_DEFAULT_DURATION;
+            }
             float t = VanillaCraftBridge.recipeTimeSeconds(r);
             return t > 0f ? t : COOKER_DEFAULT_DURATION;
         }
