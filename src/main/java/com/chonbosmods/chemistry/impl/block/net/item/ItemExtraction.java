@@ -7,7 +7,9 @@ import com.chonbosmods.chemistry.impl.block.net.item.ContainerLookup.ContainerVi
 import com.chonbosmods.chemistry.impl.block.net.item.ItemEndpoints.Endpoints;
 import com.chonbosmods.chemistry.impl.block.net.item.ItemEndpoints.Source;
 import com.chonbosmods.chemistry.impl.block.net.item.ItemPathfinder.Candidate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The pure, single-attempt PULL extraction-eligibility function for ONE source endpoint
@@ -117,61 +119,87 @@ public final class ItemExtraction {
             return null; // the source container vanished
         }
 
-        // Rule 3 (cap) + the source viaPipe filter: firstExtractable scans for the first stack the
-        // SOURCE via-pipe filter admits, reported as a Peek with its count already capped at pullCap and
-        // the matched slot's metadata. Null means empty / filter admits nothing.
-        ContainerView.Peek peek = src.firstExtractable(
-            filters.forPipe(source.viaPipeKey()), source.viaPipeKey(), source.viaFace(), pullCap);
-        if (peek == null) {
-            return null;
-        }
-        ItemKey extractable = peek.key();
+        // Find a DELIVERABLE source item regardless of slot order. The pipe filter still gates which
+        // stacks are admissible (Rule 3 cap + the source viaPipe filter both apply on every scan below),
+        // but a filtered destination (e.g. a Smelter that only accepts smeltable ores) means the FIRST
+        // admitted stack in slot order may have no accepting destination. Rather than give up for the
+        // tick (the historical bug: junk in an earlier slot stranded the ore behind it), we skip each id
+        // that no destination accepts and scan for the next admitted stack, until one is deliverable
+        // (commit + return) or none remains (return null).
+        ItemFilter pipeFilter = filters.forPipe(source.viaPipeKey());
+        Set<String> undeliverable = new HashSet<>();
 
-        // Rule 2 — NO EXTRACTION WITHOUT A DESTINATION (Mekanism sorter rule). Find the nearest-first
-        // admitting destinations FROM the source via pipe, then take the FIRST one that accepts > 0 in
-        // simulate. A destination at the source's OWN container is excluded (never pull-then-deliver to
-        // self). The sizing decision: extract min(extractable, what that first candidate accepts).
-        List<Candidate> candidates =
-            ItemPathfinder.candidates(source.viaPipeKey(), extractable, endpoints, net, grid, filters);
+        // Scan for the first admitted stack whose id we have NOT already found undeliverable this tick.
+        // Wrapping the pipe filter preserves Rule 3 (the same pullCap is passed to firstExtractable) and
+        // the source viaPipe filter exactly; it only additionally excludes ids already proven to have no
+        // accepting destination, which both skips them AND guarantees termination (each loop either
+        // returns or excludes one more id). Allocated ONCE: it closes over the final `undeliverable`
+        // reference and reads it live via contains(), so a single instance serves every iteration and
+        // avoids a per-iteration allocation in this per-tick hot path.
+        ItemFilter scan = (key, pk, vf) ->
+            pipeFilter.admits(key, pk, vf) && key != null && key.id() != null
+                && !undeliverable.contains(key.id());
 
-        Candidate chosen = null;
-        int sized = 0;
-        for (Candidate c : candidates) {
-            long destKey = c.destination().containerKey();
-            if (destKey == source.containerKey()) {
-                continue; // source self-exclusion: don't deliver back into the chest we pulled from
+        while (true) {
+            ContainerView.Peek peek =
+                src.firstExtractable(scan, source.viaPipeKey(), source.viaFace(), pullCap);
+            if (peek == null) {
+                return null; // nothing left in the source has both filter-admittance and an untried id
             }
-            ContainerView destView = containerAt(containers, destKey);
-            if (destView == null) {
-                continue; // candidate container vanished
-            }
-            // Confirm with the REAL metadata of the stack about to travel: the engine stacks into an
-            // occupied destination slot only when isStackableWith (id AND metadata), so a same-id but
-            // different-metadata slot is NOT room (CRITICAL review fix: avoids launch-then-bounce).
-            int accepted = destView.insert(extractable, peek.metadata(), extractable.count(), true);
-            if (accepted > 0) {
-                chosen = c;
-                sized = Math.min(extractable.count(), accepted);
-                break; // first accepting candidate wins (nearest-first)
-            }
-        }
-        if (chosen == null) {
-            return null; // no admitting, accepting destination -> no extraction
-        }
+            ItemKey extractable = peek.key();
 
-        // Rule 4 — COMMIT. Extract the right-sized amount for real. The commit may pull LESS than
-        // promised if the contents raced down between firstExtractable and now: trust the actual amount.
-        ContainerView.Extracted pulled = src.extract(extractable, sized, false);
-        int actual = pulled.amount();
-        if (actual <= 0) {
-            return null; // raced empty: never build a count<=0 TravelingStack (persistence invariant)
-        }
+            // Rule 2 — NO EXTRACTION WITHOUT A DESTINATION (Mekanism sorter rule). Find the nearest-first
+            // admitting destinations FROM the source via pipe, then take the FIRST one that accepts > 0 in
+            // simulate. A destination at the source's OWN container is excluded (never pull-then-deliver to
+            // self). The sizing decision: extract min(extractable, what that first candidate accepts).
+            List<Candidate> candidates =
+                ItemPathfinder.candidates(source.viaPipeKey(), extractable, endpoints, net, grid, filters);
 
-        // Build the in-flight stack. Path is the chosen candidate's (candidate-owned; of() copies).
-        // Metadata flows verbatim from the commit (the world impl supplies the real document).
-        return TravelingStack.of(
-            extractable.id(), actual, pulled.metadata(), chosen.path(),
-            source.containerKey(), chosen.destination().containerKey());
+            Candidate chosen = null;
+            int sized = 0;
+            for (Candidate c : candidates) {
+                long destKey = c.destination().containerKey();
+                if (destKey == source.containerKey()) {
+                    continue; // source self-exclusion: don't deliver back into the chest we pulled from
+                }
+                ContainerView destView = containerAt(containers, destKey);
+                if (destView == null) {
+                    continue; // candidate container vanished
+                }
+                // Confirm with the REAL metadata of the stack about to travel: the engine stacks into an
+                // occupied destination slot only when isStackableWith (id AND metadata), so a same-id but
+                // different-metadata slot is NOT room (CRITICAL review fix: avoids launch-then-bounce).
+                int accepted = destView.insert(extractable, peek.metadata(), extractable.count(), true);
+                if (accepted > 0) {
+                    chosen = c;
+                    sized = Math.min(extractable.count(), accepted);
+                    break; // first accepting candidate wins (nearest-first)
+                }
+            }
+            if (chosen == null) {
+                // No admitting, accepting destination for THIS id: skip it and scan for the next
+                // deliverable item rather than giving up the whole source for the tick.
+                undeliverable.add(extractable.id());
+                continue;
+            }
+
+            // Rule 4 — COMMIT. Extract the right-sized amount for real. The commit may pull LESS than
+            // promised if the contents raced down between firstExtractable and now: trust the actual amount.
+            ContainerView.Extracted pulled = src.extract(extractable, sized, false);
+            int actual = pulled.amount();
+            if (actual <= 0) {
+                // Raced empty on this id between peek and commit: mark it tried and keep scanning rather
+                // than aborting the whole source over one raced id (strictly more robust, same tick).
+                undeliverable.add(extractable.id());
+                continue;
+            }
+
+            // Build the in-flight stack. Path is the chosen candidate's (candidate-owned; of() copies).
+            // Metadata flows verbatim from the commit (the world impl supplies the real document).
+            return TravelingStack.of(
+                extractable.id(), actual, pulled.metadata(), chosen.path(),
+                source.containerKey(), chosen.destination().containerKey());
+        }
     }
 
     private static ContainerView containerAt(ContainerLookup containers, long key) {
