@@ -203,9 +203,11 @@ public final class BenchMachinePanelPage extends InteractiveCustomUIPage<BenchMa
         cmd.set("#TierText.TextSpans", Message.raw("Tier: " + tier));
 
         float frac = bench == null ? 0.0F : VanillaBenchBridge.progressFraction(bench, tier);
-        boolean active = bench != null && VanillaBenchBridge.isActive(bench);
+        // Truthful active: the bench is mid-process iff it has accumulated progress. The vanilla bench's
+        // isActive() sticks ON even when idle (the clearing tick never runs in our setup), so we don't trust it.
+        boolean active = enabled && frac > 0.0F;
         cmd.set("#ProgressBar.Value", BenchMachinePanelText.clamp01(frac));
-        cmd.set("#ProgressText.TextSpans", Message.raw(BenchMachinePanelText.progress(enabled, active, frac)));
+        cmd.set("#ProgressText.TextSpans", Message.raw(BenchMachinePanelText.progress(enabled, frac)));
 
         long stored = 0;
         long capacity = 0;

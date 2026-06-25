@@ -228,7 +228,7 @@ public final class ForgePanelPage extends InteractiveCustomUIPage<ForgePanelPage
         boolean active = forge.currentRecipeId() != null;
         float frac = BenchMachinePanelText.forgeFraction(progressSeconds, ForgeTickSystem.FORGE_DURATION);
         cmd.set("#ProgressBar.Value", frac);
-        cmd.set("#ProgressText.TextSpans", Message.raw(BenchMachinePanelText.progress(enabled, active, frac)));
+        cmd.set("#ProgressText.TextSpans", Message.raw(BenchMachinePanelText.progress(enabled, frac)));
 
         long stored = 0;
         long capacity = 0;
