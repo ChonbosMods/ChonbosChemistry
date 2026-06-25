@@ -2,6 +2,8 @@ package com.chonbosmods.chemistry;
 
 import com.chonbosmods.chemistry.api.registry.Chemistry;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
+import com.chonbosmods.chemistry.impl.block.craft.CookerState;
+import com.chonbosmods.chemistry.impl.block.craft.CookerTickSystem;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeTickSystem;
 import com.chonbosmods.chemistry.impl.block.CarryBreakEventSystem;
@@ -51,6 +53,7 @@ public class ChonbosChemistry extends JavaPlugin {
 
     private ComponentType<ChunkStore, MachineBlockState> machineComponentType;
     private ComponentType<ChunkStore, ForgeCraftState> forgeComponentType;
+    private ComponentType<ChunkStore, CookerState> cookerComponentType;
     private ComponentType<ChunkStore, TankBlockState> tankComponentType;
     private ComponentType<ChunkStore, PipeNode> pipeComponentType;
 
@@ -77,6 +80,11 @@ public class ChonbosChemistry extends JavaPlugin {
     /** The {@link ChunkStore} component type backing Forge blocks (the autonomous crafter's own state). */
     public ComponentType<ChunkStore, ForgeCraftState> forgeComponentType() {
         return forgeComponentType;
+    }
+
+    /** The {@link ChunkStore} component type backing Cooker blocks (the autonomous crafter's own state). */
+    public ComponentType<ChunkStore, CookerState> cookerComponentType() {
+        return cookerComponentType;
     }
 
     /** The {@link ChunkStore} component type backing tank blocks (used by the ticking system + GUI). */
@@ -111,11 +119,13 @@ public class ChonbosChemistry extends JavaPlugin {
             .registerComponent(MachineBlockState.class, "MachineBlockState", MachineBlockState.CODEC);
         forgeComponentType = getChunkStoreRegistry()
             .registerComponent(ForgeCraftState.class, "ForgeCraftState", ForgeCraftState.CODEC);
+        cookerComponentType = getChunkStoreRegistry()
+            .registerComponent(CookerState.class, "CookerState", CookerState.CODEC);
         tankComponentType = getChunkStoreRegistry()
             .registerComponent(TankBlockState.class, "TankBlockState", TankBlockState.CODEC);
         pipeComponentType = getChunkStoreRegistry()
             .registerComponent(PipeNode.class, "PipeNode", PipeNode.CODEC);
-        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, ForgeCraftState, TankBlockState, PipeNode.");
+        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, ForgeCraftState, CookerState, TankBlockState, PipeNode.");
 
         // Per-tick driver: creative-refill then work pass. Must be registered AFTER the components above.
         // (No longer pushes resources to neighbors: the NetworkTickSystem below does that over pipes.)
@@ -129,7 +139,8 @@ public class ChonbosChemistry extends JavaPlugin {
         // Per-tick pipe-network distribution (H4): for each pipe network, pull from OUTPUT-port machines
         // and fair-split into INPUT-port machines once per tick. This is what moves resources now.
         getChunkStoreRegistry().registerSystem(new NetworkTickSystem(
-            pipeComponentType, machineComponentType, tankComponentType, forgeComponentType, networkService));
+            pipeComponentType, machineComponentType, tankComponentType, forgeComponentType, cookerComponentType,
+            networkService));
         getLogger().atInfo().log("Registered NetworkTickSystem (per-tick pipe-network distribution).");
         // Demand-driven craft driver for the Forge (no held bench; own containers + even round-robin
         // selection). Registered AFTER networkService: it pulls each craft's ingredients from the ITEM
@@ -137,6 +148,12 @@ public class ChonbosChemistry extends JavaPlugin {
         getChunkStoreRegistry().registerSystem(
             new ForgeTickSystem(forgeComponentType, pipeComponentType, networkService));
         getLogger().atInfo().log("Registered ForgeTickSystem (autonomous crafting).");
+        // Demand-driven craft driver for the Cooker (sibling of the Forge: no held bench; own containers +
+        // round-robin selection). Registered AFTER networkService: it pulls each craft's ingredients from
+        // the ITEM pipe network on its input face (idle -> pull -> craft -> complete -> repeat).
+        getChunkStoreRegistry().registerSystem(
+            new CookerTickSystem(cookerComponentType, pipeComponentType, networkService));
+        getLogger().atInfo().log("Registered CookerTickSystem (autonomous crafting).");
         getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService, pipeComponentType));
         getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService, pipeComponentType));
 
@@ -146,7 +163,8 @@ public class ChonbosChemistry extends JavaPlugin {
         // BlockPlaceUtils.onPlaceBlockSuccess natively restores every component. Pure stamping/predicate
         // logic lives in BlockHolderCarry (unit-tested); the system is thin glue verified in-game.
         getEntityStoreRegistry().registerSystem(new CarryBreakEventSystem(
-            machineComponentType, tankComponentType, forgeComponentType, pipeComponentType, networkService));
+            machineComponentType, tankComponentType, forgeComponentType, cookerComponentType, pipeComponentType,
+            networkService));
         getLogger().atInfo().log("Registered CarryBreakEventSystem (BlockHolder contents carry).");
         // NOTE: NO ChunkUnloadEvent handler. In Server 0.5.3 the engine's ChunkUnloadingSystem dispatches
         // ChunkUnloadEvent from PARALLEL worker threads (forEachEntityParallel), and delivering it to an
