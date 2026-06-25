@@ -94,6 +94,16 @@ public final class VanillaCraftBridge {
         return CraftingPlugin.getBenchRecipes(type, benchId);
     }
 
+    /**
+     * The number of DISTINCT input materials a recipe requires (its {@code getInput()} array length). Used
+     * to rank recipes: more ingredients = a more "advanced" recipe to prefer over a basic one.
+     */
+    public static int ingredientCount(CraftingRecipe r) {
+        // signature: MaterialQuantity[] CraftingRecipe.getInput() (verified public on Server-0.5.3)
+        MaterialQuantity[] in = r.getInput();
+        return in == null ? 0 : in.length;
+    }
+
     /** The recipe's stable asset id. */
     public static String recipeId(CraftingRecipe r) {
         // signature: String CraftingRecipe.getId()
