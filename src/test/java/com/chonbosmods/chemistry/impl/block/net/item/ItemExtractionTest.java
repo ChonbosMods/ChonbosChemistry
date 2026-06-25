@@ -124,6 +124,121 @@ class ItemExtractionTest {
         }
     }
 
+    /**
+     * A source container holding TWO item ids in slot order (id A first, id B second). Its
+     * {@code firstExtractable} reports the FIRST id (by slot order) the filter still admits: it offers A
+     * until the filter excludes A, then offers B. This mirrors the real bug shape (a deliverable item B
+     * sitting in a slot AFTER an undeliverable item A), which a single-id {@link FakeContainer} cannot
+     * express. {@code extract} pulls from whichever id is requested.
+     */
+    private static final class TwoSlotSource implements ContainerView {
+        private final String idA;
+        private int countA;
+        private final String idB;
+        private int countB;
+
+        TwoSlotSource(String idA, int countA, String idB, int countB) {
+            this.idA = idA;
+            this.countA = countA;
+            this.idB = idB;
+            this.countB = countB;
+        }
+
+        @Override
+        public int insert(ItemKey key, org.bson.BsonDocument metadata, int amount, boolean simulate) {
+            return 0; // a pure source: never a destination here
+        }
+
+        @Override
+        public Peek firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
+            // Slot order: try A first, then B. Report the first the filter admits.
+            if (countA > 0) {
+                ItemKey a = new ItemKey(idA, Math.min(countA, cap));
+                if (filter.admits(a, pipeKey, viaFace)) {
+                    return new Peek(a, null);
+                }
+            }
+            if (countB > 0) {
+                ItemKey b = new ItemKey(idB, Math.min(countB, cap));
+                if (filter.admits(b, pipeKey, viaFace)) {
+                    return new Peek(b, null);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public Extracted extract(ItemKey key, int amount, boolean simulate) {
+            if (idA.equals(key.id())) {
+                int got = Math.min(amount, countA);
+                if (!simulate) {
+                    countA -= got;
+                }
+                return new Extracted(got, null);
+            }
+            if (idB.equals(key.id())) {
+                int got = Math.min(amount, countB);
+                if (!simulate) {
+                    countB -= got;
+                }
+                return new Extracted(got, null);
+            }
+            return new Extracted(0, null);
+        }
+    }
+
+    /**
+     * A destination that accepts ONLY a given id (a filtered machine input, e.g. a Smelter taking only
+     * ores): its {@code insert} returns 0 for any other id and {@code capacity} for the accepted id. The
+     * stand-in for "id A has no accepting destination, id B does".
+     */
+    private static final class IdFilteredDest implements ContainerView {
+        private final String acceptedId;
+        private int capacity;
+
+        IdFilteredDest(String acceptedId, int capacity) {
+            this.acceptedId = acceptedId;
+            this.capacity = capacity;
+        }
+
+        @Override
+        public int insert(ItemKey key, org.bson.BsonDocument metadata, int amount, boolean simulate) {
+            if (!acceptedId.equals(key.id())) {
+                return 0; // rejects everything but the accepted id (filtered input)
+            }
+            int fit = Math.min(amount, capacity);
+            if (!simulate) {
+                capacity -= fit;
+            }
+            return fit;
+        }
+
+        @Override
+        public Peek firstExtractable(ItemFilter filter, long pipeKey, int viaFace, int cap) {
+            return null; // a pure destination: never a source here
+        }
+
+        @Override
+        public Extracted extract(ItemKey key, int amount, boolean simulate) {
+            return new Extracted(0, null);
+        }
+    }
+
+    /** A ContainerLookup backed by a map of packed-key -> any ContainerView. */
+    private static final class FakeViewLookup implements ContainerLookup {
+        private final Map<Long, ContainerView> views = new HashMap<>();
+
+        FakeViewLookup put(int x, int y, int z, ContainerView v) {
+            views.put(NetworkManager.packKey(x, y, z), v);
+            return this;
+        }
+
+        @Override
+        public ContainerView at(int x, int y, int z) {
+            return views.get(NetworkManager.packKey(x, y, z));
+        }
+    }
+
     /** A ContainerLookup backed by a map of packed-key -> FakeContainer. */
     private static final class FakeContainerLookup implements ContainerLookup {
         private final Map<Long, FakeContainer> containers = new HashMap<>();
@@ -447,5 +562,67 @@ class ItemExtractionTest {
             "confirmation simulate must receive the source stack's metadata, not null");
         // The launched stack carries the commit's metadata so delivery round-trips byte-for-byte.
         assertEquals(meta, s.metadata(), "the TravelingStack carries the extracted metadata");
+    }
+
+    // ---- 11. deliverable item BEHIND an undeliverable one (the slot-order bug regression) ----------
+
+    @Test
+    void deliverableItemBehindUndeliverable_skipsFirst_extractsSecond() {
+        // THE BUG (fixed): a source holds junk id A in an earlier slot (no accepting destination) and a
+        // deliverable id B in a later slot. The destination is a FILTERED input (e.g. a Smelter) that
+        // accepts only B and rejects A. The old straight-line code peeked A, found no destination,
+        // returned null, and NEVER reached B (user had to physically move B to slot 0). The fix scans
+        // past A and extracts B regardless of slot order.
+        String junkA = "plant_fiber";
+        String oreB = "iron_ore";
+        FakeGrid grid = new FakeGrid()
+            .put(0, 0, 0, itemPipe())
+            .put(1, 0, 0, itemPipe());
+        Network net = networkAt(0, 0, 0, grid);
+        Source src = source(-1, 0, 0, 0, 0, 0, 1);
+        Destination destination = dest(2, 0, 0, 1, 0, 0, 0);
+        Endpoints endpoints = new Endpoints(List.of(destination), List.of(src));
+        TwoSlotSource srcC = new TwoSlotSource(junkA, 32, oreB, 10); // A in earlier slot, B behind it
+        IdFilteredDest destC = new IdFilteredDest(oreB, 64);         // accepts only B, rejects A
+        FakeViewLookup containers = new FakeViewLookup()
+            .put(-1, 0, 0, srcC)
+            .put(2, 0, 0, destC);
+
+        TravelingStack s = tryExtract(src, net, grid, containers, endpoints, 0);
+
+        assertNotNull(s, "must find the deliverable item B behind the undeliverable A (not give up)");
+        assertEquals(oreB, s.id(), "the extracted+launched stack is id B, the deliverable item");
+        assertEquals(destination.containerKey(), s.destKey());
+        assertEquals(10, s.count(), "all 10 of B (under the cap) are extracted");
+        // B really came out of the source; the junk A stayed put.
+        assertEquals(0, srcC.extract(new ItemKey(oreB, 1), 1000, true).amount(), "B was committed");
+        assertEquals(32, srcC.extract(new ItemKey(junkA, 1), 1000, true).amount(), "junk A untouched");
+    }
+
+    // ---- 12. SINGLE undeliverable id still returns null (no false positive from the scan loop) ------
+
+    @Test
+    void singleUndeliverableId_stillReturnsNull() {
+        // Guard the loop's termination + the unchanged "no destination -> null" behavior when there is
+        // only ONE id and it is undeliverable: the scan excludes it, the next scan finds nothing, null.
+        String junkA = "plant_fiber";
+        String oreB = "iron_ore";
+        FakeGrid grid = new FakeGrid()
+            .put(0, 0, 0, itemPipe())
+            .put(1, 0, 0, itemPipe());
+        Network net = networkAt(0, 0, 0, grid);
+        Source src = source(-1, 0, 0, 0, 0, 0, 1);
+        Destination destination = dest(2, 0, 0, 1, 0, 0, 0);
+        Endpoints endpoints = new Endpoints(List.of(destination), List.of(src));
+        TwoSlotSource srcC = new TwoSlotSource(junkA, 32, oreB, 0); // only junk A present, no B
+        IdFilteredDest destC = new IdFilteredDest(oreB, 64);        // accepts only B, never A
+        FakeViewLookup containers = new FakeViewLookup()
+            .put(-1, 0, 0, srcC)
+            .put(2, 0, 0, destC);
+
+        TravelingStack s = tryExtract(src, net, grid, containers, endpoints, 0);
+
+        assertNull(s, "a lone undeliverable id yields no stack (Mekanism sorter rule), loop terminates");
+        assertEquals(32, srcC.extract(new ItemKey(junkA, 1), 1000, true).amount(), "A untouched");
     }
 }
