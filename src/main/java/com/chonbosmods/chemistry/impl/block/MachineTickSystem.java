@@ -224,10 +224,6 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
         if (poweredThisTick) {
             completedThisTick = VanillaBenchBridge.advance(
                 bench, (float) affordable, entityStore, benchBlock, stateInfo, x, y, z, blockType, tier);
-            long drained = SmelterEnergy.drainFor(affordable, SMELTER_DRAW);
-            if (drained > 0) {
-                energy.extractEnergyInternal(drained, false);
-            }
         }
         float progressAfter = VanillaBenchBridge.inputProgress(bench);
 
@@ -241,6 +237,15 @@ public final class MachineTickSystem extends EntityTickingSystem<ChunkStore> {
         // guard issues the state packet only on a transition (never restarts the looping animation each tick).
         boolean processing =
             MachineVisualState.isProcessing(poweredThisTick, progressBefore, progressAfter, completedThisTick);
+        // Drain ONLY for real work this tick (the truthful processing signal), NOT for merely being
+        // powered-and-idle: a powered machine with no input must not bleed energy. Mirrors the Forge,
+        // which drains only on active craft.
+        if (processing) {
+            long drained = SmelterEnergy.drainFor(affordable, SMELTER_DRAW);
+            if (drained > 0) {
+                energy.extractEnergyInternal(drained, false);
+            }
+        }
         String desiredState = MachineVisualState.desired(poweredThisTick, processing);
         if (node.shouldUpdateVisualState(desiredState)) {
             VanillaBenchBridge.setVisualState(bench, desiredState, blockType, world, x, y, z);
