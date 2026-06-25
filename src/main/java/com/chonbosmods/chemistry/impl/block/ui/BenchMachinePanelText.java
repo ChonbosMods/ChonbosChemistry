@@ -22,18 +22,15 @@ final class BenchMachinePanelText {
     }
 
     /**
-     * The line shown under the progress bar: the machine {@link #state}, with the progress percent
-     * appended in the Active state (e.g. {@code "Active 47%"}).
-     *
-     * @param enabled  the machine's On/Off line ({@link com.chonbosmods.chemistry.impl.block.MachineBlockState#isEnabled()})
-     * @param active   whether the held bench is currently processing
-     * @param fraction process progress 0..1 (only used when {@code active})
+     * The line shown under the progress bar (the processing section): {@code "Off"} when disabled, else
+     * {@code "Processing N%"} with the current progress percent (so {@code "Processing 0%"} when on but not
+     * yet advanced). The 3-state machine word lives in {@link #state} (Off/Idle/Active) for the status line.
      */
-    static String progress(boolean enabled, boolean active, float fraction) {
-        if (!enabled || !active) {
-            return state(enabled, active);
+    static String progress(boolean enabled, float fraction) {
+        if (!enabled) {
+            return "Off";
         }
-        return "Active " + Math.round(clamp01(fraction) * 100.0f) + "%";
+        return "Processing " + Math.round(clamp01(fraction) * 100.0f) + "%";
     }
 
     /** Clamp a bar fraction into the {@code [0, 1]} range a {@code ProgressBar.Value} expects. */

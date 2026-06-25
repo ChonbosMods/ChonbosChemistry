@@ -64,12 +64,6 @@ public final class VanillaBenchBridge {
         return CraftingPlugin.get().getBenchBlockComponentType();
     }
 
-    /** Whether the bench currently considers itself processing. */
-    public static boolean isActive(ProcessingBenchBlock b) {
-        // signature: boolean isActive()
-        return b.isActive();
-    }
-
     /** The bench's current input progress (seconds accumulated toward the next completion). */
     public static float inputProgress(ProcessingBenchBlock b) {
         // signature: float getInputProgress()
