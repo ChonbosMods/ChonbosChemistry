@@ -4,7 +4,7 @@
 
 **Goal:** Let a player author a portable "recipe script" card : a blueprint of which recipes a machine may make, how many of each, and in what order : and insert it into any automated crafting machine to drive it. The Sculptor (911 Builders recipes) is unusable without this; every other auto-crafter gains optional whitelisting/blueprinting from the same system.
 
-**Status:** Designed (this doc). Blocked on Phase 0 (Hytale custom-UI feasibility, drawing on the local **Natural20** source mod's proven UI patterns).
+**Status:** Designed (this doc). **Phase 0 COMPLETE** : all six UI primitives proven feasible (see `2026-06-26-phase0-ui-feasibility-findings.md`); vanilla `EntitySpawnPage` is the build template. Phases 1-2 (engine, GUI-agnostic) unblocked; Phase 3 (GUI) has a locked affordance list + one live prototype to run (filtered list at Sculptor scale).
 
 **Builds on:** the shared `AutoCraftEngine` (`Spec.allowSet(node)` → `cardAllowSet(node.card())` → `Set<String>`, gated through `CraftSelection.allowed`), the per-machine `card()` slot already in every auto-crafter's state + codec, and the Sculptor's `scriptGateAllowSet` deny-all gate. See `docs/design.md` §7.10 and memory `assembler-sculptor-split`.
 
