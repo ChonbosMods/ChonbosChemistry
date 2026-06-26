@@ -9,7 +9,6 @@ import com.chonbosmods.chemistry.impl.block.SmelterEnergy;
 import com.chonbosmods.chemistry.impl.block.bench.VanillaCraftBridge;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
 import com.chonbosmods.chemistry.impl.block.net.PipeNode;
-import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
@@ -61,12 +60,16 @@ public final class AutoCraftEngine {
     }
 
     /**
-     * The metadata key on a recipe card carrying its allow-set (the recipe ids the machine may craft). A card
-     * with no such key imposes NO filter (a blank card crafts everything; the card-PROGRAMMING UX is
-     * deferred). Read as a {@code String[]} via {@code ItemStack.getFromMetadataOrNull}.
+     * The metadata key on a recipe card carrying its {@link RecipeScript}: the structured blueprint of which
+     * recipes the machine may craft, how many of each, and in what order. A card with no such key (or an empty
+     * script) imposes NO filter (a blank card crafts everything; see {@link #cardScript}). Read/written via
+     * {@code ItemStack.getFromMetadataOrNull} / {@code ItemStack.withMetadata}.
+     *
+     * <p>Package-private so the codec round-trip is directly testable (stamp + read a card in-test) without a
+     * separate test seam.
      */
-    private static final KeyedCodec<String[]> CARD_ALLOW =
-        new KeyedCodec<>("CC_ForgeAllow", Codec.STRING_ARRAY);
+    static final KeyedCodec<RecipeScript> CC_RECIPE_SCRIPT =
+        new KeyedCodec<>("CC_RecipeScript", RecipeScript.CODEC);
 
     /**
      * One craft step for {@code node}: source &rarr; decide &rarr; produce &rarr; drain energy &rarr; swap
@@ -332,24 +335,40 @@ public final class AutoCraftEngine {
     }
 
     /**
-     * The DEFAULT recipe-scripting: the card's allow-set, the recipe ids it permits the machine to craft, or
-     * {@code null} for no filter. A null card (no card loaded) returns null; a card with no
-     * {@link #CARD_ALLOW} metadata also returns null (a blank card imposes no filter: the card-programming
-     * UX is deferred). Otherwise the stored {@code String[]} is returned as a {@link Set}.
+     * The {@link RecipeScript} carried in {@code card}'s metadata, or {@code null} when there is no usable
+     * script: a null/empty card, a card with no {@link #CC_RECIPE_SCRIPT} metadata, or a script with no
+     * entries ({@link RecipeScript#isEmpty()}). A blank/unprogrammed card therefore reads as {@code null}.
      *
-     * <p>A {@link Spec}'s {@code allowSet()} should delegate here unless it wants custom scripting. This is
-     * the single place richer recipe-script logic will later live.
+     * <p>This is the single place richer recipe-script logic plugs in; {@link #cardAllowSet} derives the flat
+     * allow-set from it.
+     */
+    @Nullable
+    public static RecipeScript cardScript(@Nullable ItemStack card) {
+        if (card == null || card.isEmpty()) {
+            return null;
+        }
+        RecipeScript script = card.getFromMetadataOrNull(CC_RECIPE_SCRIPT);
+        if (script == null || script.isEmpty()) {
+            return null;
+        }
+        return script;
+    }
+
+    /**
+     * The DEFAULT recipe-scripting: the card's allow-set, the recipe ids it permits the machine to craft, or
+     * {@code null} for no filter. Derived from {@link #cardScript}: a null card, a card with no script, or an
+     * empty script all yield {@code null} (no filter / allow all); otherwise the script's distinct recipe ids
+     * are returned ({@link RecipeScript#recipeIds()}).
+     *
+     * <p>The {@code null = allow-all} contract is preserved exactly: non-gated machines with a blank card
+     * still craft anything, and the Sculptor's {@code scriptGateAllowSet} still denies-all on a blank card via
+     * its own card-presence check. A {@link Spec}'s {@code allowSet()} should delegate here unless it wants
+     * custom scripting.
      */
     @Nullable
     public static Set<String> cardAllowSet(@Nullable ItemStack card) {
-        if (card == null) {
-            return null;
-        }
-        String[] allow = card.getFromMetadataOrNull(CARD_ALLOW);
-        if (allow == null || allow.length == 0) {
-            return null;
-        }
-        return Set.of(allow);
+        RecipeScript script = cardScript(card);
+        return (script == null) ? null : script.recipeIds();
     }
 
     /**
