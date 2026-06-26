@@ -8,6 +8,7 @@ import com.chonbosmods.chemistry.impl.block.craft.CookerState;
 import com.chonbosmods.chemistry.impl.block.craft.OutfitterState;
 import com.chonbosmods.chemistry.impl.block.craft.AlembicState;
 import com.chonbosmods.chemistry.impl.block.craft.AssemblerState;
+import com.chonbosmods.chemistry.impl.block.craft.CultivatorState;
 import com.chonbosmods.chemistry.impl.block.craft.SculptorState;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.net.item.ItemEndpoints;
@@ -67,6 +68,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
     private final ComponentType<ChunkStore, OutfitterState> outfitterType;
     private final ComponentType<ChunkStore, AlembicState> alembicType;
     private final ComponentType<ChunkStore, AssemblerState> assemblerType;
+    private final ComponentType<ChunkStore, CultivatorState> cultivatorType;
     private final ComponentType<ChunkStore, SculptorState> sculptorType;
     private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType;
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType;
@@ -115,6 +117,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
             @Nonnull ComponentType<ChunkStore, OutfitterState> outfitterType,
             @Nonnull ComponentType<ChunkStore, AlembicState> alembicType,
             @Nonnull ComponentType<ChunkStore, AssemblerState> assemblerType,
+            @Nonnull ComponentType<ChunkStore, CultivatorState> cultivatorType,
             @Nonnull ComponentType<ChunkStore, SculptorState> sculptorType,
             @Nonnull NetworkService networkService) {
         this.pipeType = pipeType;
@@ -125,6 +128,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         this.outfitterType = outfitterType;
         this.alembicType = alembicType;
         this.assemblerType = assemblerType;
+        this.cultivatorType = cultivatorType;
         this.sculptorType = sculptorType;
         this.networkService = networkService;
         this.blockInfoType = BlockModule.BlockStateInfo.getComponentType();
@@ -218,7 +222,7 @@ public final class NetworkTickSystem extends EntityTickingSystem<ChunkStore> {
         }
 
         MachineLookup lookup =
-            new WorldMachineLookup(world, store, machineType, tankType, forgeType, cookerType, outfitterType, alembicType, assemblerType, sculptorType);
+            new WorldMachineLookup(world, store, machineType, tankType, forgeType, cookerType, outfitterType, alembicType, assemblerType, cultivatorType, sculptorType);
 
         // ITEM networks transport DISCRETE stacks, not a fungible shared buffer: they run the dedicated
         // item driver (Task 7) instead of NetworkTransfer.distribute, and skip the energy/lock write-back

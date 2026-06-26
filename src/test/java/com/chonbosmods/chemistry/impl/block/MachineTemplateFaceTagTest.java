@@ -142,6 +142,13 @@ class MachineTemplateFaceTagTest {
     }
 
     @Test
+    void cultivatorTemplateTagsMatchPorts() throws Exception {
+        // The Cultivator is an autonomous crafter (no vanilla bench) and seeds its ports under the
+        // CultivatorState component, so the helper must read that path instead of MachineBlockState.
+        assertTemplateTagsMatchPorts("CC_Cultivator", "CultivatorState");
+    }
+
+    @Test
     void sculptorTemplateTagsMatchPorts() throws Exception {
         // The Sculptor is an autonomous crafter (no vanilla bench) on the Reclaimer's 1x1x2 footprint, and
         // seeds its ports under the SculptorState component, so the helper must read that path instead of

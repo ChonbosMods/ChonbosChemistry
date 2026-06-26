@@ -1,0 +1,288 @@
+$C = "../Common.ui";
+$M = "../CC_Master.ui";
+
+// Chonbo's Chemistry: the CC CULTIVATOR panel. Sibling of CC_BenchMachinePanel.ui (Smelter/Reclaimer) but the
+// Cultivator is an autonomous crafter that owns its own containers + an inserted recipe-card slot (no held vanilla
+// bench). Same two-column vanilla-measured layout (STATUS/controls LEFT, PROCESSING I/O RIGHT) with one
+// addition: a single-slot #CardSlot for the recipe card, in the left column under the controls.
+//
+// See docs/research/2026-06-21-vanilla-ui-measurements.md for sizing. Bars use the recolored fills shipped in
+// Common/UI/Custom/CC/ (energy = #4bfcce, smelting = #aa7c4a). Server (CultivatorPanelPage) sets #ProgressBar.Value
+// / #PowerBar.Value (0..1), grid Slots, and the #CardSlot item. Texture paths use ../ (resolved relative to
+// THIS file in Pages/). #UpgradePanel is built but hidden (Visible:false) until Phase 2. The card slot is
+// DISPLAY-ONLY for v1 (AreItemsDraggable: false): hand insert/remove is deferred.
+
+@PanelBorderColor = $M.@PanelBorderColor;
+@PanelFillColor = $M.@PanelFillColor;
+@PanelDividerColor = $M.@PanelDividerColor;
+@ValueText = $M.@ValueText;
+@LabelText = $M.@LabelText;
+// Cultivator override: wider than the shared bench column. The Cultivator's held-ingredients scroll list (204px) + 2x2
+// output (140px) would crush the center to ~6px on the shared 404 width; 530 restores a ~130px progress bar
+// (the same size as the Smelter's center bar).
+@ProcessColumnWidth = 530;
+@StatusColumnWidth = $M.@StatusColumnWidth;
+@PanelGap = $M.@PanelGap;
+@ContentPad = $M.@ContentPad;
+@SlotSize = $M.@SlotSize;
+@SlotIconSize = $M.@SlotIconSize;
+@SlotSpacing = $M.@SlotSpacing;
+@BarHeight = $M.@BarHeight;
+@ButtonHeight = $M.@ButtonHeight;
+@HeaderFontSize = $M.@HeaderFontSize;
+
+$C.@PageOverlay {
+  $C.@DecoratedContainer {
+    Anchor: (Width: 920, Height: 460);
+
+    // Title set from Java (#PanelTitle.TextSpans). Vanilla title style.
+    #Title {
+      Group {
+        Label #PanelTitle {
+          Style: (
+            ...$C.@TitleStyle,
+            HorizontalAlignment: Center
+          );
+          Padding: (Horizontal: 19);
+          Text: "";
+        }
+      }
+    }
+
+    #Content {
+      LayoutMode: Left;
+      Padding: (Full: @ContentPad);
+
+      // ---- Left column: status + controls + recipe card + upgrade ----
+      Group #StatusColumn {
+        Anchor: (Width: @StatusColumnWidth);
+        LayoutMode: Top;
+
+        Group #StatusPanel {
+          Anchor: (Left: 0, Right: 0);
+          Background: @PanelBorderColor;
+          Padding: (Full: 1);
+
+          Group {
+            Anchor: (Full: 0);
+            Background: @PanelFillColor;
+            LayoutMode: Top;
+            Padding: (Top: 10, Left: 14, Right: 14, Bottom: 12);
+
+            Label #TierText {
+              Style: (FontSize: 18, RenderBold: true, TextColor: @ValueText);
+              Text: "Tier: 0";
+            }
+            Group { Anchor: (Height: 6); }
+            Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
+            Group { Anchor: (Height: 12); }
+
+            Label #EnergyText {
+              Anchor: (Left: 0, Right: 0);
+              Style: (FontSize: 14, TextColor: @LabelText);
+              Text: "Energy: 0 / 0";
+            }
+            Group { Anchor: (Height: 8); }
+
+            // Energy bar: teal #4bfcce fill (recolored, shipped in CC/).
+            Group {
+              Anchor: (Left: 0, Right: 0, Height: @BarHeight);
+              Background: "../Common/ProgressBar.png";
+
+              ProgressBar #PowerBar {
+                Anchor: (Full: 0);
+                BarTexturePath: "../CC/ProgressBarFill_Energy.png";
+                EffectTexturePath: "../Common/ProgressBarEffect.png";
+                EffectWidth: 102;
+                EffectHeight: 58;
+                EffectOffset: 74;
+                Value: 0.0;
+              }
+            }
+            Group { Anchor: (Height: 12); }
+
+            Label #StatusText {
+              Style: (FontSize: 14, TextColor: @LabelText);
+              Text: "Status: On";
+            }
+            Group { Anchor: (Height: 12); }
+
+            // Recipe card: single read-only slot (DISPLAY-ONLY for v1). Server sets #CardSlot.Slots.
+            Group {
+              LayoutMode: Left;
+
+              ItemGrid #CardSlot {
+                Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
+                SlotsPerRow: 1;
+                AreItemsDraggable: false;
+                RenderItemQualityBackground: true;
+                Anchor: (Width: 72);
+              }
+
+              Group { Anchor: (Width: 12); }
+
+              Group {
+                FlexWeight: 1;
+                LayoutMode: Top;
+                Padding: (Top: 22);
+
+                Label {
+                  Anchor: (Left: 0, Right: 0);
+                  Style: (FontSize: 13, TextColor: @LabelText);
+                  Text: "Recipe Card";
+                }
+              }
+            }
+            Group { Anchor: (Height: 14); }
+
+            // Button shows the action (mode to switch TO): when ON it reads "Turn Off". Server sets text.
+            $C.@SecondaryTextButton #PowerToggle {
+              Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+              Text: "Turn Off";
+            }
+            Group { Anchor: (Height: 8); }
+
+            $C.@CancelTextButton #EjectBtn {
+              Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+              Text: "Eject";
+            }
+          }
+        }
+
+        Group { Anchor: (Height: @PanelGap); }
+
+        // Phase 2: functional upgrade panel (hidden until wired).
+        Group #UpgradePanel {
+          Anchor: (Left: 0, Right: 0);
+          Background: @PanelBorderColor;
+          Padding: (Full: 1);
+          Visible: false;
+
+          Group {
+            Anchor: (Full: 0);
+            Background: @PanelFillColor;
+            LayoutMode: Top;
+            Padding: (Top: 10, Left: 14, Right: 14, Bottom: 12);
+
+            Label #NextTierText {
+              Style: (FontSize: @HeaderFontSize, RenderBold: true, RenderUppercase: true, TextColor: @LabelText);
+              Text: "Next Tier";
+            }
+            Group { Anchor: (Height: 6); }
+            Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
+            Group { Anchor: (Height: 12); }
+
+            Label #UpgradeReqText {
+              Anchor: (Left: 0, Right: 0);
+              Style: (FontSize: 13, TextColor: @LabelText, Wrap: true);
+              Text: "";
+            }
+            Group { Anchor: (Height: 10); }
+
+            $C.@TextButton #UpgradeBtn {
+              Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+              Text: "Upgrade";
+            }
+          }
+        }
+      }
+
+      Group { Anchor: (Width: @PanelGap); }
+
+      // ---- Right column: the I/O / processing block (native Hytale puts processing on the right) ----
+      Group #ProcessColumn {
+        Anchor: (Width: @ProcessColumnWidth);
+        LayoutMode: Top;
+
+        Group #ProcessPanel {
+          Anchor: (Left: 0, Right: 0);
+          Background: @PanelBorderColor;
+          Padding: (Full: 1);
+
+          Group {
+            Anchor: (Full: 0);
+            Background: @PanelFillColor;
+            LayoutMode: Top;
+            Padding: (Top: 10, Left: 14, Right: 14, Bottom: 12);
+
+            Label {
+              Style: (FontSize: @HeaderFontSize, RenderBold: true, RenderUppercase: true, TextColor: @LabelText);
+              Text: "Crafting";
+            }
+            Group { Anchor: (Height: 6); }
+            Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
+            Group { Anchor: (Height: 14); }
+
+            // Held ingredients (the active craft's pulled stacks) | progress bar (centered) | output slots.
+            Group #IoRow {
+              LayoutMode: Left;
+              Anchor: (Left: 0, Right: 0, Height: 220);
+
+              // Held ingredients: a vertically-scrolling viewport (TopScrolling + vanilla scrollbar style)
+              // wrapping the read-only #InputGrid. Empty while idle; the grid grows downward as ingredients
+              // are pulled and scrolls within this fixed 200px height instead of overflowing the I/O row.
+              Group #HeldScroll {
+                Anchor: (Width: 204, Height: 200);
+                LayoutMode: TopScrolling;
+                ScrollbarStyle: $C.@DefaultScrollbarStyle;
+
+                ItemGrid #InputGrid {
+                  Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
+                  SlotsPerRow: 3;
+                  AreItemsDraggable: false;
+                  RenderItemQualityBackground: true;
+                  Anchor: (Left: 0, Right: 0);
+                }
+              }
+
+              Group { Anchor: (Width: 12); }
+
+              // Center: crafting bar + status text, vertically centered in the I/O row.
+              Group {
+                FlexWeight: 1;
+                LayoutMode: Top;
+                Padding: (Top: 90);
+
+                // Crafting bar: native progress orange #aa7c4a fill (recolored, shipped in CC/).
+                Group {
+                  Anchor: (Left: 0, Right: 0, Height: @BarHeight);
+                  Background: "../Common/ProgressBar.png";
+
+                  ProgressBar #ProgressBar {
+                    Anchor: (Full: 0);
+                    BarTexturePath: "../CC/ProgressBarFill_Smelt.png";
+                    EffectTexturePath: "../Common/ProgressBarEffect.png";
+                    EffectWidth: 102;
+                    EffectHeight: 58;
+                    EffectOffset: 74;
+                    Value: 0.0;
+                  }
+                }
+
+                Group { Anchor: (Height: 10); }
+
+                Label #ProgressText {
+                  Anchor: (Left: 0, Right: 0);
+                  Style: (FontSize: 14, TextColor: @ValueText, HorizontalAlignment: Center);
+                  Text: "Idle";
+                }
+              }
+
+              Group { Anchor: (Width: 12); }
+
+              ItemGrid #OutputGrid {
+                Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
+                SlotsPerRow: 2;
+                AreItemsDraggable: false;
+                RenderItemQualityBackground: true;
+                Anchor: (Width: 140);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+$C.@BackButton {}

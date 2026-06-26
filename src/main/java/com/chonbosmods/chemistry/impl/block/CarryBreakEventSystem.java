@@ -59,6 +59,7 @@ public final class CarryBreakEventSystem extends EntityEventSystem<EntityStore, 
     private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.OutfitterState> outfitterType;
     private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.AlembicState> alembicType;
     private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.AssemblerState> assemblerType;
+    private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.CultivatorState> cultivatorType;
     private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.SculptorState> sculptorType;
     private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.net.PipeNode> pipeType;
     private final com.chonbosmods.chemistry.impl.block.net.NetworkService networkService;
@@ -71,6 +72,7 @@ public final class CarryBreakEventSystem extends EntityEventSystem<EntityStore, 
             @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.OutfitterState> outfitterType,
             @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.AlembicState> alembicType,
             @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.AssemblerState> assemblerType,
+            @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.CultivatorState> cultivatorType,
             @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.SculptorState> sculptorType,
             @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.net.PipeNode> pipeType,
             @Nonnull com.chonbosmods.chemistry.impl.block.net.NetworkService networkService) {
@@ -82,6 +84,7 @@ public final class CarryBreakEventSystem extends EntityEventSystem<EntityStore, 
         this.outfitterType = outfitterType;
         this.alembicType = alembicType;
         this.assemblerType = assemblerType;
+        this.cultivatorType = cultivatorType;
         this.sculptorType = sculptorType;
         this.pipeType = pipeType;
         this.networkService = networkService;
@@ -150,6 +153,13 @@ public final class CarryBreakEventSystem extends EntityEventSystem<EntityStore, 
                 com.chonbosmods.chemistry.impl.block.craft.AssemblerState assembler =
                     BlockModule.getComponent(assemblerType, world, pos.x(), pos.y(), pos.z());
                 carry = BlockHolderCarry.shouldCarry(assembler);
+            }
+            if (!carry) {
+                // A Cultivator broken mid-craft likewise holds REAL player items (pulled from chests) in its
+                // held container; carry them (plus output + energy + card) rather than destroying them.
+                com.chonbosmods.chemistry.impl.block.craft.CultivatorState cultivator =
+                    BlockModule.getComponent(cultivatorType, world, pos.x(), pos.y(), pos.z());
+                carry = BlockHolderCarry.shouldCarry(cultivator);
             }
             if (!carry) {
                 // A Sculptor broken mid-craft likewise holds REAL player items (pulled from chests) in its

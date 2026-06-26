@@ -8,6 +8,7 @@ import com.chonbosmods.chemistry.impl.block.craft.CookerState;
 import com.chonbosmods.chemistry.impl.block.craft.OutfitterState;
 import com.chonbosmods.chemistry.impl.block.craft.AlembicState;
 import com.chonbosmods.chemistry.impl.block.craft.AssemblerState;
+import com.chonbosmods.chemistry.impl.block.craft.CultivatorState;
 import com.chonbosmods.chemistry.impl.block.craft.SculptorState;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.Port;
@@ -62,6 +63,7 @@ public final class WorldMachineLookup implements MachineLookup {
     private final ComponentType<ChunkStore, OutfitterState> outfitterType;
     private final ComponentType<ChunkStore, AlembicState> alembicType;
     private final ComponentType<ChunkStore, AssemblerState> assemblerType;
+    private final ComponentType<ChunkStore, CultivatorState> cultivatorType;
     private final ComponentType<ChunkStore, SculptorState> sculptorType;
 
     public WorldMachineLookup(
@@ -74,6 +76,7 @@ public final class WorldMachineLookup implements MachineLookup {
             @Nonnull ComponentType<ChunkStore, OutfitterState> outfitterType,
             @Nonnull ComponentType<ChunkStore, AlembicState> alembicType,
             @Nonnull ComponentType<ChunkStore, AssemblerState> assemblerType,
+            @Nonnull ComponentType<ChunkStore, CultivatorState> cultivatorType,
             @Nonnull ComponentType<ChunkStore, SculptorState> sculptorType) {
         this.world = world;
         this.store = store;
@@ -84,6 +87,7 @@ public final class WorldMachineLookup implements MachineLookup {
         this.outfitterType = outfitterType;
         this.alembicType = alembicType;
         this.assemblerType = assemblerType;
+        this.cultivatorType = cultivatorType;
         this.sculptorType = sculptorType;
     }
 
@@ -166,6 +170,14 @@ public final class WorldMachineLookup implements MachineLookup {
             // The Assembler has no vanilla bench: it owns its input/output containers directly. It carries no
             // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
             return adapt(cell, model, assembler.energy(), channel -> null, assemblerItems(assembler));
+        }
+        CultivatorState cultivator = store.getComponent(ref, cultivatorType);
+        if (cultivator != null) {
+            PortConfig model = cultivator.ports();
+            PortConfig cell = PortProjection.forWorldCell(model, rotation, wcx, wcy, wcz);
+            // The Cultivator has no vanilla bench: it owns its input/output containers directly. It carries no
+            // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
+            return adapt(cell, model, cultivator.energy(), channel -> null, cultivatorItems(cultivator));
         }
         SculptorState sculptor = store.getComponent(ref, sculptorType);
         if (sculptor != null) {
@@ -305,6 +317,24 @@ public final class WorldMachineLookup implements MachineLookup {
             case INPUT -> null;                 // pull-window: port exists, but no pushable container (Assembler PULLS)
             case OUTPUT -> assembler.output();  // results drained OUT
             default -> null; // BOTH/CLOSED: the Assembler's item ports are INPUT/OUTPUT only
+        };
+    }
+
+    /**
+     * The Cultivator item source: like the Assembler, the Cultivator is a demand-driven PULLER, so it advertises NO
+     * pushable input container. The ITEM INPUT port still exists (it drives the pipe connection and lets
+     * {@link com.chonbosmods.chemistry.impl.block.craft.NetworkRecipeSource} resolve the input network), but
+     * INPUT returns {@code null}: the generic push transport must never deposit into {@code held()}, which
+     * holds only the active craft's pulled ingredients (a stray push would clog that invariant). The Cultivator
+     * sources its own ingredients via {@code NetworkRecipeSource}; only the OUTPUT side ({@link
+     * CultivatorState#output()}) participates in network push (results drained OUT). Same INPUT/OUTPUT-only port
+     * shape as the Assembler source, with the INPUT container deliberately withheld.
+     */
+    private static ItemContainerFn cultivatorItems(CultivatorState cultivator) {
+        return direction -> switch (direction) {
+            case INPUT -> null;                  // pull-window: port exists, but no pushable container (Cultivator PULLS)
+            case OUTPUT -> cultivator.output();  // results drained OUT
+            default -> null; // BOTH/CLOSED: the Cultivator's item ports are INPUT/OUTPUT only
         };
     }
 

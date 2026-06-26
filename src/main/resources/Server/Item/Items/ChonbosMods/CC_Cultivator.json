@@ -1,0 +1,107 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CC_Cultivator.name"
+  },
+  "Categories": [
+    "Furniture.Benches"
+  ],
+  "PlayerAnimationsId": "Block",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Model",
+    "Opacity": "Transparent",
+    "CustomModel": "Blocks/ChonbosMods/Machines/CC_Cultivator.blockymodel",
+    "CustomModelTexture": [
+      {
+        "Texture": "Blocks/ChonbosMods/Machines/CC_Cultivator_Texture_Off.png",
+        "Weight": 1
+      }
+    ],
+    "VariantRotation": "NESW",
+    "HitboxType": "CC_Cultivator",
+    "Flags": {
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "CC_CultivatorPanel"
+            }
+          }
+        ]
+      }
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "Benches"
+      }
+    },
+    "Support": {
+      "Down": [
+        {
+          "FaceType": "Full"
+        }
+      ]
+    },
+    "BlockParticleSetId": "Stone",
+    "ParticleColor": "#5C583E",
+    "BlockSoundSetId": "Stone",
+    "PhysicalMaterialId": "Stone",
+    "TextureComputedColor": "#29281F",
+    "BlockEntity": {
+      "Components": {
+        "CultivatorState": {
+          "Energy": {
+            "Stored": 0,
+            "Capacity": 40000
+          },
+          "Ports": {
+            "Ports": [
+              { "Face": 0, "Channel": "item", "Direction": "output", "CellX": 0, "CellY": 0, "CellZ": 0 },
+              { "Face": 1, "Channel": "item", "Direction": "input", "CellX": -1, "CellY": 0, "CellZ": 0 },
+              { "Face": 5, "Channel": "power", "Direction": "input", "CellX": 0, "CellY": 0, "CellZ": 0 }
+            ]
+          }
+        }
+      }
+    },
+    "State": {
+      "Definitions": {
+        "Processing": {
+          "Looping": true,
+          "Light": {
+            "Color": "#F73"
+          },
+          "CustomModelTexture": [
+            {
+              "Texture": "Blocks/ChonbosMods/Machines/CC_Cultivator_Texture.png",
+              "Weight": 1
+            }
+          ]
+        },
+        "ProcessCompleted": {
+          "Looping": true,
+          "Light": {
+            "Color": "#F73"
+          },
+          "CustomModelTexture": [
+            {
+              "Texture": "Blocks/ChonbosMods/Machines/CC_Cultivator_Texture.png",
+              "Weight": 1
+            }
+          ]
+        }
+      }
+    },
+    "ConnectedBlockRuleSet": {
+      "Type": "CustomTemplate",
+      "TemplateShapeAssetId": "CC_CultivatorTemplate",
+      "TemplateShapeBlockPatterns": {
+        "machine": "CC_Cultivator"
+      }
+    }
+  }
+}
