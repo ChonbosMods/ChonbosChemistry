@@ -410,7 +410,7 @@ The §7.3 substrate's most direct use is wrapping Hytale's own benches as energy
 | Machine | Wraps | Kind |
 |---|---|---|
 | **Smelter** | Furnace | processing |
-| **Cooker** | Campfire + Cooking | hybrid (processing + crafting) |
+| **Cooker** | Campfire + Cooking | crafting (unified pool) |
 | **Outfitter** | Tannery + Loom | hybrid (processing + crafting) |
 | **Reclaimer** | Salvage | processing |
 | **Forge** | Weapon, Armour, Armory(diagram) | crafting |
@@ -418,7 +418,7 @@ The §7.3 substrate's most direct use is wrapping Hytale's own benches as energy
 | **Assembler** | Workbench, Furniture, Builders(structural) | crafting |
 | **Cultivator** | Farming, Trough | crafting |
 
-**Cooker** and **Outfitter** are **hybrids**: their `CCMachineState` holds a `ProcessingBenchBlock` for the processing half (Campfire raw-cook / Tannery hide-tan, timed) AND drives the crafting half (Cooking dishes / Loom cloth) via the public `CraftingRecipe` helpers (§7.3). Pure-processing machines (Smelter, Reclaimer) need only the held bench; pure-crafting machines (Forge, Alembic, Assembler, Cultivator) need only the autonomous-craft path. All eight are energy-gated and overclock by power (D32/D33), and none modify vanilla benches: the originals remain placeable and usable by hand. Per-machine footprint, default ports, and which recipes surface follow each machine's own asset pass (§7.5). (Vanilla **Lumbermill** and **Memories** benches are not in the roster: Lumbermill's config was not pinned during classification and both are left vanilla for now; either can be added later.)
+The **Cooker** (IMPLEMENTED) resolves what was sketched as a "held-bench hybrid" the simpler way: because a Campfire **Processing** recipe is the SAME `CraftingRecipe` type as a Cooking **Crafting** recipe (just tagged with a different `BenchRequirement`), the Cooker needs no held `ProcessingBenchBlock` at all. It is a PURE auto-crafter (`CookerState`, the §7.3 `AutoCraftEngine` path the Forge uses) whose recipe pool simply UNIONS both benches (`RecipePool.union(Processing/"Campfire", Crafting/"Cookingbench")`). Each craft runs input→output through the one `CraftingRecipe` path and is timed by that recipe's real `getTimeSeconds` (the GUI bar reads the same per-recipe duration, scaled by a tunable multiplier, so bar and tick agree). Two cross-cutting rules learned here and now standard for every auto-crafter: (1) the recipe's `Fuel` resource requirement is **stripped** before sourcing/consume (CC machines burn ENERGY as fuel, so they never pull physical fuel items: see `VanillaCraftBridge.withoutFuel`); (2) selection prefers the most-ingredient recipe, even-rotating within that tier. **Outfitter** (Tannery + Loom) is expected to follow the same pure-auto-craft, unified-pool shape. Pure-processing machines (Smelter, Reclaimer) instead reuse the autonomous vanilla `ProcessingBenchBlock` directly (energy via its no-fuel config); pure-crafting machines (Forge, Alembic, Assembler, Cultivator) use only the auto-craft path. All are energy-gated and overclock by power (D32/D33), and none modify vanilla benches: the originals remain placeable and usable by hand. Per-machine footprint, default ports, and which recipes surface follow each machine's own asset pass (§7.5). (Vanilla **Lumbermill** and **Memories** benches are not in the roster: Lumbermill's config was not pinned during classification and both are left vanilla for now; either can be added later.)
 
 ---
 

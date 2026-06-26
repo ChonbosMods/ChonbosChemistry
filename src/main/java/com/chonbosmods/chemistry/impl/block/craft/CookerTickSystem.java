@@ -59,6 +59,14 @@ public final class CookerTickSystem extends EntityTickingSystem<ChunkStore> {
     public static final float COOKER_DEFAULT_DURATION = 4.0f;
 
     /**
+     * [TUNE] Multiplier on every craft's cook time (the recipe's real seconds, or the fallback). {@code 2.0}
+     * = double the vanilla cook time, a deliberate slow-down for now. Both the tick AND the GUI progress bar
+     * derive their duration through {@link AutoCraftEngine.Spec#craftDuration} / {@link #craftDurationFor},
+     * so scaling here keeps them in agreement automatically.
+     */
+    private static final float COOKER_TIME_MULTIPLIER = 2.0f;
+
+    /**
      * [TUNE] Ticks the Cooker idles after completing a craft before sourcing the next recipe. A cosmetic
      * beat so a completed craft reads visually before the next pull begins (the pull amount itself is
      * already exactly one recipe). 0 = no pause (back-to-back).
@@ -180,14 +188,15 @@ public final class CookerTickSystem extends EntityTickingSystem<ChunkStore> {
 
         @Override
         public float craftDuration(@Nullable CraftingRecipe r) {
-            // Per-recipe cook time: Campfire raw-cooks carry real seconds; Cooking dishes are instant in
-            // vanilla (time 0) so they fall back to the default. The engine passes null when idle (no active
-            // recipe) -> default (the value is unused while idle); MUST null-guard or every idle tick NPEs.
-            if (r == null) {
-                return COOKER_DEFAULT_DURATION;
+            // Per-recipe cook time: a recipe carries its real seconds; a time-0 recipe falls back to the
+            // default. The engine passes null when idle (the value is unused while idle); MUST null-guard or
+            // every idle tick NPEs. Scaled by COOKER_TIME_MULTIPLIER (the GUI bar reads the same scaled value
+            // via craftDurationFor, so bar and tick stay in lockstep).
+            float base = (r == null) ? COOKER_DEFAULT_DURATION : VanillaCraftBridge.recipeTimeSeconds(r);
+            if (base <= 0f) {
+                base = COOKER_DEFAULT_DURATION;
             }
-            float t = VanillaCraftBridge.recipeTimeSeconds(r);
-            return t > 0f ? t : COOKER_DEFAULT_DURATION;
+            return base * COOKER_TIME_MULTIPLIER;
         }
 
         @Override
@@ -235,9 +244,6 @@ public final class CookerTickSystem extends EntityTickingSystem<ChunkStore> {
             // Diagnostic (logged once): if this is 0, the bench ids did not resolve to recipes and the Cooker
             // can never craft. Confirms the Campfire + Cooking benches resolved.
             COOKER_DRIVE_LOG.atInfo().log("Cooker recipe pool built: " + pool.stableOrder().size() + " recipes.");
-            // TEMP DIAGNOSTIC (remove after the kebab-craftable issue is found): the full recipe-id list, once,
-            // so we can see whether an expected id (e.g. "kebab") is even in the pool.
-            COOKER_DRIVE_LOG.atInfo().log("Cooker recipe pool ids: " + pool.stableOrder());
             return POOL;
         }
     }

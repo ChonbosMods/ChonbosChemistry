@@ -13,7 +13,6 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.asset.type.blocktype.config.Rotation;
@@ -60,12 +59,6 @@ public final class AutoCraftEngine {
 
     private AutoCraftEngine() {
     }
-
-    // TEMP DIAGNOSTIC (remove after the kebab-craftable issue is found): logger + last-seen signature per
-    // machine, so the craftable/topTier/available line is logged only when it CHANGES (no per-tick spam).
-    private static final HytaleLogger DIAG_LOG = HytaleLogger.forEnclosingClass();
-    private static final java.util.Map<String, String> DIAG_LAST_SEEN =
-        new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
      * The metadata key on a recipe card carrying its allow-set (the recipe ids the machine may craft). A card
@@ -161,12 +154,6 @@ public final class AutoCraftEngine {
                     }
                     topTier = CraftSelection.topByPriority(craftable, countMap);
                 }
-
-                // TEMP DIAGNOSTIC (remove after the kebab-craftable issue is found): log the craftable set,
-                // the top tier, and the network's available item tally - THROTTLED to only when the craftable
-                // set or the available tally changes (avoid per-tick spam). Reveals whether an expected recipe
-                // (e.g. "kebab") is even in the craftable set, and what ingredients the network is offering.
-                logCraftableDiag(spec, craftable, topTier, snapshot);
             }
         }
 
@@ -254,54 +241,6 @@ public final class AutoCraftEngine {
         boolean processing = activeCraft;
         String desired = MachineVisualState.desired(powered, processing);
         applyVisualState(world, x, y, z, blockType, desired);
-    }
-
-    /**
-     * TEMP DIAGNOSTIC (remove after the kebab-craftable issue is found): log this machine's craftable set,
-     * its top (most-ingredient) tier, and the network's available {@code itemId -> count} tally. THROTTLED:
-     * only logs when that combined signature changes for this machine (keyed by the Spec's machine name),
-     * so a steady idle machine logs once, not every tick. Reads the snapshot's aggregate container for the
-     * available tally (iterating slots, summing by item id, skipping empties). Never throws.
-     */
-    private static void logCraftableDiag(@Nonnull Spec spec, @Nonnull Set<String> craftable,
-            @Nonnull Set<String> topTier, @Nullable NetworkRecipeSource.Snapshot snapshot) {
-        try {
-            String machine = diagMachineName(spec);
-            // Available itemId -> count from the snapshot aggregate (the same buffer availability is tested on).
-            java.util.Map<String, Integer> available = new java.util.TreeMap<>();
-            if (snapshot != null) {
-                SimpleItemContainer agg = snapshot.aggregate();
-                short cap = agg.getCapacity();
-                for (short slot = 0; slot < cap; slot++) {
-                    ItemStack s = agg.getItemStack(slot);
-                    if (s == null || ItemStack.isEmpty(s)) {
-                        continue;
-                    }
-                    String id = s.getItemId();
-                    if (id == null || id.isEmpty()) {
-                        continue;
-                    }
-                    available.merge(id, s.getQuantity(), Integer::sum);
-                }
-            }
-            // Sorted craftable/topTier for a stable signature (sets have no stable iteration order).
-            java.util.TreeSet<String> craftableSorted = new java.util.TreeSet<>(craftable);
-            java.util.TreeSet<String> topSorted = new java.util.TreeSet<>(topTier);
-            String line = "[" + machine + "] craftable=" + craftableSorted + " topTier=" + topSorted
-                + " available=" + available;
-            String prev = DIAG_LAST_SEEN.put(machine, line);
-            if (!line.equals(prev)) {
-                DIAG_LOG.atInfo().log(line);
-            }
-        } catch (Throwable ignored) {
-            // Diagnostic only: never disturb the craft loop.
-        }
-    }
-
-    /** TEMP DIAGNOSTIC: a readable machine name from the Spec (its enclosing tick-system class, else class). */
-    private static String diagMachineName(@Nonnull Spec spec) {
-        Class<?> enc = spec.getClass().getEnclosingClass();
-        return (enc != null ? enc.getSimpleName() : spec.getClass().getSimpleName());
     }
 
     /**
