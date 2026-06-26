@@ -126,4 +126,11 @@ class MachineTemplateFaceTagTest {
         // OutfitterState component, so the helper must read that path instead of MachineBlockState.
         assertTemplateTagsMatchPorts("CC_Outfitter", "OutfitterState");
     }
+
+    @Test
+    void alembicTemplateTagsMatchPorts() throws Exception {
+        // The Alembic is an autonomous crafter (no vanilla bench) and seeds its ports under the
+        // AlembicState component, so the helper must read that path instead of MachineBlockState.
+        assertTemplateTagsMatchPorts("CC_Alembic", "AlembicState");
+    }
 }
