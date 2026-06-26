@@ -8,6 +8,7 @@ import com.chonbosmods.chemistry.impl.block.craft.CookerState;
 import com.chonbosmods.chemistry.impl.block.craft.OutfitterState;
 import com.chonbosmods.chemistry.impl.block.craft.AlembicState;
 import com.chonbosmods.chemistry.impl.block.craft.AssemblerState;
+import com.chonbosmods.chemistry.impl.block.craft.SculptorState;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.Port;
 import com.chonbosmods.chemistry.impl.block.PortConfig;
@@ -61,6 +62,7 @@ public final class WorldMachineLookup implements MachineLookup {
     private final ComponentType<ChunkStore, OutfitterState> outfitterType;
     private final ComponentType<ChunkStore, AlembicState> alembicType;
     private final ComponentType<ChunkStore, AssemblerState> assemblerType;
+    private final ComponentType<ChunkStore, SculptorState> sculptorType;
 
     public WorldMachineLookup(
             @Nonnull World world,
@@ -71,7 +73,8 @@ public final class WorldMachineLookup implements MachineLookup {
             @Nonnull ComponentType<ChunkStore, CookerState> cookerType,
             @Nonnull ComponentType<ChunkStore, OutfitterState> outfitterType,
             @Nonnull ComponentType<ChunkStore, AlembicState> alembicType,
-            @Nonnull ComponentType<ChunkStore, AssemblerState> assemblerType) {
+            @Nonnull ComponentType<ChunkStore, AssemblerState> assemblerType,
+            @Nonnull ComponentType<ChunkStore, SculptorState> sculptorType) {
         this.world = world;
         this.store = store;
         this.machineType = machineType;
@@ -81,6 +84,7 @@ public final class WorldMachineLookup implements MachineLookup {
         this.outfitterType = outfitterType;
         this.alembicType = alembicType;
         this.assemblerType = assemblerType;
+        this.sculptorType = sculptorType;
     }
 
     @Override
@@ -162,6 +166,14 @@ public final class WorldMachineLookup implements MachineLookup {
             // The Assembler has no vanilla bench: it owns its input/output containers directly. It carries no
             // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
             return adapt(cell, model, assembler.energy(), channel -> null, assemblerItems(assembler));
+        }
+        SculptorState sculptor = store.getComponent(ref, sculptorType);
+        if (sculptor != null) {
+            PortConfig model = sculptor.ports();
+            PortConfig cell = PortProjection.forWorldCell(model, rotation, wcx, wcy, wcz);
+            // The Sculptor has no vanilla bench: it owns its input/output containers directly. It carries no
+            // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
+            return adapt(cell, model, sculptor.energy(), channel -> null, sculptorItems(sculptor));
         }
         return null;
     }
@@ -293,6 +305,22 @@ public final class WorldMachineLookup implements MachineLookup {
             case INPUT -> null;                 // pull-window: port exists, but no pushable container (Assembler PULLS)
             case OUTPUT -> assembler.output();  // results drained OUT
             default -> null; // BOTH/CLOSED: the Assembler's item ports are INPUT/OUTPUT only
+        };
+    }
+
+    /**
+     * The Sculptor item source: like the Alembic, the Sculptor is a demand-driven PULLER, so it advertises NO
+     * pushable input container. The ITEM INPUT port still exists (it drives the pipe connection and lets
+     * {@link com.chonbosmods.chemistry.impl.block.craft.NetworkRecipeSource} resolve the input network), but
+     * INPUT returns {@code null}: the generic push transport must never deposit into {@code held()}, which
+     * holds only the active craft's pulled ingredients. Only the OUTPUT side ({@link SculptorState#output()})
+     * participates in network push (results drained OUT). Same INPUT/OUTPUT-only port shape as the Alembic.
+     */
+    private static ItemContainerFn sculptorItems(SculptorState sculptor) {
+        return direction -> switch (direction) {
+            case INPUT -> null;               // pull-window: port exists, but no pushable container (Sculptor PULLS)
+            case OUTPUT -> sculptor.output(); // results drained OUT
+            default -> null; // BOTH/CLOSED: the Sculptor's item ports are INPUT/OUTPUT only
         };
     }
 
