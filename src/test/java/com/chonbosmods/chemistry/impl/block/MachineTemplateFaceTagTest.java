@@ -119,4 +119,11 @@ class MachineTemplateFaceTagTest {
         // CookerState component, so the helper must read that path instead of MachineBlockState.
         assertTemplateTagsMatchPorts("CC_Cooker", "CookerState");
     }
+
+    @Test
+    void outfitterTemplateTagsMatchPorts() throws Exception {
+        // The Outfitter is an autonomous crafter (no vanilla bench) and seeds its ports under the
+        // OutfitterState component, so the helper must read that path instead of MachineBlockState.
+        assertTemplateTagsMatchPorts("CC_Outfitter", "OutfitterState");
+    }
 }
