@@ -7,6 +7,7 @@ import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.craft.CookerState;
 import com.chonbosmods.chemistry.impl.block.craft.OutfitterState;
 import com.chonbosmods.chemistry.impl.block.craft.AlembicState;
+import com.chonbosmods.chemistry.impl.block.craft.AssemblerState;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.Port;
 import com.chonbosmods.chemistry.impl.block.PortConfig;
@@ -59,6 +60,7 @@ public final class WorldMachineLookup implements MachineLookup {
     private final ComponentType<ChunkStore, CookerState> cookerType;
     private final ComponentType<ChunkStore, OutfitterState> outfitterType;
     private final ComponentType<ChunkStore, AlembicState> alembicType;
+    private final ComponentType<ChunkStore, AssemblerState> assemblerType;
 
     public WorldMachineLookup(
             @Nonnull World world,
@@ -68,7 +70,8 @@ public final class WorldMachineLookup implements MachineLookup {
             @Nonnull ComponentType<ChunkStore, ForgeCraftState> forgeType,
             @Nonnull ComponentType<ChunkStore, CookerState> cookerType,
             @Nonnull ComponentType<ChunkStore, OutfitterState> outfitterType,
-            @Nonnull ComponentType<ChunkStore, AlembicState> alembicType) {
+            @Nonnull ComponentType<ChunkStore, AlembicState> alembicType,
+            @Nonnull ComponentType<ChunkStore, AssemblerState> assemblerType) {
         this.world = world;
         this.store = store;
         this.machineType = machineType;
@@ -77,6 +80,7 @@ public final class WorldMachineLookup implements MachineLookup {
         this.cookerType = cookerType;
         this.outfitterType = outfitterType;
         this.alembicType = alembicType;
+        this.assemblerType = assemblerType;
     }
 
     @Override
@@ -150,6 +154,14 @@ public final class WorldMachineLookup implements MachineLookup {
             // The Alembic has no vanilla bench: it owns its input/output containers directly. It carries no
             // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
             return adapt(cell, model, alembic.energy(), channel -> null, alembicItems(alembic));
+        }
+        AssemblerState assembler = store.getComponent(ref, assemblerType);
+        if (assembler != null) {
+            PortConfig model = assembler.ports();
+            PortConfig cell = PortProjection.forWorldCell(model, rotation, wcx, wcy, wcz);
+            // The Assembler has no vanilla bench: it owns its input/output containers directly. It carries no
+            // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
+            return adapt(cell, model, assembler.energy(), channel -> null, assemblerItems(assembler));
         }
         return null;
     }
@@ -263,6 +275,24 @@ public final class WorldMachineLookup implements MachineLookup {
             case INPUT -> null;              // pull-window: port exists, but no pushable container (Alembic PULLS)
             case OUTPUT -> alembic.output(); // results drained OUT
             default -> null; // BOTH/CLOSED: the Alembic's item ports are INPUT/OUTPUT only
+        };
+    }
+
+    /**
+     * The Assembler item source: like the Alembic, the Assembler is a demand-driven PULLER, so it advertises NO
+     * pushable input container. The ITEM INPUT port still exists (it drives the pipe connection and lets
+     * {@link com.chonbosmods.chemistry.impl.block.craft.NetworkRecipeSource} resolve the input network), but
+     * INPUT returns {@code null}: the generic push transport must never deposit into {@code held()}, which
+     * holds only the active craft's pulled ingredients (a stray push would clog that invariant). The Assembler
+     * sources its own ingredients via {@code NetworkRecipeSource}; only the OUTPUT side ({@link
+     * AssemblerState#output()}) participates in network push (results drained OUT). Same INPUT/OUTPUT-only port
+     * shape as the Alembic source, with the INPUT container deliberately withheld.
+     */
+    private static ItemContainerFn assemblerItems(AssemblerState assembler) {
+        return direction -> switch (direction) {
+            case INPUT -> null;                 // pull-window: port exists, but no pushable container (Assembler PULLS)
+            case OUTPUT -> assembler.output();  // results drained OUT
+            default -> null; // BOTH/CLOSED: the Assembler's item ports are INPUT/OUTPUT only
         };
     }
 

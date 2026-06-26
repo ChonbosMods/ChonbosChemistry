@@ -163,6 +163,24 @@ public final class BlockHolderCarry {
         return hasAnyItem(alembic.held()) || hasAnyItem(alembic.output());
     }
 
+    /**
+     * An Assembler carries when it has anything worth preserving: positive stored energy, OR any item in its
+     * held (active-craft ingredients pulled from real chests) or output container. Identical predicate to
+     * {@link #shouldCarry(com.chonbosmods.chemistry.impl.block.craft.AlembicState)}: breaking an Assembler
+     * mid-craft would otherwise DESTROY the real player items it pulled from the network for the in-flight
+     * craft (held + output carry on break). The active craft id + card ride along for free in the holder.
+     */
+    public static boolean shouldCarry(@Nullable com.chonbosmods.chemistry.impl.block.craft.AssemblerState assembler) {
+        if (assembler == null) {
+            return false;
+        }
+        EnergyHandler energy = assembler.energy();
+        if (energy != null && energy.getStored() > 0L) {
+            return true;
+        }
+        return hasAnyItem(assembler.held()) || hasAnyItem(assembler.output());
+    }
+
     /** Whether {@code container} holds at least one non-empty stack. Null container reads as empty. */
     private static boolean hasAnyItem(
             @Nullable com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer container) {
