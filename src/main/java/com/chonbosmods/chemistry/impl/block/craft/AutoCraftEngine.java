@@ -94,8 +94,9 @@ public final class AutoCraftEngine {
         boolean powered = affordable > 0;
 
         // 3b. Post-craft pause: when idle with a pending delay, burn one tick of it and DON'T source this
-        // tick (the machine sits in its default visual state for a couple ticks after a completed craft, so
-        // the completion reads before the next pull). Cosmetic only: the pull amount is already exact.
+        // tick. This PACES back-to-back crafts (a brief beat before the next pull); the pull amount is already
+        // exact. The visual stays ACTIVE across this beat (see step 8: the active state is sticky), so the
+        // machine does not flicker idle between recipes.
         boolean delaying = false;
         if (!crafting && node.craftDelay() > 0) {
             node.setCraftDelay(node.craftDelay() - 1);
@@ -234,11 +235,15 @@ public final class AutoCraftEngine {
             }
         }
 
-        // 8. Block visual state (vanilla-parity): "Processing" only while we actually crafted this tick,
-        // else "default". The machine has NO held bench, so we swap the placed block's interaction state
-        // directly via the BlockAccessor (mirroring NetworkTickSystem's cable-visual swaps), reading the
-        // current state first so we issue a packet only on a real transition (no per-tick animation restart).
-        boolean processing = activeCraft;
+        // 8. Block visual state (vanilla-parity): "Processing" while the machine is working, else "default".
+        // The active state is STICKY: it stays on while we worked this tick (activeCraft), while a craft is in
+        // flight (crafting: e.g. stalled on a full output), OR during the post-craft pacing delay (delaying),
+        // and reverts to idle ONLY once genuinely idle (proven false). This stops the block flickering idle in
+        // the gap between back-to-back crafts. Still ANDed with the power gate, so cutting power forces idle.
+        // The machine has NO held bench, so we swap the placed block's interaction state directly via the
+        // BlockAccessor (mirroring NetworkTickSystem's cable swaps), reading the current state first so we
+        // issue a packet only on a real transition (no per-tick animation restart).
+        boolean processing = MachineVisualState.autoCraftActive(activeCraft, crafting, delaying);
         String desired = MachineVisualState.desired(powered, processing);
         applyVisualState(world, x, y, z, blockType, desired);
     }

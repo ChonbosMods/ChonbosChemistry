@@ -62,4 +62,19 @@ public final class MachineVisualState {
         }
         return progressAfter > progressBefore || completedThisTick;
     }
+
+    /**
+     * The STICKY active-visual decision for an AUTONOMOUS auto-crafter (the {@code AutoCraftEngine} machines:
+     * Forge / Cooker / Outfitter / Alembic). Unlike a held bench, an auto-crafter inserts a short pacing
+     * delay between back-to-back crafts; gating the visual on "worked THIS tick" alone makes the block flicker
+     * active &rarr; idle &rarr; active across that gap. Instead the active state is held ON until PROVEN idle:
+     * the machine reads as active while it actually worked this tick ({@code activeCraft}), OR while a craft
+     * is in flight ({@code crafting} &mdash; e.g. completed-but-stalled on a full output), OR during the
+     * post-craft pacing delay ({@code delaying}). It reverts to idle ONLY on a tick that is none of those (no
+     * job, no pending delay, nothing craftable) &mdash; i.e. genuinely idle. The caller still ANDs this with
+     * the power gate via {@link #desired(boolean, boolean)}, so cutting power/disabling still forces idle.
+     */
+    public static boolean autoCraftActive(boolean activeCraft, boolean crafting, boolean delaying) {
+        return activeCraft || crafting || delaying;
+    }
 }

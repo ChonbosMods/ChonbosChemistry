@@ -67,4 +67,33 @@ class MachineVisualStateTest {
         // Completion resets inputProgress to 0 (after < before) but work DID happen this tick.
         assertEquals(true, MachineVisualState.isProcessing(true, 3.0f, 0.0f, true));
     }
+
+    // --- autoCraftActive: the STICKY active visual for an autonomous auto-crafter ----------------------
+    // The active state must hold ON across the brief inter-craft gap (the post-craft pacing delay) so the
+    // block does not flicker active->idle->active between back-to-back recipes: assume it keeps going until
+    // PROVEN idle (no job, no delay, nothing craftable this tick).
+
+    @Test
+    void activeWhenWorkedThisTick() {
+        // A real craft committed/advanced/completed this tick.
+        assertEquals(true, MachineVisualState.autoCraftActive(true, false, false));
+    }
+
+    @Test
+    void activeWhileCraftInFlightEvenIfNoWorkThisTick() {
+        // A craft is loaded but blocked (e.g. output full / stall): job pending -> stay active, don't flicker.
+        assertEquals(true, MachineVisualState.autoCraftActive(false, true, false));
+    }
+
+    @Test
+    void activeDuringPostCraftDelay() {
+        // THE FLICKER FIX: the pacing gap between two crafts holds the active visual ON.
+        assertEquals(true, MachineVisualState.autoCraftActive(false, false, true));
+    }
+
+    @Test
+    void idleOnlyWhenProvenIdle() {
+        // No work this tick, no craft in flight, no pending delay: genuinely idle -> off.
+        assertEquals(false, MachineVisualState.autoCraftActive(false, false, false));
+    }
 }
