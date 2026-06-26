@@ -56,6 +56,7 @@ public final class CarryBreakEventSystem extends EntityEventSystem<EntityStore, 
     private final ComponentType<ChunkStore, TankBlockState> tankType;
     private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState> forgeType;
     private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.CookerState> cookerType;
+    private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.OutfitterState> outfitterType;
     private final ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.net.PipeNode> pipeType;
     private final com.chonbosmods.chemistry.impl.block.net.NetworkService networkService;
 
@@ -64,6 +65,7 @@ public final class CarryBreakEventSystem extends EntityEventSystem<EntityStore, 
             @Nonnull ComponentType<ChunkStore, TankBlockState> tankType,
             @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState> forgeType,
             @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.CookerState> cookerType,
+            @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.craft.OutfitterState> outfitterType,
             @Nonnull ComponentType<ChunkStore, com.chonbosmods.chemistry.impl.block.net.PipeNode> pipeType,
             @Nonnull com.chonbosmods.chemistry.impl.block.net.NetworkService networkService) {
         super(BreakBlockEvent.class);
@@ -71,6 +73,7 @@ public final class CarryBreakEventSystem extends EntityEventSystem<EntityStore, 
         this.tankType = tankType;
         this.forgeType = forgeType;
         this.cookerType = cookerType;
+        this.outfitterType = outfitterType;
         this.pipeType = pipeType;
         this.networkService = networkService;
     }
@@ -117,6 +120,13 @@ public final class CarryBreakEventSystem extends EntityEventSystem<EntityStore, 
                 com.chonbosmods.chemistry.impl.block.craft.CookerState cooker =
                     BlockModule.getComponent(cookerType, world, pos.x(), pos.y(), pos.z());
                 carry = BlockHolderCarry.shouldCarry(cooker);
+            }
+            if (!carry) {
+                // An Outfitter broken mid-craft likewise holds REAL player items (pulled from chests) in its
+                // held container; carry them (plus output + energy + card) rather than destroying them.
+                com.chonbosmods.chemistry.impl.block.craft.OutfitterState outfitter =
+                    BlockModule.getComponent(outfitterType, world, pos.x(), pos.y(), pos.z());
+                carry = BlockHolderCarry.shouldCarry(outfitter);
             }
             if (!carry) {
                 return;

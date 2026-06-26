@@ -5,6 +5,7 @@ import com.chonbosmods.chemistry.api.io.PortChannel;
 import com.chonbosmods.chemistry.api.io.PortDirection;
 import com.chonbosmods.chemistry.impl.block.MachineBlockState;
 import com.chonbosmods.chemistry.impl.block.craft.CookerState;
+import com.chonbosmods.chemistry.impl.block.craft.OutfitterState;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.Port;
 import com.chonbosmods.chemistry.impl.block.PortConfig;
@@ -55,6 +56,7 @@ public final class WorldMachineLookup implements MachineLookup {
     private final ComponentType<ChunkStore, TankBlockState> tankType;
     private final ComponentType<ChunkStore, ForgeCraftState> forgeType;
     private final ComponentType<ChunkStore, CookerState> cookerType;
+    private final ComponentType<ChunkStore, OutfitterState> outfitterType;
 
     public WorldMachineLookup(
             @Nonnull World world,
@@ -62,13 +64,15 @@ public final class WorldMachineLookup implements MachineLookup {
             @Nonnull ComponentType<ChunkStore, MachineBlockState> machineType,
             @Nonnull ComponentType<ChunkStore, TankBlockState> tankType,
             @Nonnull ComponentType<ChunkStore, ForgeCraftState> forgeType,
-            @Nonnull ComponentType<ChunkStore, CookerState> cookerType) {
+            @Nonnull ComponentType<ChunkStore, CookerState> cookerType,
+            @Nonnull ComponentType<ChunkStore, OutfitterState> outfitterType) {
         this.world = world;
         this.store = store;
         this.machineType = machineType;
         this.tankType = tankType;
         this.forgeType = forgeType;
         this.cookerType = cookerType;
+        this.outfitterType = outfitterType;
     }
 
     @Override
@@ -126,6 +130,14 @@ public final class WorldMachineLookup implements MachineLookup {
             // The Cooker has no vanilla bench: it owns its input/output containers directly. It carries no
             // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
             return adapt(cell, model, cooker.energy(), channel -> null, cookerItems(cooker));
+        }
+        OutfitterState outfitter = store.getComponent(ref, outfitterType);
+        if (outfitter != null) {
+            PortConfig model = outfitter.ports();
+            PortConfig cell = PortProjection.forWorldCell(model, rotation, wcx, wcy, wcz);
+            // The Outfitter has no vanilla bench: it owns its input/output containers directly. It carries no
+            // fluid/gas buffers, so its resource accessor returns null for every channel (item + power only).
+            return adapt(cell, model, outfitter.energy(), channel -> null, outfitterItems(outfitter));
         }
         return null;
     }
@@ -203,6 +215,24 @@ public final class WorldMachineLookup implements MachineLookup {
             case INPUT -> null;             // pull-window: port exists, but no pushable container (Cooker PULLS)
             case OUTPUT -> cooker.output(); // results drained OUT
             default -> null; // BOTH/CLOSED: the Cooker's item ports are INPUT/OUTPUT only
+        };
+    }
+
+    /**
+     * The Outfitter item source: like the Cooker, the Outfitter is a demand-driven PULLER, so it advertises NO
+     * pushable input container. The ITEM INPUT port still exists (it drives the pipe connection and lets
+     * {@link com.chonbosmods.chemistry.impl.block.craft.NetworkRecipeSource} resolve the input network), but
+     * INPUT returns {@code null}: the generic push transport must never deposit into {@code held()}, which
+     * holds only the active craft's pulled ingredients (a stray push would clog that invariant). The Outfitter
+     * sources its own ingredients via {@code NetworkRecipeSource}; only the OUTPUT side ({@link
+     * OutfitterState#output()}) participates in network push (results drained OUT). Same INPUT/OUTPUT-only port
+     * shape as the Cooker source, with the INPUT container deliberately withheld.
+     */
+    private static ItemContainerFn outfitterItems(OutfitterState outfitter) {
+        return direction -> switch (direction) {
+            case INPUT -> null;                // pull-window: port exists, but no pushable container (Outfitter PULLS)
+            case OUTPUT -> outfitter.output(); // results drained OUT
+            default -> null; // BOTH/CLOSED: the Outfitter's item ports are INPUT/OUTPUT only
         };
     }
 
