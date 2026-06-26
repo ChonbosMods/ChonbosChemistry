@@ -36,7 +36,8 @@ Energy is the cross-cutting currency: transport moves it, machines spend/produce
 | **Transport layer (POWER/FLUID/GAS/ITEM)** | **DONE, in-game verified** (networks, flow-states, wrench, balancing, carry, live panel) |
 | Neutron pipe channel | Designed (fungible + length cap); not started |
 | Pipe push/pull tip visuals | ITEM shipped; Fluid/Gas/Power deferred to a pipe-art redo |
-| **Machine layer (six machines + generators + recipes)** | **Designed; THE NEXT MILESTONE.** Substrate strategy chosen (§7.3) |
+| **Machine layer: vanilla-bench auto-machines** | **All 9 IMPLEMENTED** (Smelter, Reclaimer, Forge, Cooker, Outfitter, Alembic, Assembler, Cultivator, Sculptor): pipe-fed, energy-gated, in-game verified. Remaining: a model-creation pass (3 use placeholder art) + the recipe-script phase (activates the Sculptor) (§7.10) |
+| Machine layer: generators + chemistry/nuclear recipes | Designed; not started (the substance-transforming reactions + power generation) |
 | Circuitry / control layer | Designed (this consolidation); not started |
 | Heat/cooling (coolant-as-material) | Designed; not started |
 
@@ -106,7 +107,7 @@ Each locked decision, one line, with its owning section. Open items are in §11.
 - D44. The Reactor produces no power directly: fissile + coolant -> spent fuel + steam + neutron flux; the Turbine is the power export point. Authored surface = turbine efficiency + one MeV->game scalar; all else derives from isotope tables. Neutron flux must be load-bearing in v1 (breed Pu-239). (§7.8.4)
 - D45. Spent fuel is the real radioactive fission-product mix and is RTG fuel (waste is a soft logistics puzzle in v1, not a damage hazard); reprocessing deferred. Geothermal is a heat source tiered Thermoelectric -> Turbine. (§7.8.3, §7.8.5)
 - D46. Reactor-surplus sink = overclock (D33) -> batteries -> reactor throttle (network backpressure, no new system); ship bounded, oversizing is safe; unbounded scaling waits on a parallel-processing sink. (§7.8.6)
-- D47. Eight themed auto-machines wrap the vanilla benches (Smelter, Cooker*, Outfitter*, Reclaimer, Forge, Alembic, Assembler, Cultivator; * = processing+crafting hybrid). Count is an identity choice because all crafting recipes share one `CraftingRecipe` model tagged by `BenchType`. Non-invasive; vanilla benches stay usable. (§7.10)
+- D47. Nine themed auto-machines wrap the vanilla benches (Smelter, Reclaimer, Forge, Cooker, Outfitter, Alembic, Assembler, Cultivator, Sculptor): all IMPLEMENTED. The sketched "Assembler" was split into Assembler (Workbench+Furniture) + Sculptor (Builders, recipe-script-gated). Count is an identity choice because all crafting recipes share one `CraftingRecipe` model tagged by `BenchType`. Non-invasive; vanilla benches stay usable. (§7.10)
 
 **Circuitry (control)**
 - D36. Digital signals only (on/off); no analog 0-15; no signal decay. Analog exists only at the machine boundary, converted by the comparator. (§8.1)
@@ -405,20 +406,27 @@ Type-lock stall (never void); run-dry freeze/resume (progress retained, delibera
 
 ### 7.10 Automated vanilla benches (D47)
 
-The §7.3 substrate's most direct use is wrapping Hytale's own benches as energy-powered, pipe-fed, automatable machines. Vanilla classifies benches by a `Bench.Type`: **Processing** (autonomous, timed, `Fuel`/`Input` slots, runs on `ProcessingBenchBlock`: Furnace, Campfire, Salvage, Tannery) vs **Crafting / DiagramCrafting / StructuralCrafting** (player-driven, instant, all sharing ONE `CraftingRecipe` model tagged with a `BenchRequirement(BenchType)`; the sub-types differ only in UI/slot layout). Because every crafting recipe is the same type, the auto-machine COUNT is an identity choice, not a constraint: we group the vanilla benches into eight themed machines, each accepting recipes whose bench requirement falls in its cluster.
+The §7.3 substrate's most direct use is wrapping Hytale's own benches as energy-powered, pipe-fed, automatable machines. Vanilla classifies benches by a `Bench.Type`: **Processing** (autonomous, timed, `Fuel`/`Input` slots, runs on `ProcessingBenchBlock`: Furnace, Campfire, Salvage, Tannery) vs **Crafting / DiagramCrafting / StructuralCrafting** (player-driven, instant, all sharing ONE `CraftingRecipe` model tagged with a `BenchRequirement(BenchType)`; the sub-types differ only in UI/slot layout). Because every crafting recipe is the same type, the auto-machine COUNT is an identity choice, not a constraint: we group the vanilla benches into **nine** themed machines, each accepting recipes whose bench requirement falls in its cluster. **All nine are now IMPLEMENTED** (the original eight, with the sketched "Assembler" split into Assembler + Sculptor: see below).
 
-| Machine | Wraps | Kind |
-|---|---|---|
-| **Smelter** | Furnace | processing |
-| **Cooker** | Campfire + Cooking | crafting (unified pool) |
-| **Outfitter** | Tannery + Loom | hybrid (processing + crafting) |
-| **Reclaimer** | Salvage | processing |
-| **Forge** | Weapon, Armour, Armory(diagram) | crafting |
-| **Alembic** | Alchemy, Arcane | crafting |
-| **Assembler** | Workbench, Furniture, Builders(structural) | crafting |
-| **Cultivator** | Farming, Trough | crafting |
+| Machine | Wraps (bench id) | Kind | Status |
+|---|---|---|---|
+| **Smelter** | Furnace | processing (held bench) | done |
+| **Reclaimer** | Salvage | processing (held bench) | done |
+| **Forge** | Weapon, Armour, Armory(diagram) | auto-craft | done |
+| **Cooker** | Campfire + Cooking | auto-craft (unified pool) | done |
+| **Outfitter** | Tannery + Loom (`Tannery`+`Loombench`) | auto-craft (unified pool) | done |
+| **Alembic** | Alchemy + Arcane (`Alchemybench`+`Arcanebench`) | auto-craft | done |
+| **Assembler** | Workbench + Furniture (`Workbench`+`Furniture_Bench`+`Furniture_Misc`) | auto-craft | done |
+| **Cultivator** | Farming / Trough (`Farmingbench`) | auto-craft | done |
+| **Sculptor** | Builders (`Builders` structural + crafting) | auto-craft, **recipe-script-gated** | done (gated, inert until scripted) |
 
-The **Cooker** (IMPLEMENTED) resolves what was sketched as a "held-bench hybrid" the simpler way: because a Campfire **Processing** recipe is the SAME `CraftingRecipe` type as a Cooking **Crafting** recipe (just tagged with a different `BenchRequirement`), the Cooker needs no held `ProcessingBenchBlock` at all. It is a PURE auto-crafter (`CookerState`, the §7.3 `AutoCraftEngine` path the Forge uses) whose recipe pool simply UNIONS both benches (`RecipePool.union(Processing/"Campfire", Crafting/"Cookingbench")`). Each craft runs input→output through the one `CraftingRecipe` path and is timed by that recipe's real `getTimeSeconds` (the GUI bar reads the same per-recipe duration, scaled by a tunable multiplier, so bar and tick agree). Two cross-cutting rules learned here and now standard for every auto-crafter: (1) the recipe's `Fuel` resource requirement is **stripped** before sourcing/consume (CC machines burn ENERGY as fuel, so they never pull physical fuel items: see `VanillaCraftBridge.withoutFuel`); (2) selection prefers the most-ingredient recipe, even-rotating within that tier. **Outfitter** (Tannery + Loom) is expected to follow the same pure-auto-craft, unified-pool shape. Pure-processing machines (Smelter, Reclaimer) instead reuse the autonomous vanilla `ProcessingBenchBlock` directly (energy via its no-fuel config); pure-crafting machines (Forge, Alembic, Assembler, Cultivator) use only the auto-craft path. All are energy-gated and overclock by power (D32/D33), and none modify vanilla benches: the originals remain placeable and usable by hand. Per-machine footprint, default ports, and which recipes surface follow each machine's own asset pass (§7.5). (Vanilla **Lumbermill** and **Memories** benches are not in the roster: Lumbermill's config was not pinned during classification and both are left vanilla for now; either can be added later.)
+**The unified auto-craft pattern.** The **Cooker** resolved what was sketched as a "held-bench hybrid" the simpler way: because a Campfire **Processing** recipe is the SAME `CraftingRecipe` type as a Cooking **Crafting** recipe (just tagged with a different `BenchRequirement`), it needs no held `ProcessingBenchBlock` at all. It is a PURE auto-crafter (`CookerState`, the §7.3 `AutoCraftEngine` path the Forge uses) whose recipe pool simply UNIONS its benches (`RecipePool.union(...)`). Each craft runs input→output through the one `CraftingRecipe` path, timed by that recipe's real `getTimeSeconds` (the GUI bar reads the same per-recipe duration via `craftDurationFor`, scaled by a tunable `*_TIME_MULTIPLIER`, so bar and tick agree). **Forge, Cooker, Outfitter, Alembic, Assembler, Cultivator, and Sculptor are all this same pure auto-crafter** (mirror builds differing only in name, bench pool, and model); **Smelter and Reclaimer** instead reuse the autonomous vanilla `ProcessingBenchBlock` directly (energy via its no-fuel config). All are energy-gated, and none modify vanilla benches: the originals remain placeable and usable by hand.
+
+Three cross-cutting rules are now standard for every auto-crafter (all in the shared `AutoCraftEngine`): (1) the recipe's `Fuel` resource requirement is **stripped** before sourcing/consume (CC machines burn ENERGY as fuel, so they never pull physical fuel items: see `VanillaCraftBridge.withoutFuel`: NOTE only the `Fuel` resource type is stripped, ingredient-category resource types like `Meats`/`Rock`/`Wood_Trunk` are kept); (2) selection prefers the **most-ingredient** recipe, even-rotating within that tier (`CraftSelection.topByPriority`); (3) the active block visual is held **sticky** across the inter-craft pacing gap so it never flickers idle between back-to-back crafts (`MachineVisualState.autoCraftActive`).
+
+**The Assembler/Sculptor split.** The sketched "Assembler" (Workbench + Furniture + Builders) was split: the **Assembler** keeps the small, freely-running Workbench + Furniture pool (~201 recipes), while the **Sculptor** takes the Builders bench alone (`StructuralCrafting`+`Crafting` ≈ 911 block-shape recipes: Half/Stairs/Quarter/Smooth). At that scale "make anything craftable" is useless, so the Sculptor is **recipe-script-gated**: its `Spec.allowSet` returns an EMPTY (deny-all) set unless a recipe-script item occupies its card slot (`scriptGateAllowSet`), so it is INERT until scripted. The script item, its programming bench, and the actual selection (which recipes / amounts / order / whitelist) are a DEFERRED "recipe-script phase"; the gate itself (and the `card()`/`cardAllowSet` whitelist hook it builds on) is shared infra any machine can later opt into. The Sculptor uniquely uses the Reclaimer's 1×1×2 footprint (anchor-cell ports, since it is 1-wide) rather than the 2-wide Cooker-family footprint the other auto-crafters share.
+
+**Note on the `Trough`:** the vanilla Trough bench is tagged with the same bench id (`Farmingbench`) as the Farming bench, so the Cultivator's single `Farmingbench` ref already covers both. Per-machine footprint, default ports, and which recipes surface follow each machine's own asset pass (§7.5). **Placeholder art:** the Assembler (Alembic model), Cultivator (Cooker model), and Sculptor (Reclaimer model) currently reuse duplicated stand-in models pending a model-creation pass. (Vanilla **Lumbermill** and **Memories** benches are not in the roster: Lumbermill's config was not pinned during classification and both are left vanilla for now; either can be added later.)
 
 ---
 
