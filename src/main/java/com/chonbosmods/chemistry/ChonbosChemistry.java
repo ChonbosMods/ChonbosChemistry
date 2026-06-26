@@ -6,6 +6,8 @@ import com.chonbosmods.chemistry.impl.block.craft.CookerState;
 import com.chonbosmods.chemistry.impl.block.craft.CookerTickSystem;
 import com.chonbosmods.chemistry.impl.block.craft.OutfitterState;
 import com.chonbosmods.chemistry.impl.block.craft.OutfitterTickSystem;
+import com.chonbosmods.chemistry.impl.block.craft.AlembicState;
+import com.chonbosmods.chemistry.impl.block.craft.AlembicTickSystem;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeTickSystem;
 import com.chonbosmods.chemistry.impl.block.CarryBreakEventSystem;
@@ -22,6 +24,7 @@ import com.chonbosmods.chemistry.impl.block.ui.BenchMachinePanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.ForgePanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.CookerPanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.OutfitterPanelPage;
+import com.chonbosmods.chemistry.impl.block.ui.AlembicPanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshService;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshSystem;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
@@ -59,6 +62,7 @@ public class ChonbosChemistry extends JavaPlugin {
     private ComponentType<ChunkStore, ForgeCraftState> forgeComponentType;
     private ComponentType<ChunkStore, CookerState> cookerComponentType;
     private ComponentType<ChunkStore, OutfitterState> outfitterComponentType;
+    private ComponentType<ChunkStore, AlembicState> alembicComponentType;
     private ComponentType<ChunkStore, TankBlockState> tankComponentType;
     private ComponentType<ChunkStore, PipeNode> pipeComponentType;
 
@@ -97,6 +101,11 @@ public class ChonbosChemistry extends JavaPlugin {
         return outfitterComponentType;
     }
 
+    /** The {@link ChunkStore} component type backing Alembic blocks (the autonomous crafter's own state). */
+    public ComponentType<ChunkStore, AlembicState> alembicComponentType() {
+        return alembicComponentType;
+    }
+
     /** The {@link ChunkStore} component type backing tank blocks (used by the ticking system + GUI). */
     public ComponentType<ChunkStore, TankBlockState> tankComponentType() {
         return tankComponentType;
@@ -133,11 +142,13 @@ public class ChonbosChemistry extends JavaPlugin {
             .registerComponent(CookerState.class, "CookerState", CookerState.CODEC);
         outfitterComponentType = getChunkStoreRegistry()
             .registerComponent(OutfitterState.class, "OutfitterState", OutfitterState.CODEC);
+        alembicComponentType = getChunkStoreRegistry()
+            .registerComponent(AlembicState.class, "AlembicState", AlembicState.CODEC);
         tankComponentType = getChunkStoreRegistry()
             .registerComponent(TankBlockState.class, "TankBlockState", TankBlockState.CODEC);
         pipeComponentType = getChunkStoreRegistry()
             .registerComponent(PipeNode.class, "PipeNode", PipeNode.CODEC);
-        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, ForgeCraftState, CookerState, OutfitterState, TankBlockState, PipeNode.");
+        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, ForgeCraftState, CookerState, OutfitterState, AlembicState, TankBlockState, PipeNode.");
 
         // Per-tick driver: creative-refill then work pass. Must be registered AFTER the components above.
         // (No longer pushes resources to neighbors: the NetworkTickSystem below does that over pipes.)
@@ -152,7 +163,7 @@ public class ChonbosChemistry extends JavaPlugin {
         // and fair-split into INPUT-port machines once per tick. This is what moves resources now.
         getChunkStoreRegistry().registerSystem(new NetworkTickSystem(
             pipeComponentType, machineComponentType, tankComponentType, forgeComponentType, cookerComponentType,
-            outfitterComponentType, networkService));
+            outfitterComponentType, alembicComponentType, networkService));
         getLogger().atInfo().log("Registered NetworkTickSystem (per-tick pipe-network distribution).");
         // Demand-driven craft driver for the Forge (no held bench; own containers + even round-robin
         // selection). Registered AFTER networkService: it pulls each craft's ingredients from the ITEM
@@ -172,6 +183,12 @@ public class ChonbosChemistry extends JavaPlugin {
         getChunkStoreRegistry().registerSystem(
             new OutfitterTickSystem(outfitterComponentType, pipeComponentType, networkService));
         getLogger().atInfo().log("Registered OutfitterTickSystem (autonomous crafting).");
+        // Demand-driven craft driver for the Alembic (sibling of the Outfitter: no held bench; own containers +
+        // round-robin selection). Registered AFTER networkService: it pulls each craft's ingredients from
+        // the ITEM pipe network on its input face (idle -> pull -> craft -> complete -> repeat).
+        getChunkStoreRegistry().registerSystem(
+            new AlembicTickSystem(alembicComponentType, pipeComponentType, networkService));
+        getLogger().atInfo().log("Registered AlembicTickSystem (autonomous crafting).");
         getEntityStoreRegistry().registerSystem(new PipePlaceEventSystem(networkService, pipeComponentType));
         getEntityStoreRegistry().registerSystem(new PipeBreakEventSystem(networkService, pipeComponentType));
 
@@ -182,7 +199,7 @@ public class ChonbosChemistry extends JavaPlugin {
         // logic lives in BlockHolderCarry (unit-tested); the system is thin glue verified in-game.
         getEntityStoreRegistry().registerSystem(new CarryBreakEventSystem(
             machineComponentType, tankComponentType, forgeComponentType, cookerComponentType, outfitterComponentType,
-            pipeComponentType, networkService));
+            alembicComponentType, pipeComponentType, networkService));
         getLogger().atInfo().log("Registered CarryBreakEventSystem (BlockHolder contents carry).");
         // NOTE: NO ChunkUnloadEvent handler. In Server 0.5.3 the engine's ChunkUnloadingSystem dispatches
         // ChunkUnloadEvent from PARALLEL worker threads (forEachEntityParallel), and delivering it to an
@@ -235,6 +252,15 @@ public class ChonbosChemistry extends JavaPlugin {
             this, OutfitterPanelPage.class, "CC_OutfitterPanel",
             (playerRef, blockRef) -> new OutfitterPanelPage(playerRef, blockRef, "Outfitter"));
         getLogger().atInfo().log("Registered CC_OutfitterPanel outfitter GUI.");
+
+        // The Alembic panel: a sibling of the Outfitter GUI (a pure auto-craft machine), reading the autonomous
+        // Alembic's own AlembicState (own input/output containers + recipe-card slot) rather than a held
+        // vanilla bench. The "CC_AlembicPanel" id is referenced by CC_Alembic.json's Interactions.Use
+        // (OpenCustomUI Page.Id).
+        OpenCustomUIInteraction.registerBlockEntityCustomPage(
+            this, AlembicPanelPage.class, "CC_AlembicPanel",
+            (playerRef, blockRef) -> new AlembicPanelPage(playerRef, blockRef, "Alembic"));
+        getLogger().atInfo().log("Registered CC_AlembicPanel alembic GUI.");
 
         // CC_Wrench (Task 9): a held tool whose Secondary interaction taps a pipe face to cycle its
         // flow state, or a machine face to cycle its port. The JSON "Type" is this registered id; the
