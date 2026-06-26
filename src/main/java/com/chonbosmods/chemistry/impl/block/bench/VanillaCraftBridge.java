@@ -8,6 +8,7 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.MaterialQuantity;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -80,7 +81,35 @@ import java.util.List;
  */
 public final class VanillaCraftBridge {
 
+    /**
+     * The resource-type id vanilla uses for a recipe's FUEL requirement (e.g. Apple Pie carries a
+     * {@code {ResourceTypeId:"Fuel", Quantity:3}} alongside its real ingredients). Vanilla satisfies it
+     * by matching+consuming ANY fuel-valued item (sticks, coal, planks) found in the container.
+     */
+    static final String FUEL_RESOURCE_TYPE = "Fuel";
+
     private VanillaCraftBridge() {
+    }
+
+    /** True iff {@code m} is a recipe's "Fuel" resource-type requirement (NOT a real ingredient). */
+    private static boolean isFuel(MaterialQuantity m) {
+        return m != null && FUEL_RESOURCE_TYPE.equals(m.getResourceTypeId());
+    }
+
+    /**
+     * A copy of {@code materials} with every "Fuel" resource-type entry removed. CC machines burn ENERGY
+     * as their fuel, so a recipe's fuel requirement must never pull/consume physical fuel items (sticks,
+     * coal, planks). ONLY "Fuel" is stripped: other resource types (Meats, Vegetables, Rock, Wood_Trunk,
+     * ...) are real ingredient CATEGORIES (a slot matching "any meat"/"any rock") and are kept.
+     */
+    static List<MaterialQuantity> withoutFuel(List<MaterialQuantity> materials) {
+        List<MaterialQuantity> kept = new ArrayList<>(materials.size());
+        for (MaterialQuantity m : materials) {
+            if (!isFuel(m)) {
+                kept.add(m);
+            }
+        }
+        return kept;
     }
 
     /**
@@ -95,13 +124,26 @@ public final class VanillaCraftBridge {
     }
 
     /**
-     * The number of DISTINCT input materials a recipe requires (its {@code getInput()} array length). Used
-     * to rank recipes: more ingredients = a more "advanced" recipe to prefer over a basic one.
+     * The number of DISTINCT REAL input materials a recipe requires. Used to rank recipes: more
+     * ingredients = a more "advanced" recipe to prefer over a basic one.
+     *
+     * <p>A recipe's "Fuel" resource-type requirement is EXCLUDED from the count: CC machines burn energy
+     * (not physical fuel items), so fuel is never an ingredient we pull. Counting it would inflate the
+     * priority (e.g. Apple Pie would rank as 4 ingredients instead of its real 3). See {@link #withoutFuel}.
      */
     public static int ingredientCount(CraftingRecipe r) {
         // signature: MaterialQuantity[] CraftingRecipe.getInput() (verified public on Server-0.5.3)
         MaterialQuantity[] in = r.getInput();
-        return in == null ? 0 : in.length;
+        if (in == null) {
+            return 0;
+        }
+        int count = 0;
+        for (MaterialQuantity m : in) {
+            if (!isFuel(m)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /** The recipe's stable asset id. */
@@ -128,11 +170,17 @@ public final class VanillaCraftBridge {
      * un-craftable. {@code false} accepts "enough or more" (still fails when there is not enough), which is
      * the correct semantics for a buffer. Agrees with {@link #consumeInputs}. An empty material list (a
      * recipe with no inputs) trivially returns {@code true}.
+     *
+     * <p>The recipe's "Fuel" resource-type requirement is STRIPPED ({@link #withoutFuel}) before the
+     * availability test: CC machines burn ENERGY as their fuel, so the availability of a recipe must
+     * NEVER depend on a physical fuel item (sticks/coal/planks) being present in the network. Other
+     * resource-type categories (Meats, Rock, Wood_Trunk, ...) are real ingredients and are kept.
      */
     public static boolean inputsPresent(CraftingRecipe r, ItemContainer input, int batch) {
         // signature: CraftingManager.getInputMaterials(CraftingRecipe, int tier) (static)
         //            : List<MaterialQuantity>
-        List<MaterialQuantity> materials = CraftingManager.getInputMaterials(r, batch); // batch=1 => one recipe set (NOT the machine tier; *0 zeroes qty)
+        List<MaterialQuantity> materials = withoutFuel(
+            CraftingManager.getInputMaterials(r, batch)); // batch=1 => one recipe set (NOT the machine tier; *0 zeroes qty)
         // signature: ItemContainer.canRemoveMaterials(List<MaterialQuantity>, boolean matchExactType,
         //            boolean forbidOverRemoval) : boolean  [pure test, no mutation]
         return input.canRemoveMaterials(materials, true, false);
@@ -144,11 +192,17 @@ public final class VanillaCraftBridge {
      * UNTOUCHED (vanilla's {@code internal_removeMaterials} tests all materials before committing — see
      * class javadoc "Atomicity"). This is the exact path vanilla's
      * {@code CraftingManager.removeInputFromInventory(ItemContainer, CraftingRecipe, int)} uses.
+     *
+     * <p>The recipe's "Fuel" resource-type requirement is STRIPPED ({@link #withoutFuel}) before the
+     * consume: CC machines burn ENERGY as their fuel, so a craft must NEVER consume a physical fuel item
+     * (sticks/coal/planks) from the network (vanilla would otherwise match+drain any fuel-valued item).
+     * Other resource-type categories (Meats, Rock, Wood_Trunk, ...) are real ingredients and are consumed.
      */
     public static boolean consumeInputs(CraftingRecipe r, ItemContainer input, int batch) {
         // signature: CraftingManager.getInputMaterials(CraftingRecipe, int tier) (static)
         //            : List<MaterialQuantity>
-        List<MaterialQuantity> materials = CraftingManager.getInputMaterials(r, batch); // batch=1 => one recipe set (NOT the machine tier; *0 zeroes qty)
+        List<MaterialQuantity> materials = withoutFuel(
+            CraftingManager.getInputMaterials(r, batch)); // batch=1 => one recipe set (NOT the machine tier; *0 zeroes qty)
         // signature: ItemContainer.removeMaterials(List<MaterialQuantity>, boolean matchExactType,
         //            boolean forbidOverRemoval, boolean sendUpdate)
         //            : ListTransaction<MaterialTransaction>   [atomic: no-op on failure]
