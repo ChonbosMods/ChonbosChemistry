@@ -196,6 +196,20 @@ public final class CookerTickSystem extends EntityTickingSystem<ChunkStore> {
         }
     };
 
+    /**
+     * The real craft duration (seconds) of the recipe currently loaded in a Cooker, for the PANEL's progress
+     * bar denominator. Resolves {@code recipeId} against the shared pool and runs the SAME
+     * {@link AutoCraftEngine.Spec#craftDuration} the tick uses (the recipe's {@link VanillaCraftBridge#recipeTimeSeconds}
+     * or {@link #COOKER_DEFAULT_DURATION} for a time-0 recipe), so the bar fills over exactly the cook time the
+     * tick is timing: no pausing at 100% (real time longer than the constant) and no completing before 100%
+     * (real time shorter). A {@code null} id (idle) or an id not in the pool yields the default. Safe to call
+     * off the tick: the pool is a cached, immutable, load-time-fixed snapshot.
+     */
+    public static float craftDurationFor(@Nullable String recipeId) {
+        CraftingRecipe r = recipeId == null ? null : cookerRecipePool().map().get(recipeId);
+        return COOKER_SPEC.craftDuration(r); // null-guarded -> COOKER_DEFAULT_DURATION
+    }
+
     // --- shared recipe pool (load-time-fixed; built once, lazily) ---
 
     private static volatile RecipePool POOL;

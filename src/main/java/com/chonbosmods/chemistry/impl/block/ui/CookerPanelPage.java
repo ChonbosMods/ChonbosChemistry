@@ -66,9 +66,11 @@ import org.joml.Vector3d;
  * {@link CookerState#setEnabled(boolean)}) and an Eject button draining the Cooker's own input + output
  * containers into the player's inventory ({@link MachineEject}), dropping overflow at the player's feet.
  *
- * <p>Progress bar fraction is {@code progress() / COOKER_DEFAULT_DURATION} via
- * {@link BenchMachinePanelText#forgeFraction}; {@code COOKER_DEFAULT_DURATION} comes from
- * {@link CookerTickSystem#COOKER_DEFAULT_DURATION} (the fallback craft-length constant shared with the tick).
+ * <p>Progress bar fraction is {@code progress() / } the ACTIVE recipe's real cook time via
+ * {@link BenchMachinePanelText#forgeFraction}, with the duration resolved by
+ * {@link CookerTickSystem#craftDurationFor} (the same per-recipe {@code getTimeSeconds}, or
+ * {@code COOKER_DEFAULT_DURATION} fallback, the tick times the craft by). So the bar fills exactly over each
+ * craft regardless of recipe: a 5s pie and a 2s grill both reach 100% at completion, never early or late.
  * A craft is treated as ACTIVE while {@code currentRecipeId() != null} (the tick's real "crafting" definition:
  * on the START tick the ingredients are pulled but progress is still 0, yet the Cooker IS crafting, so
  * {@code progress > 0} would wrongly flash "Idle").
@@ -223,11 +225,13 @@ public final class CookerPanelPage extends InteractiveCustomUIPage<CookerPanelPa
         cmd.set("#TierText.TextSpans", Message.raw("Tier: 0"));
 
         // A craft is in flight while a recipe is loaded (start tick pulls ingredients before progress > 0).
-        // Progress fraction stays raw-seconds based: seconds -> 0..1 against COOKER_DEFAULT_DURATION.
-        // [v1] approximate: per-recipe-accurate fraction needs the active recipe's duration
+        // Progress fraction is raw-seconds based: seconds -> 0..1 against the ACTIVE recipe's real cook time
+        // (the same duration the tick is timing this craft by), so the bar fills exactly over the craft: no
+        // pausing at 100% for a long recipe, no completing before 100% for a short one. Idle -> default.
         float progressSeconds = cooker.progress();
         boolean active = cooker.currentRecipeId() != null;
-        float frac = BenchMachinePanelText.forgeFraction(progressSeconds, CookerTickSystem.COOKER_DEFAULT_DURATION);
+        float duration = CookerTickSystem.craftDurationFor(cooker.currentRecipeId());
+        float frac = BenchMachinePanelText.forgeFraction(progressSeconds, duration);
         cmd.set("#ProgressBar.Value", frac);
         cmd.set("#ProgressText.TextSpans", Message.raw(BenchMachinePanelText.progress(enabled, frac)));
 
