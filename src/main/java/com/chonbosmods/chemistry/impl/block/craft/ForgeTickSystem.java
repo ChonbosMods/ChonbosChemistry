@@ -216,9 +216,6 @@ public final class ForgeTickSystem extends EntityTickingSystem<ChunkStore> {
             // Diagnostic (logged once): if this is 0, the bench ids did not resolve to recipes and the Forge
             // can never craft. Expected ~100 across Weapon_Bench / Armor_Bench / ArmorBench / Armory.
             FORGE_DRIVE_LOG.atInfo().log("Forge recipe pool built: " + pool.stableOrder().size() + " recipes.");
-            // TEMP DIAGNOSTIC (remove after the kebab-craftable issue is found): the full recipe-id list, once,
-            // so we can see whether an expected id (e.g. "kebab") is even in the pool.
-            FORGE_DRIVE_LOG.atInfo().log("Forge recipe pool ids: " + pool.stableOrder());
             return POOL;
         }
     }
