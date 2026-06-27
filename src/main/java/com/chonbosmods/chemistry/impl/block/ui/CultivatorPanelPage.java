@@ -318,6 +318,21 @@ public final class CultivatorPanelPage extends InteractiveCustomUIPage<Cultivato
         cultivator.setCurrentRecipeId(null);
         cultivator.setProgress(0f);
 
+        // Also return the inserted recipe card to the player. Insert via the SAME inventory sink the drained
+        // items use (hotbar-first); any leftover joins the overflow so the block below drops it at the
+        // player's feet. Then clear the slot + per-card script progress so the card can't be re-read. Guarded
+        // null-safe; no dup/loss (the card is returned first, then cleared).
+        ItemStack card = cultivator.card();
+        if (card != null && !ItemStack.isEmpty(card)) {
+            int accepted = sink.insert(card.getItemId(), card.getMetadata(), card.getQuantity());
+            int leftover = card.getQuantity() - accepted;
+            if (leftover > 0) {
+                overflow.add(new MachineEject.EjectStack(card.getItemId(), leftover, card.getMetadata()));
+            }
+            cultivator.setCard(null);
+            cultivator.clearScriptProgress();
+        }
+
         if (overflow.isEmpty()) {
             return;
         }
