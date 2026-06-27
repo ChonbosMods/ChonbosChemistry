@@ -22,6 +22,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.accessor.BlockAccessor;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -88,6 +89,18 @@ public final class AutoCraftEngine {
 
         // 2. The shared (cached) bench recipe pool: stable id order + id -> recipe map.
         RecipePool pool = spec.recipePool();
+
+        // 2b. Card-change -> progress reset (every tick): resolve the inserted card's script + its signature
+        // and clear the machine's per-card progress whenever the signature changes. This covers eject (-> ""),
+        // reprogram (different entries/order/counts), and reload-mismatch. The Task-5 GUI ALSO clears on eject;
+        // this is the engine backstop. `script` (null when no/blank card) drives the script-aware candidate set
+        // (step 4b) and the scripted progress increment (step 6, COMPLETE).
+        RecipeScript script = cardScript(node.card());
+        String sig = scriptSignature(script);
+        if (!sig.equals(node.lastCardSig())) {
+            node.clearScriptProgress();
+            node.setLastCardSig(sig);
+        }
 
         // 3. State: are we mid-craft? and the energy gate (simulated craft seconds affordable this tick,
         // 0 when disabled or the buffer is empty).
@@ -156,7 +169,9 @@ public final class AutoCraftEngine {
                     for (String id : craftable) {
                         countMap.put(id, VanillaCraftBridge.ingredientCount(pool.map().get(id)));
                     }
-                    topTier = CraftSelection.topByPriority(craftable, countMap);
+                    // Script-aware candidate set: no card -> unchanged topByPriority; ordered -> the forced
+                    // single pick; unordered -> priority WITHIN the script's progress-retired active set.
+                    topTier = resolveCandidates(script, node.scriptProgress(), craftable, countMap);
                 }
             }
         }
@@ -216,6 +231,12 @@ public final class AutoCraftEngine {
                 if (r != null && VanillaCraftBridge.canProduce(node.output(), outs)) {
                     VanillaCraftBridge.addOutputs(node.output(), outs);
                     clearHeld(node); // the held ingredients are consumed by the craft
+                    // Scripted progress: count this completed craft EXACTLY ONCE, and only when a script is
+                    // active for this card (no-card path leaves progress untouched). d.pick() is the id that
+                    // just completed (the same id used to resolve `r`/`outs` above).
+                    if (script != null) {
+                        node.incrementScriptProgress(d.pick());
+                    }
                     node.setCurrentRecipeId(null);
                     node.setProgress(0f);
                     node.setLastSelectedId(d.newCursor()); // cursor advances to the crafted id
@@ -369,6 +390,62 @@ public final class AutoCraftEngine {
     public static Set<String> cardAllowSet(@Nullable ItemStack card) {
         RecipeScript script = cardScript(card);
         return (script == null) ? null : script.recipeIds();
+    }
+
+    /**
+     * The script-aware candidate set fed to {@link PullCraftStep#decide}, replacing the bare
+     * {@link CraftSelection#topByPriority} call in the IDLE branch.
+     *
+     * <ul>
+     *   <li><b>No card</b> ({@code script == null}): UNCHANGED no-card path: returns
+     *       {@code topByPriority(craftable, countMap)} exactly as before scripting existed.</li>
+     *   <li><b>Ordered script</b>: forces the single {@link ScriptSelection#orderedPick ordered pick} (list
+     *       order is the priority): a singleton, or empty when nothing in the script is active.</li>
+     *   <li><b>Unordered script</b>: most-ingredient priority WITHIN the script's
+     *       {@link ScriptSelection#activeSet active set} (finite entries retired by progress, intersected with
+     *       what is craftable now).</li>
+     * </ul>
+     *
+     * <p>When the result is empty (completed / nothing active / ordered-with-nothing-craftable),
+     * {@link PullCraftStep#decide} naturally yields IDLE: no special-casing is needed, and a finished script's
+     * active set is empty ({@link ScriptSelection#isComplete} is honored implicitly).
+     *
+     * <p>Pure (no world/ECS): unit-tested directly.
+     */
+    static Set<String> resolveCandidates(@Nullable RecipeScript script, Map<String, Integer> progress,
+            Set<String> craftable, Map<String, Integer> countMap) {
+        if (script == null) {
+            return CraftSelection.topByPriority(craftable, countMap); // UNCHANGED no-card path
+        }
+        Set<String> active = ScriptSelection.activeSet(script, progress, craftable);
+        if (script.ordered()) {
+            String pick = ScriptSelection.orderedPick(script, active);
+            return pick == null ? java.util.Set.of() : java.util.Set.of(pick); // ordered: force the one pick
+        }
+        return CraftSelection.topByPriority(active, countMap); // unordered: priority WITHIN the active set
+    }
+
+    /**
+     * A deterministic signature of {@code script} used by {@link #drive} to detect a card change (eject,
+     * reprogram, reload-mismatch) and reset the machine's progress. Equal scripts produce equal signatures;
+     * any change (incl. card removal, which maps to {@code null}) produces a different signature.
+     *
+     * <p>Form: {@code ""} for a null script (no/blank card), else {@code ordered + "|" + each entry
+     * "id:count"} joined by {@code ";"}, in the script's entry order. Pure: unit-tested directly.
+     */
+    static String scriptSignature(@Nullable RecipeScript script) {
+        if (script == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(script.ordered());
+        for (RecipeScript.Entry e : script.entries()) {
+            sb.append('|');
+            if (e != null) {
+                sb.append(e.recipeId()).append(':').append(e.count());
+            }
+        }
+        return sb.toString();
     }
 
     /**
