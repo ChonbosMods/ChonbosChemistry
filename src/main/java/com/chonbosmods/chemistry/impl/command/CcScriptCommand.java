@@ -7,8 +7,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
-import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
+import com.hypixel.hytale.server.core.command.system.CommandUtil;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -36,6 +35,14 @@ import javax.annotation.Nonnull;
  * {@code world.execute(...)} (the {@link World} is the executor). So all the player / inventory work below is
  * on the WorldThread, satisfying the project's off-WorldThread command rule without an explicit wrap. The
  * pure token parsing happens BEFORE that hop (it touches no world state).
+ *
+ * <h2>Argument capture</h2>
+ * The arg framework only groups space-separated tokens into a single list arg when the user wraps them in
+ * {@code [a, b, c]} or comma-separates them (see {@code ParserContext}); a {@code withListRequiredArg(STRING)}
+ * therefore captures only the FIRST bare token of {@code /cc-script ordered a:5 b c}. So instead we declare no
+ * required args, opt into {@link #setAllowsExtraArguments(boolean) extra arguments}, and recover the whole
+ * rest-of-line ourselves via {@code CommandUtil.stripCommandName(getInputString()).split("\\s+")} : the same
+ * proven pattern the vanilla {@code /notify} command uses for free-form multi-token input.
  */
 public final class CcScriptCommand extends AbstractPlayerCommand {
 
@@ -47,20 +54,21 @@ public final class CcScriptCommand extends AbstractPlayerCommand {
         "Usage: /cc-script [ordered] <recipeId[:count]> [recipeId[:count] ...]  "
         + "(count omitted or 0 = infinite). Example: /cc-script ordered ironbar:5 nail";
 
-    @Nonnull
-    private final RequiredArg<List<String>> tokensArg = this.withListRequiredArg(
-        "script", "The recipe script: an optional leading 'ordered', then recipeId[:count] tokens",
-        ArgTypes.STRING);
-
     public CcScriptCommand() {
         super("cc-script", "Give yourself a CC_RecipeScript card stamped with a recipe script (debug)");
+        // Declare no required args: we capture the whole rest-of-line ourselves (see class javadoc). Opting into
+        // extra arguments stops the framework rejecting the trailing tokens it didn't bind to a declared arg.
+        this.setAllowsExtraArguments(true);
     }
 
     @Override
     protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store,
             @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
         // Parse FIRST (pure, no world state): on bad args, fail with usage feedback before touching anything.
-        List<String> tokens = this.tokensArg.get(context);
+        // Recover the rest-of-line ourselves (the list arg can't capture bare space-separated tokens : see
+        // class javadoc). stripCommandName drops the leading "/cc-script "; an empty tail yields no tokens.
+        String rawArgs = CommandUtil.stripCommandName(context.getInputString()).trim();
+        List<String> tokens = rawArgs.isEmpty() ? List.of() : List.of(rawArgs.split("\\s+"));
         RecipeScript script;
         try {
             script = RecipeScriptArgs.parse(tokens);
