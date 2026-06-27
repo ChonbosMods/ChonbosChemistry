@@ -4,6 +4,7 @@ import com.chonbosmods.chemistry.impl.block.PoweredMachineNode;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * The state contract an autonomous-crafting machine exposes to the shared craft engine ({@code
@@ -23,6 +24,13 @@ public interface AutoCraftNode extends PoweredMachineNode {
 
     /** @return the inserted recipe card, or null if no card is loaded. */
     ItemStack card();
+
+    /**
+     * Sets (or clears, when {@code null}) the inserted recipe card. Implementations also mark their owning
+     * block needs-saving as their other mutators do. Only the Cooker panel writes this today (the interactive
+     * card slot); the other states implement it so the contract compiles uniformly.
+     */
+    void setCard(@Nullable ItemStack card);
 
     /** @return the recipe currently being crafted, or null if idle. */
     String currentRecipeId();
