@@ -288,7 +288,7 @@ public final class CookerPanelPage extends InteractiveCustomUIPage<CookerPanelPa
     /** The single recipe-card slot: the card item, or one empty slot when no card is loaded. */
     private static List<ItemGridSlot> cardSlot(ItemStack card) {
         List<ItemGridSlot> slots = new ArrayList<>(1);
-        slots.add(card == null || ItemStack.isEmpty(card) ? new ItemGridSlot() : new ItemGridSlot(card));
+        slots.add(card == null || ItemStack.isEmpty(card) ? new ItemGridSlot() : new ItemGridSlot(new ItemStack(card.getItemId(), Math.max(1, card.getQuantity()))));
         return slots;
     }
 
