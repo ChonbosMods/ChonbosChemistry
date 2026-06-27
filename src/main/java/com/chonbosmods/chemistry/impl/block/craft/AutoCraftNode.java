@@ -12,9 +12,12 @@ import javax.annotation.Nullable;
  * crafting machines (Cooker, Outfitter) implement the same contract so the engine drives them uniformly.
  *
  * <p>Extends {@link PoweredMachineNode}, the shared powered-machine contract (energy + ports + on/off),
- * so the energy/ports/enabled accessors are inherited rather than redeclared here.
+ * so the energy/ports/enabled accessors are inherited rather than redeclared here. Also extends
+ * {@link CardHolder} (the {@code card()}/{@code setCard()} pair), so the card-load interaction can treat a
+ * machine and the (non-machine) Recipe Programmer uniformly; the {@code card()}/{@code setCard()} declared
+ * below are the same contract, kept here for their machine-specific Javadoc.
  */
-public interface AutoCraftNode extends PoweredMachineNode {
+public interface AutoCraftNode extends PoweredMachineNode, CardHolder {
 
     /** @return the held ingredients pulled for the active craft (empty when idle). */
     SimpleItemContainer held();

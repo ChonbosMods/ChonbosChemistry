@@ -1,0 +1,78 @@
+$C = "../Common.ui";
+$M = "../CC_Master.ui";
+
+// Chonbo's Chemistry: the Recipe Programmer bench panel (STUB, Phase 3.1). A trimmed sibling of
+// CC_CookerPanel.ui: one bordered status panel showing the loaded card's program as text + a Take Card
+// button. Server (RecipeProgrammerPanelPage) sets #PanelTitle.TextSpans and #ProgramText.TextSpans, and
+// binds #TakeCard (Activating). The full authoring GUI (recipe browser, counts, duplicate) is later phases.
+
+@PanelBorderColor = $M.@PanelBorderColor;
+@PanelFillColor = $M.@PanelFillColor;
+@PanelDividerColor = $M.@PanelDividerColor;
+@ValueText = $M.@ValueText;
+@LabelText = $M.@LabelText;
+@ContentPad = $M.@ContentPad;
+@ButtonHeight = $M.@ButtonHeight;
+@HeaderFontSize = $M.@HeaderFontSize;
+
+$C.@PageOverlay {
+  $C.@DecoratedContainer {
+    Anchor: (Width: 460, Height: 300);
+
+    // Title set from Java (#PanelTitle.TextSpans). Vanilla title style.
+    #Title {
+      Group {
+        Label #PanelTitle {
+          Style: (
+            ...$C.@TitleStyle,
+            HorizontalAlignment: Center
+          );
+          Padding: (Horizontal: 19);
+          Text: "";
+        }
+      }
+    }
+
+    #Content {
+      LayoutMode: Top;
+      Padding: (Full: @ContentPad);
+
+      Group #StatusPanel {
+        Anchor: (Left: 0, Right: 0);
+        Background: @PanelBorderColor;
+        Padding: (Full: 1);
+
+        Group {
+          Anchor: (Full: 0);
+          Background: @PanelFillColor;
+          LayoutMode: Top;
+          Padding: (Top: 12, Left: 16, Right: 16, Bottom: 14);
+
+          Label {
+            Style: (FontSize: @HeaderFontSize, RenderBold: true, RenderUppercase: true, TextColor: @LabelText);
+            Text: "Loaded Program";
+          }
+          Group { Anchor: (Height: 6); }
+          Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
+          Group { Anchor: (Height: 12); }
+
+          // The loaded card's program text (or "No card loaded." / "Blank card ..."). Server-set, wrapped.
+          Label #ProgramText {
+            Anchor: (Left: 0, Right: 0);
+            Style: (FontSize: 14, TextColor: @ValueText, Wrap: true);
+            Text: "No card loaded.";
+          }
+          Group { Anchor: (Height: 16); }
+
+          // Return the loaded card to the player (clears the slot). Server binds #TakeCard (Activating).
+          $C.@CancelTextButton #TakeCard {
+            Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+            Text: "Take Card";
+          }
+        }
+      }
+    }
+  }
+}
+
+$C.@BackButton {}
