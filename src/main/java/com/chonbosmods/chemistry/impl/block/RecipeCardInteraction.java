@@ -2,6 +2,7 @@ package com.chonbosmods.chemistry.impl.block;
 
 import com.chonbosmods.chemistry.ChonbosChemistry;
 import com.chonbosmods.chemistry.impl.block.craft.AutoCraftNode;
+import com.chonbosmods.chemistry.impl.block.craft.CardHolder;
 import com.chonbosmods.chemistry.impl.block.net.item.ItemContainerView;
 import com.chonbosmods.chemistry.impl.block.net.item.ItemKey;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -38,11 +39,11 @@ import org.joml.Vector3d;
 import org.joml.Vector3i;
 
 /**
- * The {@code CC_RecipeScript} block interaction: right-clicking (Secondary) a CC auto-crafter machine
- * while holding a recipe-script card INSERTS the card into the machine's card slot, or SWAPS it for the
- * card already loaded there. Mirrors {@link WrenchInteraction} exactly (a {@link SimpleBlockInteraction}
- * whose Secondary resolves the targeted CC machine block-entity and mutates it); F/Use still opens the
- * machine panel (a different input), untouched.
+ * The {@code CC_RecipeScript} block interaction: right-clicking (Secondary) a CC {@link CardHolder} block
+ * (any of the 7 auto-crafter machines OR the Recipe Programmer bench) while holding a recipe-script card
+ * INSERTS the card into its card slot, or SWAPS it for the card already loaded there. Mirrors
+ * {@link WrenchInteraction} exactly (a {@link SimpleBlockInteraction} whose Secondary resolves the targeted
+ * CC block-entity and mutates it); F/Use still opens the block's panel (a different input), untouched.
  *
  * <h2>Behaviour (design: card insert/swap, 2026-06)</h2>
  * <ul>
@@ -54,10 +55,12 @@ import org.joml.Vector3i;
  * </ul>
  *
  * <p>The card carries its {@code CC_RecipeScript} blueprint transparently in its ItemStack metadata; this
- * class never parses it (the engine's {@code AutoCraftEngine.cardScript} reads it). Swapping the card
- * resets the machine's per-card progress via {@link AutoCraftNode#clearScriptProgress()} so a freshly
- * inserted card starts counting from zero (the engine also detects this via the card signature, but the
- * explicit reset here keeps the panel feedback immediate and matches the panel's eject behaviour).
+ * class never parses it (the engine's {@code AutoCraftEngine.cardScript} reads it). For a MACHINE target
+ * (an {@link AutoCraftNode}), swapping the card resets its per-card progress via
+ * {@link AutoCraftNode#clearScriptProgress()} so a freshly inserted card starts counting from zero (the
+ * engine also detects this via the card signature, but the explicit reset here keeps the panel feedback
+ * immediate and matches the panel's eject behaviour). The Recipe Programmer holds no progress, so that reset
+ * is skipped for it (guarded by an {@code instanceof AutoCraftNode} check).
  *
  * <h2>Engine facts used (mirrors {@link WrenchInteraction})</h2>
  * <ul>
@@ -101,20 +104,23 @@ public final class RecipeCardInteraction extends SimpleBlockInteraction {
                 return;
             }
 
-            AutoCraftNode node = resolveNode(world, blockPos.x(), blockPos.y(), blockPos.z());
-            if (node == null) {
-                // Not one of our auto-crafter machines: do nothing (no chat spam: a card is a normal item
-                // that may be right-clicked anywhere).
+            CardHolder holder = resolveHolder(world, blockPos.x(), blockPos.y(), blockPos.z());
+            if (holder == null) {
+                // Not one of our auto-crafter machines nor the Recipe Programmer: do nothing (no chat spam:
+                // a card is a normal item that may be right-clicked anywhere).
                 return;
             }
 
             // SWAP vs INSERT is decided purely by whether a card is already stored.
-            ItemStack stored = node.card();
+            ItemStack stored = holder.card();
             boolean swap = RecipeCardOps.isGivebackWorthy(stored);
 
-            // Insert the new card and reset per-card progress (the new card starts fresh).
-            node.setCard(toInsert);
-            node.clearScriptProgress();
+            // Insert the new card. The per-card progress reset is MACHINE-only (the Programmer has no
+            // progress): apply it only when the holder is an auto-crafter, so the new card starts fresh.
+            holder.setCard(toInsert);
+            if (holder instanceof AutoCraftNode acn) {
+                acn.clearScriptProgress();
+            }
 
             // Consume ONE card from the held stack (vanilla ModifyInventoryInteraction pattern).
             consumeOneHeld(context, itemStack);
@@ -141,15 +147,16 @@ public final class RecipeCardInteraction extends SimpleBlockInteraction {
         // Server-side only: all mutation happens in interactWithBlock on the WorldThread.
     }
 
-    // --- machine resolution (mirrors CarryBreakEventSystem's per-type cascade) ---
+    // --- holder resolution (mirrors CarryBreakEventSystem's per-type cascade) ---
 
     /**
-     * The single {@link AutoCraftNode} block-entity at (x,y,z), resolved across all 7 auto-crafter
-     * component types, or {@code null} when the targeted block is not one of ours. All 7 states implement
-     * {@link AutoCraftNode}, so the first one present is returned directly.
+     * The single {@link CardHolder} block-entity at (x,y,z), resolved across all 7 auto-crafter component
+     * types PLUS the Recipe Programmer's component type, or {@code null} when the targeted block is not one
+     * of ours. The 7 machine states implement {@code CardHolder} (via {@link AutoCraftNode}) and the
+     * Programmer's state implements it directly, so the first one present is returned directly.
      */
     @Nullable
-    private AutoCraftNode resolveNode(World world, int x, int y, int z) {
+    private CardHolder resolveHolder(World world, int x, int y, int z) {
         ChonbosChemistry plugin = ChonbosChemistry.getInstance();
         if (plugin == null) {
             return null;
@@ -162,46 +169,50 @@ public final class RecipeCardInteraction extends SimpleBlockInteraction {
         if (store == null) {
             return null;
         }
-        AutoCraftNode node;
-        if ((node = get(store, ref, plugin.cookerComponentType())) != null) {
-            return node;
+        CardHolder holder;
+        if ((holder = get(store, ref, plugin.cookerComponentType())) != null) {
+            return holder;
         }
-        if ((node = get(store, ref, plugin.forgeComponentType())) != null) {
-            return node;
+        if ((holder = get(store, ref, plugin.forgeComponentType())) != null) {
+            return holder;
         }
-        if ((node = get(store, ref, plugin.outfitterComponentType())) != null) {
-            return node;
+        if ((holder = get(store, ref, plugin.outfitterComponentType())) != null) {
+            return holder;
         }
-        if ((node = get(store, ref, plugin.alembicComponentType())) != null) {
-            return node;
+        if ((holder = get(store, ref, plugin.alembicComponentType())) != null) {
+            return holder;
         }
-        if ((node = get(store, ref, plugin.assemblerComponentType())) != null) {
-            return node;
+        if ((holder = get(store, ref, plugin.assemblerComponentType())) != null) {
+            return holder;
         }
-        if ((node = get(store, ref, plugin.cultivatorComponentType())) != null) {
-            return node;
+        if ((holder = get(store, ref, plugin.cultivatorComponentType())) != null) {
+            return holder;
         }
-        if ((node = get(store, ref, plugin.sculptorComponentType())) != null) {
-            return node;
+        if ((holder = get(store, ref, plugin.sculptorComponentType())) != null) {
+            return holder;
+        }
+        if ((holder = get(store, ref, plugin.recipeProgrammerComponentType())) != null) {
+            return holder;
         }
         return null;
     }
 
     /**
-     * Reads {@code type}'s component off {@code ref} and returns it as an {@link AutoCraftNode}; null type
-     * or absent component yields null. The cast is safe: every component type passed here belongs to one of
-     * the 7 auto-crafter states, all of which implement {@link AutoCraftNode}. We bound {@code T} to plain
-     * {@link com.hypixel.hytale.component.Component} (not an intersection with {@code AutoCraftNode}, which
+     * Reads {@code type}'s component off {@code ref} and returns it as a {@link CardHolder}; null type or
+     * absent component yields null. The cast is safe: every component type passed here belongs either to one
+     * of the 7 auto-crafter states (all {@code CardHolder} via {@code AutoCraftNode}) or to the Recipe
+     * Programmer's state (a direct {@code CardHolder}). We bound {@code T} to plain
+     * {@link com.hypixel.hytale.component.Component} (not an intersection with {@code CardHolder}, which
      * conflicts on {@code clone()}) and cast the read component.
      */
     @Nullable
-    private <T extends com.hypixel.hytale.component.Component<ChunkStore>> AutoCraftNode get(
+    private <T extends com.hypixel.hytale.component.Component<ChunkStore>> CardHolder get(
             Store<ChunkStore> store, Ref<ChunkStore> ref, @Nullable ComponentType<ChunkStore, T> type) {
         if (type == null) {
             return null;
         }
         T component = store.getComponent(ref, type);
-        return component instanceof AutoCraftNode ? (AutoCraftNode) component : null;
+        return component instanceof CardHolder ? (CardHolder) component : null;
     }
 
     // --- held-item consume (vanilla ModifyInventoryInteraction pattern) ---

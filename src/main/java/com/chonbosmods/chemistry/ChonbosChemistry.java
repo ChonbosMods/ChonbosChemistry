@@ -21,6 +21,7 @@ import com.chonbosmods.chemistry.impl.command.CcScriptCommand;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
 import com.chonbosmods.chemistry.impl.block.RecipeCardInteraction;
+import com.chonbosmods.chemistry.impl.block.RecipeProgrammerState;
 import com.chonbosmods.chemistry.impl.block.WrenchInteraction;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
 import com.chonbosmods.chemistry.impl.block.net.NetworkTickSystem;
@@ -36,6 +37,7 @@ import com.chonbosmods.chemistry.impl.block.ui.AlembicPanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.AssemblerPanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.CultivatorPanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.SculptorPanelPage;
+import com.chonbosmods.chemistry.impl.block.ui.RecipeProgrammerPanelPage;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshService;
 import com.chonbosmods.chemistry.impl.block.ui.PanelRefreshSystem;
 import com.chonbosmods.chemistry.impl.registry.InMemorySubstanceRegistry;
@@ -79,6 +81,7 @@ public class ChonbosChemistry extends JavaPlugin {
     private ComponentType<ChunkStore, SculptorState> sculptorComponentType;
     private ComponentType<ChunkStore, TankBlockState> tankComponentType;
     private ComponentType<ChunkStore, PipeNode> pipeComponentType;
+    private ComponentType<ChunkStore, RecipeProgrammerState> recipeProgrammerComponentType;
 
     /** Per-world cache of transport pipe networks: shared by the invalidation events and the tick. */
     private NetworkService networkService;
@@ -145,6 +148,11 @@ public class ChonbosChemistry extends JavaPlugin {
         return pipeComponentType;
     }
 
+    /** The {@link ChunkStore} component type backing the Recipe Programmer bench (holds one authored card). */
+    public ComponentType<ChunkStore, RecipeProgrammerState> recipeProgrammerComponentType() {
+        return recipeProgrammerComponentType;
+    }
+
     /** The per-world {@link NetworkService} caching pipe transport networks (used by events + tick). */
     public NetworkService networkService() {
         return networkService;
@@ -183,7 +191,9 @@ public class ChonbosChemistry extends JavaPlugin {
             .registerComponent(TankBlockState.class, "TankBlockState", TankBlockState.CODEC);
         pipeComponentType = getChunkStoreRegistry()
             .registerComponent(PipeNode.class, "PipeNode", PipeNode.CODEC);
-        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, ForgeCraftState, CookerState, OutfitterState, AlembicState, AssemblerState, CultivatorState, SculptorState, TankBlockState, PipeNode.");
+        recipeProgrammerComponentType = getChunkStoreRegistry()
+            .registerComponent(RecipeProgrammerState.class, "RecipeProgrammerState", RecipeProgrammerState.CODEC);
+        getLogger().atInfo().log("Registered ChunkStore block-entity components: MachineBlockState, ForgeCraftState, CookerState, OutfitterState, AlembicState, AssemblerState, CultivatorState, SculptorState, TankBlockState, PipeNode, RecipeProgrammerState.");
 
         // Per-tick driver: creative-refill then work pass. Must be registered AFTER the components above.
         // (No longer pushes resources to neighbors: the NetworkTickSystem below does that over pipes.)
@@ -343,6 +353,15 @@ public class ChonbosChemistry extends JavaPlugin {
             this, SculptorPanelPage.class, "CC_SculptorPanel",
             (playerRef, blockRef) -> new SculptorPanelPage(playerRef, blockRef, "Sculptor"));
         getLogger().atInfo().log("Registered CC_SculptorPanel sculptor GUI.");
+
+        // The Recipe Programmer panel (Phase 3.1 STUB): a non-machine authoring bench reading its own
+        // RecipeProgrammerState (a single loaded recipe card). The stub shows the loaded card's program as
+        // text + a Take Card button. The "CC_RecipeProgrammerPanel" id is referenced by
+        // CC_RecipeProgrammer.json's Interactions.Use (OpenCustomUI Page.Id).
+        OpenCustomUIInteraction.registerBlockEntityCustomPage(
+            this, RecipeProgrammerPanelPage.class, "CC_RecipeProgrammerPanel",
+            (playerRef, blockRef) -> new RecipeProgrammerPanelPage(playerRef, blockRef, "Recipe Programmer"));
+        getLogger().atInfo().log("Registered CC_RecipeProgrammerPanel recipe programmer GUI (stub).");
 
         // CC_Wrench (Task 9): a held tool whose Secondary interaction taps a pipe face to cycle its
         // flow state, or a machine face to cycle its port. The JSON "Type" is this registered id; the

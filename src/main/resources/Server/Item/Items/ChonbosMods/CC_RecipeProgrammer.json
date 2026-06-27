@@ -1,0 +1,49 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CC_RecipeProgrammer.name"
+  },
+  "Categories": [
+    "Furniture.Benches"
+  ],
+  "PlayerAnimationsId": "Block",
+  "BlockType": {
+    "Material": "Solid",
+    "DrawType": "Cube",
+    "Flags": {
+      "IsUsable": true
+    },
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {
+              "Id": "CC_RecipeProgrammerPanel"
+            }
+          }
+        ]
+      }
+    },
+    "Gathering": {
+      "Breaking": {
+        "GatherType": "SoftBlocks"
+      }
+    },
+    "BlockParticleSetId": "Dust",
+    "BlockSoundSetId": "Cloth",
+    "PhysicalMaterialId": "Wool",
+    "Textures": [
+      {
+        "Weight": 1,
+        "All": "BlockTextures/Cloth_White.png"
+      }
+    ],
+    "ParticleColor": "#f5f5f5",
+    "TextureComputedColor": "#EEEEEE",
+    "BlockEntity": {
+      "Components": {
+        "RecipeProgrammerState": {}
+      }
+    }
+  }
+}
