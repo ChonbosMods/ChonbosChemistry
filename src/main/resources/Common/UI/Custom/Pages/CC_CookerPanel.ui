@@ -9,8 +9,9 @@ $M = "../CC_Master.ui";
 // See docs/research/2026-06-21-vanilla-ui-measurements.md for sizing. Bars use the recolored fills shipped in
 // Common/UI/Custom/CC/ (energy = #4bfcce, smelting = #aa7c4a). Server (CookerPanelPage) sets #ProgressBar.Value
 // / #PowerBar.Value (0..1), grid Slots, and the #CardSlot item. Texture paths use ../ (resolved relative to
-// THIS file in Pages/). #UpgradePanel is built but hidden (Visible:false) until Phase 2. The card slot is
-// DISPLAY-ONLY for v1 (AreItemsDraggable: false): hand insert/remove is deferred.
+// THIS file in Pages/). #UpgradePanel is built but hidden (Visible:false) until Phase 2. The #CardSlot is now
+// INTERACTIVE (AreItemsDraggable: true + a Dropped binding): drag any inventory item onto it to load it as the
+// card, click the filled slot to take it back. This proves the inventory<->slot drag-and-drop loop.
 
 @PanelBorderColor = $M.@PanelBorderColor;
 @PanelFillColor = $M.@PanelFillColor;
@@ -107,16 +108,32 @@ $C.@PageOverlay {
             }
             Group { Anchor: (Height: 12); }
 
-            // Recipe card: single read-only slot (DISPLAY-ONLY for v1). Server sets #CardSlot.Slots.
+            // Recipe card: single INTERACTIVE slot. The player drags any item from their inventory onto it to
+            // insert it as the card (server's #CardSlot Dropped binding -> CookerPanelPage.handleDataEvent moves
+            // exactly one item from the inventory into node.card()); clicking the filled slot ejects it back to
+            // the inventory. Mirrors vanilla EntitySpawnPage's #ItemMaterialSlot (a plain droppable ItemGrid +
+            // a HitTestVisible:false drop-hint icon child shown only while empty). Server sets #CardSlot.Slots.
             Group {
               LayoutMode: Left;
 
-              ItemGrid #CardSlot {
-                Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
-                SlotsPerRow: 1;
-                AreItemsDraggable: false;
-                RenderItemQualityBackground: true;
+              Group {
                 Anchor: (Width: 72);
+
+                ItemGrid #CardSlot {
+                  Anchor: (Full: 0);
+                  Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
+                  SlotsPerRow: 1;
+                  AreItemsDraggable: true;
+                  RenderItemQualityBackground: true;
+                }
+
+                // Drop-hint icon centered over the slot; only shown while the slot is empty (server toggles
+                // #CardDropHint.Visible). HitTestVisible:false so it never swallows the drop/click on the slot.
+                Group #CardDropHint {
+                  Anchor: (Width: 24, Height: 24, Horizontal: 0, Vertical: 0);
+                  Background: "../Common/BlockSelectorSlotDropIcon.png";
+                  HitTestVisible: false;
+                }
               }
 
               Group { Anchor: (Width: 12); }

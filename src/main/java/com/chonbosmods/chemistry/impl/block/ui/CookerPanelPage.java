@@ -42,6 +42,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import org.bson.BsonDocument;
 import org.joml.Vector3d;
 
 /**
@@ -52,9 +53,13 @@ import org.joml.Vector3d;
  * vanilla bench to delegate to.
  *
  * <p>Layout mirrors the bench panel (status/controls on the LEFT, processing I/O on the RIGHT) and ADDS a
- * single-slot {@code #CardSlot} for the inserted recipe card. Like the bench panel the slots are read-only
- * display ({@code AreItemsDraggable: false}): items flow through pipes, not by hand, and the recipe card is
- * DISPLAY-ONLY for v1 (card insert/remove via hand is deferred: the card-programming UX is a later task).
+ * single-slot {@code #CardSlot} for the inserted recipe card. The I/O grids stay read-only display
+ * ({@code AreItemsDraggable: false}): items flow through pipes, not by hand. The {@code #CardSlot} is now
+ * INTERACTIVE: a player drags ANY inventory item onto it (a {@link CustomUIEventBindingType#Dropped} binding,
+ * mirroring vanilla {@code EntitySpawnPage}'s {@code #ItemMaterialSlot}) to load it into {@code node.card()},
+ * removing exactly one matching item from the inventory; clicking the filled slot (or the Eject button)
+ * returns the card to the inventory. This proves the inventory&lt;-&gt;slot drag-and-drop loop with real
+ * player-inventory transfer (capability proof: any item works; no dedicated card item yet).
  *
  * <p>The left "input" grid is NOT a push-fed input buffer: the Cooker is a demand-driven puller, so its
  * {@code held()} container holds ONLY the active craft's pulled ingredients (empty when idle, a few stacks
@@ -121,6 +126,17 @@ public final class CookerPanelPage extends InteractiveCustomUIPage<CookerPanelPa
             new EventData().append("Action", Action.TOGGLE));
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#EjectBtn",
             new EventData().append("Action", Action.EJECT));
+        // Drag any inventory item onto #CardSlot to load it as the card. The Dropped payload carries the
+        // dropped item's id under "ItemStackId" (Codec.STRING) : the same single key vanilla EntitySpawnPage's
+        // #ItemMaterialSlot Dropped binding receives. It does NOT carry the source inventory slot or quantity,
+        // so on insert we remove exactly ONE matching item by id from the player inventory (preserving its
+        // metadata). Action routes it to INSERT_CARD in handleDataEvent.
+        eventBuilder.addEventBinding(CustomUIEventBindingType.Dropped, "#CardSlot",
+            new EventData().append("Action", Action.INSERT_CARD));
+        // Clicking the (filled) card slot takes the card back into the inventory. Best-effort affordance; the
+        // Eject button also returns the card, so take-back works even if SlotClicking does not fire in-game.
+        eventBuilder.addEventBinding(CustomUIEventBindingType.SlotClicking, "#CardSlot",
+            new EventData().append("Action", Action.TAKE_CARD));
 
         World world = this.resolveWorld();
         if (world != null) {
@@ -155,11 +171,14 @@ public final class CookerPanelPage extends InteractiveCustomUIPage<CookerPanelPa
         if (world == null) {
             return;
         }
-        // Button events may arrive off the WorldThread: do all ECS work on it.
-        world.execute(() -> this.applyAction(ref, store, action));
+        String itemStackId = data.itemStackId;
+        // Button/slot events may arrive off the WorldThread: do all ECS + inventory work on it.
+        world.execute(() -> this.applyAction(ref, store, action, itemStackId));
     }
 
-    private void applyAction(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull String action) {
+    private void applyAction(
+            @Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store,
+            @Nonnull String action, String itemStackId) {
         CookerState cooker = this.cooker();
         if (cooker == null) {
             return;
@@ -169,6 +188,15 @@ public final class CookerPanelPage extends InteractiveCustomUIPage<CookerPanelPa
             this.markNeedsSaving();
         } else if (Action.EJECT.equals(action)) {
             this.eject(ref, store, cooker);
+            // Eject also returns the loaded card to the inventory : a reliable take-back affordance even if the
+            // slot-click does not fire in-game (takeCard is a no-op when no card is loaded).
+            this.takeCard(ref, store, cooker);
+            this.markNeedsSaving();
+        } else if (Action.INSERT_CARD.equals(action)) {
+            this.insertCard(ref, store, cooker, itemStackId);
+            this.markNeedsSaving();
+        } else if (Action.TAKE_CARD.equals(action)) {
+            this.takeCard(ref, store, cooker);
             this.markNeedsSaving();
         } else {
             return;
@@ -176,6 +204,85 @@ public final class CookerPanelPage extends InteractiveCustomUIPage<CookerPanelPa
         UICommandBuilder update = new UICommandBuilder();
         applyState(update);
         this.sendUpdate(update);
+    }
+
+    /**
+     * Insert one dropped item as the card. If the slot already holds a card, ignore (single-card slot). The
+     * Dropped payload gives only the item id, so we remove exactly ONE matching item by id from the player
+     * inventory (preserving its metadata) via the same {@link ItemContainerView} used by the eject path, then
+     * store that exact stack as the card. If no matching item is found (e.g. the player no longer holds it),
+     * nothing is changed : no card is set and no item is created, so there is no duplication.
+     */
+    private void insertCard(
+            @Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store,
+            @Nonnull CookerState cooker, String itemStackId) {
+        if (itemStackId == null || itemStackId.isEmpty()) {
+            return;
+        }
+        ItemStack existing = cooker.card();
+        if (existing != null && !ItemStack.isEmpty(existing)) {
+            return; // single-card slot already occupied
+        }
+        Player player = store.getComponent(ref, Player.getComponentType());
+        if (player == null) {
+            return;
+        }
+        CombinedItemContainer inventory = player.getInventory().getCombinedHotbarFirst();
+        ItemContainerView invView = new ItemContainerView(inventory);
+        // Remove exactly one of the dropped id from the player inventory. extract returns the removed count
+        // and the removed item's metadata, so the card we store round-trips byte-for-byte.
+        ContainerView.Extracted removed = invView.extract(new ItemKey(itemStackId, 1), 1, false);
+        if (removed == null || removed.amount() <= 0) {
+            return; // the player no longer holds a matching item : nothing removed, nothing set
+        }
+        ItemStack card = new ItemStack(itemStackId, 1);
+        if (removed.metadata() != null) {
+            card = card.withMetadata(removed.metadata().clone());
+        }
+        cooker.setCard(card);
+    }
+
+    /**
+     * Return the held card to the player inventory and empty the slot. Adds the exact card stack (id +
+     * metadata) back via the same inventory sink the eject path uses; if the inventory is full the card is
+     * dropped at the player's feet (overflow), so the card is never lost or duplicated. No-op when no card is
+     * loaded.
+     */
+    private void takeCard(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull CookerState cooker) {
+        ItemStack card = cooker.card();
+        if (card == null || ItemStack.isEmpty(card)) {
+            return;
+        }
+        Player player = store.getComponent(ref, Player.getComponentType());
+        if (player == null) {
+            return;
+        }
+        CombinedItemContainer inventory = player.getInventory().getCombinedHotbarFirst();
+        ItemContainerView invView = new ItemContainerView(inventory);
+        String id = card.getItemId();
+        int quantity = Math.max(1, card.getQuantity());
+        BsonDocument metadata = card.getMetadata();
+        int inserted = invView.insert(new ItemKey(id, quantity), metadata, quantity, false);
+        // Clear the card BEFORE handling overflow : the card has left the slot either into the inventory or
+        // (below) onto the ground, so the slot must empty exactly once regardless of the overflow path.
+        cooker.setCard(null);
+        int overflow = quantity - inserted;
+        if (overflow <= 0) {
+            return;
+        }
+        // Inventory full for the remainder : drop it at the player's feet (mirrors the eject overflow path).
+        TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
+        if (transform == null || transform.getPosition() == null) {
+            return; // no position to drop at; the remainder is forfeited rather than risking a crash
+        }
+        Vector3d pos = transform.getPosition();
+        ItemStack drop = new ItemStack(id, overflow);
+        if (metadata != null) {
+            drop = drop.withMetadata(metadata.clone());
+        }
+        Holder<EntityStore>[] holders = ItemComponent.generateItemDrops(
+            store, List.of(drop), new Vector3d(pos.x, pos.y, pos.z), Rotation3f.IDENTITY);
+        store.addEntities(holders, AddReason.SPAWN);
     }
 
     @Override
@@ -217,9 +324,13 @@ public final class CookerPanelPage extends InteractiveCustomUIPage<CookerPanelPa
         cmd.set("#OutputGrid.Slots", slotsOf(cooker.output()));
         cmd.set("#OutputGrid.DisplayItemQuantity", true);
 
-        // Recipe card: single read-only slot (DISPLAY-ONLY for v1; insert/remove deferred).
-        cmd.set("#CardSlot.Slots", cardSlot(cooker.card()));
+        // Recipe card: single INTERACTIVE slot. Drag any inventory item onto it to load it; click (or Eject)
+        // to take it back. Show the drop-hint icon only while the slot is empty.
+        ItemStack card = cooker.card();
+        boolean hasCard = card != null && !ItemStack.isEmpty(card);
+        cmd.set("#CardSlot.Slots", cardSlot(card));
         cmd.set("#CardSlot.DisplayItemQuantity", false);
+        cmd.set("#CardDropHint.Visible", !hasCard);
 
         // The Cooker has no tier upgrades yet (tier 0).
         cmd.set("#TierText.TextSpans", Message.raw("Tier: 0"));
@@ -380,20 +491,34 @@ public final class CookerPanelPage extends InteractiveCustomUIPage<CookerPanelPa
         return external == null ? null : external.getWorld();
     }
 
-    /** The event payload: which control fired ({@link Action#TOGGLE}/{@link Action#EJECT}). */
+    /**
+     * The event payload: which control fired ({@link Action}) and, for a {@link Action#INSERT_CARD} drop, the
+     * dropped item's id. {@code itemStackId} is populated by the client for a {@code Dropped} event on an
+     * {@link CustomUIEventBindingType#Dropped ItemGrid} under the key {@code "ItemStackId"} (Codec.STRING) :
+     * the SAME single key vanilla {@code EntitySpawnPage}'s {@code #ItemMaterialSlot} receives. The Dropped
+     * payload carries ONLY this id (no source slot/section, no quantity), so on insert we remove exactly one
+     * matching item by id from the player inventory.
+     */
     public static final class PageData {
         private String action = "";
+        private String itemStackId;
 
         public static final BuilderCodec<PageData> CODEC = BuilderCodec.builder(PageData.class, PageData::new)
             .append(new KeyedCodec<>("Action", Codec.STRING, false),
                 (o, v) -> o.action = v == null ? "" : v, o -> o.action).add()
+            .append(new KeyedCodec<>("ItemStackId", Codec.STRING, false),
+                (o, v) -> o.itemStackId = v, o -> o.itemStackId).add()
             .build();
     }
 
-    /** The two button actions, as the literal strings bound in the .ui event data. */
+    /** The control/slot actions, as the literal strings bound in the .ui event data. */
     private static final class Action {
         static final String TOGGLE = "Toggle";
         static final String EJECT = "Eject";
+        /** A player dragged an inventory item onto #CardSlot: load it as the card. */
+        static final String INSERT_CARD = "InsertCard";
+        /** A player clicked the filled #CardSlot: return the card to the inventory. */
+        static final String TAKE_CARD = "TakeCard";
 
         private Action() {
         }

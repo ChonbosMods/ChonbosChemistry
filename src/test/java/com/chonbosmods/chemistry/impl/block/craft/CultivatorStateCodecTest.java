@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hypixel.hytale.codec.EmptyExtraInfo;
+import java.util.Map;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import org.bson.BsonDocument;
 import org.bson.BsonInt32;
@@ -123,5 +124,45 @@ class CultivatorStateCodecTest {
         encoded.remove("Enabled");
         CultivatorState decoded = CultivatorState.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
         assertTrue(decoded.isEnabled());
+    }
+
+    @Test
+    void scriptProgressAndCardSigRoundTrip() {
+        CultivatorState state = new CultivatorState();
+        state.incrementScriptProgress("a");
+        state.incrementScriptProgress("a");
+        state.incrementScriptProgress("a");
+        state.incrementScriptProgress("b");
+        state.incrementScriptProgress("b");
+        state.incrementScriptProgress("b");
+        state.incrementScriptProgress("b");
+        state.incrementScriptProgress("b");
+        state.incrementScriptProgress("b");
+        state.incrementScriptProgress("b");
+        state.setLastCardSig("sig-42");
+        assertEquals(Map.of("a", 3, "b", 7), state.scriptProgress());
+
+        BsonValue encoded = CultivatorState.CODEC.encode(state, EmptyExtraInfo.EMPTY);
+        CultivatorState decoded = CultivatorState.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
+
+        assertEquals(Map.of("a", 3, "b", 7), decoded.scriptProgress());
+        assertEquals("sig-42", decoded.lastCardSig());
+    }
+
+    @Test
+    void absentScriptKeysDecodeToEmptyDefaults() {
+        CultivatorState state = new CultivatorState();
+        assertNotNull(state.scriptProgress());
+        assertTrue(state.scriptProgress().isEmpty());
+        assertEquals("", state.lastCardSig());
+
+        BsonDocument encoded = CultivatorState.CODEC.encode(state, EmptyExtraInfo.EMPTY).asDocument();
+        encoded.remove("ScriptProgress");
+        encoded.remove("CardSig");
+        CultivatorState decoded = CultivatorState.CODEC.decode(encoded, EmptyExtraInfo.EMPTY);
+
+        assertNotNull(decoded.scriptProgress());
+        assertTrue(decoded.scriptProgress().isEmpty());
+        assertEquals("", decoded.lastCardSig());
     }
 }

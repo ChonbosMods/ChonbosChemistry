@@ -9,7 +9,6 @@ import com.chonbosmods.chemistry.impl.block.SmelterEnergy;
 import com.chonbosmods.chemistry.impl.block.bench.VanillaCraftBridge;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
 import com.chonbosmods.chemistry.impl.block.net.PipeNode;
-import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Store;
@@ -23,6 +22,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.accessor.BlockAccessor;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -61,12 +61,16 @@ public final class AutoCraftEngine {
     }
 
     /**
-     * The metadata key on a recipe card carrying its allow-set (the recipe ids the machine may craft). A card
-     * with no such key imposes NO filter (a blank card crafts everything; the card-PROGRAMMING UX is
-     * deferred). Read as a {@code String[]} via {@code ItemStack.getFromMetadataOrNull}.
+     * The metadata key on a recipe card carrying its {@link RecipeScript}: the structured blueprint of which
+     * recipes the machine may craft, how many of each, and in what order. A card with no such key (or an empty
+     * script) imposes NO filter (a blank card crafts everything; see {@link #cardScript}). Read/written via
+     * {@code ItemStack.getFromMetadataOrNull} / {@code ItemStack.withMetadata}.
+     *
+     * <p>Package-private so the codec round-trip is directly testable (stamp + read a card in-test) without a
+     * separate test seam.
      */
-    private static final KeyedCodec<String[]> CARD_ALLOW =
-        new KeyedCodec<>("CC_ForgeAllow", Codec.STRING_ARRAY);
+    static final KeyedCodec<RecipeScript> CC_RECIPE_SCRIPT =
+        new KeyedCodec<>("CC_RecipeScript", RecipeScript.CODEC);
 
     /**
      * One craft step for {@code node}: source &rarr; decide &rarr; produce &rarr; drain energy &rarr; swap
@@ -85,6 +89,18 @@ public final class AutoCraftEngine {
 
         // 2. The shared (cached) bench recipe pool: stable id order + id -> recipe map.
         RecipePool pool = spec.recipePool();
+
+        // 2b. Card-change -> progress reset (every tick): resolve the inserted card's script + its signature
+        // and clear the machine's per-card progress whenever the signature changes. This covers eject (-> ""),
+        // reprogram (different entries/order/counts), and reload-mismatch. The Task-5 GUI ALSO clears on eject;
+        // this is the engine backstop. `script` (null when no/blank card) drives the script-aware candidate set
+        // (step 4b) and the scripted progress increment (step 6, COMPLETE).
+        RecipeScript script = cardScript(node.card());
+        String sig = scriptSignature(script);
+        if (!sig.equals(node.lastCardSig())) {
+            node.clearScriptProgress();
+            node.setLastCardSig(sig);
+        }
 
         // 3. State: are we mid-craft? and the energy gate (simulated craft seconds affordable this tick,
         // 0 when disabled or the buffer is empty).
@@ -153,7 +169,9 @@ public final class AutoCraftEngine {
                     for (String id : craftable) {
                         countMap.put(id, VanillaCraftBridge.ingredientCount(pool.map().get(id)));
                     }
-                    topTier = CraftSelection.topByPriority(craftable, countMap);
+                    // Script-aware candidate set: no card -> unchanged topByPriority; ordered -> the forced
+                    // single pick; unordered -> priority WITHIN the script's progress-retired active set.
+                    topTier = resolveCandidates(script, node.scriptProgress(), craftable, countMap);
                 }
             }
         }
@@ -213,6 +231,12 @@ public final class AutoCraftEngine {
                 if (r != null && VanillaCraftBridge.canProduce(node.output(), outs)) {
                     VanillaCraftBridge.addOutputs(node.output(), outs);
                     clearHeld(node); // the held ingredients are consumed by the craft
+                    // Scripted progress: count this completed craft EXACTLY ONCE, and only when a script is
+                    // active for this card (no-card path leaves progress untouched). d.pick() is the id that
+                    // just completed (the same id used to resolve `r`/`outs` above).
+                    if (script != null) {
+                        node.incrementScriptProgress(d.pick());
+                    }
                     node.setCurrentRecipeId(null);
                     node.setProgress(0f);
                     node.setLastSelectedId(d.newCursor()); // cursor advances to the crafted id
@@ -332,24 +356,96 @@ public final class AutoCraftEngine {
     }
 
     /**
-     * The DEFAULT recipe-scripting: the card's allow-set, the recipe ids it permits the machine to craft, or
-     * {@code null} for no filter. A null card (no card loaded) returns null; a card with no
-     * {@link #CARD_ALLOW} metadata also returns null (a blank card imposes no filter: the card-programming
-     * UX is deferred). Otherwise the stored {@code String[]} is returned as a {@link Set}.
+     * The {@link RecipeScript} carried in {@code card}'s metadata, or {@code null} when there is no usable
+     * script: a null/empty card, a card with no {@link #CC_RECIPE_SCRIPT} metadata, or a script with no
+     * entries ({@link RecipeScript#isEmpty()}). A blank/unprogrammed card therefore reads as {@code null}.
      *
-     * <p>A {@link Spec}'s {@code allowSet()} should delegate here unless it wants custom scripting. This is
-     * the single place richer recipe-script logic will later live.
+     * <p>This is the single place richer recipe-script logic plugs in; {@link #cardAllowSet} derives the flat
+     * allow-set from it.
+     */
+    @Nullable
+    public static RecipeScript cardScript(@Nullable ItemStack card) {
+        if (card == null || card.isEmpty()) {
+            return null;
+        }
+        RecipeScript script = card.getFromMetadataOrNull(CC_RECIPE_SCRIPT);
+        if (script == null || script.isEmpty()) {
+            return null;
+        }
+        return script;
+    }
+
+    /**
+     * The DEFAULT recipe-scripting: the card's allow-set, the recipe ids it permits the machine to craft, or
+     * {@code null} for no filter. Derived from {@link #cardScript}: a null card, a card with no script, or an
+     * empty script all yield {@code null} (no filter / allow all); otherwise the script's distinct recipe ids
+     * are returned ({@link RecipeScript#recipeIds()}).
+     *
+     * <p>The {@code null = allow-all} contract is preserved exactly: non-gated machines with a blank card
+     * still craft anything, and the Sculptor's {@code scriptGateAllowSet} still denies-all on a blank card via
+     * its own card-presence check. A {@link Spec}'s {@code allowSet()} should delegate here unless it wants
+     * custom scripting.
      */
     @Nullable
     public static Set<String> cardAllowSet(@Nullable ItemStack card) {
-        if (card == null) {
-            return null;
+        RecipeScript script = cardScript(card);
+        return (script == null) ? null : script.recipeIds();
+    }
+
+    /**
+     * The script-aware candidate set fed to {@link PullCraftStep#decide}, replacing the bare
+     * {@link CraftSelection#topByPriority} call in the IDLE branch.
+     *
+     * <ul>
+     *   <li><b>No card</b> ({@code script == null}): UNCHANGED no-card path: returns
+     *       {@code topByPriority(craftable, countMap)} exactly as before scripting existed.</li>
+     *   <li><b>Ordered script</b>: forces the single {@link ScriptSelection#orderedPick ordered pick} (list
+     *       order is the priority): a singleton, or empty when nothing in the script is active.</li>
+     *   <li><b>Unordered script</b>: most-ingredient priority WITHIN the script's
+     *       {@link ScriptSelection#activeSet active set} (finite entries retired by progress, intersected with
+     *       what is craftable now).</li>
+     * </ul>
+     *
+     * <p>When the result is empty (completed / nothing active / ordered-with-nothing-craftable),
+     * {@link PullCraftStep#decide} naturally yields IDLE: no special-casing is needed, and a finished script's
+     * active set is empty ({@link ScriptSelection#isComplete} is honored implicitly).
+     *
+     * <p>Pure (no world/ECS): unit-tested directly.
+     */
+    static Set<String> resolveCandidates(@Nullable RecipeScript script, Map<String, Integer> progress,
+            Set<String> craftable, Map<String, Integer> countMap) {
+        if (script == null) {
+            return CraftSelection.topByPriority(craftable, countMap); // UNCHANGED no-card path
         }
-        String[] allow = card.getFromMetadataOrNull(CARD_ALLOW);
-        if (allow == null || allow.length == 0) {
-            return null;
+        Set<String> active = ScriptSelection.activeSet(script, progress, craftable);
+        if (script.ordered()) {
+            String pick = ScriptSelection.orderedPick(script, active);
+            return pick == null ? java.util.Set.of() : java.util.Set.of(pick); // ordered: force the one pick
         }
-        return Set.of(allow);
+        return CraftSelection.topByPriority(active, countMap); // unordered: priority WITHIN the active set
+    }
+
+    /**
+     * A deterministic signature of {@code script} used by {@link #drive} to detect a card change (eject,
+     * reprogram, reload-mismatch) and reset the machine's progress. Equal scripts produce equal signatures;
+     * any change (incl. card removal, which maps to {@code null}) produces a different signature.
+     *
+     * <p>Form: {@code ""} for a null script (no/blank card), else {@code ordered + "|" + each entry
+     * "id:count"} joined by {@code ";"}, in the script's entry order. Pure: unit-tested directly.
+     */
+    static String scriptSignature(@Nullable RecipeScript script) {
+        if (script == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(script.ordered());
+        for (RecipeScript.Entry e : script.entries()) {
+            sb.append('|');
+            if (e != null) {
+                sb.append(e.recipeId()).append(':').append(e.count());
+            }
+        }
+        return sb.toString();
     }
 
     /**

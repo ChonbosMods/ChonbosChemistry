@@ -7,11 +7,14 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.EmptyExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The persistent ECS state the Outfitter block carries on the {@link ChunkStore}. Unlike the processing
@@ -72,6 +75,17 @@ public final class OutfitterState implements Component<ChunkStore>, AutoCraftNod
         // "Enabled" key leaves the field its true default. Mirrors MachineBlockState verbatim.
         .append(new KeyedCodec<>("Enabled", Codec.BOOLEAN, false),
                 (o, v) -> o.enabled = v, o -> o.enabled).add()
+        // Per-machine recipe-script progress (recipeId -> made-count for the inserted card). OPTIONAL
+        // (3-arg, not-required): legacy/fresh data with no "ScriptProgress" key leaves the field its empty
+        // default. MapCodec is an object codec over a String-keyed map; Codec.INTEGER values round-trip.
+        .append(new KeyedCodec<>("ScriptProgress", new MapCodec<>(Codec.INTEGER, LinkedHashMap::new), false),
+                (o, v) -> o.scriptProgress = (v != null) ? new LinkedHashMap<>(v) : new LinkedHashMap<>(),
+                o -> o.scriptProgress).add()
+        // Signature of the recipe card last seen by the engine (Task 4 compares it to detect a swap and
+        // reset progress). OPTIONAL (3-arg, not-required): absent decodes to the "" default. Codec.STRING is
+        // an object codec, so a null on encode is omitted and an absent key reaches the setter as null.
+        .append(new KeyedCodec<>("CardSig", Codec.STRING, false),
+                (o, v) -> o.lastCardSig = (v != null) ? v : "", o -> o.lastCardSig).add()
         .build();
 
     private EnergyBuffer energy;
@@ -94,6 +108,13 @@ public final class OutfitterState implements Component<ChunkStore>, AutoCraftNod
     private String lastSelectedId;
     /** On/Off control line (default ON); the circuit run/halt seam. See the "Enabled" codec key. */
     private boolean enabled = true;
+    /**
+     * Per-machine recipe-script progress for the currently-inserted card: {@code recipeId -> made-count}.
+     * Lives on the machine (not the immutable card); cleared on card eject/swap. See the "ScriptProgress" key.
+     */
+    private Map<String, Integer> scriptProgress = new LinkedHashMap<>();
+    /** Signature of the card last seen by the engine ("" when none); see the "CardSig" key and Task 4. */
+    private String lastCardSig = "";
 
     /** Public no-arg constructor for the codec supplier. */
     public OutfitterState() {
@@ -209,6 +230,37 @@ public final class OutfitterState implements Component<ChunkStore>, AutoCraftNod
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    // --- recipe-script progress (per-machine; resets on card eject/swap) ---
+
+    /** @return the live per-recipe made-count map ({@code recipeId -> made}); never null (empty when idle). */
+    @Override
+    public Map<String, Integer> scriptProgress() {
+        return scriptProgress;
+    }
+
+    @Override
+    public void incrementScriptProgress(String recipeId) {
+        scriptProgress.merge(recipeId, 1, Integer::sum);
+    }
+
+    @Override
+    public void clearScriptProgress() {
+        scriptProgress.clear();
+    }
+
+    // --- card signature (stored here; the engine computes/compares it in Task 4) ---
+
+    /** @return the signature of the card last seen by the engine ("" when none). */
+    @Override
+    public String lastCardSig() {
+        return lastCardSig;
+    }
+
+    @Override
+    public void setLastCardSig(String sig) {
+        this.lastCardSig = (sig != null) ? sig : "";
     }
 
     /**

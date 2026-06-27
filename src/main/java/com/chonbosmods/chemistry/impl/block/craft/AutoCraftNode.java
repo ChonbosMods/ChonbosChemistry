@@ -3,6 +3,8 @@ package com.chonbosmods.chemistry.impl.block.craft;
 import com.chonbosmods.chemistry.impl.block.PoweredMachineNode;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.SimpleItemContainer;
+import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * The state contract an autonomous-crafting machine exposes to the shared craft engine ({@code
@@ -23,6 +25,13 @@ public interface AutoCraftNode extends PoweredMachineNode {
     /** @return the inserted recipe card, or null if no card is loaded. */
     ItemStack card();
 
+    /**
+     * Sets (or clears, when {@code null}) the inserted recipe card. Implementations also mark their owning
+     * block needs-saving as their other mutators do. Only the Cooker panel writes this today (the interactive
+     * card slot); the other states implement it so the contract compiles uniformly.
+     */
+    void setCard(@Nullable ItemStack card);
+
     /** @return the recipe currently being crafted, or null if idle. */
     String currentRecipeId();
 
@@ -42,4 +51,35 @@ public interface AutoCraftNode extends PoweredMachineNode {
     int craftDelay();
 
     void setCraftDelay(int craftDelay);
+
+    // --- recipe-script progress (per-machine, resets on card eject/swap) ---
+
+    /**
+     * The per-recipe made-counts for the currently-inserted recipe card: a map of {@code recipeId -> made}
+     * (how many of each scripted recipe this machine has produced for the inserted card). PROGRESS lives on
+     * the MACHINE (not the immutable card); it resets when the card is ejected or swapped, and persists while
+     * the same card stays inserted.
+     *
+     * @return the live progress map; never null (empty when idle/unscripted).
+     */
+    Map<String, Integer> scriptProgress();
+
+    /**
+     * Increments the made-count for {@code recipeId} by one ({@code made[recipeId] += 1}), inserting a
+     * starting count of zero first when the id is absent.
+     */
+    void incrementScriptProgress(String recipeId);
+
+    /** Empties the progress map. Called on card eject/swap so a new card starts fresh. */
+    void clearScriptProgress();
+
+    /**
+     * @return the signature of the recipe card last seen by the engine (empty string when none). The engine
+     *     compares this to the current card's signature to detect a change and reset progress (Task 4); this
+     *     accessor only STORES it.
+     */
+    String lastCardSig();
+
+    /** Records the signature of the recipe card last seen by the engine. A null sig is stored as "". */
+    void setLastCardSig(String sig);
 }
