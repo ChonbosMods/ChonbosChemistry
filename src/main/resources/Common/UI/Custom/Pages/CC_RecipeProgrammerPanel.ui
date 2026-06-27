@@ -92,12 +92,12 @@ $C.@PageOverlay {
             Group { Anchor: (Height: 8); }
 
             // Live search box. Server binds #SearchInput (ValueChanged -> @SearchQuery). The CompactTextField
-            // id (#SearchInput) is fixed by the $C.@HeaderSearch macro; we re-anchor it to fill the column.
+            // id (#SearchInput) is fixed by the $C.@HeaderSearch macro. Invoke it EXACTLY as vanilla
+            // EntitySpawnPage does (empty body : overriding the macro's Anchor breaks the document load); the
+            // wrapper #SearchBar positions it (the macro self-anchors Width 200, Right 0 inside the bar).
             Group #SearchBar {
               Anchor: (Left: 0, Right: 0, Height: 30);
-              $C.@HeaderSearch {
-                Anchor: (Left: 0, Right: 0);
-              }
+              $C.@HeaderSearch {}
             }
             Group { Anchor: (Height: 8); }
 
