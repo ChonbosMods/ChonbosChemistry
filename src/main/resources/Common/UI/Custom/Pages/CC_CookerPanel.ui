@@ -9,9 +9,8 @@ $M = "../CC_Master.ui";
 // See docs/research/2026-06-21-vanilla-ui-measurements.md for sizing. Bars use the recolored fills shipped in
 // Common/UI/Custom/CC/ (energy = #4bfcce, smelting = #aa7c4a). Server (CookerPanelPage) sets #ProgressBar.Value
 // / #PowerBar.Value (0..1), grid Slots, and the #CardSlot item. Texture paths use ../ (resolved relative to
-// THIS file in Pages/). #UpgradePanel is built but hidden (Visible:false) until Phase 2. The #CardSlot is now
-// INTERACTIVE (AreItemsDraggable: true + a Dropped binding): drag any inventory item onto it to load it as the
-// card, click the filled slot to take it back. This proves the inventory<->slot drag-and-drop loop.
+// THIS file in Pages/). #UpgradePanel is built but hidden (Visible:false) until Phase 2. The card slot is
+// DISPLAY-ONLY for v1 (AreItemsDraggable: false): hand insert/remove is deferred.
 
 @PanelBorderColor = $M.@PanelBorderColor;
 @PanelFillColor = $M.@PanelFillColor;
@@ -108,32 +107,16 @@ $C.@PageOverlay {
             }
             Group { Anchor: (Height: 12); }
 
-            // Recipe card: single INTERACTIVE slot. The player drags any item from their inventory onto it to
-            // insert it as the card (server's #CardSlot Dropped binding -> CookerPanelPage.handleDataEvent moves
-            // exactly one item from the inventory into node.card()); clicking the filled slot ejects it back to
-            // the inventory. Mirrors vanilla EntitySpawnPage's #ItemMaterialSlot (a plain droppable ItemGrid +
-            // a HitTestVisible:false drop-hint icon child shown only while empty). Server sets #CardSlot.Slots.
+            // Recipe card: single read-only slot (DISPLAY-ONLY for v1). Server sets #CardSlot.Slots.
             Group {
               LayoutMode: Left;
 
-              Group {
+              ItemGrid #CardSlot {
+                Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
+                SlotsPerRow: 1;
+                AreItemsDraggable: false;
+                RenderItemQualityBackground: true;
                 Anchor: (Width: 72);
-
-                ItemGrid #CardSlot {
-                  Anchor: (Full: 0);
-                  Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
-                  SlotsPerRow: 1;
-                  AreItemsDraggable: true;
-                  RenderItemQualityBackground: true;
-                }
-
-                // Drop-hint icon centered over the slot; only shown while the slot is empty (server toggles
-                // #CardDropHint.Visible). HitTestVisible:false so it never swallows the drop/click on the slot.
-                Group #CardDropHint {
-                  Anchor: (Width: 24, Height: 24, Horizontal: 0, Vertical: 0);
-                  Background: "../Common/BlockSelectorSlotDropIcon.png";
-                  HitTestVisible: false;
-                }
               }
 
               Group { Anchor: (Width: 12); }
@@ -199,61 +182,6 @@ $C.@PageOverlay {
             $C.@TextButton #UpgradeBtn {
               Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
               Text: "Upgrade";
-            }
-          }
-        }
-
-        Group { Anchor: (Height: @PanelGap); }
-
-        // ---- PROBE: live player-inventory grids ----
-        // These ItemGrids are bound to the player's LIVE inventory via the native client-side element property
-        // InventorySectionId (NOT a server-pushed .Slots list): -9 = backpack, -1 = hotbar (engine constants
-        // Inventory.BACKPACK_SECTION_ID / HOTBAR_SECTION_ID). The probe asks whether the client renders the
-        // player's real, draggable items here so the player has a DRAG SOURCE for the #CardSlot above (which
-        // otherwise has no source behind an Interact-F machine panel : the player's own inventory UI is hidden).
-        // We set InventorySectionId BOTH declaratively here AND at runtime from Java (CookerPanelPage.applyState
-        // via commandBuilder.set(int overload)) so the probe maximizes the chance one path works. The server
-        // does NOT push .Slots to these grids : the section binding is supposed to populate them live. If the
-        // declarative property is ignored by the client the grids render empty (and the Java set is the fallback).
-        Group #PlayerInvPanel {
-          Anchor: (Left: 0, Right: 0);
-          Background: @PanelBorderColor;
-          Padding: (Full: 1);
-
-          Group {
-            Anchor: (Full: 0);
-            Background: @PanelFillColor;
-            LayoutMode: Top;
-            Padding: (Top: 10, Left: 14, Right: 14, Bottom: 12);
-
-            Label {
-              Style: (FontSize: @HeaderFontSize, RenderBold: true, RenderUppercase: true, TextColor: @LabelText);
-              Text: "Inventory (probe)";
-            }
-            Group { Anchor: (Height: 6); }
-            Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
-            Group { Anchor: (Height: 12); }
-
-            // Backpack (section -9). Draggable so the player can drag an item out onto #CardSlot.
-            ItemGrid #PlayerBackpack {
-              Anchor: (Left: 0, Right: 0);
-              Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
-              SlotsPerRow: 9;
-              AreItemsDraggable: true;
-              RenderItemQualityBackground: true;
-              InventorySectionId: -9;
-            }
-
-            Group { Anchor: (Height: 8); }
-
-            // Hotbar (section -1).
-            ItemGrid #PlayerHotbar {
-              Anchor: (Left: 0, Right: 0);
-              Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
-              SlotsPerRow: 9;
-              AreItemsDraggable: true;
-              RenderItemQualityBackground: true;
-              InventorySectionId: -1;
             }
           }
         }
