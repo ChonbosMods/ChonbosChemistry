@@ -73,6 +73,27 @@ public final class AutoCraftEngine {
         new KeyedCodec<>("CC_RecipeScript", RecipeScript.CODEC);
 
     /**
+     * Stamp {@code script} into {@code card}'s metadata under {@link #CC_RECIPE_SCRIPT}, returning the new
+     * stamped {@link ItemStack} ({@code ItemStack.withMetadata} is copy-on-write: the input is untouched).
+     * This is the <b>canonical stamp path</b>: it is the single public seam for writing a recipe script onto a
+     * card, so callers never need the package-private {@link #CC_RECIPE_SCRIPT} key. Today it backs the
+     * {@code /cc-script} debug command; the future programmer bench will mint cards the same way.
+     *
+     * <p>The round-trip reads back via {@link #cardScript(ItemStack)} (a blank/empty script reads as
+     * {@code null}). NOTE: {@code withMetadata} writes correctly in-game but NPEs in the headless test JVM
+     * (no item registry), so this is exercised in-game / via {@code cardScript} on a hand-built stack, not by
+     * stamping a live {@code ItemStack} in a unit test.
+     *
+     * @param card   the card stack to stamp (e.g. a fresh {@code CC_RecipeScript}); not mutated
+     * @param script the blueprint to write
+     * @return a new stamped copy of {@code card}
+     */
+    @Nonnull
+    public static ItemStack writeScript(@Nonnull ItemStack card, @Nonnull RecipeScript script) {
+        return card.withMetadata(CC_RECIPE_SCRIPT, script);
+    }
+
+    /**
      * One craft step for {@code node}: source &rarr; decide &rarr; produce &rarr; drain energy &rarr; swap
      * the block visual. Mutates the node + the block. NEVER throws (guard internally; the caller's
      * catch-Throwable is the backstop).

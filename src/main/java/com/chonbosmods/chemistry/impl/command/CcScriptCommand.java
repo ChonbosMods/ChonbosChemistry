@@ -1,0 +1,100 @@
+package com.chonbosmods.chemistry.impl.command;
+
+import com.chonbosmods.chemistry.impl.block.craft.AutoCraftEngine;
+import com.chonbosmods.chemistry.impl.block.craft.RecipeScript;
+import com.chonbosmods.chemistry.impl.block.craft.RecipeScriptArgs;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.command.system.CommandContext;
+import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
+import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
+import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.transaction.ItemStackTransaction;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import java.util.List;
+import javax.annotation.Nonnull;
+
+/**
+ * Debug command {@code /cc-script}: mint a {@code CC_RecipeScript} card stamped with a chosen
+ * {@link RecipeScript} and hand it to the commanding player, so the recipe-script engine
+ * ({@link AutoCraftEngine}) can be exercised in-game before the (future) programmer bench exists.
+ *
+ * <h2>Syntax</h2>
+ * <pre>{@code  /cc-script [ordered] <recipeId[:count]> [recipeId[:count] ...]}</pre>
+ * An optional leading {@code ordered} token makes the script an ordered run-list (else an unordered
+ * whitelist); each remaining token is a recipe id with an optional {@code :count} ({@code count} omitted or
+ * {@code <= 0} = infinite). Example: {@code /cc-script ordered ironbar:5 nail} mints an ordered card that
+ * crafts 5 iron bars then nails forever.
+ *
+ * <h2>Threading</h2>
+ * This extends {@link AbstractPlayerCommand}, whose {@code execute(...)} body the engine already runs through
+ * {@code world.execute(...)} (the {@link World} is the executor). So all the player / inventory work below is
+ * on the WorldThread, satisfying the project's off-WorldThread command rule without an explicit wrap. The
+ * pure token parsing happens BEFORE that hop (it touches no world state).
+ */
+public final class CcScriptCommand extends AbstractPlayerCommand {
+
+    /** The item id of the recipe-script card (matches {@code Server/Item/Items/ChonbosMods/CC_RecipeScript.json}). */
+    public static final String CARD_ITEM_ID = "CC_RecipeScript";
+
+    /** Usage line shown on a parse failure (no translation key: this is a dev-only debug command). */
+    private static final String USAGE =
+        "Usage: /cc-script [ordered] <recipeId[:count]> [recipeId[:count] ...]  "
+        + "(count omitted or 0 = infinite). Example: /cc-script ordered ironbar:5 nail";
+
+    @Nonnull
+    private final RequiredArg<List<String>> tokensArg = this.withListRequiredArg(
+        "script", "The recipe script: an optional leading 'ordered', then recipeId[:count] tokens",
+        ArgTypes.STRING);
+
+    public CcScriptCommand() {
+        super("cc-script", "Give yourself a CC_RecipeScript card stamped with a recipe script (debug)");
+    }
+
+    @Override
+    protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store,
+            @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
+        // Parse FIRST (pure, no world state): on bad args, fail with usage feedback before touching anything.
+        List<String> tokens = this.tokensArg.get(context);
+        RecipeScript script;
+        try {
+            script = RecipeScriptArgs.parse(tokens);
+        } catch (RecipeScriptArgs.ParseException ex) {
+            context.sendMessage(Message.raw("Bad recipe script: " + ex.getMessage()));
+            context.sendMessage(Message.raw(USAGE));
+            return;
+        }
+
+        Player player = store.getComponent(ref, Player.getComponentType());
+        if (player == null) {
+            context.sendMessage(Message.raw("Could not resolve your player entity."));
+            return;
+        }
+
+        // Mint a fresh card (qty 1) and stamp it via the canonical AutoCraftEngine.writeScript path (the same
+        // seam the future programmer bench will use). withMetadata is copy-on-write: `stamped` carries the
+        // CC_RecipeScript metadata the auto-crafters read back via AutoCraftEngine.cardScript.
+        ItemStack card = new ItemStack(CARD_ITEM_ID, 1);
+        ItemStack stamped = AutoCraftEngine.writeScript(card, script);
+
+        // Give it hotbar-first; the engine's giveItem returns the unplaced remainder when the inventory is
+        // full. We don't silently destroy it: report the remainder so the player knows to free a slot.
+        ItemStackTransaction transaction = player.giveItem(stamped, ref, store);
+        ItemStack remainder = transaction.getRemainder();
+
+        context.sendMessage(Message.raw("Recipe script: " + RecipeScriptArgs.describe(script)));
+        if (remainder != null && !remainder.isEmpty()) {
+            context.sendMessage(Message.raw(
+                "Inventory full: could not give the " + script.entries().size()
+                + "-entry recipe script card. Free a slot and retry."));
+        } else {
+            context.sendMessage(Message.raw(
+                "Gave " + script.entries().size() + "-entry recipe script card."));
+        }
+    }
+}
