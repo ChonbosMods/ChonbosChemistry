@@ -1,0 +1,31 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CC_RecipeScript.name",
+    "Description": "server.items.CC_RecipeScript.description"
+  },
+  "Categories": [
+    "Items.Tools"
+  ],
+  "Icon": "Icons/ItemsGenerated/Tool_Hammer_Crude.png",
+  "Quality": "Common",
+  "MaxStack": 16,
+  "Interactions": {
+    "Primary": "Block_Primary",
+    "Secondary": {
+      "Interactions": [
+        {
+          "Type": "cc_recipe_card",
+          "UseLatestTarget": true
+        }
+      ]
+    }
+  },
+  "Tags": {
+    "Type": [
+      "Tool"
+    ]
+  },
+  "BlockSelectorTool": {
+    "DurabilityLossOnUse": 0.0
+  }
+}

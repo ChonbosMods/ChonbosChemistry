@@ -17,8 +17,10 @@ import com.chonbosmods.chemistry.impl.block.craft.SculptorTickSystem;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeCraftState;
 import com.chonbosmods.chemistry.impl.block.craft.ForgeTickSystem;
 import com.chonbosmods.chemistry.impl.block.CarryBreakEventSystem;
+import com.chonbosmods.chemistry.impl.command.CcScriptCommand;
 import com.chonbosmods.chemistry.impl.block.MachineTickSystem;
 import com.chonbosmods.chemistry.impl.block.TankBlockState;
+import com.chonbosmods.chemistry.impl.block.RecipeCardInteraction;
 import com.chonbosmods.chemistry.impl.block.WrenchInteraction;
 import com.chonbosmods.chemistry.impl.block.net.NetworkService;
 import com.chonbosmods.chemistry.impl.block.net.NetworkTickSystem;
@@ -348,6 +350,20 @@ public class ChonbosChemistry extends JavaPlugin {
         getCodecRegistry(Interaction.CODEC).register(
             "cc_wrench", WrenchInteraction.class, WrenchInteraction.CODEC);
         getLogger().atInfo().log("Registered cc_wrench interaction (CC_Wrench pipe/machine face config).");
+
+        // CC_RecipeScript: a held card whose Secondary interaction inserts (or swaps) the card into a CC
+        // auto-crafter machine's card slot. Like the wrench, the item must set "UseLatestTarget": true and
+        // be tool-like (BlockSelectorTool) so the targeted blockPos flows through to interactWithBlock.
+        getCodecRegistry(Interaction.CODEC).register(
+            "cc_recipe_card", RecipeCardInteraction.class, RecipeCardInteraction.CODEC);
+        getLogger().atInfo().log("Registered cc_recipe_card interaction (CC_RecipeScript insert/swap).");
+
+        // Debug command /cc-script: mint a CC_RecipeScript card stamped with a chosen RecipeScript and give
+        // it to the commanding player, so the recipe-script engine can be exercised in-game before the (future)
+        // programmer bench exists. It extends AbstractPlayerCommand, whose execute() body the engine already
+        // runs through world.execute(...) (off-WorldThread command rule satisfied).
+        getCommandRegistry().registerCommand(new CcScriptCommand());
+        getLogger().atInfo().log("Registered /cc-script debug command (mint stamped recipe-script cards).");
 
         // Live panel refresh (2026-06-05 design): pages register with the service after a successful
         // build; this query-less per-world pulse refreshes them every 10th tick on the WorldThread.
