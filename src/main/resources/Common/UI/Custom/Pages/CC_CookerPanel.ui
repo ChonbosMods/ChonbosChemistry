@@ -202,6 +202,61 @@ $C.@PageOverlay {
             }
           }
         }
+
+        Group { Anchor: (Height: @PanelGap); }
+
+        // ---- PROBE: live player-inventory grids ----
+        // These ItemGrids are bound to the player's LIVE inventory via the native client-side element property
+        // InventorySectionId (NOT a server-pushed .Slots list): -9 = backpack, -1 = hotbar (engine constants
+        // Inventory.BACKPACK_SECTION_ID / HOTBAR_SECTION_ID). The probe asks whether the client renders the
+        // player's real, draggable items here so the player has a DRAG SOURCE for the #CardSlot above (which
+        // otherwise has no source behind an Interact-F machine panel : the player's own inventory UI is hidden).
+        // We set InventorySectionId BOTH declaratively here AND at runtime from Java (CookerPanelPage.applyState
+        // via commandBuilder.set(int overload)) so the probe maximizes the chance one path works. The server
+        // does NOT push .Slots to these grids : the section binding is supposed to populate them live. If the
+        // declarative property is ignored by the client the grids render empty (and the Java set is the fallback).
+        Group #PlayerInvPanel {
+          Anchor: (Left: 0, Right: 0);
+          Background: @PanelBorderColor;
+          Padding: (Full: 1);
+
+          Group {
+            Anchor: (Full: 0);
+            Background: @PanelFillColor;
+            LayoutMode: Top;
+            Padding: (Top: 10, Left: 14, Right: 14, Bottom: 12);
+
+            Label {
+              Style: (FontSize: @HeaderFontSize, RenderBold: true, RenderUppercase: true, TextColor: @LabelText);
+              Text: "Inventory (probe)";
+            }
+            Group { Anchor: (Height: 6); }
+            Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
+            Group { Anchor: (Height: 12); }
+
+            // Backpack (section -9). Draggable so the player can drag an item out onto #CardSlot.
+            ItemGrid #PlayerBackpack {
+              Anchor: (Left: 0, Right: 0);
+              Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
+              SlotsPerRow: 9;
+              AreItemsDraggable: true;
+              RenderItemQualityBackground: true;
+              InventorySectionId: -9;
+            }
+
+            Group { Anchor: (Height: 8); }
+
+            // Hotbar (section -1).
+            ItemGrid #PlayerHotbar {
+              Anchor: (Left: 0, Right: 0);
+              Style: ItemGridStyle(SlotSize: @SlotSize, SlotIconSize: @SlotIconSize, SlotSpacing: @SlotSpacing, SlotBackground: "../Common/BlockSelectorSlotBackground.png");
+              SlotsPerRow: 9;
+              AreItemsDraggable: true;
+              RenderItemQualityBackground: true;
+              InventorySectionId: -1;
+            }
+          }
+        }
       }
 
       Group { Anchor: (Width: @PanelGap); }

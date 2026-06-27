@@ -121,6 +121,15 @@ public final class CookerPanelPage extends InteractiveCustomUIPage<CookerPanelPa
             @Nonnull Store<EntityStore> store) {
         commandBuilder.append("Pages/CC_CookerPanel.ui");
         commandBuilder.set("#PanelTitle.TextSpans", Message.raw(this.title));
+        // PROBE (Java fallback for the live player-inventory grids): bind the two probe ItemGrids to the
+        // player's LIVE inventory sections via the native client element property InventorySectionId
+        // (-9 = backpack, -1 = hotbar : Inventory.BACKPACK_SECTION_ID / HOTBAR_SECTION_ID). This duplicates the
+        // declarative InventorySectionId set in CC_CookerPanel.ui so the probe maximizes the chance one path
+        // works : if the client ignores the .ui property it may still honor this runtime set (int overload of
+        // UICommandBuilder.set). Sent ONCE at build (the binding is static); we never push .Slots to these grids
+        // (the section binding is meant to populate them live).
+        commandBuilder.set("#PlayerBackpack.InventorySectionId", -9);
+        commandBuilder.set("#PlayerHotbar.InventorySectionId", -1);
         applyState(commandBuilder);
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#PowerToggle",
             new EventData().append("Action", Action.TOGGLE));
