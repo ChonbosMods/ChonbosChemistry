@@ -2,9 +2,14 @@ package com.chonbosmods.chemistry.impl.block.ui;
 
 import com.chonbosmods.chemistry.ChonbosChemistry;
 import com.chonbosmods.chemistry.impl.block.RecipeProgrammerState;
+import com.chonbosmods.chemistry.impl.block.bench.VanillaCraftBridge;
 import com.chonbosmods.chemistry.impl.block.craft.AutoCraftEngine;
+import com.chonbosmods.chemistry.impl.block.craft.MachineRecipePools;
+import com.chonbosmods.chemistry.impl.block.craft.MachineRecipePools.Machine;
+import com.chonbosmods.chemistry.impl.block.craft.RecipeBrowse;
+import com.chonbosmods.chemistry.impl.block.craft.RecipePool;
 import com.chonbosmods.chemistry.impl.block.craft.RecipeScript;
-import com.chonbosmods.chemistry.impl.block.craft.RecipeScriptArgs;
+import com.chonbosmods.chemistry.impl.block.craft.RecipeScript.Entry;
 import com.chonbosmods.chemistry.impl.block.net.item.ItemContainerView;
 import com.chonbosmods.chemistry.impl.block.net.item.ItemKey;
 import com.hypixel.hytale.codec.Codec;
@@ -20,6 +25,7 @@ import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.asset.type.item.config.CraftingRecipe;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -27,6 +33,7 @@ import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
+import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -36,28 +43,39 @@ import com.hypixel.hytale.server.core.universe.world.chunk.BlockChunk;
 import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.bson.BsonDocument;
 import org.joml.Vector3d;
 
 /**
- * The STUB panel for the Recipe Programmer bench ({@code Pages/CC_RecipeProgrammerPanel.ui}). Phase 3.1: a
- * minimal read-only view that proves the bench + card-load loop end-to-end. It reads the loaded card off the
- * block's {@link RecipeProgrammerState} and shows the card's program as TEXT (via
- * {@link AutoCraftEngine#cardScript} + {@link RecipeScriptArgs#describe}), plus a single <b>Take Card</b>
- * button that returns the loaded card to the player and clears the slot.
+ * The Recipe Programmer bench panel ({@code Pages/CC_RecipeProgrammerPanel.ui}). Phase 3.2: the recipe
+ * BROWSER : a machine-filter button-bar, a live search box, a scrolling + CAPPED recipe list, and the loaded
+ * card's current program (read-only). Clicking a recipe row ADDS that recipe (infinite count) to the loaded
+ * card's program by re-stamping the card via {@link AutoCraftEngine#writeScript}. Plus the P3.1 Take Card
+ * button. Editing counts / removing / reordering is P3.3 (not here).
  *
- * <p>The full authoring GUI (machine-filter tabs, search, the scrolling recipe browser, count steppers, the
- * ordered toggle, Duplicate) is later phases (P3.2-P3.4). Here there is no progress, no engine, no live tick
- * : the panel re-pushes itself manually after the Take Card button fires.
+ * <p>Mirrors vanilla {@code EntitySpawnPage}: the button-bar (Activating + Style/Visible toggle), the
+ * {@code CompactTextField #SearchInput} (ValueChanged -&gt; {@code @SearchQuery}), and the runtime
+ * {@code TopScrolling} list ({@code clear} + per-row {@code append} of {@code Common/TextButton.ui} +
+ * per-row Activating binding carrying the recipe id).
  *
- * <p><b>Threading:</b> mirrors {@link CookerPanelPage} : {@link #build} runs on the WorldThread; button
- * events ({@link #handleDataEvent}) may arrive off it, so the ECS mutations are wrapped in
- * {@link World#execute(Runnable)}.
+ * <p><b>SCALE (the one real risk).</b> The Sculptor pool is ~911 recipes and there is no list virtualization.
+ * {@link #buildRecipeList} ALWAYS filters (machine scope + search) and then hard-caps to
+ * {@link RecipeBrowse#ROW_CAP} via {@link RecipeBrowse#filterAndCap} BEFORE appending a single row : the full
+ * pool is never rendered, even on an empty query. A "showing N of M" note appears when capped.
+ *
+ * <p><b>Threading:</b> {@link #build} runs on the WorldThread; event handlers may arrive off it, so every
+ * ECS / card mutation (and the asset-registry reads in {@link #buildRecipeList}) runs on
+ * {@link World#execute(Runnable)}. Nothing here throws on the page thread.
  */
 public final class RecipeProgrammerPanelPage
         extends InteractiveCustomUIPage<RecipeProgrammerPanelPage.PageData> {
+
+    /** Active vs inactive machine-filter button styles (vanilla Common.ui button styles). */
+    private static final Value<String> TAB_STYLE_ACTIVE = Value.ref("Common.ui", "DefaultTextButtonStyle");
+    private static final Value<String> TAB_STYLE_INACTIVE = Value.ref("Common.ui", "SecondaryTextButtonStyle");
 
     @Nonnull
     private final Ref<ChunkStore> blockRef;
@@ -67,6 +85,13 @@ public final class RecipeProgrammerPanelPage
     private final ComponentType<ChunkStore, BlockModule.BlockStateInfo> blockInfoType =
         BlockModule.BlockStateInfo.getComponentType();
     private final ComponentType<ChunkStore, BlockChunk> blockChunkType = BlockChunk.getComponentType();
+
+    /** The machine whose recipe pool the browser is currently scoped to (defaults to the first machine). */
+    @Nonnull
+    private Machine activeMachine = MachineRecipePools.MACHINES.get(0);
+    /** The current (lowercased, trimmed) search query; empty = match all (still capped). */
+    @Nonnull
+    private String searchQuery = "";
 
     public RecipeProgrammerPanelPage(
             @Nonnull PlayerRef playerRef,
@@ -85,41 +110,263 @@ public final class RecipeProgrammerPanelPage
             @Nonnull Store<EntityStore> store) {
         commandBuilder.append("Pages/CC_RecipeProgrammerPanel.ui");
         commandBuilder.set("#PanelTitle.TextSpans", Message.raw(this.title));
-        applyState(commandBuilder);
+
+        // Machine-filter button-bar: one Activating binding per machine (payload = MachineId).
+        for (Machine m : MachineRecipePools.MACHINES) {
+            eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, machineBtnSelector(m),
+                new EventData().append("Type", EventType.MACHINE).append("MachineId", m.id()), false);
+        }
+        // Live search (ValueChanged resolves the field's current value into @SearchQuery).
+        eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, "#SearchInput",
+            new EventData().append("Type", EventType.SEARCH).append("@SearchQuery", "#SearchInput.Value"), false);
+        // Take Card (P3.1).
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#TakeCard",
-            new EventData().append("Action", Action.TAKE_CARD));
+            new EventData().append("Type", EventType.TAKE_CARD), false);
+
+        this.updateMachineStyles(commandBuilder);
+        this.buildRecipeList(commandBuilder, eventBuilder);
+        this.buildProgram(commandBuilder);
     }
 
     @Override
     public void handleDataEvent(
             @Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull PageData data) {
-        String action = data.action;
-        if (action == null) {
+        String type = data.type;
+        if (type == null || type.isEmpty()) {
             return;
         }
         World world = this.resolveWorld();
         if (world == null) {
             return;
         }
-        // Button events may arrive off the WorldThread: do all ECS work on it.
-        world.execute(() -> this.applyAction(ref, store, action));
+        // Events may arrive off the WorldThread: do all ECS + asset-registry work on it.
+        world.execute(() -> {
+            try {
+                this.handleOnWorld(ref, store, data);
+            } catch (Throwable ignored) {
+                // never let a browser event crash the world thread
+            }
+        });
     }
 
-    private void applyAction(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull String action) {
+    /** Route a decoded event on the WorldThread. Guarded by the caller's catch-Throwable. */
+    private void handleOnWorld(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, @Nonnull PageData data) {
+        switch (data.type) {
+            case EventType.SEARCH -> {
+                String q = data.searchQuery == null ? "" : data.searchQuery.trim();
+                this.searchQuery = q;
+                UICommandBuilder cmd = new UICommandBuilder();
+                UIEventBuilder evt = new UIEventBuilder();
+                this.buildRecipeList(cmd, evt);
+                this.sendUpdate(cmd, evt, false);
+            }
+            case EventType.MACHINE -> {
+                Machine m = MachineRecipePools.byId(data.machineId);
+                if (m == null || m == this.activeMachine) {
+                    return;
+                }
+                this.activeMachine = m;
+                this.searchQuery = "";
+                UICommandBuilder cmd = new UICommandBuilder();
+                UIEventBuilder evt = new UIEventBuilder();
+                this.updateMachineStyles(cmd);
+                cmd.set("#SearchInput.Value", "");
+                this.buildRecipeList(cmd, evt);
+                this.sendUpdate(cmd, evt, false);
+            }
+            case EventType.ADD_RECIPE -> this.addRecipe(ref, store, data.recipeId);
+            case EventType.TAKE_CARD -> this.takeCardAction(ref, store);
+            default -> { /* unknown event: ignore */ }
+        }
+    }
+
+    // ----------------------------------------------------------------------------------------------------
+    // Browser : machine filter + search + capped list
+    // ----------------------------------------------------------------------------------------------------
+
+    /** Set each machine-filter button's Style (active vs inactive) for the current {@link #activeMachine}. */
+    private void updateMachineStyles(@Nonnull UICommandBuilder cmd) {
+        for (Machine m : MachineRecipePools.MACHINES) {
+            boolean active = m == this.activeMachine;
+            cmd.set(machineBtnSelector(m) + ".Style", active ? TAB_STYLE_ACTIVE : TAB_STYLE_INACTIVE);
+        }
+    }
+
+    /**
+     * Rebuild {@code #RecipeList} for the active machine + search query. <b>Filters + caps BEFORE rendering</b>
+     * (see class doc / {@link RecipeBrowse#filterAndCap}): the pool's recipes are mapped to rows, filtered by
+     * {@link #searchQuery}, truncated to {@link RecipeBrowse#ROW_CAP}, then cleared + re-appended one row at a
+     * time. Each row is a {@code Common/TextButton.ui} carrying an Activating binding that adds the recipe.
+     * Runs on the WorldThread (resolves recipe outputs against the asset registry).
+     */
+    private void buildRecipeList(@Nonnull UICommandBuilder cmd, @Nonnull UIEventBuilder evt) {
+        cmd.clear("#RecipeList");
+
+        List<RecipeBrowse.Row> candidates = this.candidateRows();
+        RecipeBrowse.Result result = RecipeBrowse.filterAndCap(candidates, this.searchQuery, RecipeBrowse.ROW_CAP);
+
+        List<RecipeBrowse.Row> rows = result.rows();
+        for (int i = 0; i < rows.size(); i++) {
+            RecipeBrowse.Row row = rows.get(i);
+            String selector = "#RecipeList[" + i + "]";
+            cmd.append("#RecipeList", "Common/TextButton.ui");
+            cmd.set(selector + " #Button.Text", row.label());
+            evt.addEventBinding(CustomUIEventBindingType.Activating, selector + " #Button",
+                new EventData().append("Type", EventType.ADD_RECIPE).append("RecipeId", row.recipeId()), false);
+        }
+
+        // "showing N of M (refine search)" : only when capped.
+        if (result.isCapped()) {
+            cmd.set("#ListNote.Text",
+                "Showing " + rows.size() + " of " + result.totalMatched() + " (refine search)");
+            cmd.set("#ListNote.Visible", true);
+        } else {
+            cmd.set("#ListNote.Text", "");
+            cmd.set("#ListNote.Visible", false);
+        }
+    }
+
+    /**
+     * Map the active machine's pool to browser rows in the pool's stable id order. The pool resolves against
+     * the live recipe registry; each recipe's row label is its primary output item id (fallback: recipe id)
+     * via {@link RecipeBrowse#rowLabel}. Guarded : a recipe whose outputs cannot be read still yields a row.
+     */
+    @Nonnull
+    private List<RecipeBrowse.Row> candidateRows() {
+        RecipePool pool = MachineRecipePools.pool(this.activeMachine);
+        List<RecipeBrowse.Row> rows = new ArrayList<>(pool.stableOrder().size());
+        for (String recipeId : pool.stableOrder()) {
+            if (recipeId == null) {
+                continue;
+            }
+            rows.add(new RecipeBrowse.Row(recipeId, RecipeBrowse.rowLabel(recipeId, outputItemIds(pool, recipeId))));
+        }
+        return rows;
+    }
+
+    /** The output item ids of {@code recipeId} in {@code pool}, or an empty list (guarded against any throw). */
+    @Nonnull
+    private static List<String> outputItemIds(@Nonnull RecipePool pool, @Nonnull String recipeId) {
+        try {
+            CraftingRecipe recipe = pool.map().get(recipeId);
+            if (recipe == null) {
+                return List.of();
+            }
+            List<ItemStack> outputs = VanillaCraftBridge.outputs(recipe);
+            if (outputs == null || outputs.isEmpty()) {
+                return List.of();
+            }
+            List<String> ids = new ArrayList<>(outputs.size());
+            for (ItemStack stack : outputs) {
+                if (stack != null && stack.getItemId() != null) {
+                    ids.add(stack.getItemId());
+                }
+            }
+            return ids;
+        } catch (Throwable ignored) {
+            return List.of();
+        }
+    }
+
+    /** The selector for a machine-filter button (matches the .ui ids {@code #MachineBtn_<id>}). */
+    @Nonnull
+    private static String machineBtnSelector(@Nonnull Machine m) {
+        return "#MachineBtn_" + m.id();
+    }
+
+    // ----------------------------------------------------------------------------------------------------
+    // Program : read-only entries + click-to-add + take card
+    // ----------------------------------------------------------------------------------------------------
+
+    /**
+     * Add {@code recipeId} to the loaded card's program as an INFINITE entry (count 0), de-duped (an already
+     * present recipe is a no-op), by re-stamping the card via {@link AutoCraftEngine#writeScript}. Then
+     * rebuilds the program view so the add lands visibly. No-op when no recipe id / no card is loaded.
+     */
+    private void addRecipe(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, String recipeId) {
+        if (recipeId == null || recipeId.isEmpty()) {
+            return;
+        }
         RecipeProgrammerState state = this.programmer();
         if (state == null) {
             return;
         }
-        if (Action.TAKE_CARD.equals(action)) {
-            this.takeCard(ref, store, state);
-            this.markNeedsSaving();
-        } else {
+        ItemStack card = state.card();
+        if (card == null || ItemStack.isEmpty(card)) {
             return;
         }
-        // Manual re-push (no live PanelRefreshService for the stub).
-        UICommandBuilder update = new UICommandBuilder();
-        applyState(update);
-        this.sendUpdate(update);
+        RecipeScript current = AutoCraftEngine.cardScript(card);
+        List<Entry> entries = new ArrayList<>();
+        boolean ordered = false;
+        if (current != null) {
+            ordered = current.ordered();
+            for (Entry e : current.entries()) {
+                if (e != null && e.recipeId() != null) {
+                    if (e.recipeId().equals(recipeId)) {
+                        return; // already in the program: adding again is a no-op
+                    }
+                    entries.add(e);
+                }
+            }
+        }
+        entries.add(new Entry(recipeId, 0)); // 0 = infinite
+        RecipeScript next = new RecipeScript(ordered, entries);
+        ItemStack stamped = AutoCraftEngine.writeScript(card, next);
+        state.setCard(stamped);
+        this.markNeedsSaving();
+
+        UICommandBuilder cmd = new UICommandBuilder();
+        this.buildProgram(cmd);
+        this.sendUpdate(cmd);
+    }
+
+    /** Take Card action: return the loaded card + rebuild the program view. */
+    private void takeCardAction(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
+        RecipeProgrammerState state = this.programmer();
+        if (state == null) {
+            return;
+        }
+        this.takeCard(ref, store, state);
+        this.markNeedsSaving();
+        UICommandBuilder cmd = new UICommandBuilder();
+        this.buildProgram(cmd);
+        this.sendUpdate(cmd);
+    }
+
+    /**
+     * Populate the program status line ({@code #ProgramText}) + the read-only entries list
+     * ({@code #ProgramList}) from the loaded card. Null-safe: no card / blank card render gracefully.
+     */
+    private void buildProgram(@Nonnull UICommandBuilder cmd) {
+        cmd.clear("#ProgramList");
+        RecipeProgrammerState state = this.programmer();
+        ItemStack card = state == null ? null : state.card();
+
+        if (card == null || ItemStack.isEmpty(card)) {
+            cmd.set("#ProgramText.TextSpans", Message.raw("No card loaded."));
+            return;
+        }
+        RecipeScript script = AutoCraftEngine.cardScript(card);
+        if (script == null || script.isEmpty()) {
+            cmd.set("#ProgramText.TextSpans", Message.raw("Blank card (no program)."));
+            return;
+        }
+
+        List<Entry> entries = script.entries();
+        cmd.set("#ProgramText.TextSpans",
+            Message.raw((script.ordered() ? "Ordered" : "Whitelist") + " : " + entries.size() + " entr"
+                + (entries.size() == 1 ? "y" : "ies")));
+
+        for (int i = 0; i < entries.size(); i++) {
+            Entry e = entries.get(i);
+            if (e == null || e.recipeId() == null) {
+                continue;
+            }
+            String selector = "#ProgramList[" + i + "]";
+            String countLabel = RecipeScript.isInfinite(e) ? "x∞" : "x" + e.count();
+            cmd.append("#ProgramList", "Common/TextButton.ui");
+            cmd.set(selector + " #Button.Text", e.recipeId() + "  " + countLabel);
+        }
     }
 
     /** Resolve the Programmer's {@link RecipeProgrammerState}, or null if the block is gone / not ours. */
@@ -129,30 +376,6 @@ public final class RecipeProgrammerPanelPage
         }
         return this.blockRef.getStore()
             .getComponent(this.blockRef, ChonbosChemistry.getInstance().recipeProgrammerComponentType());
-    }
-
-    /** Populate the panel's program-text label from the loaded card. Null-safe throughout. */
-    private void applyState(@Nonnull UICommandBuilder cmd) {
-        RecipeProgrammerState state = this.programmer();
-        if (state == null) {
-            return;
-        }
-        cmd.set("#ProgramText.TextSpans", Message.raw(programText(state.card())));
-    }
-
-    /**
-     * The human-readable program text for {@code card}: "No card loaded." when no card is present, "Blank
-     * card (no program)." when a card is loaded but carries no script, else the {@code describe} string.
-     */
-    private static String programText(ItemStack card) {
-        if (card == null || ItemStack.isEmpty(card)) {
-            return "No card loaded.";
-        }
-        RecipeScript script = AutoCraftEngine.cardScript(card);
-        if (script == null) {
-            return "Blank card (no program).";
-        }
-        return RecipeScriptArgs.describe(script);
     }
 
     /**
@@ -200,7 +423,7 @@ public final class RecipeProgrammerPanelPage
         store.addEntities(holders, AddReason.SPAWN);
     }
 
-    /** Mark the Programmer's chunk needing-save after a card take (WrenchInteraction pattern). */
+    /** Mark the Programmer's chunk needing-save after a card mutation (WrenchInteraction pattern). */
     private void markNeedsSaving() {
         try {
             World world = this.resolveWorld();
@@ -240,21 +463,33 @@ public final class RecipeProgrammerPanelPage
         return external == null ? null : external.getWorld();
     }
 
-    /** The event payload: which control fired ({@link Action#TAKE_CARD}). */
+    /** The event payload: which control fired + its parameters (machine id / search text / recipe id). */
     public static final class PageData {
-        private String action = "";
+        private String type = "";
+        private String machineId;
+        private String searchQuery;
+        private String recipeId;
 
         public static final BuilderCodec<PageData> CODEC = BuilderCodec.builder(PageData.class, PageData::new)
-            .append(new KeyedCodec<>("Action", Codec.STRING, false),
-                (o, v) -> o.action = v == null ? "" : v, o -> o.action).add()
+            .append(new KeyedCodec<>("Type", Codec.STRING, false),
+                (o, v) -> o.type = v == null ? "" : v, o -> o.type).add()
+            .append(new KeyedCodec<>("MachineId", Codec.STRING, false),
+                (o, v) -> o.machineId = v, o -> o.machineId).add()
+            .append(new KeyedCodec<>("@SearchQuery", Codec.STRING, false),
+                (o, v) -> o.searchQuery = v, o -> o.searchQuery).add()
+            .append(new KeyedCodec<>("RecipeId", Codec.STRING, false),
+                (o, v) -> o.recipeId = v, o -> o.recipeId).add()
             .build();
     }
 
-    /** The one button action, as the literal string bound in the .ui event data. */
-    private static final class Action {
+    /** The event types, as the literal {@code Type} strings bound in the .ui event data. */
+    private static final class EventType {
+        static final String MACHINE = "Machine";
+        static final String SEARCH = "Search";
+        static final String ADD_RECIPE = "AddRecipe";
         static final String TAKE_CARD = "TakeCard";
 
-        private Action() {
+        private EventType() {
         }
     }
 }
