@@ -11,23 +11,17 @@ import javax.annotation.Nonnull;
  * machinery (the command is thin glue that parses, stamps, and gives; this is the brain).
  *
  * <h2>Grammar</h2>
- * <pre>{@code  [ordered] recipeId[:count] recipeId[:count] ...}</pre>
+ * <pre>{@code  recipeId[:count] recipeId[:count] ...}</pre>
  * <ul>
- *   <li>An optional leading {@code ordered} token (case-insensitive) makes the resulting script an ordered
- *       run-list; anything else (or its absence) yields an unordered whitelist.</li>
- *   <li>Each remaining token is a {@code recipeId} optionally suffixed with {@code :count}. An omitted count,
- *       a {@code :0}, or any non-positive/blank count means INFINITE ({@code count <= 0}; see
- *       {@link RecipeScript}). A positive count is a finite target.</li>
+ *   <li>Each token is a {@code recipeId} optionally suffixed with {@code :count}. An omitted count, a
+ *       {@code :0}, or any non-positive/blank count means INFINITE ({@code count <= 0}; see
+ *       {@link RecipeScript}). A positive count is a finite amount.</li>
  *   <li>At least one recipe entry is required; tokens that are blank or have a blank id are rejected.</li>
  * </ul>
  *
- * <p>Examples: {@code "ordered a:5 b"} &rarr; ordered, {@code [a x5, b xINF]}; {@code "a b:2"} &rarr;
- * unordered, {@code [a xINF, b x2]}.
+ * <p>Examples: {@code "a:5 b"} &rarr; {@code [a x5, b xINF]}; {@code "a b:2"} &rarr; {@code [a xINF, b x2]}.
  */
 public final class RecipeScriptArgs {
-
-    /** The leading keyword that flips the script into an ordered run-list (case-insensitive). */
-    public static final String ORDERED_TOKEN = "ordered";
 
     private RecipeScriptArgs() {
     }
@@ -42,8 +36,7 @@ public final class RecipeScriptArgs {
     /**
      * Parse {@code tokens} into a {@link RecipeScript} per the class grammar.
      *
-     * @param tokens the raw command tokens (an optional leading {@code ordered}, then one or more
-     *               {@code recipeId[:count]}); null is treated as empty
+     * @param tokens the raw command tokens (one or more {@code recipeId[:count]}); null is treated as empty
      * @return the parsed script (never null)
      * @throws ParseException when there is no recipe entry, or a token is malformed (blank id, non-integer
      *                        count)
@@ -62,21 +55,11 @@ public final class RecipeScriptArgs {
             throw new ParseException("no recipe ids given");
         }
 
-        boolean ordered = false;
-        int start = 0;
-        if (ORDERED_TOKEN.equalsIgnoreCase(work.get(0))) {
-            ordered = true;
-            start = 1;
-        }
-        if (start >= work.size()) {
-            throw new ParseException("'" + ORDERED_TOKEN + "' must be followed by at least one recipe id");
-        }
-
         List<Entry> entries = new ArrayList<>();
-        for (int i = start; i < work.size(); i++) {
-            entries.add(parseEntry(work.get(i)));
+        for (String token : work) {
+            entries.add(parseEntry(token));
         }
-        return new RecipeScript(ordered, entries);
+        return new RecipeScript(entries);
     }
 
     /** Parse a single {@code recipeId[:count]} token into an {@link Entry} ({@code count <= 0} = infinite). */
@@ -104,13 +87,12 @@ public final class RecipeScriptArgs {
     }
 
     /**
-     * A compact human-readable description of {@code script} for chat feedback: {@code "ordered: a x5, b
-     * x∞"} / {@code "unordered: a x∞"}. Pure (id + count formatting), so it is unit-tested alongside
-     * {@link #parse}.
+     * A compact human-readable description of {@code script} for chat feedback: {@code "a x5, b x∞"}. Pure
+     * (id + count formatting), so it is unit-tested alongside {@link #parse}.
      */
     @Nonnull
     public static String describe(@Nonnull RecipeScript script) {
-        StringBuilder sb = new StringBuilder(script.ordered() ? "ordered: " : "unordered: ");
+        StringBuilder sb = new StringBuilder();
         List<Entry> entries = script.entries();
         for (int i = 0; i < entries.size(); i++) {
             Entry e = entries.get(i);

@@ -24,11 +24,10 @@ import javax.annotation.Nonnull;
  * ({@link AutoCraftEngine}) can be exercised in-game before the (future) programmer bench exists.
  *
  * <h2>Syntax</h2>
- * <pre>{@code  /cc-script [ordered] <recipeId[:count]> [recipeId[:count] ...]}</pre>
- * An optional leading {@code ordered} token makes the script an ordered run-list (else an unordered
- * whitelist); each remaining token is a recipe id with an optional {@code :count} ({@code count} omitted or
- * {@code <= 0} = infinite). Example: {@code /cc-script ordered ironbar:5 nail} mints an ordered card that
- * crafts 5 iron bars then nails forever.
+ * <pre>{@code  /cc-script <recipeId[:count]> [recipeId[:count] ...]}</pre>
+ * Each token is a recipe id with an optional {@code :count} ({@code count} omitted or {@code <= 0} =
+ * infinite). Example: {@code /cc-script ironbar:5 nail} mints a card that crafts 5 iron bars (finite, first)
+ * then nails forever (infinite, round-robin).
  *
  * <h2>Threading</h2>
  * This extends {@link AbstractPlayerCommand}, whose {@code execute(...)} body the engine already runs through
@@ -39,7 +38,7 @@ import javax.annotation.Nonnull;
  * <h2>Argument capture</h2>
  * The arg framework only groups space-separated tokens into a single list arg when the user wraps them in
  * {@code [a, b, c]} or comma-separates them (see {@code ParserContext}); a {@code withListRequiredArg(STRING)}
- * therefore captures only the FIRST bare token of {@code /cc-script ordered a:5 b c}. So instead we declare no
+ * therefore captures only the FIRST bare token of {@code /cc-script a:5 b c}. So instead we declare no
  * required args, opt into {@link #setAllowsExtraArguments(boolean) extra arguments}, and recover the whole
  * rest-of-line ourselves via {@code CommandUtil.stripCommandName(getInputString()).split("\\s+")} : the same
  * proven pattern the vanilla {@code /notify} command uses for free-form multi-token input.
@@ -51,8 +50,8 @@ public final class CcScriptCommand extends AbstractPlayerCommand {
 
     /** Usage line shown on a parse failure (no translation key: this is a dev-only debug command). */
     private static final String USAGE =
-        "Usage: /cc-script [ordered] <recipeId[:count]> [recipeId[:count] ...]  "
-        + "(count omitted or 0 = infinite). Example: /cc-script ordered ironbar:5 nail";
+        "Usage: /cc-script <recipeId[:count]> [recipeId[:count] ...]  "
+        + "(count omitted or 0 = infinite). Example: /cc-script ironbar:5 nail";
 
     public CcScriptCommand() {
         super("cc-script", "Give yourself a CC_RecipeScript card stamped with a recipe script (debug)");

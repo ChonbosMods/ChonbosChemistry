@@ -58,8 +58,8 @@ class RecipeScriptTest {
     // --- metadata round-trip ---
 
     @Test
-    void metadataRoundTripsOrderedFlagAndEntriesInOrder() {
-        RecipeScript script = new RecipeScript(true, List.of(
+    void metadataRoundTripsEntriesInOrder() {
+        RecipeScript script = new RecipeScript(List.of(
             new RecipeScript.Entry("a", 0),
             new RecipeScript.Entry("b", 5),
             new RecipeScript.Entry("c", -1)));
@@ -67,7 +67,6 @@ class RecipeScriptTest {
         ItemStack card = programmedCard(script);
         RecipeScript read = card.getFromMetadataOrNull(AutoCraftEngine.CC_RECIPE_SCRIPT);
 
-        assertTrue(read.ordered());
         assertEquals(3, read.entries().size());
         assertEquals("a", read.entries().get(0).recipeId());
         assertEquals(0, read.entries().get(0).count());
@@ -77,11 +76,24 @@ class RecipeScriptTest {
         assertEquals(-1, read.entries().get(2).count());
     }
 
+    /**
+     * A legacy card carrying an extra "Ordered" key still decodes: the model no longer declares that key, so
+     * the unknown key is harmlessly ignored and the entries round-trip intact.
+     */
     @Test
-    void metadataRoundTripsUnorderedFlag() {
-        RecipeScript script = new RecipeScript(false, List.of(new RecipeScript.Entry("x", 1)));
-        RecipeScript read = programmedCard(script).getFromMetadataOrNull(AutoCraftEngine.CC_RECIPE_SCRIPT);
-        assertFalse(read.ordered());
+    void legacyOrderedKeyIsIgnoredOnDecode() {
+        BsonDocument meta = new BsonDocument();
+        AutoCraftEngine.CC_RECIPE_SCRIPT.put(meta,
+            new RecipeScript(List.of(new RecipeScript.Entry("x", 1))), EmptyExtraInfo.EMPTY);
+        // Splice a stray legacy "Ordered" flag into the stamped script document.
+        BsonDocument scriptDoc = meta.getDocument("CC_RecipeScript");
+        scriptDoc.append("Ordered", org.bson.BsonBoolean.TRUE);
+
+        RecipeScript read = stack("CC_RecipeCard", 1, meta)
+            .getFromMetadataOrNull(AutoCraftEngine.CC_RECIPE_SCRIPT);
+        assertEquals(1, read.entries().size());
+        assertEquals("x", read.entries().get(0).recipeId());
+        assertEquals(1, read.entries().get(0).count());
     }
 
     // --- cardScript ---
@@ -98,16 +110,15 @@ class RecipeScriptTest {
 
     @Test
     void cardScriptEmptyScriptCardIsNull() {
-        ItemStack card = programmedCard(new RecipeScript(false, List.of()));
+        ItemStack card = programmedCard(new RecipeScript(List.of()));
         assertNull(AutoCraftEngine.cardScript(card));
     }
 
     @Test
     void cardScriptProgrammedCardReadsBack() {
-        RecipeScript script = new RecipeScript(true, List.of(new RecipeScript.Entry("a", 2)));
+        RecipeScript script = new RecipeScript(List.of(new RecipeScript.Entry("a", 2)));
         RecipeScript read = AutoCraftEngine.cardScript(programmedCard(script));
         assertEquals(Set.of("a"), read.recipeIds());
-        assertTrue(read.ordered());
     }
 
     // --- cardAllowSet (null = allow-all contract) ---
@@ -120,13 +131,13 @@ class RecipeScriptTest {
 
     @Test
     void cardAllowSetEmptyScriptIsNull() {
-        ItemStack card = programmedCard(new RecipeScript(false, List.of()));
+        ItemStack card = programmedCard(new RecipeScript(List.of()));
         assertNull(AutoCraftEngine.cardAllowSet(card));
     }
 
     @Test
     void cardAllowSetProgrammedCardYieldsDistinctIds() {
-        RecipeScript script = new RecipeScript(false, List.of(
+        RecipeScript script = new RecipeScript(List.of(
             new RecipeScript.Entry("a", 0),
             new RecipeScript.Entry("b", 5),
             new RecipeScript.Entry("c", 0)));
@@ -145,7 +156,7 @@ class RecipeScriptTest {
 
     @Test
     void recipeIdsAreDistinctAndOrderPreserving() {
-        RecipeScript script = new RecipeScript(false, List.of(
+        RecipeScript script = new RecipeScript(List.of(
             new RecipeScript.Entry("c", 1),
             new RecipeScript.Entry("a", 1),
             new RecipeScript.Entry("c", 2),
@@ -156,16 +167,16 @@ class RecipeScriptTest {
 
     @Test
     void isEmptyReflectsEntries() {
-        assertTrue(new RecipeScript(false, List.of()).isEmpty());
-        assertTrue(new RecipeScript(false, null).isEmpty());
-        assertFalse(new RecipeScript(false, List.of(new RecipeScript.Entry("a", 1))).isEmpty());
+        assertTrue(new RecipeScript(List.of()).isEmpty());
+        assertTrue(new RecipeScript(null).isEmpty());
+        assertFalse(new RecipeScript(List.of(new RecipeScript.Entry("a", 1))).isEmpty());
     }
 
     @Test
     void entriesAreDefensivelyCopied() {
         java.util.List<RecipeScript.Entry> mutable = new java.util.ArrayList<>();
         mutable.add(new RecipeScript.Entry("a", 1));
-        RecipeScript script = new RecipeScript(false, mutable);
+        RecipeScript script = new RecipeScript(mutable);
         mutable.add(new RecipeScript.Entry("b", 1));
         assertEquals(1, script.entries().size());
     }
