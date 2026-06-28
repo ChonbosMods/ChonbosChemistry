@@ -5,10 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import com.hypixel.hytale.protocol.BenchRequirement;
 import com.hypixel.hytale.server.core.asset.type.item.config.CraftingRecipe;
 import com.hypixel.hytale.server.core.inventory.MaterialQuantity;
 import java.util.List;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -110,5 +113,62 @@ class VanillaCraftBridgeTest {
         assertEquals(1, result.get(0).getQuantity());
         assertEquals("Meats", result.get(1).getResourceTypeId(),
             "resource-type category must survive in order");
+    }
+
+    // ----------------------------------------------------------------------------------------------------
+    // displayFor : the pure resource-handling branch (the AssetStore-backed resolver is in-game-only, so it
+    // is supplied here as a fake Function<String,String>). Itemed entries pass through; resource-type
+    // ("any <resource>") entries resolve to a representative or, failing that, the fallback : never dropped.
+    // ----------------------------------------------------------------------------------------------------
+
+    /** A fake resolver: "Meats" -> a representative meat item id; everything else unresolved. */
+    private static final Function<String, String> FAKE_REP =
+        id -> "Meats".equals(id) ? "Food_Beef_Raw" : null;
+
+    @Test
+    void displayFor_itemedEntry_passesThroughItemIdAndQuantity() {
+        VanillaCraftBridge.InputDisplay spec =
+            VanillaCraftBridge.displayFor(item("Ingredient_Dough", 4), FAKE_REP, "Plant_Fruit_Apple");
+        assertEquals("Ingredient_Dough", spec.itemId());
+        assertEquals(4, spec.quantity());
+    }
+
+    @Test
+    void displayFor_resourceWithRepresentative_usesRepresentativeAtQuantity() {
+        VanillaCraftBridge.InputDisplay spec =
+            VanillaCraftBridge.displayFor(resource("Meats", 3), FAKE_REP, "Plant_Fruit_Apple");
+        assertEquals("Food_Beef_Raw", spec.itemId(), "a resolved representative is shown");
+        assertEquals(3, spec.quantity());
+    }
+
+    @Test
+    void displayFor_resourceWithoutRepresentative_fallsBackButStillShows() {
+        // "Rubble" has no representative from FAKE_REP : the fallback keeps the slot non-empty (not dropped).
+        VanillaCraftBridge.InputDisplay spec =
+            VanillaCraftBridge.displayFor(resource("Rubble", 4), FAKE_REP, "Plant_Fruit_Apple");
+        assertEquals("Plant_Fruit_Apple", spec.itemId(), "unresolved resource falls back, never dropped");
+        assertEquals(4, spec.quantity());
+    }
+
+    @Test
+    void displayFor_resourceWithoutRepresentativeOrFallback_yieldsNoItem() {
+        // No representative AND no fallback : nothing to render (itemId null), but quantity is still carried.
+        VanillaCraftBridge.InputDisplay spec =
+            VanillaCraftBridge.displayFor(resource("Rubble", 2), FAKE_REP, null);
+        assertNull(spec.itemId());
+    }
+
+    @Test
+    void displayFor_nullResolver_resourceFallsBack() {
+        VanillaCraftBridge.InputDisplay spec =
+            VanillaCraftBridge.displayFor(resource("Meats", 1), null, "Plant_Fruit_Apple");
+        assertEquals("Plant_Fruit_Apple", spec.itemId(), "a null resolver still falls back, never dropped");
+    }
+
+    @Test
+    void displayFor_nullMaterial_yieldsNoItem() {
+        VanillaCraftBridge.InputDisplay spec =
+            VanillaCraftBridge.displayFor(null, FAKE_REP, "Plant_Fruit_Apple");
+        assertNull(spec.itemId(), "a null material renders nothing");
     }
 }

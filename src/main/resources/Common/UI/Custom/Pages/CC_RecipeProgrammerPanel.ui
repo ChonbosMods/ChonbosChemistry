@@ -101,13 +101,23 @@ $C.@PageOverlay {
             Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
             Group { Anchor: (Height: 8); }
 
-            // Live search box. Server binds #SearchInput (ValueChanged -> @SearchQuery). The CompactTextField
-            // id (#SearchInput) is fixed by the $C.@HeaderSearch macro. Invoke it EXACTLY as vanilla
-            // EntitySpawnPage does (empty body : overriding the macro's Anchor breaks the document load); the
-            // wrapper #SearchBar positions it (the macro self-anchors Width 200, Right 0 inside the bar).
-            Group #SearchBar {
-              Anchor: (Left: 0, Right: 0, Height: 30);
-              $C.@HeaderSearch {}
+            // Live search box : a FULL-WIDTH input spanning the recipes column, with the standard recessed
+            // dark input background (Common/InputBox.png, via the $C.@TextField macro's @InputBoxBackground)
+            // and a left search icon. We invoke the proven $C.@TextField macro and set its @Anchor parameter
+            // (its supported override hook : NOT overriding any internal anchor : the verbatim full-width
+            // pattern used by PrefabBrowser.ui / ImageImportPage.ui's "$C.@TextField #SearchInput"). The id
+            // #SearchInput is kept (the page binds ValueChanged on it). The search-icon Decoration + left
+            // padding mirror the CompactTextField inside $C.@HeaderSearch.
+            $C.@TextField #SearchInput {
+              @Anchor = (Left: 0, Right: 0);
+              PlaceholderText: %server.customUI.searchPlaceholder;
+              Padding: (Horizontal: 12, Left: 34);
+              Decoration: (
+                Default: (
+                  Icon: (Texture: "../Common/SearchIcon.png", Width: 16, Height: 16, Offset: 9),
+                  ClearButtonStyle: $C.@ClearButtonStyle
+                )
+              );
             }
             Group { Anchor: (Height: 8); }
 
@@ -173,17 +183,17 @@ $C.@PageOverlay {
             // The selected recipe's INPUT ingredients as a scrolling ICON GRID (Fuel stripped : CC machines
             // burn energy). Server sets #IngredientGrid.Slots to ItemGridSlot[] of each input stack; xN
             // required-quantity shows via DisplayItemQuantity. Cleared when nothing is selected. Scroll attrs
-            // copied from #RecipeGrid; modest 40px slots.
+            // copied from #RecipeGrid; same @GridSlotSize (80px) as #RecipeGrid, 2 per row to fit the column.
             ItemGrid #IngredientGrid {
               Anchor: (Left: 0, Right: 0);
               FlexWeight: 1;
-              SlotsPerRow: 4;
+              SlotsPerRow: 2;
               AreItemsDraggable: false;
               ShowScrollbar: true;
               RenderItemQualityBackground: false;
               Style: (
-                SlotSize: 40,
-                SlotIconSize: 40,
+                SlotSize: @GridSlotSize,
+                SlotIconSize: @GridSlotSize,
                 SlotSpacing: @GridSlotGap,
                 SlotBackground: "../Common/BlockSelectorSlotBackground.png"
               );
@@ -235,11 +245,22 @@ $C.@PageOverlay {
             }
             Group { Anchor: (Height: 8); }
 
-            // Add / select status line (server-set; e.g. "Added to card." / "No card loaded.").
+            // Select status line : shown ONLY for genuine errors (e.g. "No card loaded." / "Select a recipe
+            // first."). The positive "added" feedback is intentionally not shown (the program grid updates
+            // visibly). Server-set.
             Label #SelectStatus {
               Anchor: (Left: 0, Right: 0);
               Style: (FontSize: 12, TextColor: @LabelText, Wrap: true);
               Text: "";
+            }
+            Group { Anchor: (Height: 10); }
+
+            // ADD TO CARD : the primary (blue) action button, panel-local at the BOTTOM of the select pane
+            // (a normal full-width button like CC_CookerPanel's #PowerToggle). Server binds #AddToCard
+            // (Activating + @Count). A real Anchor (Height) : never a bare FlexWeight.
+            $C.@TextButton #AddToCard {
+              @Anchor = (Left: 0, Right: 0, Height: @ButtonHeight);
+              @Text = "Add To Card";
             }
           }
         }
@@ -277,51 +298,32 @@ $C.@PageOverlay {
             // The current program entries as an ICON GRID (one slot per entry = the recipe's primary output;
             // finite entries show "icon xN", infinite entries show a bare icon). DisplayItemQuantity renders
             // the finite counts. Double-clicking a slot fires SlotDoubleClicking (the client auto-injects
-            // SlotIndex, same as SlotClicking) -> the server removes that entry. Attrs match #RecipeGrid.
+            // SlotIndex, same as SlotClicking) -> the server removes that entry. Attrs match #RecipeGrid
+            // (same @GridSlotSize, 2 per row to fit the column).
             ItemGrid #ProgramGrid {
               Anchor: (Left: 0, Right: 0);
               FlexWeight: 1;
-              SlotsPerRow: 4;
+              SlotsPerRow: 2;
               AreItemsDraggable: false;
               ShowScrollbar: true;
               RenderItemQualityBackground: false;
               Style: (
-                SlotSize: 40,
-                SlotIconSize: 40,
+                SlotSize: @GridSlotSize,
+                SlotIconSize: @GridSlotSize,
                 SlotSpacing: @GridSlotGap,
                 SlotBackground: "../Common/BlockSelectorSlotBackground.png"
               );
             }
+            Group { Anchor: (Height: 10); }
+
+            // TAKE CARD : panel-local at the BOTTOM of the program pane. Returns the loaded card to the
+            // player (clears the slot). Server binds #TakeCard (Activating). A real Anchor (Height) : never
+            // a bare FlexWeight.
+            $C.@CancelTextButton #TakeCard {
+              Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+              Text: "Take Card";
+            }
           }
-        }
-      }
-
-      Group { Anchor: (Height: @ContentPad); }
-
-      // --- Shared bottom button row: Add To Card + Take Card on ONE line. Both buttons carry FlexWeight 1
-      //     directly (proven: EntitySpawnPage's #TabNPC/#TabItems/#TabModel put FlexWeight straight on the
-      //     macro-invoked button, never on an empty wrapper group), split by a fixed-width spacer (a spacer
-      //     WITH an Anchor, like every vanilla gap). No empty childless flex groups. Server binds #AddToCard
-      //     (Activating + @Count) and #TakeCard (Activating). Each button gets a real Anchor (Height) like
-      //     CC_CookerPanel's #PowerToggle/#EjectBtn. ---
-      Group #BottomButtons {
-        Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
-        LayoutMode: Left;
-
-        // ADD TO CARD : the primary (blue) action button. Server binds #AddToCard (Activating + @Count).
-        $C.@TextButton #AddToCard {
-          @Anchor = (Height: @ButtonHeight);
-          @Text = "Add To Card";
-          FlexWeight: 1;
-        }
-
-        Group { Anchor: (Width: @ContentPad); }
-
-        // Return the loaded card to the player (clears the slot). Server binds #TakeCard (Activating).
-        $C.@CancelTextButton #TakeCard {
-          Anchor: (Height: @ButtonHeight);
-          Text: "Take Card";
-          FlexWeight: 1;
         }
       }
     }

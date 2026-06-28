@@ -395,8 +395,9 @@ public final class RecipeProgrammerPanelPage
      * Populate the ingredient ICON GRID ({@code #IngredientGrid}) from the selected recipe's INPUT
      * ingredients (Fuel stripped : CC machines burn ENERGY), one {@link ItemGridSlot} per
      * {@link ItemStack} returned by {@link VanillaCraftBridge#displayInputs} (so "xN" required-quantity
-     * shows via {@code DisplayItemQuantity}). Resource-type categories that resolve to no representative
-     * item are simply absent (the bridge skips them). Guarded : any read failure clears the grid.
+     * shows via {@code DisplayItemQuantity}). Resource-type ("any &lt;resource&gt;") categories render a
+     * representative item of that category (or a fallback placeholder), so they SHOW rather than being
+     * skipped. Guarded : any read failure clears the grid.
      */
     private void buildIngredients(@Nonnull UICommandBuilder cmd, @Nonnull RecipePool pool) {
         List<ItemGridSlot> slots = new ArrayList<>();
@@ -465,8 +466,11 @@ public final class RecipeProgrammerPanelPage
         state.setCard(stamped);
         this.markNeedsSaving();
 
+        // The positive "added/updated" feedback is intentionally NOT shown : the program grid updates
+        // visibly, so the success message was redundant. #SelectStatus is reserved for genuine errors
+        // ("No card loaded." / "Select a recipe first.") : clear any stale error on a successful add.
         UICommandBuilder cmd = new UICommandBuilder();
-        cmd.set("#SelectStatus.Text", replaced ? "Updated on card." : "Added to card.");
+        cmd.set("#SelectStatus.Text", "");
         this.buildProgram(cmd);
         this.sendUpdate(cmd);
     }
