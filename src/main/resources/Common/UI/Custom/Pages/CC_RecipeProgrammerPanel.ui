@@ -210,7 +210,7 @@ $C.@PageOverlay {
               Label {
                 Anchor: (Width: 56);
                 Text: "Count";
-                Style: (...$C.@DefaultLabelStyle, VerticalAlignment: Center);
+                Style: (FontSize: 13, TextColor: @LabelText, VerticalAlignment: Center);
               }
 
               $C.@SecondaryTextButton #CountDown {
@@ -308,36 +308,30 @@ $C.@PageOverlay {
 
       Group { Anchor: (Height: @ContentPad); }
 
-      // --- Shared bottom button row: Add To Card (middle column) + Take Card (right column) on ONE line.
-      //     A left spacer matches the left browser column's FlexWeight (3) so the two buttons sit under the
-      //     middle + right columns; each button column carries FlexWeight 2 to mirror its panel above. Server
-      //     binds #AddToCard (Activating + @Count) and #TakeCard (Activating). ---
+      // --- Shared bottom button row: Add To Card + Take Card on ONE line. Both buttons carry FlexWeight 1
+      //     directly (proven: EntitySpawnPage's #TabNPC/#TabItems/#TabModel put FlexWeight straight on the
+      //     macro-invoked button, never on an empty wrapper group), split by a fixed-width spacer (a spacer
+      //     WITH an Anchor, like every vanilla gap). No empty childless flex groups. Server binds #AddToCard
+      //     (Activating + @Count) and #TakeCard (Activating). Each button gets a real Anchor (Height) like
+      //     CC_CookerPanel's #PowerToggle/#EjectBtn. ---
       Group #BottomButtons {
         Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
         LayoutMode: Left;
 
-        Group { FlexWeight: 3; }
-
-        Group { Anchor: (Width: @ContentPad); }
-
         // ADD TO CARD : the primary (blue) action button. Server binds #AddToCard (Activating + @Count).
-        Group {
-          FlexWeight: 2;
-          $C.@TextButton #AddToCard {
-            @Anchor = (Left: 0, Right: 0, Height: @ButtonHeight);
-            @Text = "Add To Card";
-          }
+        $C.@TextButton #AddToCard {
+          @Anchor = (Height: @ButtonHeight);
+          @Text = "Add To Card";
+          FlexWeight: 1;
         }
 
         Group { Anchor: (Width: @ContentPad); }
 
         // Return the loaded card to the player (clears the slot). Server binds #TakeCard (Activating).
-        Group {
-          FlexWeight: 2;
-          $C.@CancelTextButton #TakeCard {
-            Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
-            Text: "Take Card";
-          }
+        $C.@CancelTextButton #TakeCard {
+          Anchor: (Height: @ButtonHeight);
+          Text: "Take Card";
+          FlexWeight: 1;
         }
       }
     }
