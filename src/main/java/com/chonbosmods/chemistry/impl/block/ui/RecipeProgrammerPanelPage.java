@@ -268,10 +268,10 @@ public final class RecipeProgrammerPanelPage
         }
     }
 
-    /** The selector for a machine-filter button (matches the .ui ids {@code #MachineBtn_<id>}). */
+    /** The selector for a machine-filter button (matches the .ui ids {@code #MachineBtn<id>}). */
     @Nonnull
     private static String machineBtnSelector(@Nonnull Machine m) {
-        return "#MachineBtn_" + m.id();
+        return "#MachineBtn" + m.id();
     }
 
     // ----------------------------------------------------------------------------------------------------
