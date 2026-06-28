@@ -125,4 +125,62 @@ class RecipeBrowseTest {
     void rowCap_isReasonablePositive() {
         assertTrue(RecipeBrowse.ROW_CAP > 0 && RecipeBrowse.ROW_CAP <= 100);
     }
+
+    // --- primaryOutputId ---
+
+    @Test
+    void primaryOutputId_firstNonBlank() {
+        assertEquals("Apple", RecipeBrowse.primaryOutputId(Arrays.asList(null, "  ", "Apple", "Other")));
+    }
+
+    @Test
+    void primaryOutputId_nullWhenNoneResolvable() {
+        org.junit.jupiter.api.Assertions.assertNull(RecipeBrowse.primaryOutputId(null));
+        org.junit.jupiter.api.Assertions.assertNull(RecipeBrowse.primaryOutputId(List.of()));
+        org.junit.jupiter.api.Assertions.assertNull(RecipeBrowse.primaryOutputId(Arrays.asList(null, "   ")));
+    }
+
+    // --- humanize ---
+
+    @Test
+    void humanize_stripsPrefixAndTitleCases() {
+        assertEquals("Crystal Blue", RecipeBrowse.humanize("Ingredient_Crystal_Blue"));
+        assertEquals("Apple", RecipeBrowse.humanize("Plant_Apple"));
+        assertEquals("Iron Ingot", RecipeBrowse.humanize("Item_Iron_Ingot"));
+    }
+
+    @Test
+    void humanize_dropsNamespacePrefix() {
+        assertEquals("Oak Log", RecipeBrowse.humanize("hytale:Block_Oak_Log"));
+    }
+
+    @Test
+    void humanize_blankYieldsEmpty() {
+        assertEquals("", RecipeBrowse.humanize(null));
+        assertEquals("", RecipeBrowse.humanize("   "));
+    }
+
+    @Test
+    void humanize_plainIdTitleCased() {
+        assertEquals("Mug", RecipeBrowse.humanize("Mug"));
+        assertEquals("Some Thing", RecipeBrowse.humanize("some_thing"));
+    }
+
+    // --- recipeAtSlot (slot index -> recipe mapping) ---
+
+    @Test
+    void recipeAtSlot_mapsIndexToRecipeId() {
+        List<Row> rows = List.of(row("r0", "A"), row("r1", "B"), row("r2", "C"));
+        assertEquals("r0", RecipeBrowse.recipeAtSlot(rows, 0));
+        assertEquals("r2", RecipeBrowse.recipeAtSlot(rows, 2));
+    }
+
+    @Test
+    void recipeAtSlot_outOfRangeIsNull() {
+        List<Row> rows = List.of(row("r0", "A"));
+        org.junit.jupiter.api.Assertions.assertNull(RecipeBrowse.recipeAtSlot(rows, -1));
+        org.junit.jupiter.api.Assertions.assertNull(RecipeBrowse.recipeAtSlot(rows, 1));
+        org.junit.jupiter.api.Assertions.assertNull(RecipeBrowse.recipeAtSlot(null, 0));
+        org.junit.jupiter.api.Assertions.assertNull(RecipeBrowse.recipeAtSlot(List.of(), 0));
+    }
 }

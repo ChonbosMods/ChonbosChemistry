@@ -33,6 +33,7 @@ import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
+import com.hypixel.hytale.server.core.ui.ItemGridSlot;
 import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -50,20 +51,30 @@ import org.bson.BsonDocument;
 import org.joml.Vector3d;
 
 /**
- * The Recipe Programmer bench panel ({@code Pages/CC_RecipeProgrammerPanel.ui}). Phase 3.2: the recipe
- * BROWSER : a machine-filter button-bar, a live search box, a scrolling + CAPPED recipe list, and the loaded
- * card's current program (read-only). Clicking a recipe row ADDS that recipe (infinite count) to the loaded
- * card's program by re-stamping the card via {@link AutoCraftEngine#writeScript}. Plus the P3.1 Take Card
- * button. Editing counts / removing / reordering is P3.3 (not here).
+ * The Recipe Programmer bench panel ({@code Pages/CC_RecipeProgrammerPanel.ui}). Three columns toward the
+ * native crafting-bench look:
  *
- * <p>Mirrors vanilla {@code EntitySpawnPage}: the button-bar (Activating + Style/Visible toggle), the
- * {@code CompactTextField #SearchInput} (ValueChanged -&gt; {@code @SearchQuery}), and the runtime
- * {@code TopScrolling} list ({@code clear} + per-row {@code append} of {@code Common/TextButton.ui} +
- * per-row Activating binding carrying the recipe id).
+ * <ul>
+ *   <li><b>LEFT : an ICON GRID browser.</b> A machine-filter button-bar + live search drives a filtered +
+ *       CAPPED list of recipes (via {@link RecipeBrowse#filterAndCap}); the kept rows are rendered into an
+ *       {@code ItemGrid #RecipeGrid} as {@link ItemGridSlot}s of the recipe's PRIMARY output stack (icon +
+ *       quantity). Clicking a slot fires {@code SlotClicking} (the client auto-injects the {@code SlotIndex}),
+ *       which selects that recipe.</li>
+ *   <li><b>MIDDLE : a select / count / add pane.</b> The selected recipe's output display NAME, a
+ *       {@code NumberField #Count} (0 = infinite), and a blue {@code #AddToCard} button. Add appends an
+ *       {@link Entry}{@code (selectedRecipeId, count)} to the loaded card's program (replacing the count when
+ *       the recipe is already present) via {@link AutoCraftEngine#writeScript}.</li>
+ *   <li><b>RIGHT : the loaded card's program</b> (read-only entries, each shown as its output label + count /
+ *       "inf") + the Take Card button.</li>
+ * </ul>
  *
- * <p><b>SCALE (the one real risk).</b> The Sculptor pool is ~911 recipes and there is no list virtualization.
+ * <p>Mirrors vanilla {@code EntitySpawnPage} (search + machine button-bar + count NumberField + a primary
+ * action button reading {@code #Count.Value}) and the {@code ItemGrid} {@code SlotClicking} + {@code SlotIndex}
+ * mechanism proven in HyProTech's AlloySmelterPage (the only codebase precedent for a recipe-selector grid).
+ *
+ * <p><b>SCALE (the one real risk).</b> The Sculptor pool is ~911 recipes and there is no grid virtualization.
  * {@link #buildRecipeList} ALWAYS filters (machine scope + search) and then hard-caps to
- * {@link RecipeBrowse#ROW_CAP} via {@link RecipeBrowse#filterAndCap} BEFORE appending a single row : the full
+ * {@link RecipeBrowse#ROW_CAP} via {@link RecipeBrowse#filterAndCap} BEFORE building a single slot : the full
  * pool is never rendered, even on an empty query. A "showing N of M" note appears when capped.
  *
  * <p><b>Threading:</b> {@link #build} runs on the WorldThread; event handlers may arrive off it, so every
@@ -93,6 +104,17 @@ public final class RecipeProgrammerPanelPage
     @Nonnull
     private String searchQuery = "";
 
+    /**
+     * The rows currently rendered into {@code #RecipeGrid}, in slot order (row i = grid slot i). Set by
+     * {@link #buildRecipeList}; read by the {@code SlotClicking} handler to map {@code SlotIndex} -&gt; recipe
+     * id via {@link RecipeBrowse#recipeAtSlot}.
+     */
+    @Nonnull
+    private List<RecipeBrowse.Row> renderedRows = List.of();
+
+    /** The recipe id currently selected in the middle pane, or {@code null} when nothing is selected. */
+    private String selectedRecipeId;
+
     public RecipeProgrammerPanelPage(
             @Nonnull PlayerRef playerRef,
             @Nonnull Ref<ChunkStore> blockRef,
@@ -119,12 +141,20 @@ public final class RecipeProgrammerPanelPage
         // Live search (ValueChanged resolves the field's current value into @SearchQuery).
         eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, "#SearchInput",
             new EventData().append("Type", EventType.SEARCH).append("@SearchQuery", "#SearchInput.Value"), false);
+        // Icon-grid recipe selection: clicking a slot fires SlotClicking; the client auto-injects SlotIndex
+        // (the clicked slot) into the payload (proven in HyProTech AlloySmelterPage : the only precedent).
+        eventBuilder.addEventBinding(CustomUIEventBindingType.SlotClicking, "#RecipeGrid",
+            new EventData().append("Type", EventType.SELECT_RECIPE), false);
+        // Add-to-card: the primary blue button; reads the NumberField's current value into @Count.
+        eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#AddToCard",
+            new EventData().append("Type", EventType.ADD_TO_CARD).append("@Count", "#Count.Value"), false);
         // Take Card (P3.1).
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#TakeCard",
             new EventData().append("Type", EventType.TAKE_CARD), false);
 
         this.updateMachineStyles(commandBuilder);
-        this.buildRecipeList(commandBuilder, eventBuilder);
+        this.buildRecipeList(commandBuilder);
+        this.updateSelectPane(commandBuilder);
         this.buildProgram(commandBuilder);
     }
 
@@ -156,9 +186,8 @@ public final class RecipeProgrammerPanelPage
                 String q = data.searchQuery == null ? "" : data.searchQuery.trim();
                 this.searchQuery = q;
                 UICommandBuilder cmd = new UICommandBuilder();
-                UIEventBuilder evt = new UIEventBuilder();
-                this.buildRecipeList(cmd, evt);
-                this.sendUpdate(cmd, evt, false);
+                this.buildRecipeList(cmd);
+                this.sendUpdate(cmd);
             }
             case EventType.MACHINE -> {
                 Machine m = MachineRecipePools.byId(data.machineId);
@@ -167,21 +196,23 @@ public final class RecipeProgrammerPanelPage
                 }
                 this.activeMachine = m;
                 this.searchQuery = "";
+                this.selectedRecipeId = null;
                 UICommandBuilder cmd = new UICommandBuilder();
-                UIEventBuilder evt = new UIEventBuilder();
                 this.updateMachineStyles(cmd);
                 cmd.set("#SearchInput.Value", "");
-                this.buildRecipeList(cmd, evt);
-                this.sendUpdate(cmd, evt, false);
+                this.buildRecipeList(cmd);
+                this.updateSelectPane(cmd);
+                this.sendUpdate(cmd);
             }
-            case EventType.ADD_RECIPE -> this.addRecipe(ref, store, data.recipeId);
+            case EventType.SELECT_RECIPE -> this.selectRecipe(data.slotIndex);
+            case EventType.ADD_TO_CARD -> this.addRecipe(ref, store, this.selectedRecipeId, data.count);
             case EventType.TAKE_CARD -> this.takeCardAction(ref, store);
             default -> { /* unknown event: ignore */ }
         }
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // Browser : machine filter + search + capped list
+    // Browser : machine filter + search + capped icon grid
     // ----------------------------------------------------------------------------------------------------
 
     /** Set each machine-filter button's Style (active vs inactive) for the current {@link #activeMachine}. */
@@ -193,27 +224,25 @@ public final class RecipeProgrammerPanelPage
     }
 
     /**
-     * Rebuild {@code #RecipeList} for the active machine + search query. <b>Filters + caps BEFORE rendering</b>
+     * Rebuild {@code #RecipeGrid} for the active machine + search query. <b>Filters + caps BEFORE rendering</b>
      * (see class doc / {@link RecipeBrowse#filterAndCap}): the pool's recipes are mapped to rows, filtered by
-     * {@link #searchQuery}, truncated to {@link RecipeBrowse#ROW_CAP}, then cleared + re-appended one row at a
-     * time. Each row is a {@code Common/TextButton.ui} carrying an Activating binding that adds the recipe.
-     * Runs on the WorldThread (resolves recipe outputs against the asset registry).
+     * {@link #searchQuery}, truncated to {@link RecipeBrowse#ROW_CAP}, then set as the grid's {@code .Slots}.
+     * Each slot is an {@link ItemGridSlot} of the recipe's primary output stack (icon + quantity), in slot
+     * order (the {@link #renderedRows} order : the slot-index -&gt; recipe mapping). Runs on the WorldThread.
      */
-    private void buildRecipeList(@Nonnull UICommandBuilder cmd, @Nonnull UIEventBuilder evt) {
-        cmd.clear("#RecipeList");
-
+    private void buildRecipeList(@Nonnull UICommandBuilder cmd) {
         List<RecipeBrowse.Row> candidates = this.candidateRows();
         RecipeBrowse.Result result = RecipeBrowse.filterAndCap(candidates, this.searchQuery, RecipeBrowse.ROW_CAP);
 
         List<RecipeBrowse.Row> rows = result.rows();
-        for (int i = 0; i < rows.size(); i++) {
-            RecipeBrowse.Row row = rows.get(i);
-            String selector = "#RecipeList[" + i + "]";
-            cmd.append("#RecipeList", "Common/TextButton.ui");
-            cmd.set(selector + " #Button.Text", row.label());
-            evt.addEventBinding(CustomUIEventBindingType.Activating, selector + " #Button",
-                new EventData().append("Type", EventType.ADD_RECIPE).append("RecipeId", row.recipeId()), false);
+        this.renderedRows = rows;
+
+        RecipePool pool = MachineRecipePools.pool(this.activeMachine);
+        List<ItemGridSlot> slots = new ArrayList<>(rows.size());
+        for (RecipeBrowse.Row row : rows) {
+            slots.add(slotFor(pool, row));
         }
+        cmd.set("#RecipeGrid.Slots", slots);
 
         // "showing N of M (refine search)" : only when capped.
         if (result.isCapped()) {
@@ -224,6 +253,24 @@ public final class RecipeProgrammerPanelPage
             cmd.set("#ListNote.Text", "");
             cmd.set("#ListNote.Visible", false);
         }
+    }
+
+    /**
+     * The grid slot for a browser row: an {@link ItemGridSlot} of the recipe's primary output stack
+     * ({@code new ItemStack(outputId, qty)} : a metadata-stripped, clean stack to avoid the slot-set error we
+     * hit with full stacks). When the output cannot be resolved the slot is empty but still activatable, so the
+     * grid keeps stable slot indices (slot i still maps to row i).
+     */
+    @Nonnull
+    private static ItemGridSlot slotFor(@Nonnull RecipePool pool, @Nonnull RecipeBrowse.Row row) {
+        ItemGridSlot slot = new ItemGridSlot();
+        slot.setActivatable(true);
+        slot.setSkipItemQualityBackground(true);
+        OutputStack out = outputStack(pool, row.recipeId());
+        if (out != null) {
+            slot.setItemStack(new ItemStack(out.itemId(), Math.max(1, out.quantity())));
+        }
+        return slot;
     }
 
     /**
@@ -247,24 +294,29 @@ public final class RecipeProgrammerPanelPage
     /** The output item ids of {@code recipeId} in {@code pool}, or an empty list (guarded against any throw). */
     @Nonnull
     private static List<String> outputItemIds(@Nonnull RecipePool pool, @Nonnull String recipeId) {
+        OutputStack out = outputStack(pool, recipeId);
+        return out == null ? List.of() : List.of(out.itemId());
+    }
+
+    /** The primary output id + quantity of {@code recipeId} in {@code pool}, or {@code null} (guarded). */
+    private static OutputStack outputStack(@Nonnull RecipePool pool, @Nonnull String recipeId) {
         try {
             CraftingRecipe recipe = pool.map().get(recipeId);
             if (recipe == null) {
-                return List.of();
+                return null;
             }
             List<ItemStack> outputs = VanillaCraftBridge.outputs(recipe);
             if (outputs == null || outputs.isEmpty()) {
-                return List.of();
+                return null;
             }
-            List<String> ids = new ArrayList<>(outputs.size());
             for (ItemStack stack : outputs) {
-                if (stack != null && stack.getItemId() != null) {
-                    ids.add(stack.getItemId());
+                if (stack != null && stack.getItemId() != null && !stack.getItemId().isBlank()) {
+                    return new OutputStack(stack.getItemId(), Math.max(1, stack.getQuantity()));
                 }
             }
-            return ids;
+            return null;
         } catch (Throwable ignored) {
-            return List.of();
+            return null;
         }
     }
 
@@ -275,16 +327,59 @@ public final class RecipeProgrammerPanelPage
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // Program : read-only entries + click-to-add + take card
+    // Middle : select pane (name + count + add)
     // ----------------------------------------------------------------------------------------------------
 
     /**
-     * Add {@code recipeId} to the loaded card's program as an INFINITE entry (count 0), de-duped (an already
-     * present recipe is a no-op), by re-stamping the card via {@link AutoCraftEngine#writeScript}. Then
-     * rebuilds the program view so the add lands visibly. No-op when no recipe id / no card is loaded.
+     * Handle a {@code SlotClicking} on the recipe grid: map the clicked {@code slotIndex} to a recipe via
+     * {@link RecipeBrowse#recipeAtSlot} over {@link #renderedRows}, record it as the selection, and refresh the
+     * select pane. An out-of-range / stale slot is a no-op.
      */
-    private void addRecipe(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, String recipeId) {
+    private void selectRecipe(int slotIndex) {
+        String recipeId = RecipeBrowse.recipeAtSlot(this.renderedRows, slotIndex);
+        if (recipeId == null) {
+            return;
+        }
+        this.selectedRecipeId = recipeId;
+        UICommandBuilder cmd = new UICommandBuilder();
+        this.updateSelectPane(cmd);
+        this.sendUpdate(cmd);
+    }
+
+    /**
+     * Populate the middle select pane from {@link #selectedRecipeId}: the output display NAME ({@code
+     * #SelectName}) and a status line ({@code #SelectStatus}). When nothing is selected the name is a prompt
+     * and the status is cleared. The count field + Add button are static in the .ui (no per-selection reset).
+     */
+    private void updateSelectPane(@Nonnull UICommandBuilder cmd) {
+        if (this.selectedRecipeId == null) {
+            cmd.set("#SelectName.Text", "Select a recipe");
+            cmd.set("#SelectStatus.Text", "");
+            return;
+        }
+        RecipePool pool = MachineRecipePools.pool(this.activeMachine);
+        OutputStack out = outputStack(pool, this.selectedRecipeId);
+        String label = out != null ? RecipeBrowse.humanize(out.itemId()) : this.selectedRecipeId;
+        if (label.isBlank()) {
+            label = this.selectedRecipeId;
+        }
+        cmd.set("#SelectName.Text", label);
+        cmd.set("#SelectStatus.Text", "");
+    }
+
+    // ----------------------------------------------------------------------------------------------------
+    // Program : read-only entries + add + take card
+    // ----------------------------------------------------------------------------------------------------
+
+    /**
+     * Add {@code recipeId} to the loaded card's program with {@code count} ({@code <= 0} = infinite), by
+     * re-stamping the card via {@link AutoCraftEngine#writeScript}. If the recipe is already on the card its
+     * count is REPLACED (not duplicated). Then rebuilds the program view. No-ops with a status message when no
+     * recipe is selected or no card is loaded.
+     */
+    private void addRecipe(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, String recipeId, int count) {
         if (recipeId == null || recipeId.isEmpty()) {
+            this.setSelectStatus("Select a recipe first.");
             return;
         }
         RecipeProgrammerState state = this.programmer();
@@ -293,30 +388,47 @@ public final class RecipeProgrammerPanelPage
         }
         ItemStack card = state.card();
         if (card == null || ItemStack.isEmpty(card)) {
+            this.setSelectStatus("No card loaded.");
             return;
         }
+        int safeCount = Math.max(0, count); // 0 = infinite; never store a negative
+
         RecipeScript current = AutoCraftEngine.cardScript(card);
         List<Entry> entries = new ArrayList<>();
         boolean ordered = false;
+        boolean replaced = false;
         if (current != null) {
             ordered = current.ordered();
             for (Entry e : current.entries()) {
-                if (e != null && e.recipeId() != null) {
-                    if (e.recipeId().equals(recipeId)) {
-                        return; // already in the program: adding again is a no-op
-                    }
+                if (e == null || e.recipeId() == null) {
+                    continue;
+                }
+                if (e.recipeId().equals(recipeId)) {
+                    entries.add(new Entry(recipeId, safeCount)); // replace the count in place
+                    replaced = true;
+                } else {
                     entries.add(e);
                 }
             }
         }
-        entries.add(new Entry(recipeId, 0)); // 0 = infinite
+        if (!replaced) {
+            entries.add(new Entry(recipeId, safeCount));
+        }
         RecipeScript next = new RecipeScript(ordered, entries);
         ItemStack stamped = AutoCraftEngine.writeScript(card, next);
         state.setCard(stamped);
         this.markNeedsSaving();
 
         UICommandBuilder cmd = new UICommandBuilder();
+        cmd.set("#SelectStatus.Text", replaced ? "Updated on card." : "Added to card.");
         this.buildProgram(cmd);
+        this.sendUpdate(cmd);
+    }
+
+    /** Set just the middle-pane status line and push it. */
+    private void setSelectStatus(@Nonnull String text) {
+        UICommandBuilder cmd = new UICommandBuilder();
+        cmd.set("#SelectStatus.Text", text);
         this.sendUpdate(cmd);
     }
 
@@ -335,7 +447,8 @@ public final class RecipeProgrammerPanelPage
 
     /**
      * Populate the program status line ({@code #ProgramText}) + the read-only entries list
-     * ({@code #ProgramList}) from the loaded card. Null-safe: no card / blank card render gracefully.
+     * ({@code #ProgramList}) from the loaded card. Each entry row shows the recipe's OUTPUT label (humanized)
+     * plus its count ("inf" for infinite). Null-safe: no card / blank card render gracefully.
      */
     private void buildProgram(@Nonnull UICommandBuilder cmd) {
         cmd.clear("#ProgramList");
@@ -352,10 +465,10 @@ public final class RecipeProgrammerPanelPage
             return;
         }
 
+        RecipePool pool = MachineRecipePools.pool(this.activeMachine);
         List<Entry> entries = script.entries();
         cmd.set("#ProgramText.TextSpans",
-            Message.raw((script.ordered() ? "Ordered" : "Whitelist") + " : " + entries.size() + " entr"
-                + (entries.size() == 1 ? "y" : "ies")));
+            Message.raw(entries.size() + " entr" + (entries.size() == 1 ? "y" : "ies")));
 
         for (int i = 0; i < entries.size(); i++) {
             Entry e = entries.get(i);
@@ -363,10 +476,18 @@ public final class RecipeProgrammerPanelPage
                 continue;
             }
             String selector = "#ProgramList[" + i + "]";
-            String countLabel = RecipeScript.isInfinite(e) ? "x∞" : "x" + e.count();
+            String countLabel = RecipeScript.isInfinite(e) ? "x inf" : "x" + e.count();
             cmd.append("#ProgramList", "Common/TextButton.ui");
-            cmd.set(selector + " #Button.Text", e.recipeId() + "  " + countLabel);
+            cmd.set(selector + " #Button.Text", entryLabel(pool, e) + "  " + countLabel);
         }
+    }
+
+    /** A readable program-row label for an entry: the recipe's humanized output name (fallback: recipe id). */
+    @Nonnull
+    private static String entryLabel(@Nonnull RecipePool pool, @Nonnull Entry e) {
+        OutputStack out = outputStack(pool, e.recipeId());
+        String label = out != null ? RecipeBrowse.humanize(out.itemId()) : "";
+        return label.isBlank() ? e.recipeId() : label;
     }
 
     /** Resolve the Programmer's {@link RecipeProgrammerState}, or null if the block is gone / not ours. */
@@ -463,12 +584,17 @@ public final class RecipeProgrammerPanelPage
         return external == null ? null : external.getWorld();
     }
 
-    /** The event payload: which control fired + its parameters (machine id / search text / recipe id). */
+    /** A resolved primary output: an item id + quantity. World-free, just a tiny carrier. */
+    private record OutputStack(@Nonnull String itemId, int quantity) {
+    }
+
+    /** The event payload: which control fired + its parameters (machine id / search / slot index / count). */
     public static final class PageData {
         private String type = "";
         private String machineId;
         private String searchQuery;
-        private String recipeId;
+        private int slotIndex = -1;
+        private int count;
 
         public static final BuilderCodec<PageData> CODEC = BuilderCodec.builder(PageData.class, PageData::new)
             .append(new KeyedCodec<>("Type", Codec.STRING, false),
@@ -477,8 +603,12 @@ public final class RecipeProgrammerPanelPage
                 (o, v) -> o.machineId = v, o -> o.machineId).add()
             .append(new KeyedCodec<>("@SearchQuery", Codec.STRING, false),
                 (o, v) -> o.searchQuery = v, o -> o.searchQuery).add()
-            .append(new KeyedCodec<>("RecipeId", Codec.STRING, false),
-                (o, v) -> o.recipeId = v, o -> o.recipeId).add()
+            // SlotIndex is auto-injected by the client on SlotClicking (proven in HyProTech AlloySmelterPage).
+            .append(new KeyedCodec<>("SlotIndex", Codec.INTEGER, false),
+                (o, v) -> o.slotIndex = v == null ? -1 : v, o -> o.slotIndex).add()
+            // @Count is resolved from #Count.Value on the Add binding (vanilla EntitySpawnPage pattern).
+            .append(new KeyedCodec<>("@Count", Codec.INTEGER, false),
+                (o, v) -> o.count = v == null ? 0 : v, o -> o.count).add()
             .build();
     }
 
@@ -486,7 +616,8 @@ public final class RecipeProgrammerPanelPage
     private static final class EventType {
         static final String MACHINE = "Machine";
         static final String SEARCH = "Search";
-        static final String ADD_RECIPE = "AddRecipe";
+        static final String SELECT_RECIPE = "SelectRecipe";
+        static final String ADD_TO_CARD = "AddToCard";
         static final String TAKE_CARD = "TakeCard";
 
         private EventType() {

@@ -1,15 +1,19 @@
 $C = "../Common.ui";
 $M = "../CC_Master.ui";
 
-// Chonbo's Chemistry: the Recipe Programmer bench panel (Phase 3.2 : the recipe BROWSER). A sibling of
-// CC_CookerPanel.ui. Mirrors vanilla EntitySpawnPage's mechanisms (machine button-bar + search +
-// TopScrolling runtime-built list + click-to-add). The server (RecipeProgrammerPanelPage) sets
-// #PanelTitle.TextSpans, drives the machine-filter buttons (#MachineBtn*), the search field
-// (#SearchInput, ValueChanged), the runtime #RecipeList rows (each Activating -> add to the card's
-// program), the read-only #ProgramText, the "showing N of M" #ListNote, and binds #TakeCard (Activating).
+// Chonbo's Chemistry: the Recipe Programmer bench panel (the recipe BROWSER, native crafting-bench look). A
+// sibling of CC_CookerPanel.ui. Three columns: LEFT an ICON GRID (#RecipeGrid, an ItemGrid populated with the
+// recipe outputs; SlotClicking -> select), MIDDLE a select pane (#SelectName + a #Count NumberField + a blue
+// #AddToCard button), RIGHT the loaded card's read-only program (#ProgramText / #ProgramList) + #TakeCard.
 //
-// SCALE: #RecipeList is filtered + capped server-side (RecipeBrowse.filterAndCap) BEFORE any row is
-// appended : the Sculptor's ~911-recipe pool is never rendered whole (see RecipeBrowse.ROW_CAP).
+// Mirrors vanilla EntitySpawnPage's mechanisms (machine button-bar + search + a #Count NumberField + a primary
+// action button reading #Count.Value) and the ItemGrid SlotClicking/SlotIndex selection proven in HyProTech's
+// AlloySmelterPage. The server (RecipeProgrammerPanelPage) sets #PanelTitle.TextSpans, drives the machine
+// buttons (#MachineBtn*), the search field (#SearchInput, ValueChanged), the runtime #RecipeGrid.Slots (each
+// slot click -> select that recipe), the select pane, the read-only program, and binds #AddToCard / #TakeCard.
+//
+// SCALE: #RecipeGrid is filtered + capped server-side (RecipeBrowse.filterAndCap) BEFORE any slot is built :
+// the Sculptor's ~911-recipe pool is never rendered whole (see RecipeBrowse.ROW_CAP).
 
 @PanelBorderColor = $M.@PanelBorderColor;
 @PanelFillColor = $M.@PanelFillColor;
@@ -20,9 +24,13 @@ $M = "../CC_Master.ui";
 @ButtonHeight = $M.@ButtonHeight;
 @HeaderFontSize = $M.@HeaderFontSize;
 
+// Icon-grid slot sizing (matches the proven HyProTech recipe-grid look : 40px slots, 4px gap).
+@GridSlotSize = 40;
+@GridSlotGap = 4;
+
 $C.@PageOverlay {
   $C.@DecoratedContainer {
-    Anchor: (Width: 640, Height: 480);
+    Anchor: (Width: 820, Height: 480);
 
     // Title set from Java (#PanelTitle.TextSpans). Vanilla title style.
     #Title {
@@ -65,13 +73,13 @@ $C.@PageOverlay {
 
       Group { Anchor: (Height: 10); }
 
-      // --- The two columns: a filtered/capped recipe browser (left) + the read-only program (right). ---
+      // --- The three columns: icon-grid browser (left) + select/count/add pane (middle) + program (right). ---
       Group {
         Anchor: (Left: 0, Right: 0);
         FlexWeight: 1;
         LayoutMode: Left;
 
-        // LEFT: the recipe browser (search + scrolling, capped recipe rows).
+        // LEFT: the recipe browser (search + capped ICON GRID of recipe outputs).
         Group #BrowserPanel {
           FlexWeight: 3;
           Background: @PanelBorderColor;
@@ -110,13 +118,100 @@ $C.@PageOverlay {
             }
             Group { Anchor: (Height: 4); }
 
-            // The runtime-built, capped recipe list. Server clears + appends Common/TextButton.ui rows, each
-            // bound Activating -> add the recipe to the card's program. TopScrolling = a scrollbar past the cap.
-            Group #RecipeList {
+            // The runtime-built, capped recipe ICON GRID. Server sets #RecipeGrid.Slots to ItemGridSlot[] of
+            // each recipe's primary output stack (icon + quantity); a slot click fires SlotClicking (the
+            // client auto-injects SlotIndex). ShowScrollbar = scroll past the visible rows up to the cap.
+            ItemGrid #RecipeGrid {
               Anchor: (Left: 0, Right: 0);
               FlexWeight: 1;
-              LayoutMode: TopScrolling;
-              ScrollbarStyle: $C.@DefaultScrollbarStyle;
+              SlotsPerRow: 5;
+              AreItemsDraggable: false;
+              ShowScrollbar: true;
+              RenderItemQualityBackground: false;
+              Style: (
+                SlotSize: @GridSlotSize,
+                SlotIconSize: @GridSlotSize,
+                SlotSpacing: @GridSlotGap,
+                SlotBackground: "../Common/BlockSelectorSlotBackground.png"
+              );
+            }
+          }
+        }
+
+        Group { Anchor: (Width: @ContentPad); }
+
+        // MIDDLE: the select pane : the selected recipe's output name, a count control, and Add To Card.
+        Group #SelectPanel {
+          FlexWeight: 2;
+          Background: @PanelBorderColor;
+          Padding: (Full: 1);
+
+          Group {
+            Anchor: (Full: 0);
+            Background: @PanelFillColor;
+            LayoutMode: Top;
+            Padding: (Top: 10, Left: 12, Right: 12, Bottom: 12);
+
+            Label {
+              Style: (FontSize: @HeaderFontSize, RenderBold: true, RenderUppercase: true, TextColor: @LabelText);
+              Text: "Selection";
+            }
+            Group { Anchor: (Height: 6); }
+            Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
+            Group { Anchor: (Height: 10); }
+
+            // The selected recipe's output display name (server-set; a prompt when nothing is selected).
+            Label #SelectName {
+              Anchor: (Left: 0, Right: 0);
+              Style: (FontSize: 16, RenderBold: true, TextColor: @ValueText, Wrap: true);
+              Text: "Select a recipe";
+            }
+            Group { Anchor: (Height: 12); }
+
+            // Count control. NumberField shows the number (0 = infinite); the hint below explains it (we do
+            // not fight the widget by trying to show an infinity glyph). The Add button reads #Count.Value.
+            Group {
+              Anchor: (Left: 0, Right: 0);
+              LayoutMode: Left;
+
+              Label {
+                Anchor: (Width: 70);
+                Text: "Count";
+                Style: (...$C.@DefaultLabelStyle, VerticalAlignment: Center);
+              }
+
+              $C.@NumberField #Count {
+                @Anchor = (Left: 5, Width: 90, Right: 0);
+                Format: (
+                  MaxDecimalPlaces: 0,
+                  Step: 1,
+                  MinValue: 0,
+                  MaxValue: 9999
+                );
+                Value: 0;
+              }
+            }
+            Group { Anchor: (Height: 4); }
+
+            Label {
+              Anchor: (Left: 0, Right: 0);
+              Style: (FontSize: 12, TextColor: @LabelText);
+              Text: "0 = infinite";
+            }
+            Group { Anchor: (Height: 14); }
+
+            // ADD TO CARD : the primary (blue) action button. Server binds #AddToCard (Activating + @Count).
+            $C.@TextButton #AddToCard {
+              @Anchor = (Left: 0, Right: 0, Height: @ButtonHeight);
+              @Text = "Add To Card";
+            }
+            Group { Anchor: (Height: 8); }
+
+            // Add / select status line (server-set; e.g. "Added to card." / "No card loaded.").
+            Label #SelectStatus {
+              Anchor: (Left: 0, Right: 0);
+              Style: (FontSize: 12, TextColor: @LabelText, Wrap: true);
+              Text: "";
             }
           }
         }
