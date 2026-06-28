@@ -120,6 +120,9 @@ public final class RecipeProgrammerPanelPage
     /** The recipe id currently selected in the middle pane, or {@code null} when nothing is selected. */
     private String selectedRecipeId;
 
+    /** The {@code #Count} NumberField's MaxValue (mirrors the .ui Format.MaxValue) : the stepper clamp. */
+    private static final int MAX_COUNT = 9999;
+
     public RecipeProgrammerPanelPage(
             @Nonnull PlayerRef playerRef,
             @Nonnull Ref<ChunkStore> blockRef,
@@ -156,12 +159,20 @@ public final class RecipeProgrammerPanelPage
         // Add-to-card: the primary blue button; reads the NumberField's current value into @Count.
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#AddToCard",
             new EventData().append("Type", EventType.ADD_TO_CARD).append("@Count", "#Count.Value"), false);
+        // Count steppers: each reads the LIVE #Count.Value into @Count (no server-side pending state), and
+        // the handler writes back a clamped #Count.Value. The field stays directly editable.
+        eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#CountDown",
+            new EventData().append("Type", EventType.COUNT_DOWN).append("@Count", "#Count.Value"), false);
+        eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#CountUp",
+            new EventData().append("Type", EventType.COUNT_UP).append("@Count", "#Count.Value"), false);
         // Take Card (P3.1).
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#TakeCard",
             new EventData().append("Type", EventType.TAKE_CARD), false);
 
         // Finite program-entry counts render as "icon xN"; infinite entries (stack of 1) show no number.
         commandBuilder.set("#ProgramGrid.DisplayItemQuantity", true);
+        // The ingredient grid shows each input's required quantity ("xN").
+        commandBuilder.set("#IngredientGrid.DisplayItemQuantity", true);
 
         this.buildMachineTabs(commandBuilder);
         this.buildRecipeList(commandBuilder);
@@ -218,6 +229,8 @@ public final class RecipeProgrammerPanelPage
             case EventType.SELECT_RECIPE -> this.selectRecipe(data.slotIndex);
             case EventType.REMOVE_ENTRY -> this.removeEntry(data.slotIndex);
             case EventType.ADD_TO_CARD -> this.addRecipe(ref, store, this.selectedRecipeId, data.count);
+            case EventType.COUNT_DOWN -> this.stepCount(data.count, -1);
+            case EventType.COUNT_UP -> this.stepCount(data.count, 1);
             case EventType.TAKE_CARD -> this.takeCardAction(ref, store);
             default -> { /* unknown event: ignore */ }
         }
@@ -365,6 +378,7 @@ public final class RecipeProgrammerPanelPage
         if (this.selectedRecipeId == null) {
             cmd.set("#SelectName.Text", "Select a recipe");
             cmd.set("#SelectStatus.Text", "");
+            cmd.set("#IngredientGrid.Slots", new ArrayList<ItemGridSlot>());
             return;
         }
         RecipePool pool = MachineRecipePools.pool(this.activeMachine);
@@ -375,6 +389,31 @@ public final class RecipeProgrammerPanelPage
         }
         cmd.set("#SelectName.Text", label);
         cmd.set("#SelectStatus.Text", "");
+        this.buildIngredients(cmd, pool);
+    }
+
+    /**
+     * Populate the ingredient ICON GRID ({@code #IngredientGrid}) from the selected recipe's INPUT
+     * ingredients (Fuel stripped : CC machines burn ENERGY), one {@link ItemGridSlot} per
+     * {@link ItemStack} returned by {@link VanillaCraftBridge#displayInputs} (so "xN" required-quantity
+     * shows via {@code DisplayItemQuantity}). Resource-type categories that resolve to no representative
+     * item are simply absent (the bridge skips them). Guarded : any read failure clears the grid.
+     */
+    private void buildIngredients(@Nonnull UICommandBuilder cmd, @Nonnull RecipePool pool) {
+        List<ItemGridSlot> slots = new ArrayList<>();
+        try {
+            CraftingRecipe recipe = pool.map().get(this.selectedRecipeId);
+            if (recipe != null) {
+                for (ItemStack stack : VanillaCraftBridge.displayInputs(recipe)) {
+                    if (stack != null && !ItemStack.isEmpty(stack)) {
+                        slots.add(new ItemGridSlot(stack));
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+            slots = new ArrayList<>();
+        }
+        cmd.set("#IngredientGrid.Slots", slots);
     }
 
     // ----------------------------------------------------------------------------------------------------
@@ -430,6 +469,19 @@ public final class RecipeProgrammerPanelPage
         UICommandBuilder cmd = new UICommandBuilder();
         cmd.set("#SelectStatus.Text", replaced ? "Updated on card." : "Added to card.");
         this.buildProgram(cmd);
+        this.sendUpdate(cmd);
+    }
+
+    /**
+     * Adjust {@code #Count} by {@code delta} from the LIVE field value the binding carried (@Count -&gt;
+     * #Count.Value), writing the clamped result straight back to {@code #Count.Value}. No server-side
+     * pending count is kept : the NumberField is the single source of truth (it also stays directly
+     * editable). Clamped to {@code [0, MAX_COUNT]} (0 = infinite).
+     */
+    private void stepCount(int current, int delta) {
+        int next = Math.max(0, Math.min(MAX_COUNT, current + delta));
+        UICommandBuilder cmd = new UICommandBuilder();
+        cmd.set("#Count.Value", next);
         this.sendUpdate(cmd);
     }
 
@@ -690,6 +742,8 @@ public final class RecipeProgrammerPanelPage
         static final String SELECT_RECIPE = "SelectRecipe";
         static final String REMOVE_ENTRY = "RemoveEntry";
         static final String ADD_TO_CARD = "AddToCard";
+        static final String COUNT_DOWN = "CountDown";
+        static final String COUNT_UP = "CountUp";
         static final String TAKE_CARD = "TakeCard";
 
         private EventType() {

@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.hypixel.hytale.protocol.BenchRequirement;
+import com.hypixel.hytale.server.core.asset.type.item.config.CraftingRecipe;
 import com.hypixel.hytale.server.core.inventory.MaterialQuantity;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -79,5 +81,34 @@ class VanillaCraftBridgeTest {
     @Test
     void withoutFuel_empty_empty() {
         assertTrue(VanillaCraftBridge.withoutFuel(List.of()).isEmpty());
+    }
+
+    /**
+     * {@code displayInputMaterials} is the pure (no-ItemStack) layer behind {@code displayInputs}: it
+     * reads {@code getInputMaterials(r, 1)} (a pure copy of the recipe's {@code getInput()} array : it
+     * does NOT touch the AssetStore, verified from bytecode) and strips Fuel, keeping both itemed
+     * ingredients and resource-type CATEGORIES in order. The {@code new ItemStack}/{@code toItemStack}
+     * resolution that {@code displayInputs} layers on top is in-game-only (AssetStore-bound).
+     */
+    @Test
+    void displayInputMaterials_stripsFuel_keepsItemsAndCategories() {
+        MaterialQuantity dough = item("Ingredient_Dough", 1);
+        MaterialQuantity meats = resource("Meats", 1);
+        // Public 8-arg CraftingRecipe ctor: (input, output, outputs[], int, requirements[], time, bool, int).
+        CraftingRecipe r = new CraftingRecipe(
+            new MaterialQuantity[] {dough, fuel(3), meats},
+            null, new MaterialQuantity[0], 0, new BenchRequirement[0], 0f, false, 0);
+
+        List<MaterialQuantity> result = VanillaCraftBridge.displayInputMaterials(r);
+
+        assertEquals(2, result.size());
+        for (MaterialQuantity m : result) {
+            assertFalse("Fuel".equals(m.getResourceTypeId()), "fuel must be stripped");
+        }
+        // getInputMaterials returns copies (qty * tier=1), so compare by value not identity, in order.
+        assertEquals("Ingredient_Dough", result.get(0).getItemId());
+        assertEquals(1, result.get(0).getQuantity());
+        assertEquals("Meats", result.get(1).getResourceTypeId(),
+            "resource-type category must survive in order");
     }
 }
