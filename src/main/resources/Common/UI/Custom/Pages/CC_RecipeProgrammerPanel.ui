@@ -178,22 +178,48 @@ $C.@PageOverlay {
               Style: (FontSize: 16, RenderBold: true, TextColor: @ValueText, Wrap: true);
               Text: "Select a recipe";
             }
+            Group { Anchor: (Height: 10); }
+
+            // The selected recipe's INPUT ingredients as a scrolling ICON GRID (Fuel stripped : CC machines
+            // burn energy). Server sets #IngredientGrid.Slots to ItemGridSlot[] of each input stack; xN
+            // required-quantity shows via DisplayItemQuantity. Cleared when nothing is selected. Scroll attrs
+            // copied from #RecipeGrid; modest 40px slots.
+            ItemGrid #IngredientGrid {
+              Anchor: (Left: 0, Right: 0);
+              FlexWeight: 1;
+              SlotsPerRow: 4;
+              AreItemsDraggable: false;
+              ShowScrollbar: true;
+              RenderItemQualityBackground: false;
+              Style: (
+                SlotSize: 40,
+                SlotIconSize: 40,
+                SlotSpacing: @GridSlotGap,
+                SlotBackground: "../Common/BlockSelectorSlotBackground.png"
+              );
+            }
             Group { Anchor: (Height: 12); }
 
-            // Count control. NumberField shows the number (0 = infinite); the hint below explains it (we do
-            // not fight the widget by trying to show an infinity glyph). The Add button reads #Count.Value.
+            // Count control. A smaller NumberField (0 = infinite) flanked by decrement/increment arrows. The
+            // arrows read the LIVE #Count.Value and write back the clamped result (no server pending state);
+            // the field stays directly editable. The hint below explains 0 = infinite.
             Group {
               Anchor: (Left: 0, Right: 0);
               LayoutMode: Left;
 
               Label {
-                Anchor: (Width: 70);
+                Anchor: (Width: 56);
                 Text: "Count";
                 Style: (...$C.@DefaultLabelStyle, VerticalAlignment: Center);
               }
 
+              $C.@SecondaryTextButton #CountDown {
+                Anchor: (Width: 32, Height: @ButtonHeight);
+                Text: "<";
+              }
+
               $C.@NumberField #Count {
-                @Anchor = (Left: 5, Width: 90, Right: 0);
+                @Anchor = (Left: 4, Width: 64, Right: 0);
                 Format: (
                   MaxDecimalPlaces: 0,
                   Step: 1,
@@ -202,6 +228,13 @@ $C.@PageOverlay {
                 );
                 Value: 0;
               }
+
+              Group { Anchor: (Width: 4); }
+
+              $C.@SecondaryTextButton #CountUp {
+                Anchor: (Width: 32, Height: @ButtonHeight);
+                Text: ">";
+              }
             }
             Group { Anchor: (Height: 4); }
 
@@ -209,13 +242,6 @@ $C.@PageOverlay {
               Anchor: (Left: 0, Right: 0);
               Style: (FontSize: 12, TextColor: @LabelText);
               Text: "0 = infinite";
-            }
-            Group { Anchor: (Height: 14); }
-
-            // ADD TO CARD : the primary (blue) action button. Server binds #AddToCard (Activating + @Count).
-            $C.@TextButton #AddToCard {
-              @Anchor = (Left: 0, Right: 0, Height: @ButtonHeight);
-              @Text = "Add To Card";
             }
             Group { Anchor: (Height: 8); }
 
@@ -276,13 +302,41 @@ $C.@PageOverlay {
                 SlotBackground: "../Common/BlockSelectorSlotBackground.png"
               );
             }
-            Group { Anchor: (Height: 10); }
+          }
+        }
+      }
 
-            // Return the loaded card to the player (clears the slot). Server binds #TakeCard (Activating).
-            $C.@CancelTextButton #TakeCard {
-              Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
-              Text: "Take Card";
-            }
+      Group { Anchor: (Height: @ContentPad); }
+
+      // --- Shared bottom button row: Add To Card (middle column) + Take Card (right column) on ONE line.
+      //     A left spacer matches the left browser column's FlexWeight (3) so the two buttons sit under the
+      //     middle + right columns; each button column carries FlexWeight 2 to mirror its panel above. Server
+      //     binds #AddToCard (Activating + @Count) and #TakeCard (Activating). ---
+      Group #BottomButtons {
+        Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+        LayoutMode: Left;
+
+        Group { FlexWeight: 3; }
+
+        Group { Anchor: (Width: @ContentPad); }
+
+        // ADD TO CARD : the primary (blue) action button. Server binds #AddToCard (Activating + @Count).
+        Group {
+          FlexWeight: 2;
+          $C.@TextButton #AddToCard {
+            @Anchor = (Left: 0, Right: 0, Height: @ButtonHeight);
+            @Text = "Add To Card";
+          }
+        }
+
+        Group { Anchor: (Width: @ContentPad); }
+
+        // Return the loaded card to the player (clears the slot). Server binds #TakeCard (Activating).
+        Group {
+          FlexWeight: 2;
+          $C.@CancelTextButton #TakeCard {
+            Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+            Text: "Take Card";
           }
         }
       }

@@ -213,6 +213,55 @@ public final class VanillaCraftBridge {
     }
 
     /**
+     * The recipe's REAL input materials (Fuel stripped) at a single recipe set, for DISPLAY. Pure: it
+     * reads {@code getInputMaterials(r, 1)} (falling back to {@code r.getInput()}) and strips "Fuel"
+     * (CC machines burn energy : fuel is never a shown ingredient), returning the surviving
+     * {@link MaterialQuantity}s in order. Split out from {@link #displayInputs} so the Fuel-strip /
+     * material-iteration logic is unit-testable without resolving any {@code ItemStack} (which would
+     * hit the AssetStore and NPE in a plain unit JVM).
+     */
+    static List<MaterialQuantity> displayInputMaterials(CraftingRecipe r) {
+        List<MaterialQuantity> raw;
+        List<MaterialQuantity> fromManager = CraftingManager.getInputMaterials(r, 1);
+        if (fromManager != null && !fromManager.isEmpty()) {
+            raw = fromManager;
+        } else {
+            MaterialQuantity[] in = r.getInput();
+            raw = in == null ? List.of() : List.of(in);
+        }
+        return withoutFuel(raw);
+    }
+
+    /**
+     * The recipe's INPUT ingredients as display {@link ItemStack}s, Fuel-stripped (CC machines burn
+     * ENERGY : fuel is never shown). For each surviving {@link MaterialQuantity}: an itemed entry
+     * ({@code getItemId() != null}) becomes {@code new ItemStack(itemId, quantity)}; a resource-type /
+     * category entry (Meats, Rock, ...) becomes {@code m.toItemStack()} IF that yields a non-empty
+     * stack, else it is skipped (a category may have no single representative). Used to populate
+     * {@code #IngredientGrid}. NOT unit-tested ({@code new ItemStack}/{@code toItemStack} resolve
+     * against the AssetStore) : the pure filter is {@link #displayInputMaterials}.
+     */
+    public static List<ItemStack> displayInputs(CraftingRecipe r) {
+        List<ItemStack> out = new ArrayList<>();
+        for (MaterialQuantity m : displayInputMaterials(r)) {
+            if (m == null) {
+                continue;
+            }
+            int qty = Math.max(1, m.getQuantity());
+            if (m.getItemId() != null && !m.getItemId().isBlank()) {
+                out.add(new ItemStack(m.getItemId(), qty));
+                continue;
+            }
+            // Resource-type / category (e.g. Meats, Rock): include a representative if one resolves.
+            ItemStack rep = m.toItemStack();
+            if (rep != null && !ItemStack.isEmpty(rep)) {
+                out.add(rep);
+            }
+        }
+        return out;
+    }
+
+    /**
      * The finished-goods {@link ItemStack}s a single craft of {@code r} produces (the recipe's primary
      * output plus any secondary outputs), expanded from the recipe's output materials.
      */
