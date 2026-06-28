@@ -3,13 +3,17 @@ package com.chonbosmods.chemistry.impl.block.bench;
 import com.hypixel.hytale.builtin.crafting.CraftingPlugin;
 import com.hypixel.hytale.builtin.crafting.component.CraftingManager;
 import com.hypixel.hytale.protocol.BenchType;
+import com.hypixel.hytale.protocol.ItemResourceType;
 import com.hypixel.hytale.server.core.asset.type.item.config.CraftingRecipe;
+import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.MaterialQuantity;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * The SOLE chokepoint into the server-internal vanilla CRAFTING API
@@ -233,29 +237,121 @@ public final class VanillaCraftBridge {
     }
 
     /**
+     * The item id used as a last-resort placeholder for a resource-type ("any &lt;resource&gt;") ingredient
+     * whose category resolves to NO representative item. A non-empty stack is rendered so the slot still
+     * APPEARS (the requirement is never silently dropped). Chosen as a stable, always-registered vanilla
+     * item; if even this is absent the slot is dropped (it can never resolve to an icon anyway).
+     */
+    static final String RESOURCE_FALLBACK_ITEM_ID = "Plant_Fruit_Apple";
+
+    /**
+     * A display spec for one ingredient slot: the item id whose icon to show + the quantity to overlay.
+     * A pure carrier (no AssetStore), so {@link #displayFor} is unit-testable. {@code itemId == null}
+     * means "render nothing for this material" (it could not be resolved even to a fallback).
+     */
+    record InputDisplay(String itemId, int quantity) {
+    }
+
+    /**
+     * Resolve ONE {@link MaterialQuantity} to its display spec, PURELY (no AssetStore):
+     * <ul>
+     *   <li>an ITEMED entry ({@code getItemId()} non-blank) -&gt; that item id at its quantity;</li>
+     *   <li>a RESOURCE-TYPE / category entry ({@code getResourceTypeId()} non-blank, e.g. "Meats",
+     *       "Rubble") -&gt; {@code resourceRep.apply(resourceTypeId)} (a representative item id for that
+     *       category); if that yields null/blank, the {@code fallbackItemId} so the slot still SHOWS
+     *       (the "any &lt;resource&gt;" requirement is never silently dropped);</li>
+     *   <li>neither -&gt; {@code null} (nothing to render).</li>
+     * </ul>
+     * Split out from {@link #displayInputs} so the resource-handling branch is testable with a fake
+     * resolver (the real resolver, {@link #representativeItemIdForResource}, scans the {@link Item}
+     * AssetStore and is in-game-only).
+     */
+    static InputDisplay displayFor(MaterialQuantity m, Function<String, String> resourceRep, String fallbackItemId) {
+        if (m == null) {
+            return new InputDisplay(null, 0);
+        }
+        int qty = Math.max(1, m.getQuantity());
+        String itemId = m.getItemId();
+        if (itemId != null && !itemId.isBlank()) {
+            return new InputDisplay(itemId, qty);
+        }
+        String resourceTypeId = m.getResourceTypeId();
+        if (resourceTypeId != null && !resourceTypeId.isBlank()) {
+            String rep = resourceRep == null ? null : resourceRep.apply(resourceTypeId);
+            if (rep != null && !rep.isBlank()) {
+                return new InputDisplay(rep, qty);
+            }
+            // No representative resolved : fall back to a generic item so the slot still appears.
+            if (fallbackItemId != null && !fallbackItemId.isBlank()) {
+                return new InputDisplay(fallbackItemId, qty);
+            }
+        }
+        return new InputDisplay(null, qty);
+    }
+
+    /**
+     * The first registered {@link Item} that belongs to the resource type {@code resourceTypeId} (its
+     * {@code getResourceTypes()} contains a matching {@link ItemResourceType#id}) : a representative icon
+     * for an "any &lt;resource&gt;" ingredient slot. Scans the live {@link Item} AssetStore, so it is
+     * in-game-only (the AssetStore is empty / NPEs in a plain unit JVM); returns {@code null} when nothing
+     * matches or the registry is unavailable (guarded). Matches vanilla's
+     * {@code CraftingManager.matches} resource test (item.getResourceTypes() contains the id).
+     */
+    static String representativeItemIdForResource(String resourceTypeId) {
+        if (resourceTypeId == null || resourceTypeId.isBlank()) {
+            return null;
+        }
+        try {
+            Map<String, Item> items = Item.getAssetMap().getAssetMap();
+            if (items == null) {
+                return null;
+            }
+            for (Map.Entry<String, Item> entry : items.entrySet()) {
+                Item item = entry.getValue();
+                if (item == null) {
+                    continue;
+                }
+                ItemResourceType[] types = item.getResourceTypes();
+                if (types == null) {
+                    continue;
+                }
+                for (ItemResourceType t : types) {
+                    if (t != null && resourceTypeId.equals(t.id)) {
+                        String id = item.getId();
+                        if (id != null && !id.isBlank()) {
+                            return id;
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+            // registry unavailable / not ready : no representative
+        }
+        return null;
+    }
+
+    /**
      * The recipe's INPUT ingredients as display {@link ItemStack}s, Fuel-stripped (CC machines burn
-     * ENERGY : fuel is never shown). For each surviving {@link MaterialQuantity}: an itemed entry
-     * ({@code getItemId() != null}) becomes {@code new ItemStack(itemId, quantity)}; a resource-type /
-     * category entry (Meats, Rock, ...) becomes {@code m.toItemStack()} IF that yields a non-empty
-     * stack, else it is skipped (a category may have no single representative). Used to populate
-     * {@code #IngredientGrid}. NOT unit-tested ({@code new ItemStack}/{@code toItemStack} resolve
-     * against the AssetStore) : the pure filter is {@link #displayInputMaterials}.
+     * ENERGY : fuel is never shown). For each surviving {@link MaterialQuantity} (via {@link #displayFor}):
+     * an itemed entry becomes {@code new ItemStack(itemId, quantity)}; a resource-type / category entry
+     * (Meats, Rubble, Rock, ...) becomes a {@link ItemStack} of a REPRESENTATIVE item of that category
+     * (the first registered item in it, {@link #representativeItemIdForResource}), or, when none resolves,
+     * a {@link #RESOURCE_FALLBACK_ITEM_ID} placeholder so the slot still APPEARS (the "any &lt;resource&gt;"
+     * requirement is never silently dropped). Used to populate {@code #IngredientGrid}. NOT unit-tested
+     * ({@code new ItemStack} + the {@link Item} AssetStore scan are in-game-only) : the pure layers are
+     * {@link #displayInputMaterials} and {@link #displayFor}.
      */
     public static List<ItemStack> displayInputs(CraftingRecipe r) {
         List<ItemStack> out = new ArrayList<>();
         for (MaterialQuantity m : displayInputMaterials(r)) {
-            if (m == null) {
+            InputDisplay spec = displayFor(m, VanillaCraftBridge::representativeItemIdForResource,
+                RESOURCE_FALLBACK_ITEM_ID);
+            if (spec.itemId() == null || spec.itemId().isBlank()) {
                 continue;
             }
-            int qty = Math.max(1, m.getQuantity());
-            if (m.getItemId() != null && !m.getItemId().isBlank()) {
-                out.add(new ItemStack(m.getItemId(), qty));
-                continue;
-            }
-            // Resource-type / category (e.g. Meats, Rock): include a representative if one resolves.
-            ItemStack rep = m.toItemStack();
-            if (rep != null && !ItemStack.isEmpty(rep)) {
-                out.add(rep);
+            ItemStack stack = new ItemStack(spec.itemId(), Math.max(1, spec.quantity()));
+            if (!ItemStack.isEmpty(stack)) {
+                out.add(stack);
             }
         }
         return out;
