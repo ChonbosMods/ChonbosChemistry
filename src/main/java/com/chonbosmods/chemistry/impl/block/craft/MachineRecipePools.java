@@ -26,15 +26,18 @@ import javax.annotation.Nullable;
  */
 public final class MachineRecipePools {
 
-    /** One recipe-bearing machine: its stable id, browser display name, and unioned vanilla benches. */
+    /** One recipe-bearing machine: its stable id, browser display name, CC block item id, and benches. */
     public static final class Machine {
         private final String id;
         private final String displayName;
+        private final String itemId;
         private final List<BenchRef> benches;
 
-        private Machine(@Nonnull String id, @Nonnull String displayName, @Nonnull List<BenchRef> benches) {
+        private Machine(@Nonnull String id, @Nonnull String displayName, @Nonnull String itemId,
+                @Nonnull List<BenchRef> benches) {
             this.id = id;
             this.displayName = displayName;
+            this.itemId = itemId;
             this.benches = List.copyOf(benches);
         }
 
@@ -44,10 +47,20 @@ public final class MachineRecipePools {
             return id;
         }
 
-        /** @return the human-readable name shown on the machine-filter button. */
+        /** @return the human-readable name shown beside the machine tabs. */
         @Nonnull
         public String displayName() {
             return displayName;
+        }
+
+        /**
+         * @return the CC block item id for this machine's tab icon (one of the {@code CC_*} items under
+         *     {@code Server/Item/Items/ChonbosMods/}). The machine-tab ItemGrid renders an {@code ItemStack}
+         *     of this id; the icon auto-updates when real block art lands.
+         */
+        @Nonnull
+        public String itemId() {
+            return itemId;
         }
 
         /** @return the vanilla benches this machine unions (never empty). */
@@ -60,39 +73,39 @@ public final class MachineRecipePools {
     // --- The 7 machines. BenchRef lists are copied verbatim from each *TickSystem's RecipePool.union(...). ---
 
     /** keep in sync with CookerTickSystem */
-    private static final Machine COOKER = new Machine("Cooker", "Cooker", List.of(
+    private static final Machine COOKER = new Machine("Cooker", "Cooker", "CC_Cooker", List.of(
         new BenchRef(BenchType.Processing, "Campfire"),
         new BenchRef(BenchType.Crafting, "Cookingbench")));
 
     /** keep in sync with ForgeTickSystem */
-    private static final Machine FORGE = new Machine("Forge", "Forge", List.of(
+    private static final Machine FORGE = new Machine("Forge", "Forge", "CC_Forge", List.of(
         new BenchRef(BenchType.Crafting, "Weapon_Bench"),
         new BenchRef(BenchType.Crafting, "Armor_Bench"),
         new BenchRef(BenchType.Crafting, "ArmorBench"),
         new BenchRef(BenchType.DiagramCrafting, "Armory")));
 
     /** keep in sync with CultivatorTickSystem */
-    private static final Machine CULTIVATOR = new Machine("Cultivator", "Cultivator", List.of(
+    private static final Machine CULTIVATOR = new Machine("Cultivator", "Cultivator", "CC_Cultivator", List.of(
         new BenchRef(BenchType.Crafting, "Farmingbench")));
 
     /** keep in sync with AlembicTickSystem */
-    private static final Machine ALEMBIC = new Machine("Alembic", "Alembic", List.of(
+    private static final Machine ALEMBIC = new Machine("Alembic", "Alembic", "CC_Alembic", List.of(
         new BenchRef(BenchType.Crafting, "Alchemybench"),
         new BenchRef(BenchType.Crafting, "Arcanebench")));
 
     /** keep in sync with AssemblerTickSystem */
-    private static final Machine ASSEMBLER = new Machine("Assembler", "Assembler", List.of(
+    private static final Machine ASSEMBLER = new Machine("Assembler", "Assembler", "CC_Assembler", List.of(
         new BenchRef(BenchType.Crafting, "Workbench"),
         new BenchRef(BenchType.Crafting, "Furniture_Bench"),
         new BenchRef(BenchType.Crafting, "Furniture_Misc")));
 
     /** keep in sync with OutfitterTickSystem */
-    private static final Machine OUTFITTER = new Machine("Outfitter", "Outfitter", List.of(
+    private static final Machine OUTFITTER = new Machine("Outfitter", "Outfitter", "CC_Outfitter", List.of(
         new BenchRef(BenchType.Processing, "Tannery"),
         new BenchRef(BenchType.Crafting, "Loombench")));
 
     /** keep in sync with SculptorTickSystem */
-    private static final Machine SCULPTOR = new Machine("Sculptor", "Sculptor", List.of(
+    private static final Machine SCULPTOR = new Machine("Sculptor", "Sculptor", "CC_Sculptor", List.of(
         new BenchRef(BenchType.StructuralCrafting, "Builders"),
         new BenchRef(BenchType.Crafting, "Builders")));
 
@@ -104,6 +117,18 @@ public final class MachineRecipePools {
     private static final Map<String, RecipePool> POOL_CACHE = new ConcurrentHashMap<>();
 
     private MachineRecipePools() {
+    }
+
+    /**
+     * @return the machine at {@code index} in {@link #MACHINES} (the machine-tab grid's slot order : slot i =
+     *     machine i), or {@code null} when {@code index} is out of range (a stale / garbage slot click).
+     */
+    @Nullable
+    public static Machine byIndex(int index) {
+        if (index < 0 || index >= MACHINES.size()) {
+            return null;
+        }
+        return MACHINES.get(index);
     }
 
     /** @return the machine with {@code id}, or {@code null} if none matches (a stale/garbage event payload). */
