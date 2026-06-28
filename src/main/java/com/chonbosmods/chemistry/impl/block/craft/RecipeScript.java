@@ -11,18 +11,15 @@ import javax.annotation.Nonnull;
 
 /**
  * An immutable recipe-script blueprint carried in a recipe card's item metadata: it tells an auto-crafter
- * WHICH recipes it may make, HOW MANY of each, and (optionally) in what ORDER. This replaces the old flat
- * {@code String[]} whitelist on the card (see {@link AutoCraftEngine}).
+ * WHICH recipes it may make and HOW MANY of each. This replaces the old flat {@code String[]} whitelist on
+ * the card (see {@link AutoCraftEngine}).
  *
  * <h2>Shape</h2>
- * <ul>
- *   <li>{@code ordered}: whether the {@link Entry} list is an ordered run-list (the crafter walks it in
- *       order) versus an unordered whitelist. The engine's selection logic interprets this; the script is
- *       pure data.</li>
- *   <li>{@code entries}: the per-recipe targets, each an {@link Entry} of {@code recipeId} + {@code count}.
- *       <b>{@code count <= 0} means INFINITE</b> (a permanent whitelist member with no finite target);
- *       {@code count > 0} is a finite target (craft that many, then retire the entry).</li>
- * </ul>
+ * A card is just a list of {@link Entry}s, each an {@code recipeId} + {@code count}.
+ * <b>{@code count <= 0} means INFINITE</b> (a permanent member with no finite target); {@code count > 0} is a
+ * finite amount (make that many, then the entry is met). The machine runs the card in two phases: finite
+ * entries first (sequential, in card order), then a plain round-robin of the infinite entries forever (see
+ * {@link ScriptSelection}). There is NO ordered/unordered flag and NO most-ingredient priority within a card.
  *
  * <p>Pure, null-safe and defensive: the entries list is copied on construction so the instance cannot be
  * mutated through the caller's list.
@@ -64,16 +61,14 @@ public final class RecipeScript {
         }
     }
 
+    // A legacy card may still carry an extra "Ordered" key; the codec simply does not declare it, so decoding
+    // an old card harmlessly ignores it (extra keys are dropped). The flag no longer exists in the model.
     public static final BuilderCodec<RecipeScript> CODEC =
         BuilderCodec.builder(RecipeScript.class, RecipeScript::new)
-            // Ordered is OPTIONAL (3-arg): legacy/absent decodes to its false default (unordered whitelist).
-            .append(new KeyedCodec<>("Ordered", Codec.BOOLEAN, false),
-                    (o, v) -> o.ordered = v, o -> o.ordered).add()
             .append(new KeyedCodec<>("Entries", new ArrayCodec<>(Entry.CODEC, Entry[]::new)),
                     (o, v) -> o.entries = List.of(v), o -> o.entries.toArray(new Entry[0])).add()
             .build();
 
-    private boolean ordered;
     private List<Entry> entries = List.of();
 
     /** Public no-arg constructor for the codec supplier. */
@@ -83,17 +78,10 @@ public final class RecipeScript {
     /**
      * An immutable script. The {@code entries} list is defensively copied; a null list is treated as empty.
      *
-     * @param ordered whether the entries form an ordered run-list (vs an unordered whitelist)
      * @param entries the per-recipe targets ({@code count <= 0} = infinite)
      */
-    public RecipeScript(boolean ordered, List<Entry> entries) {
-        this.ordered = ordered;
+    public RecipeScript(List<Entry> entries) {
         this.entries = (entries == null) ? List.of() : List.copyOf(entries);
-    }
-
-    /** @return whether the entries form an ordered run-list (vs an unordered whitelist). */
-    public boolean ordered() {
-        return ordered;
     }
 
     /** @return the per-recipe targets, never null (an immutable copy). */

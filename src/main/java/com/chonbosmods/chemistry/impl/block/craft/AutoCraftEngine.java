@@ -190,8 +190,9 @@ public final class AutoCraftEngine {
                     for (String id : craftable) {
                         countMap.put(id, VanillaCraftBridge.ingredientCount(pool.map().get(id)));
                     }
-                    // Script-aware candidate set: no card -> unchanged topByPriority; ordered -> the forced
-                    // single pick; unordered -> priority WITHIN the script's progress-retired active set.
+                    // Script-aware candidate set: no card -> unchanged topByPriority; card present -> finite
+                    // phase forces the first-in-order finite pick (singleton), else round-robins the craftable
+                    // infinite entries (selectNext rotates the returned set with the engine cursor).
                     topTier = resolveCandidates(script, node.scriptProgress(), craftable, countMap);
                 }
             }
@@ -419,17 +420,24 @@ public final class AutoCraftEngine {
      *
      * <ul>
      *   <li><b>No card</b> ({@code script == null}): UNCHANGED no-card path: returns
-     *       {@code topByPriority(craftable, countMap)} exactly as before scripting existed.</li>
-     *   <li><b>Ordered script</b>: forces the single {@link ScriptSelection#orderedPick ordered pick} (list
-     *       order is the priority): a singleton, or empty when nothing in the script is active.</li>
-     *   <li><b>Unordered script</b>: most-ingredient priority WITHIN the script's
-     *       {@link ScriptSelection#activeSet active set} (finite entries retired by progress, intersected with
-     *       what is craftable now).</li>
+     *       {@code topByPriority(craftable, countMap)} exactly as before scripting existed
+     *       (most-ingredient priority over the full craftable set).</li>
+     *   <li><b>Card present, finite phase</b>: the FIRST finite entry still unmet + craftable in card order
+     *       ({@link ScriptSelection#finitePick}) as a SINGLETON, so {@link CraftSelection#selectNext} (run by
+     *       {@code decide}) picks exactly it. Skip-not-stall: an un-craftable finite head is skipped.</li>
+     *   <li><b>Card present, infinite phase</b> (no finite entry still active): the full craftable infinite
+     *       set ({@link ScriptSelection#infiniteActive}), so {@code selectNext} round-robins it with the
+     *       engine cursor : PLAIN even rotation, no priority.</li>
      * </ul>
      *
-     * <p>When the result is empty (completed / nothing active / ordered-with-nothing-craftable),
-     * {@link PullCraftStep#decide} naturally yields IDLE: no special-casing is needed, and a finished script's
-     * active set is empty ({@link ScriptSelection#isComplete} is honored implicitly).
+     * <p>The finite phase strictly precedes the infinite phase, and the singleton-vs-full-set return keeps the
+     * engine's existing {@code selectNext}+cursor flow intact: a singleton collapses {@code selectNext} to a
+     * forced pick; the full infinite set lets the cursor rotate. When the result is empty (completed / nothing
+     * active), {@link PullCraftStep#decide} naturally yields IDLE; a finished card has no active finite or
+     * infinite entry ({@link ScriptSelection#isComplete} is honored implicitly). NO most-ingredient priority
+     * is applied within a card.
+     *
+     * <p>{@code countMap} is now used ONLY by the no-card path; the card path ignores it (no priority).
      *
      * <p>Pure (no world/ECS): unit-tested directly.
      */
@@ -438,12 +446,13 @@ public final class AutoCraftEngine {
         if (script == null) {
             return CraftSelection.topByPriority(craftable, countMap); // UNCHANGED no-card path
         }
-        Set<String> active = ScriptSelection.activeSet(script, progress, craftable);
-        if (script.ordered()) {
-            String pick = ScriptSelection.orderedPick(script, active);
-            return pick == null ? java.util.Set.of() : java.util.Set.of(pick); // ordered: force the one pick
+        // Finite phase: force the single first-in-order finite pick (a singleton selectNext rotates to).
+        String finite = ScriptSelection.finitePick(script, progress, craftable);
+        if (finite != null) {
+            return java.util.Set.of(finite);
         }
-        return CraftSelection.topByPriority(active, countMap); // unordered: priority WITHIN the active set
+        // Infinite phase: hand the full craftable infinite set so selectNext round-robins it (no priority).
+        return ScriptSelection.infiniteActive(script, craftable);
     }
 
     /**
@@ -451,15 +460,14 @@ public final class AutoCraftEngine {
      * reprogram, reload-mismatch) and reset the machine's progress. Equal scripts produce equal signatures;
      * any change (incl. card removal, which maps to {@code null}) produces a different signature.
      *
-     * <p>Form: {@code ""} for a null script (no/blank card), else {@code ordered + "|" + each entry
-     * "id:count"} joined by {@code ";"}, in the script's entry order. Pure: unit-tested directly.
+     * <p>Form: {@code ""} for a null script (no/blank card), else each entry {@code "id:count"} prefixed by
+     * {@code "|"}, in the script's entry order. Pure: unit-tested directly.
      */
     static String scriptSignature(@Nullable RecipeScript script) {
         if (script == null) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(script.ordered());
         for (RecipeScript.Entry e : script.entries()) {
             sb.append('|');
             if (e != null) {

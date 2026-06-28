@@ -395,10 +395,8 @@ public final class RecipeProgrammerPanelPage
 
         RecipeScript current = AutoCraftEngine.cardScript(card);
         List<Entry> entries = new ArrayList<>();
-        boolean ordered = false;
         boolean replaced = false;
         if (current != null) {
-            ordered = current.ordered();
             for (Entry e : current.entries()) {
                 if (e == null || e.recipeId() == null) {
                     continue;
@@ -414,7 +412,7 @@ public final class RecipeProgrammerPanelPage
         if (!replaced) {
             entries.add(new Entry(recipeId, safeCount));
         }
-        RecipeScript next = new RecipeScript(ordered, entries);
+        RecipeScript next = new RecipeScript(entries);
         ItemStack stamped = AutoCraftEngine.writeScript(card, next);
         state.setCard(stamped);
         this.markNeedsSaving();
