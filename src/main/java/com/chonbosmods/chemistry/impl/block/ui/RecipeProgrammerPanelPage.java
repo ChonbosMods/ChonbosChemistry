@@ -34,6 +34,7 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
 import com.hypixel.hytale.server.core.ui.ItemGridSlot;
+import com.hypixel.hytale.server.core.ui.PatchStyle;
 import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -326,6 +327,27 @@ public final class RecipeProgrammerPanelPage
         return out == null ? List.of() : List.of(out.itemId());
     }
 
+    /**
+     * The primary output id + quantity of {@code recipeId} resolved across ALL machine pools (not just the
+     * active one). A program entry's recipe may belong to a DIFFERENT machine than the currently-active tab :
+     * resolving it only against {@link #activeMachine}'s pool returns null for cross-machine entries, blanking
+     * their slot (ISSUE 1). This iterates {@link MachineRecipePools#MACHINES}, getting each {@link #pool}, and
+     * returns the first pool whose {@link #outputStack} resolves non-null. Guarded per-pool.
+     */
+    private static OutputStack outputStackAnyPool(@Nonnull String recipeId) {
+        for (Machine m : MachineRecipePools.MACHINES) {
+            try {
+                OutputStack out = outputStack(MachineRecipePools.pool(m), recipeId);
+                if (out != null) {
+                    return out;
+                }
+            } catch (Throwable ignored) {
+                // a pool that fails to resolve must not block the others
+            }
+        }
+        return null;
+    }
+
     /** The primary output id + quantity of {@code recipeId} in {@code pool}, or {@code null} (guarded). */
     private static OutputStack outputStack(@Nonnull RecipePool pool, @Nonnull String recipeId) {
         try {
@@ -394,19 +416,20 @@ public final class RecipeProgrammerPanelPage
     /**
      * Populate the ingredient ICON GRID ({@code #IngredientGrid}) from the selected recipe's INPUT
      * ingredients (Fuel stripped : CC machines burn ENERGY), one {@link ItemGridSlot} per
-     * {@link ItemStack} returned by {@link VanillaCraftBridge#displayInputs} (so "xN" required-quantity
-     * shows via {@code DisplayItemQuantity}). Resource-type ("any &lt;resource&gt;") categories render a
-     * representative item of that category (or a fallback placeholder), so they SHOW rather than being
-     * skipped. Guarded : any read failure clears the grid.
+     * {@link VanillaCraftBridge.IngredientView} returned by {@link VanillaCraftBridge#displayIngredients}.
+     * An ITEM ingredient renders as an {@link ItemStack} (so "xN" required-quantity shows via
+     * {@code DisplayItemQuantity}); a RESOURCE-TYPE ("any &lt;resource&gt;") category renders the NATIVE
+     * Hytale resource icon via {@link #resourceSlot} (ISSUE 2). Guarded : any read failure clears the grid.
      */
     private void buildIngredients(@Nonnull UICommandBuilder cmd, @Nonnull RecipePool pool) {
         List<ItemGridSlot> slots = new ArrayList<>();
         try {
             CraftingRecipe recipe = pool.map().get(this.selectedRecipeId);
             if (recipe != null) {
-                for (ItemStack stack : VanillaCraftBridge.displayInputs(recipe)) {
-                    if (stack != null && !ItemStack.isEmpty(stack)) {
-                        slots.add(new ItemGridSlot(stack));
+                for (VanillaCraftBridge.IngredientView view : VanillaCraftBridge.displayIngredients(recipe)) {
+                    ItemGridSlot slot = ingredientSlot(view);
+                    if (slot != null) {
+                        slots.add(slot);
                     }
                 }
             }
@@ -414,6 +437,59 @@ public final class RecipeProgrammerPanelPage
             slots = new ArrayList<>();
         }
         cmd.set("#IngredientGrid.Slots", slots);
+    }
+
+    /**
+     * Build the {@link ItemGridSlot} for one ingredient view: an ITEM view becomes a stack of its item id at
+     * its quantity (renders "icon xN"); a RESOURCE-TYPE view renders the NATIVE Hytale resource icon (ISSUE
+     * 2) via {@link #resourceSlot}. Returns {@code null} when nothing can be rendered.
+     */
+    private static ItemGridSlot ingredientSlot(VanillaCraftBridge.IngredientView view) {
+        if (view == null) {
+            return null;
+        }
+        int qty = Math.max(1, view.quantity());
+        if (view.isResourceType()) {
+            return resourceSlot(view.resourceTypeId(), qty);
+        }
+        String itemId = view.itemId();
+        if (itemId == null || itemId.isBlank()) {
+            return null;
+        }
+        ItemStack stack = new ItemStack(itemId, qty);
+        return ItemStack.isEmpty(stack) ? null : new ItemGridSlot(stack);
+    }
+
+    /**
+     * The grid slot for an "any &lt;resource&gt;" CATEGORY ingredient. Renders the NATIVE Hytale resource
+     * icon: {@code setIcon(Value.of(new PatchStyle(Value.of(texturePath))))} where {@code texturePath} is the
+     * {@code ResourceType}'s {@code getIcon()} (e.g. {@code "Icons/ResourceTypes/Rock_Quartzite_Cobble.png"},
+     * via {@link VanillaCraftBridge#resourceTypeIcon}). The quantity overlay rides along by ALSO setting an
+     * {@link ItemStack} of a representative item at {@code qty} : in-game the {@code Icon} PatchStyle overrides
+     * the slot's visual while {@code DisplayItemQuantity} still renders the stack's "xN" (icon-vs-itemstack
+     * precedence + the quantity overlay are IN-GAME-ONLY to confirm). When the native icon does not resolve,
+     * falls back to the representative-item path ({@link VanillaCraftBridge#resourceFallbackItemId}) so the
+     * slot never vanishes.
+     */
+    @Nonnull
+    private static ItemGridSlot resourceSlot(@Nonnull String resourceTypeId, int qty) {
+        ItemGridSlot slot = new ItemGridSlot();
+        slot.setSkipItemQualityBackground(true);
+        String iconPath = VanillaCraftBridge.resourceTypeIcon(resourceTypeId);
+        String repItemId = VanillaCraftBridge.resourceFallbackItemId(resourceTypeId);
+        // Carry the quantity (and a fallback visual) via a representative item stack so the "xN" overlay shows.
+        if (repItemId != null && !repItemId.isBlank()) {
+            ItemStack rep = new ItemStack(repItemId, qty);
+            if (!ItemStack.isEmpty(rep)) {
+                slot.setItemStack(rep);
+            }
+        }
+        // The native resource icon overrides the slot visual (the explicit ask); when it does not resolve the
+        // representative item stack above remains as the fallback image.
+        if (iconPath != null && !iconPath.isBlank()) {
+            slot.setIcon(Value.of(new PatchStyle(Value.of(iconPath))));
+        }
+        return slot;
     }
 
     // ----------------------------------------------------------------------------------------------------
@@ -521,11 +597,19 @@ public final class RecipeProgrammerPanelPage
         ItemStack card = state == null ? null : state.card();
 
         if (card == null || ItemStack.isEmpty(card)) {
+            // No card inserted : grey out the WHOLE program section behind the big "No Card Loaded" cover
+            // (ISSUE 3). The cover is shown ONLY for a truly-absent card (a blank-but-present card still
+            // shows #ProgramContent with its "Blank card (no program)." text below).
             this.renderedEntries = List.of();
-            cmd.set("#ProgramText.TextSpans", Message.raw("No card loaded."));
+            cmd.set("#ProgramContent.Visible", false);
+            cmd.set("#ProgramEmpty.Visible", true);
             cmd.set("#ProgramGrid.Slots", new ArrayList<ItemGridSlot>());
             return;
         }
+        // A card IS loaded : show the content, hide the empty-state cover.
+        cmd.set("#ProgramContent.Visible", true);
+        cmd.set("#ProgramEmpty.Visible", false);
+
         RecipeScript script = AutoCraftEngine.cardScript(card);
         if (script == null || script.isEmpty()) {
             this.renderedEntries = List.of();
@@ -534,7 +618,6 @@ public final class RecipeProgrammerPanelPage
             return;
         }
 
-        RecipePool pool = MachineRecipePools.pool(this.activeMachine);
         List<Entry> entries = new ArrayList<>();
         List<ItemGridSlot> slots = new ArrayList<>();
         for (Entry e : script.entries()) {
@@ -542,7 +625,7 @@ public final class RecipeProgrammerPanelPage
                 continue;
             }
             entries.add(e);
-            slots.add(programSlotFor(pool, e));
+            slots.add(programSlotFor(e));
         }
         this.renderedEntries = List.copyOf(entries);
         cmd.set("#ProgramGrid.Slots", slots);
@@ -553,15 +636,17 @@ public final class RecipeProgrammerPanelPage
     /**
      * The program-grid slot for an entry: an {@link ItemGridSlot} of the recipe's primary output. A finite
      * entry uses the entry's {@code count} as the stack quantity (so the grid renders "icon xN"); an infinite
-     * entry uses a quantity of 1 (a stack of 1 shows no number : the bare icon, as the user wants). When the
-     * output cannot be resolved the slot is empty but still activatable, keeping stable slot indices.
+     * entry uses a quantity of 1 (a stack of 1 shows no number : the bare icon, as the user wants). The output
+     * is resolved across ALL machine pools ({@link #outputStackAnyPool}) so a program entry whose recipe
+     * belongs to a DIFFERENT machine than the active tab still renders its icon (ISSUE 1). When the output
+     * cannot be resolved the slot is empty but still activatable, keeping stable slot indices.
      */
     @Nonnull
-    private static ItemGridSlot programSlotFor(@Nonnull RecipePool pool, @Nonnull Entry e) {
+    private static ItemGridSlot programSlotFor(@Nonnull Entry e) {
         ItemGridSlot slot = new ItemGridSlot();
         slot.setActivatable(true);
         slot.setSkipItemQualityBackground(true);
-        OutputStack out = outputStack(pool, e.recipeId());
+        OutputStack out = outputStackAnyPool(e.recipeId());
         if (out != null) {
             int qty = RecipeScript.isInfinite(e) ? 1 : Math.max(1, e.count());
             slot.setItemStack(new ItemStack(out.itemId(), qty));

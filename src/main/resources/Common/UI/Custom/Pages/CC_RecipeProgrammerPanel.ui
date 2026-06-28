@@ -261,7 +261,11 @@ $C.@PageOverlay {
 
         Group { Anchor: (Width: @ContentPad); }
 
-        // RIGHT: the loaded card's current program (read-only entries) + Take Card.
+        // RIGHT: the loaded card's current program (read-only entries) + Take Card. The inner fill group holds
+        // TWO OVERLAPPING full-area children (both Anchor: (Full: 0), so they occupy the same space, the way
+        // vanilla overlays): #ProgramContent (the real program UI) and #ProgramEmpty (a dim-grey "No Card
+        // Loaded" cover). The server toggles their .Visible : content when a card is loaded, the cover when no
+        // card is inserted. Neither is a bare FlexWeight-only group : each has an explicit Anchor + children.
         Group #ProgramPanel {
           FlexWeight: 2;
           Background: @PanelBorderColor;
@@ -270,52 +274,77 @@ $C.@PageOverlay {
           Group {
             Anchor: (Full: 0);
             Background: @PanelFillColor;
-            LayoutMode: Top;
-            Padding: (Top: 10, Left: 12, Right: 12, Bottom: 12);
 
-            Label {
-              Style: (FontSize: @HeaderFontSize, RenderBold: true, RenderUppercase: true, TextColor: @LabelText);
-              Text: "Program";
+            // The real program content (header + status + grid + take-card). Hidden when no card is loaded.
+            Group #ProgramContent {
+              Anchor: (Full: 0);
+              LayoutMode: Top;
+              Padding: (Top: 10, Left: 12, Right: 12, Bottom: 12);
+
+              Label {
+                Style: (FontSize: @HeaderFontSize, RenderBold: true, RenderUppercase: true, TextColor: @LabelText);
+                Text: "Program";
+              }
+              Group { Anchor: (Height: 6); }
+              Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
+              Group { Anchor: (Height: 8); }
+
+              // Card status line ("Blank card (no program)." / "N entries"). Server-set.
+              Label #ProgramText {
+                Anchor: (Left: 0, Right: 0);
+                Style: (FontSize: 13, TextColor: @ValueText, Wrap: true);
+                Text: "No card loaded.";
+              }
+              Group { Anchor: (Height: 8); }
+
+              // The current program entries as an ICON GRID (one slot per entry = the recipe's primary output;
+              // finite entries show "icon xN", infinite entries show a bare icon). DisplayItemQuantity renders
+              // the finite counts. Double-clicking a slot fires SlotDoubleClicking (the client auto-injects
+              // SlotIndex, same as SlotClicking) -> the server removes that entry. Attrs match #RecipeGrid
+              // (same @GridSlotSize, 2 per row to fit the column).
+              ItemGrid #ProgramGrid {
+                Anchor: (Left: 0, Right: 0);
+                FlexWeight: 1;
+                SlotsPerRow: 2;
+                AreItemsDraggable: false;
+                ShowScrollbar: true;
+                RenderItemQualityBackground: false;
+                Style: (
+                  SlotSize: @GridSlotSize,
+                  SlotIconSize: @GridSlotSize,
+                  SlotSpacing: @GridSlotGap,
+                  SlotBackground: "../Common/BlockSelectorSlotBackground.png"
+                );
+              }
+              Group { Anchor: (Height: 10); }
+
+              // TAKE CARD : panel-local at the BOTTOM of the program pane. Returns the loaded card to the
+              // player (clears the slot). Server binds #TakeCard (Activating). A real Anchor (Height) : never
+              // a bare FlexWeight.
+              $C.@CancelTextButton #TakeCard {
+                Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
+                Text: "Take Card";
+              }
             }
-            Group { Anchor: (Height: 6); }
-            Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
-            Group { Anchor: (Height: 8); }
 
-            // Card status line ("No card loaded." / "N entries"). Server-set.
-            Label #ProgramText {
-              Anchor: (Left: 0, Right: 0);
-              Style: (FontSize: 13, TextColor: @ValueText, Wrap: true);
-              Text: "No card loaded.";
-            }
-            Group { Anchor: (Height: 8); }
+            // EMPTY-STATE COVER : a dim-grey full-area overlay with a BIG centered "No Card Loaded" message,
+            // shown (server toggles .Visible) when no card is inserted. Greys out the whole program section.
+            // The alpha-color form #000000(0.5) is the proven vanilla overlay form (e.g. EntitySpawnPage).
+            Group #ProgramEmpty {
+              Anchor: (Full: 0);
+              Background: #000000(0.5);
 
-            // The current program entries as an ICON GRID (one slot per entry = the recipe's primary output;
-            // finite entries show "icon xN", infinite entries show a bare icon). DisplayItemQuantity renders
-            // the finite counts. Double-clicking a slot fires SlotDoubleClicking (the client auto-injects
-            // SlotIndex, same as SlotClicking) -> the server removes that entry. Attrs match #RecipeGrid
-            // (same @GridSlotSize, 2 per row to fit the column).
-            ItemGrid #ProgramGrid {
-              Anchor: (Left: 0, Right: 0);
-              FlexWeight: 1;
-              SlotsPerRow: 2;
-              AreItemsDraggable: false;
-              ShowScrollbar: true;
-              RenderItemQualityBackground: false;
-              Style: (
-                SlotSize: @GridSlotSize,
-                SlotIconSize: @GridSlotSize,
-                SlotSpacing: @GridSlotGap,
-                SlotBackground: "../Common/BlockSelectorSlotBackground.png"
-              );
-            }
-            Group { Anchor: (Height: 10); }
-
-            // TAKE CARD : panel-local at the BOTTOM of the program pane. Returns the loaded card to the
-            // player (clears the slot). Server binds #TakeCard (Activating). A real Anchor (Height) : never
-            // a bare FlexWeight.
-            $C.@CancelTextButton #TakeCard {
-              Anchor: (Left: 0, Right: 0, Height: @ButtonHeight);
-              Text: "Take Card";
+              Label #ProgramEmptyText {
+                Anchor: (Full: 0);
+                Style: (
+                  FontSize: 24,
+                  RenderBold: true,
+                  HorizontalAlignment: Center,
+                  VerticalAlignment: Center,
+                  TextColor: @LabelText
+                );
+                Text: "No Card Loaded";
+              }
             }
           }
         }

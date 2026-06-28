@@ -6,6 +6,7 @@ import com.hypixel.hytale.protocol.BenchType;
 import com.hypixel.hytale.protocol.ItemResourceType;
 import com.hypixel.hytale.server.core.asset.type.item.config.CraftingRecipe;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
+import com.hypixel.hytale.server.core.asset.type.item.config.ResourceType;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.MaterialQuantity;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
@@ -328,6 +329,107 @@ public final class VanillaCraftBridge {
             // registry unavailable / not ready : no representative
         }
         return null;
+    }
+
+    /**
+     * A per-ingredient view for the Recipe Programmer's ingredient grid: EITHER an {@code itemId} (a concrete
+     * item to render via {@code setItemStack}) XOR a {@code resourceTypeId} (an "any &lt;resource&gt;" CATEGORY
+     * whose NATIVE Hytale resource icon the panel renders via {@code ItemGridSlot.setIcon}). Exactly one of
+     * {@code itemId}/{@code resourceTypeId} is non-null (the other null); {@code quantity} is the "xN"
+     * required amount. A pure carrier (no AssetStore), so {@link #displayViewFor} is unit-testable; the panel
+     * does the in-game-only resource-icon AssetStore lookup when building the slot (ISSUE 2).
+     */
+    public record IngredientView(String itemId, String resourceTypeId, int quantity) {
+        /** True iff this view is a resource-type CATEGORY (render the native resource icon, not an item). */
+        public boolean isResourceType() {
+            return this.resourceTypeId != null && !this.resourceTypeId.isBlank();
+        }
+    }
+
+    /**
+     * Resolve ONE {@link MaterialQuantity} to an {@link IngredientView}, PURELY (no AssetStore):
+     * <ul>
+     *   <li>an ITEMED entry ({@code getItemId()} non-blank) -&gt; an item view at its quantity;</li>
+     *   <li>a RESOURCE-TYPE / category entry ({@code getResourceTypeId()} non-blank, e.g. "Meats",
+     *       "Rubble") -&gt; a RESOURCE-TYPE view carrying that id (the panel renders the native resource
+     *       icon : ISSUE 2);</li>
+     *   <li>neither -&gt; {@code null} (nothing to render).</li>
+     * </ul>
+     * Unlike {@link #displayFor}, this does NOT collapse a resource-type into a representative item id : it
+     * PRESERVES the resource-type id so the panel can show the native "any &lt;resource&gt;" image (and fall
+     * back to a representative item only if the resource icon does not resolve in-game).
+     */
+    public static IngredientView displayViewFor(MaterialQuantity m) {
+        if (m == null) {
+            return null;
+        }
+        int qty = Math.max(1, m.getQuantity());
+        String itemId = m.getItemId();
+        if (itemId != null && !itemId.isBlank()) {
+            return new IngredientView(itemId, null, qty);
+        }
+        String resourceTypeId = m.getResourceTypeId();
+        if (resourceTypeId != null && !resourceTypeId.isBlank()) {
+            return new IngredientView(null, resourceTypeId, qty);
+        }
+        return null;
+    }
+
+    /**
+     * The recipe's INPUT ingredients as {@link IngredientView}s, Fuel-stripped (CC machines burn ENERGY :
+     * fuel is never shown). Built on the pure {@link #displayInputMaterials} + {@link #displayViewFor}, so an
+     * itemed ingredient yields an ITEM view and a resource-type category (Meats, Rubble, Rock, ...) yields a
+     * RESOURCE-TYPE view that PRESERVES the resource id (the panel then renders the native resource icon :
+     * ISSUE 2). Null/unrenderable materials are dropped. Pure (no AssetStore) : the resource-icon lookup is
+     * done by the panel in-game.
+     */
+    public static List<IngredientView> displayIngredients(CraftingRecipe r) {
+        List<IngredientView> out = new ArrayList<>();
+        for (MaterialQuantity m : displayInputMaterials(r)) {
+            IngredientView view = displayViewFor(m);
+            if (view != null) {
+                out.add(view);
+            }
+        }
+        return out;
+    }
+
+    /**
+     * The native Hytale resource-type icon texture path for {@code resourceTypeId} (e.g.
+     * {@code "Icons/ResourceTypes/Rock_Quartzite_Cobble.png"}), or {@code null} when the resource type or its
+     * icon cannot be resolved. Reads the live {@link ResourceType} AssetStore, so it is in-game-only (the
+     * AssetStore is empty / NPEs in a plain unit JVM); guarded. The panel feeds this into
+     * {@code ItemGridSlot.setIcon(Value.of(new PatchStyle(Value.of(path))))} (ISSUE 2).
+     */
+    public static String resourceTypeIcon(String resourceTypeId) {
+        if (resourceTypeId == null || resourceTypeId.isBlank()) {
+            return null;
+        }
+        try {
+            ResourceType type = ResourceType.getAssetMap().getAsset(resourceTypeId);
+            if (type == null) {
+                return null;
+            }
+            String icon = type.getIcon();
+            return icon == null || icon.isBlank() ? null : icon;
+        } catch (Throwable ignored) {
+            // registry unavailable / not ready : no native icon, caller falls back to a representative item
+            return null;
+        }
+    }
+
+    /**
+     * The first registered representative item id for {@code resourceTypeId} (delegates to
+     * {@link #representativeItemIdForResource}), or the {@link #RESOURCE_FALLBACK_ITEM_ID} when none resolves :
+     * the panel's FALLBACK when a resource-type's native icon ({@link #resourceTypeIcon}) does not resolve, so
+     * the slot never vanishes (ISSUE 2). In-game-only (AssetStore-bound); guarded by the underlying scan.
+     */
+    public static String resourceFallbackItemId(String resourceTypeId) {
+        String rep = representativeItemIdForResource(resourceTypeId);
+        if (rep != null && !rep.isBlank()) {
+            return rep;
+        }
+        return RESOURCE_FALLBACK_ITEM_ID;
     }
 
     /**

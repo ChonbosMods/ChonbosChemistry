@@ -171,4 +171,35 @@ class VanillaCraftBridgeTest {
             VanillaCraftBridge.displayFor(null, FAKE_REP, "Plant_Fruit_Apple");
         assertNull(spec.itemId(), "a null material renders nothing");
     }
+
+    // ----------------------------------------------------------------------------------------------------
+    // displayViewFor : the pure ingredient-VIEW mapper (ISSUE 2). Unlike displayFor it does NOT collapse a
+    // resource-type into a representative item : it PRESERVES the resource-type id so the panel can render the
+    // native "any <resource>" icon. Itemed entries -> item view; resource-type entries -> resource view.
+    // ----------------------------------------------------------------------------------------------------
+
+    @Test
+    void displayViewFor_itemedEntry_isItemView() {
+        VanillaCraftBridge.IngredientView v =
+            VanillaCraftBridge.displayViewFor(item("Ingredient_Dough", 4));
+        assertEquals("Ingredient_Dough", v.itemId());
+        assertNull(v.resourceTypeId(), "an itemed entry carries no resource-type id");
+        assertEquals(4, v.quantity());
+        assertFalse(v.isResourceType(), "an itemed entry is not a resource-type category");
+    }
+
+    @Test
+    void displayViewFor_resourceEntry_preservesResourceTypeId() {
+        VanillaCraftBridge.IngredientView v =
+            VanillaCraftBridge.displayViewFor(resource("Rubble", 4));
+        assertNull(v.itemId(), "a resource-type entry carries no item id (NOT collapsed to a representative)");
+        assertEquals("Rubble", v.resourceTypeId(), "the resource-type id must be preserved for the native icon");
+        assertEquals(4, v.quantity());
+        assertTrue(v.isResourceType());
+    }
+
+    @Test
+    void displayViewFor_nullMaterial_isNull() {
+        assertNull(VanillaCraftBridge.displayViewFor(null), "a null material yields no view");
+    }
 }
