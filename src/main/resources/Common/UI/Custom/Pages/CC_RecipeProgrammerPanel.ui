@@ -7,12 +7,12 @@ $M = "../CC_Master.ui";
 // #AddToCard button), RIGHT the loaded card's program ICON GRID (#ProgramGrid, icon x count; double-click a
 // slot to remove that entry) + #TakeCard.
 //
-// Mirrors vanilla EntitySpawnPage's mechanisms (search + a #Count NumberField + a primary action button
-// reading #Count.Value) and the ItemGrid SlotClicking/SlotIndex selection proven in HyProTech's
-// AlloySmelterPage. The server (RecipeProgrammerPanelPage) sets #PanelTitle.TextSpans, drives the machine-tab
-// ItemGrid (#MachineTabs : one block item per machine, SlotClicking -> scope to that machine), the search
-// field (#SearchInput, ValueChanged), the runtime #RecipeGrid.Slots (each slot click -> select that recipe),
-// the select pane, the program grid (#ProgramGrid), and binds #AddToCard / #TakeCard.
+// Mirrors vanilla EntitySpawnPage's mechanisms (machine button-bar + search + a #Count NumberField + a
+// primary action button reading #Count.Value) and the ItemGrid SlotClicking/SlotIndex selection proven in
+// HyProTech's AlloySmelterPage. The server (RecipeProgrammerPanelPage) sets #PanelTitle.TextSpans, drives the
+// machine buttons (#MachineBtn*), the search field (#SearchInput, ValueChanged), the runtime #RecipeGrid.Slots
+// (each slot click -> select that recipe), the select pane, the program grid (#ProgramGrid), and binds
+// #AddToCard / #TakeCard.
 //
 // SCALE: #RecipeGrid is one ItemGrid (not cloned rows) with TopScrolling, so it scrolls at scale : the server
 // now sets a slot for EVERY filtered recipe (no cap; the machine filter + search still narrow the list).
@@ -52,35 +52,25 @@ $C.@PageOverlay {
       LayoutMode: Top;
       Padding: (Full: @ContentPad);
 
-      // --- Machine filter tabs: an ICON GRID of the 7 CC machine block items (one slot per machine, in
-      //     MachineRecipePools order). The server sets #MachineTabs.Slots; a slot click (SlotClicking, the
-      //     client auto-injects SlotIndex) scopes the browser to that machine's recipe pool. The active
-      //     machine name is shown in #ActiveMachineName beside the tabs. ItemGrid attrs match #RecipeGrid. ---
+      // --- Machine filter button-bar: one SecondaryTextButton per recipe-bearing machine. The server
+      //     toggles each button's Style (active vs inactive) + scopes #RecipeList to that machine's pool. ---
       Group #MachineBar {
-        Anchor: (Left: 0, Right: 0, Height: 44);
+        Anchor: (Left: 0, Right: 0, Height: 30);
         LayoutMode: Left;
 
-        ItemGrid #MachineTabs {
-          Anchor: (Width: 308, Height: 44);
-          SlotsPerRow: 7;
-          AreItemsDraggable: false;
-          ShowScrollbar: false;
-          RenderItemQualityBackground: false;
-          Style: (
-            SlotSize: 40,
-            SlotIconSize: 40,
-            SlotSpacing: 4,
-            SlotBackground: "../Common/BlockSelectorSlotBackground.png"
-          );
-        }
-
-        Group { Anchor: (Width: 12); }
-
-        Label #ActiveMachineName {
-          FlexWeight: 1;
-          Style: (FontSize: @HeaderFontSize, RenderBold: true, TextColor: @ValueText, VerticalAlignment: Center);
-          Text: "";
-        }
+        $C.@SecondaryTextButton #MachineBtnCooker     { Text: "Cooker";     FlexWeight: 1; }
+        Group { Anchor: (Width: 4); }
+        $C.@SecondaryTextButton #MachineBtnForge      { Text: "Forge";      FlexWeight: 1; }
+        Group { Anchor: (Width: 4); }
+        $C.@SecondaryTextButton #MachineBtnCultivator { Text: "Cultivator"; FlexWeight: 1; }
+        Group { Anchor: (Width: 4); }
+        $C.@SecondaryTextButton #MachineBtnAlembic    { Text: "Alembic";    FlexWeight: 1; }
+        Group { Anchor: (Width: 4); }
+        $C.@SecondaryTextButton #MachineBtnAssembler  { Text: "Assembler";  FlexWeight: 1; }
+        Group { Anchor: (Width: 4); }
+        $C.@SecondaryTextButton #MachineBtnOutfitter  { Text: "Outfitter";  FlexWeight: 1; }
+        Group { Anchor: (Width: 4); }
+        $C.@SecondaryTextButton #MachineBtnSculptor   { Text: "Sculptor";   FlexWeight: 1; }
       }
 
       Group { Anchor: (Height: 10); }

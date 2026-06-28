@@ -34,6 +34,7 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
 import com.hypixel.hytale.server.core.ui.ItemGridSlot;
+import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -54,12 +55,12 @@ import org.joml.Vector3d;
  * native crafting-bench look:
  *
  * <ul>
- *   <li><b>LEFT : an ICON GRID browser.</b> A machine-tab ICON GRID ({@code #MachineTabs} : one CC block item
- *       per machine) + live search drives a filtered (UNCAPPED) list of recipes (via
+ *   <li><b>LEFT : an ICON GRID browser.</b> A machine-filter button-bar ({@code #MachineBtn*} : one
+ *       SecondaryTextButton per machine) + live search drives a filtered (UNCAPPED) list of recipes (via
  *       {@link RecipeBrowse#filter}); every matching row is rendered into an {@code ItemGrid #RecipeGrid} as
  *       {@link ItemGridSlot}s of the recipe's PRIMARY output stack (icon + quantity). Clicking a recipe slot
  *       fires {@code SlotClicking} (the client auto-injects the {@code SlotIndex}), which selects that recipe;
- *       clicking a machine-tab slot scopes the browser to that machine's pool.</li>
+ *       clicking a machine button scopes the browser to that machine's pool.</li>
  *   <li><b>MIDDLE : a select / count / add pane.</b> The selected recipe's output display NAME, a
  *       {@code NumberField #Count} (0 = infinite), and a blue {@code #AddToCard} button. Add appends an
  *       {@link Entry}{@code (selectedRecipeId, count)} to the loaded card's program (replacing the count when
@@ -84,6 +85,10 @@ import org.joml.Vector3d;
  */
 public final class RecipeProgrammerPanelPage
         extends InteractiveCustomUIPage<RecipeProgrammerPanelPage.PageData> {
+
+    /** Active vs inactive machine-filter button styles (vanilla Common.ui button styles). */
+    private static final Value<String> TAB_STYLE_ACTIVE = Value.ref("Common.ui", "DefaultTextButtonStyle");
+    private static final Value<String> TAB_STYLE_INACTIVE = Value.ref("Common.ui", "SecondaryTextButtonStyle");
 
     @Nonnull
     private final Ref<ChunkStore> blockRef;
@@ -141,10 +146,11 @@ public final class RecipeProgrammerPanelPage
         commandBuilder.append("Pages/CC_RecipeProgrammerPanel.ui");
         commandBuilder.set("#PanelTitle.TextSpans", Message.raw(this.title));
 
-        // Machine-tab ICON GRID: clicking a tab slot fires SlotClicking; the client auto-injects SlotIndex
-        // (the clicked slot = the machine index in MachineRecipePools order).
-        eventBuilder.addEventBinding(CustomUIEventBindingType.SlotClicking, "#MachineTabs",
-            new EventData().append("Type", EventType.MACHINE), false);
+        // Machine-filter button-bar: one Activating binding per machine (payload = MachineId).
+        for (Machine m : MachineRecipePools.MACHINES) {
+            eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, machineBtnSelector(m),
+                new EventData().append("Type", EventType.MACHINE).append("MachineId", m.id()), false);
+        }
         // Live search (ValueChanged resolves the field's current value into @SearchQuery).
         eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, "#SearchInput",
             new EventData().append("Type", EventType.SEARCH).append("@SearchQuery", "#SearchInput.Value"), false);
@@ -174,7 +180,7 @@ public final class RecipeProgrammerPanelPage
         // The ingredient grid shows each input's required quantity ("xN").
         commandBuilder.set("#IngredientGrid.DisplayItemQuantity", true);
 
-        this.buildMachineTabs(commandBuilder);
+        this.updateMachineStyles(commandBuilder);
         this.buildRecipeList(commandBuilder);
         this.updateSelectPane(commandBuilder);
         this.buildProgram(commandBuilder);
@@ -212,7 +218,7 @@ public final class RecipeProgrammerPanelPage
                 this.sendUpdate(cmd);
             }
             case EventType.MACHINE -> {
-                Machine m = MachineRecipePools.byIndex(data.slotIndex);
+                Machine m = MachineRecipePools.byId(data.machineId);
                 if (m == null || m == this.activeMachine) {
                     return;
                 }
@@ -220,7 +226,7 @@ public final class RecipeProgrammerPanelPage
                 this.searchQuery = "";
                 this.selectedRecipeId = null;
                 UICommandBuilder cmd = new UICommandBuilder();
-                this.buildMachineTabs(cmd);
+                this.updateMachineStyles(cmd);
                 cmd.set("#SearchInput.Value", "");
                 this.buildRecipeList(cmd);
                 this.updateSelectPane(cmd);
@@ -237,28 +243,21 @@ public final class RecipeProgrammerPanelPage
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // Browser : machine tabs + search + icon grid
+    // Browser : machine filter + search + icon grid
     // ----------------------------------------------------------------------------------------------------
 
-    /**
-     * Rebuild the machine-tab ICON GRID ({@code #MachineTabs}): one {@link ItemGridSlot} per machine in
-     * {@link MachineRecipePools#MACHINES} order, each an {@link ItemStack} of the machine's CC block item. The
-     * active machine's slot is marked (non-activatable highlight via the item-quality background) so the
-     * current tab reads visually; the active machine's display name is shown in {@code #ActiveMachineName}.
-     */
-    private void buildMachineTabs(@Nonnull UICommandBuilder cmd) {
-        List<Machine> machines = MachineRecipePools.MACHINES;
-        List<ItemGridSlot> slots = new ArrayList<>(machines.size());
-        for (Machine m : machines) {
-            ItemGridSlot slot = new ItemGridSlot(new ItemStack(m.itemId(), 1));
-            slot.setActivatable(true);
-            // Active tab: keep the item-quality background (a subtle highlight); inactive tabs skip it.
-            slot.setSkipItemQualityBackground(m != this.activeMachine);
-            slot.setName(m.displayName());
-            slots.add(slot);
+    /** Set each machine-filter button's Style (active vs inactive) for the current {@link #activeMachine}. */
+    private void updateMachineStyles(@Nonnull UICommandBuilder cmd) {
+        for (Machine m : MachineRecipePools.MACHINES) {
+            boolean active = m == this.activeMachine;
+            cmd.set(machineBtnSelector(m) + ".Style", active ? TAB_STYLE_ACTIVE : TAB_STYLE_INACTIVE);
         }
-        cmd.set("#MachineTabs.Slots", slots);
-        cmd.set("#ActiveMachineName.Text", this.activeMachine.displayName());
+    }
+
+    /** The selector for a machine-filter button (matches the .ui ids {@code #MachineBtn<id>}). */
+    @Nonnull
+    private static String machineBtnSelector(@Nonnull Machine m) {
+        return "#MachineBtn" + m.id();
     }
 
     /**
@@ -712,9 +711,10 @@ public final class RecipeProgrammerPanelPage
     private record OutputStack(@Nonnull String itemId, int quantity) {
     }
 
-    /** The event payload: which control fired + its parameters (search / slot index / count). */
+    /** The event payload: which control fired + its parameters (machine id / search / slot index / count). */
     public static final class PageData {
         private String type = "";
+        private String machineId;
         private String searchQuery;
         private int slotIndex = -1;
         private int count;
@@ -722,6 +722,8 @@ public final class RecipeProgrammerPanelPage
         public static final BuilderCodec<PageData> CODEC = BuilderCodec.builder(PageData.class, PageData::new)
             .append(new KeyedCodec<>("Type", Codec.STRING, false),
                 (o, v) -> o.type = v == null ? "" : v, o -> o.type).add()
+            .append(new KeyedCodec<>("MachineId", Codec.STRING, false),
+                (o, v) -> o.machineId = v, o -> o.machineId).add()
             .append(new KeyedCodec<>("@SearchQuery", Codec.STRING, false),
                 (o, v) -> o.searchQuery = v, o -> o.searchQuery).add()
             // SlotIndex is auto-injected by the client on SlotClicking / SlotDoubleClicking (same Slot* family;
