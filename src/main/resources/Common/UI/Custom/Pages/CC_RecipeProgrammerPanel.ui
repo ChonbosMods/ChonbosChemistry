@@ -101,23 +101,17 @@ $C.@PageOverlay {
             Group { Anchor: (Height: 1); Background: @PanelDividerColor; }
             Group { Anchor: (Height: 8); }
 
-            // Live search box : a FULL-WIDTH input spanning the recipes column, with the standard recessed
-            // dark input background (Common/InputBox.png, via the $C.@TextField macro's @InputBoxBackground)
-            // and a left search icon. We invoke the proven $C.@TextField macro and set its @Anchor parameter
-            // (its supported override hook : NOT overriding any internal anchor : the verbatim full-width
-            // pattern used by PrefabBrowser.ui / ImageImportPage.ui's "$C.@TextField #SearchInput"). The id
-            // #SearchInput is kept (the page binds ValueChanged on it). The search-icon Decoration + left
-            // padding mirror the CompactTextField inside $C.@HeaderSearch.
+            // Live search box : a FULL-WIDTH input spanning the recipes column with the standard recessed
+            // dark input background. The $C.@TextField macro ALREADY carries Background: @InputBoxBackground
+            // (Common/InputBox.png : the recessed look every Hytale search bar uses) and Height: 38; we only
+            // set @Anchor (its supported full-width hook : Left/Right 0) + PlaceholderText. This is the exact
+            // proven call form from PrefabBrowser.ui / InstanceListPage.ui's "$C.@TextField #SearchInput".
+            // NOTE: no inline search-icon Decoration : Decoration is a CompactTextField property (what
+            // $C.@HeaderSearch uses), NOT a plain TextField one; attaching it here fails document parse.
+            // The id #SearchInput is kept (the page binds ValueChanged on it).
             $C.@TextField #SearchInput {
               @Anchor = (Left: 0, Right: 0);
               PlaceholderText: %server.customUI.searchPlaceholder;
-              Padding: (Horizontal: 12, Left: 34);
-              Decoration: (
-                Default: (
-                  Icon: (Texture: "../Common/SearchIcon.png", Width: 16, Height: 16, Offset: 9),
-                  ClearButtonStyle: $C.@ClearButtonStyle
-                )
-              );
             }
             Group { Anchor: (Height: 8); }
 
