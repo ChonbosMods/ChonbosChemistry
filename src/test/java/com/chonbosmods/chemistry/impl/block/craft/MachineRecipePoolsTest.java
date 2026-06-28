@@ -77,4 +77,32 @@ class MachineRecipePoolsTest {
         assertNull(MachineRecipePools.byId("NotAMachine"));
         assertNull(MachineRecipePools.byId(null));
     }
+
+    @Test
+    void byIndex_mapsSlotOrderToMachineAndGuardsRange() {
+        for (int i = 0; i < MachineRecipePools.MACHINES.size(); i++) {
+            assertSame(MachineRecipePools.MACHINES.get(i), MachineRecipePools.byIndex(i),
+                "byIndex must return the machine at slot " + i);
+        }
+        assertNull(MachineRecipePools.byIndex(-1));
+        assertNull(MachineRecipePools.byIndex(MachineRecipePools.MACHINES.size()));
+        assertNull(MachineRecipePools.byIndex(999));
+    }
+
+    @Test
+    void everyMachineHasExpectedCcBlockItemId() {
+        // The machine-tab icons reference these CC_* block items (verified to exist on disk).
+        assertEquals("CC_Cooker", MachineRecipePools.byId("Cooker").itemId());
+        assertEquals("CC_Forge", MachineRecipePools.byId("Forge").itemId());
+        assertEquals("CC_Cultivator", MachineRecipePools.byId("Cultivator").itemId());
+        assertEquals("CC_Alembic", MachineRecipePools.byId("Alembic").itemId());
+        assertEquals("CC_Assembler", MachineRecipePools.byId("Assembler").itemId());
+        assertEquals("CC_Outfitter", MachineRecipePools.byId("Outfitter").itemId());
+        assertEquals("CC_Sculptor", MachineRecipePools.byId("Sculptor").itemId());
+        for (Machine m : MachineRecipePools.MACHINES) {
+            assertNotNull(m.itemId());
+            assertFalse(m.itemId().isBlank(), "machine itemId must be non-blank");
+            assertTrue(m.itemId().startsWith("CC_"), "machine itemId must be a CC_ block item: " + m.itemId());
+        }
+    }
 }

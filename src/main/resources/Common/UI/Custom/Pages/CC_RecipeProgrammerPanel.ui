@@ -4,16 +4,18 @@ $M = "../CC_Master.ui";
 // Chonbo's Chemistry: the Recipe Programmer bench panel (the recipe BROWSER, native crafting-bench look). A
 // sibling of CC_CookerPanel.ui. Three columns: LEFT an ICON GRID (#RecipeGrid, an ItemGrid populated with the
 // recipe outputs; SlotClicking -> select), MIDDLE a select pane (#SelectName + a #Count NumberField + a blue
-// #AddToCard button), RIGHT the loaded card's read-only program (#ProgramText / #ProgramList) + #TakeCard.
+// #AddToCard button), RIGHT the loaded card's program ICON GRID (#ProgramGrid, icon x count; double-click a
+// slot to remove that entry) + #TakeCard.
 //
-// Mirrors vanilla EntitySpawnPage's mechanisms (machine button-bar + search + a #Count NumberField + a primary
-// action button reading #Count.Value) and the ItemGrid SlotClicking/SlotIndex selection proven in HyProTech's
-// AlloySmelterPage. The server (RecipeProgrammerPanelPage) sets #PanelTitle.TextSpans, drives the machine
-// buttons (#MachineBtn*), the search field (#SearchInput, ValueChanged), the runtime #RecipeGrid.Slots (each
-// slot click -> select that recipe), the select pane, the read-only program, and binds #AddToCard / #TakeCard.
+// Mirrors vanilla EntitySpawnPage's mechanisms (search + a #Count NumberField + a primary action button
+// reading #Count.Value) and the ItemGrid SlotClicking/SlotIndex selection proven in HyProTech's
+// AlloySmelterPage. The server (RecipeProgrammerPanelPage) sets #PanelTitle.TextSpans, drives the machine-tab
+// ItemGrid (#MachineTabs : one block item per machine, SlotClicking -> scope to that machine), the search
+// field (#SearchInput, ValueChanged), the runtime #RecipeGrid.Slots (each slot click -> select that recipe),
+// the select pane, the program grid (#ProgramGrid), and binds #AddToCard / #TakeCard.
 //
-// SCALE: #RecipeGrid is filtered + capped server-side (RecipeBrowse.filterAndCap) BEFORE any slot is built :
-// the Sculptor's ~911-recipe pool is never rendered whole (see RecipeBrowse.ROW_CAP).
+// SCALE: #RecipeGrid is one ItemGrid (not cloned rows) with TopScrolling, so it scrolls at scale : the server
+// now sets a slot for EVERY filtered recipe (no cap; the machine filter + search still narrow the list).
 
 @PanelBorderColor = $M.@PanelBorderColor;
 @PanelFillColor = $M.@PanelFillColor;
@@ -24,13 +26,13 @@ $M = "../CC_Master.ui";
 @ButtonHeight = $M.@ButtonHeight;
 @HeaderFontSize = $M.@HeaderFontSize;
 
-// Icon-grid slot sizing (matches the proven HyProTech recipe-grid look : 40px slots, 4px gap).
-@GridSlotSize = 40;
+// Icon-grid slot sizing : 2x the original (80px slots, 4px gap) for a chunkier, more native recipe look.
+@GridSlotSize = 80;
 @GridSlotGap = 4;
 
 $C.@PageOverlay {
   $C.@DecoratedContainer {
-    Anchor: (Width: 820, Height: 480);
+    Anchor: (Width: 900, Height: 520);
 
     // Title set from Java (#PanelTitle.TextSpans). Vanilla title style.
     #Title {
@@ -50,25 +52,35 @@ $C.@PageOverlay {
       LayoutMode: Top;
       Padding: (Full: @ContentPad);
 
-      // --- Machine filter button-bar: one SecondaryTextButton per recipe-bearing machine. The server
-      //     toggles each button's Style (active vs inactive) + scopes #RecipeList to that machine's pool. ---
+      // --- Machine filter tabs: an ICON GRID of the 7 CC machine block items (one slot per machine, in
+      //     MachineRecipePools order). The server sets #MachineTabs.Slots; a slot click (SlotClicking, the
+      //     client auto-injects SlotIndex) scopes the browser to that machine's recipe pool. The active
+      //     machine name is shown in #ActiveMachineName beside the tabs. ItemGrid attrs match #RecipeGrid. ---
       Group #MachineBar {
-        Anchor: (Left: 0, Right: 0, Height: 30);
+        Anchor: (Left: 0, Right: 0, Height: 44);
         LayoutMode: Left;
 
-        $C.@SecondaryTextButton #MachineBtnCooker     { Text: "Cooker";     FlexWeight: 1; }
-        Group { Anchor: (Width: 4); }
-        $C.@SecondaryTextButton #MachineBtnForge      { Text: "Forge";      FlexWeight: 1; }
-        Group { Anchor: (Width: 4); }
-        $C.@SecondaryTextButton #MachineBtnCultivator { Text: "Cultivator"; FlexWeight: 1; }
-        Group { Anchor: (Width: 4); }
-        $C.@SecondaryTextButton #MachineBtnAlembic    { Text: "Alembic";    FlexWeight: 1; }
-        Group { Anchor: (Width: 4); }
-        $C.@SecondaryTextButton #MachineBtnAssembler  { Text: "Assembler";  FlexWeight: 1; }
-        Group { Anchor: (Width: 4); }
-        $C.@SecondaryTextButton #MachineBtnOutfitter  { Text: "Outfitter";  FlexWeight: 1; }
-        Group { Anchor: (Width: 4); }
-        $C.@SecondaryTextButton #MachineBtnSculptor   { Text: "Sculptor";   FlexWeight: 1; }
+        ItemGrid #MachineTabs {
+          Anchor: (Width: 308, Height: 44);
+          SlotsPerRow: 7;
+          AreItemsDraggable: false;
+          ShowScrollbar: false;
+          RenderItemQualityBackground: false;
+          Style: (
+            SlotSize: 40,
+            SlotIconSize: 40,
+            SlotSpacing: 4,
+            SlotBackground: "../Common/BlockSelectorSlotBackground.png"
+          );
+        }
+
+        Group { Anchor: (Width: 12); }
+
+        Label #ActiveMachineName {
+          FlexWeight: 1;
+          Style: (FontSize: @HeaderFontSize, RenderBold: true, TextColor: @ValueText, VerticalAlignment: Center);
+          Text: "";
+        }
       }
 
       Group { Anchor: (Height: 10); }
@@ -109,22 +121,22 @@ $C.@PageOverlay {
             }
             Group { Anchor: (Height: 8); }
 
-            // "showing N of M (refine search)" : server-set, only visible when the list is capped.
+            // A plain "N recipes" count of the filtered list (server-set; no cap any more).
             Label #ListNote {
               Anchor: (Left: 0, Right: 0);
               Style: (FontSize: 12, TextColor: @LabelText);
               Text: "";
-              Visible: false;
             }
             Group { Anchor: (Height: 4); }
 
-            // The runtime-built, capped recipe ICON GRID. Server sets #RecipeGrid.Slots to ItemGridSlot[] of
-            // each recipe's primary output stack (icon + quantity); a slot click fires SlotClicking (the
-            // client auto-injects SlotIndex). ShowScrollbar = scroll past the visible rows up to the cap.
+            // The runtime-built recipe ICON GRID (uncapped : one slot per filtered recipe). Server sets
+            // #RecipeGrid.Slots to ItemGridSlot[] of each recipe's primary output stack (icon + quantity); a
+            // slot click fires SlotClicking (the client auto-injects SlotIndex). ShowScrollbar = scroll the
+            // full filtered list (it is ONE ItemGrid, not cloned rows, so it scales).
             ItemGrid #RecipeGrid {
               Anchor: (Left: 0, Right: 0);
               FlexWeight: 1;
-              SlotsPerRow: 5;
+              SlotsPerRow: 3;
               AreItemsDraggable: false;
               ShowScrollbar: true;
               RenderItemQualityBackground: false;
@@ -246,12 +258,23 @@ $C.@PageOverlay {
             }
             Group { Anchor: (Height: 8); }
 
-            // The current program entries (one read-only row each). Server clears + appends rows.
-            Group #ProgramList {
+            // The current program entries as an ICON GRID (one slot per entry = the recipe's primary output;
+            // finite entries show "icon xN", infinite entries show a bare icon). DisplayItemQuantity renders
+            // the finite counts. Double-clicking a slot fires SlotDoubleClicking (the client auto-injects
+            // SlotIndex, same as SlotClicking) -> the server removes that entry. Attrs match #RecipeGrid.
+            ItemGrid #ProgramGrid {
               Anchor: (Left: 0, Right: 0);
               FlexWeight: 1;
-              LayoutMode: TopScrolling;
-              ScrollbarStyle: $C.@DefaultScrollbarStyle;
+              SlotsPerRow: 4;
+              AreItemsDraggable: false;
+              ShowScrollbar: true;
+              RenderItemQualityBackground: false;
+              Style: (
+                SlotSize: 40,
+                SlotIconSize: 40,
+                SlotSpacing: @GridSlotGap,
+                SlotBackground: "../Common/BlockSelectorSlotBackground.png"
+              );
             }
             Group { Anchor: (Height: 10); }
 
