@@ -395,11 +395,23 @@ public final class VanillaCraftBridge {
     }
 
     /**
-     * The native Hytale resource-type icon texture path for {@code resourceTypeId} (e.g.
-     * {@code "Icons/ResourceTypes/Rock_Quartzite_Cobble.png"}), or {@code null} when the resource type or its
-     * icon cannot be resolved. Reads the live {@link ResourceType} AssetStore, so it is in-game-only (the
-     * AssetStore is empty / NPEs in a plain unit JVM); guarded. The panel feeds this into
-     * {@code ItemGridSlot.setIcon(Value.of(new PatchStyle(Value.of(path))))} (ISSUE 2).
+     * The texture path our panel uses to render a resource-type's native "any &lt;resource&gt;" image in an
+     * {@code ItemGridSlot.setIcon(...)} (ISSUE 2), or {@code null} when it cannot be resolved.
+     *
+     * <p><b>Path resolution (the crux : the raw asset path does NOT work in custom UI).</b> The
+     * {@link ResourceType} asset's {@code getIcon()} returns an ASSET-ROOT path like
+     * {@code "Icons/ResourceTypes/Any_Meat.png"} (resolved against {@code Common/} : where the native
+     * crafting bench loads it via the {@code UpdateResourceTypes} packet). But a custom {@code .ui} PatchStyle
+     * texture path resolves RELATIVE TO THE .ui FILE ({@code Common/UI/Custom/Pages/}), NOT the asset root :
+     * so the raw path landed at the non-existent {@code Pages/Icons/ResourceTypes/...} and rendered as a
+     * MISSING image. We therefore ship these icons inside the mod at
+     * {@code resources/Common/UI/Custom/CC/ResourceTypes/} and reference them via {@code ../CC/ResourceTypes/}
+     * : the SAME proven {@code ../CC/...} relative form our progress-bar fills already use successfully. This
+     * maps the resolved icon's BASENAME onto that bundled path.
+     *
+     * <p>Reads the live {@link ResourceType} AssetStore (to know WHICH icon the type uses), so it is
+     * in-game-only (the AssetStore is empty / NPEs in a plain unit JVM); guarded. Returns {@code null} (caller
+     * falls back to a representative item) when the type/icon can't be resolved.
      */
     public static String resourceTypeIcon(String resourceTypeId) {
         if (resourceTypeId == null || resourceTypeId.isBlank()) {
@@ -410,12 +422,29 @@ public final class VanillaCraftBridge {
             if (type == null) {
                 return null;
             }
-            String icon = type.getIcon();
-            return icon == null || icon.isBlank() ? null : icon;
+            return bundledResourceIconPath(type.getIcon());
         } catch (Throwable ignored) {
             // registry unavailable / not ready : no native icon, caller falls back to a representative item
             return null;
         }
+    }
+
+    /**
+     * Map a {@link ResourceType#getIcon()} asset-root path (e.g. {@code "Icons/ResourceTypes/Any_Meat.png"}) to
+     * the mod-bundled, custom-UI-resolvable path {@code "../CC/ResourceTypes/Any_Meat.png"} (the icons are
+     * shipped under {@code resources/Common/UI/Custom/CC/ResourceTypes/}). Returns {@code null} for a blank
+     * input. Pure (no AssetStore) : unit-testable. See {@link #resourceTypeIcon} for why the raw path fails.
+     */
+    static String bundledResourceIconPath(String assetIconPath) {
+        if (assetIconPath == null || assetIconPath.isBlank()) {
+            return null;
+        }
+        int slash = assetIconPath.lastIndexOf('/');
+        String basename = slash >= 0 ? assetIconPath.substring(slash + 1) : assetIconPath;
+        if (basename.isBlank()) {
+            return null;
+        }
+        return "../CC/ResourceTypes/" + basename;
     }
 
     /**
