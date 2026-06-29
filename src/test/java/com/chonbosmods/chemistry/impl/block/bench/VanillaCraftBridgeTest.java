@@ -202,31 +202,4 @@ class VanillaCraftBridgeTest {
     void displayViewFor_nullMaterial_isNull() {
         assertNull(VanillaCraftBridge.displayViewFor(null), "a null material yields no view");
     }
-
-    // ------------------------------------------------------------------------------------------------
-    // bundledResourceIconPath : map an asset-root ResourceType icon path to the mod-bundled ../CC/ path
-    // (ISSUE 2 fix : the raw asset path does NOT resolve in a custom-UI PatchStyle ; it resolves relative
-    // to the .ui file, so we ship the icons under resources/Common/UI/Custom/CC/ResourceTypes/).
-    // ------------------------------------------------------------------------------------------------
-
-    @Test
-    void bundledResourceIconPath_assetRootPath_remappedToBundledCcPath() {
-        assertEquals("../CC/ResourceTypes/Any_Meat.png",
-            VanillaCraftBridge.bundledResourceIconPath("Icons/ResourceTypes/Any_Meat.png"),
-            "the asset-root icon path must be remapped to the mod-bundled ../CC/ResourceTypes/ form");
-    }
-
-    @Test
-    void bundledResourceIconPath_bareFilename_isPrefixed() {
-        assertEquals("../CC/ResourceTypes/Any_Rock.png",
-            VanillaCraftBridge.bundledResourceIconPath("Any_Rock.png"),
-            "a bare basename (no directory) is still prefixed with the bundled path");
-    }
-
-    @Test
-    void bundledResourceIconPath_blankOrNull_isNull() {
-        assertNull(VanillaCraftBridge.bundledResourceIconPath(null));
-        assertNull(VanillaCraftBridge.bundledResourceIconPath(""));
-        assertNull(VanillaCraftBridge.bundledResourceIconPath("   "));
-    }
 }

@@ -6,7 +6,6 @@ import com.hypixel.hytale.protocol.BenchType;
 import com.hypixel.hytale.protocol.ItemResourceType;
 import com.hypixel.hytale.server.core.asset.type.item.config.CraftingRecipe;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
-import com.hypixel.hytale.server.core.asset.type.item.config.ResourceType;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.MaterialQuantity;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
@@ -333,14 +332,15 @@ public final class VanillaCraftBridge {
 
     /**
      * A per-ingredient view for the Recipe Programmer's ingredient grid: EITHER an {@code itemId} (a concrete
-     * item to render via {@code setItemStack}) XOR a {@code resourceTypeId} (an "any &lt;resource&gt;" CATEGORY
-     * whose NATIVE Hytale resource icon the panel renders via {@code ItemGridSlot.setIcon}). Exactly one of
+     * item to render via {@code setItemStack}) XOR a {@code resourceTypeId} (an "any &lt;resource&gt;" CATEGORY,
+     * which the panel renders as a REPRESENTATIVE item icon + an "Any &lt;resource&gt;" slot name : a custom-UI
+     * grid can only render real item icons, not the native resource-category badge). Exactly one of
      * {@code itemId}/{@code resourceTypeId} is non-null (the other null); {@code quantity} is the "xN"
      * required amount. A pure carrier (no AssetStore), so {@link #displayViewFor} is unit-testable; the panel
-     * does the in-game-only resource-icon AssetStore lookup when building the slot (ISSUE 2).
+     * does the in-game-only representative-item AssetStore lookup when building the slot (ISSUE 2).
      */
     public record IngredientView(String itemId, String resourceTypeId, int quantity) {
-        /** True iff this view is a resource-type CATEGORY (render the native resource icon, not an item). */
+        /** True iff this view is a resource-type CATEGORY (render a representative item + "Any X" name). */
         public boolean isResourceType() {
             return this.resourceTypeId != null && !this.resourceTypeId.isBlank();
         }
@@ -351,13 +351,13 @@ public final class VanillaCraftBridge {
      * <ul>
      *   <li>an ITEMED entry ({@code getItemId()} non-blank) -&gt; an item view at its quantity;</li>
      *   <li>a RESOURCE-TYPE / category entry ({@code getResourceTypeId()} non-blank, e.g. "Meats",
-     *       "Rubble") -&gt; a RESOURCE-TYPE view carrying that id (the panel renders the native resource
-     *       icon : ISSUE 2);</li>
+     *       "Rubble") -&gt; a RESOURCE-TYPE view carrying that id (the panel renders a representative item +
+     *       an "Any &lt;resource&gt;" name : ISSUE 2);</li>
      *   <li>neither -&gt; {@code null} (nothing to render).</li>
      * </ul>
-     * Unlike {@link #displayFor}, this does NOT collapse a resource-type into a representative item id : it
-     * PRESERVES the resource-type id so the panel can show the native "any &lt;resource&gt;" image (and fall
-     * back to a representative item only if the resource icon does not resolve in-game).
+     * Unlike {@link #displayFor}, this does NOT collapse a resource-type into a representative item id at this
+     * layer : it PRESERVES the resource-type id so the panel can name the slot "Any &lt;resource&gt;" while
+     * still resolving its representative-item icon when building the slot.
      */
     public static IngredientView displayViewFor(MaterialQuantity m) {
         if (m == null) {
@@ -379,9 +379,9 @@ public final class VanillaCraftBridge {
      * The recipe's INPUT ingredients as {@link IngredientView}s, Fuel-stripped (CC machines burn ENERGY :
      * fuel is never shown). Built on the pure {@link #displayInputMaterials} + {@link #displayViewFor}, so an
      * itemed ingredient yields an ITEM view and a resource-type category (Meats, Rubble, Rock, ...) yields a
-     * RESOURCE-TYPE view that PRESERVES the resource id (the panel then renders the native resource icon :
-     * ISSUE 2). Null/unrenderable materials are dropped. Pure (no AssetStore) : the resource-icon lookup is
-     * done by the panel in-game.
+     * RESOURCE-TYPE view that PRESERVES the resource id (the panel then renders a representative item + an
+     * "Any &lt;resource&gt;" name : ISSUE 2). Null/unrenderable materials are dropped. Pure (no AssetStore) :
+     * the representative-item lookup is done by the panel in-game.
      */
     public static List<IngredientView> displayIngredients(CraftingRecipe r) {
         List<IngredientView> out = new ArrayList<>();
@@ -395,63 +395,11 @@ public final class VanillaCraftBridge {
     }
 
     /**
-     * The texture path our panel uses to render a resource-type's native "any &lt;resource&gt;" image in an
-     * {@code ItemGridSlot.setIcon(...)} (ISSUE 2), or {@code null} when it cannot be resolved.
-     *
-     * <p><b>Path resolution (the crux : the raw asset path does NOT work in custom UI).</b> The
-     * {@link ResourceType} asset's {@code getIcon()} returns an ASSET-ROOT path like
-     * {@code "Icons/ResourceTypes/Any_Meat.png"} (resolved against {@code Common/} : where the native
-     * crafting bench loads it via the {@code UpdateResourceTypes} packet). But a custom {@code .ui} PatchStyle
-     * texture path resolves RELATIVE TO THE .ui FILE ({@code Common/UI/Custom/Pages/}), NOT the asset root :
-     * so the raw path landed at the non-existent {@code Pages/Icons/ResourceTypes/...} and rendered as a
-     * MISSING image. We therefore ship these icons inside the mod at
-     * {@code resources/Common/UI/Custom/CC/ResourceTypes/} and reference them via {@code ../CC/ResourceTypes/}
-     * : the SAME proven {@code ../CC/...} relative form our progress-bar fills already use successfully. This
-     * maps the resolved icon's BASENAME onto that bundled path.
-     *
-     * <p>Reads the live {@link ResourceType} AssetStore (to know WHICH icon the type uses), so it is
-     * in-game-only (the AssetStore is empty / NPEs in a plain unit JVM); guarded. Returns {@code null} (caller
-     * falls back to a representative item) when the type/icon can't be resolved.
-     */
-    public static String resourceTypeIcon(String resourceTypeId) {
-        if (resourceTypeId == null || resourceTypeId.isBlank()) {
-            return null;
-        }
-        try {
-            ResourceType type = ResourceType.getAssetMap().getAsset(resourceTypeId);
-            if (type == null) {
-                return null;
-            }
-            return bundledResourceIconPath(type.getIcon());
-        } catch (Throwable ignored) {
-            // registry unavailable / not ready : no native icon, caller falls back to a representative item
-            return null;
-        }
-    }
-
-    /**
-     * Map a {@link ResourceType#getIcon()} asset-root path (e.g. {@code "Icons/ResourceTypes/Any_Meat.png"}) to
-     * the mod-bundled, custom-UI-resolvable path {@code "../CC/ResourceTypes/Any_Meat.png"} (the icons are
-     * shipped under {@code resources/Common/UI/Custom/CC/ResourceTypes/}). Returns {@code null} for a blank
-     * input. Pure (no AssetStore) : unit-testable. See {@link #resourceTypeIcon} for why the raw path fails.
-     */
-    static String bundledResourceIconPath(String assetIconPath) {
-        if (assetIconPath == null || assetIconPath.isBlank()) {
-            return null;
-        }
-        int slash = assetIconPath.lastIndexOf('/');
-        String basename = slash >= 0 ? assetIconPath.substring(slash + 1) : assetIconPath;
-        if (basename.isBlank()) {
-            return null;
-        }
-        return "../CC/ResourceTypes/" + basename;
-    }
-
-    /**
      * The first registered representative item id for {@code resourceTypeId} (delegates to
      * {@link #representativeItemIdForResource}), or the {@link #RESOURCE_FALLBACK_ITEM_ID} when none resolves :
-     * the panel's FALLBACK when a resource-type's native icon ({@link #resourceTypeIcon}) does not resolve, so
-     * the slot never vanishes (ISSUE 2). In-game-only (AssetStore-bound); guarded by the underlying scan.
+     * the icon the panel shows for an "any &lt;resource&gt;" slot (a custom-UI grid can only render a real item
+     * icon, so a representative item stands in for the category, disambiguated by an "Any &lt;resource&gt;" slot
+     * name). Never blank (ISSUE 2). In-game-only (AssetStore-bound); guarded by the underlying scan.
      */
     public static String resourceFallbackItemId(String resourceTypeId) {
         String rep = representativeItemIdForResource(resourceTypeId);

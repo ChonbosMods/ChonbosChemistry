@@ -34,7 +34,6 @@ import com.hypixel.hytale.server.core.modules.block.BlockModule;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.item.ItemComponent;
 import com.hypixel.hytale.server.core.ui.ItemGridSlot;
-import com.hypixel.hytale.server.core.ui.PatchStyle;
 import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -461,34 +460,31 @@ public final class RecipeProgrammerPanelPage
     }
 
     /**
-     * The grid slot for an "any &lt;resource&gt;" CATEGORY ingredient. Renders the NATIVE Hytale resource
-     * icon: {@code setIcon(Value.of(new PatchStyle(Value.of(texturePath))))} where {@code texturePath} is the
-     * {@code ResourceType}'s {@code getIcon()} (e.g. {@code "Icons/ResourceTypes/Rock_Quartzite_Cobble.png"},
-     * via {@link VanillaCraftBridge#resourceTypeIcon}). The quantity overlay rides along by ALSO setting an
-     * {@link ItemStack} of a representative item at {@code qty} : in-game the {@code Icon} PatchStyle overrides
-     * the slot's visual while {@code DisplayItemQuantity} still renders the stack's "xN" (icon-vs-itemstack
-     * precedence + the quantity overlay are IN-GAME-ONLY to confirm). When the native icon does not resolve,
-     * falls back to the representative-item path ({@link VanillaCraftBridge#resourceFallbackItemId}) so the
-     * slot never vanishes.
+     * The grid slot for an "any &lt;resource&gt;" CATEGORY ingredient (e.g. "any Rock", "any Meat").
+     *
+     * <p><b>Why a representative item, not the native category badge.</b> A custom-UI {@link ItemGrid} slot
+     * can only reliably render an actual ITEM icon (via {@code setItemStack}) : the native "any &lt;resource&gt;"
+     * images ({@code Any_Rock.png}, ...) are drawn solely by the game's BUILT-IN crafting UI from the
+     * resource-type registry packet, which a custom panel cannot reach. ({@code ItemGridSlot.setIcon(PatchStyle)}
+     * with a runtime texture path has ZERO callers anywhere in the vanilla server or HyProTech and renders a
+     * blank slot : abandoned.) So we show a REPRESENTATIVE item of the category at {@code qty} (the "xN" overlay
+     * rides on the stack) and set the slot NAME to "Any &lt;Resource&gt;" so hovering makes the category
+     * unambiguous. The representative ({@link VanillaCraftBridge#resourceFallbackItemId}) is the first item in
+     * the category, or a generic fallback, so the slot never vanishes.
      */
     @Nonnull
     private static ItemGridSlot resourceSlot(@Nonnull String resourceTypeId, int qty) {
         ItemGridSlot slot = new ItemGridSlot();
         slot.setSkipItemQualityBackground(true);
-        String iconPath = VanillaCraftBridge.resourceTypeIcon(resourceTypeId);
         String repItemId = VanillaCraftBridge.resourceFallbackItemId(resourceTypeId);
-        // Carry the quantity (and a fallback visual) via a representative item stack so the "xN" overlay shows.
         if (repItemId != null && !repItemId.isBlank()) {
             ItemStack rep = new ItemStack(repItemId, qty);
             if (!ItemStack.isEmpty(rep)) {
                 slot.setItemStack(rep);
             }
         }
-        // The native resource icon overrides the slot visual (the explicit ask); when it does not resolve the
-        // representative item stack above remains as the fallback image.
-        if (iconPath != null && !iconPath.isBlank()) {
-            slot.setIcon(Value.of(new PatchStyle(Value.of(iconPath))));
-        }
+        // Disambiguate the category on hover : the icon is a stand-in item, the name says it's "any" of a type.
+        slot.setName("Any " + RecipeBrowse.humanize(resourceTypeId));
         return slot;
     }
 
